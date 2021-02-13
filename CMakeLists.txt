@@ -1,0 +1,26 @@
+cmake_minimum_required( VERSION 3.16 )
+
+project( openemsh
+	LANGUAGES CXX
+	VERSION 0.0.0
+	DESCRIPTION "openEMS mesher"
+	)
+
+if( NOT CMAKE_BUILD_TYPE )
+	set( CMAKE_BUILD_TYPE "Release" )
+endif()
+message( STATUS "Build type: ${CMAKE_BUILD_TYPE}" )
+
+#[[
+set( CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
+	OWNER_READ
+	OWNER_WRITE
+	OWNER_EXECUTE
+	GROUP_READ
+	GROUP_EXECUTE
+	WORLD_READ
+	WORLD_EXECUTE
+	)
+#]]
+
+add_subdirectory( "${CMAKE_SOURCE_DIR}/src" )
