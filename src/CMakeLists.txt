@@ -1,7 +1,9 @@
 
 set( SOURCES
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/board.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflict.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/edge.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/domain/meshline_manager.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/point.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/polygon.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/main.cpp"

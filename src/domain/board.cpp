@@ -16,21 +16,33 @@ Board::Board(vector<unique_ptr<Polygon>>& _polygons)
 			edges.push_back(edge.get());
 }
 
+//******************************************************************************
+void Board::detect_disabled_edges() {
+	for(unsigned long i = 0; i < polygons.size() ; ++i) {
+		for(unsigned long j = i + 1; j < polygons.size(); ++j) {
+			if(are_possibly_overlapping(*polygons[i], *polygons[j])) {
+				
+			}
+		}
+	}
+}
+
 //****************************************************************************** TODO handle conflicts
 void Board::detect_halfs_rule_edges() {
 	for(unsigned long i = 0; i < edges.size(); ++i) {
 		if(edges[i]->direction == Edge::Direction::DIAGONAL)
 			continue;
-
+/*
 		for(unsigned long j = i + 1; j < edges.size(); ++j) {
 			if((edges[j]->direction == edges[i]->direction)    // Different axis.
 			&& ((edges[i]->normal != edges[j]->normal)         // Opposite directions.
-			|| (edges[i]->status == Edge::Status::HALFS)       // More than 2 conflicting edges.
-			|| (edges[j]->status == Edge::Status::HALFS))) {
-				edges[i]->status = Edge::Status::HALFS;
-				edges[j]->status = Edge::Status::HALFS;
+			|| (edges[i]->policy == Edge::Policy::HALFS)       // More than 2 conflicting edges.
+			|| (edges[j]->policy == Edge::Policy::HALFS))) {
+				edges[i]->policy = Edge::Policy::HALFS;
+				edges[j]->policy = Edge::Policy::HALFS;
 			}
 		}
+*/
 	}
 }
 

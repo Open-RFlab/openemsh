@@ -11,7 +11,7 @@
 using namespace std;
 
 //******************************************************************************
-Point::Point(double _x, double _y)
+Point::Point(double const _x, double const _y)
 : x(_x)
 , y(_y)
 {}

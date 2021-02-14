@@ -6,6 +6,9 @@
 
 #include <iostream>
 
+#include "edge.hpp"
+#include "point.hpp"
+
 #include "polygon.hpp"
 
 using namespace std;
@@ -72,10 +75,10 @@ inline void Polygon::detect_edge_normal() {
 	case Rotation::CW: 
 		for(std::unique_ptr<Edge>& edge : edges) {
 			switch(edge->direction) {
-			case Edge::Direction::XMIN: edge->normal = Edge::Normal::YMIN; break;
-			case Edge::Direction::XMAX: edge->normal = Edge::Normal::YMAX; break;
-			case Edge::Direction::YMIN: edge->normal = Edge::Normal::XMAX; break;
-			case Edge::Direction::YMAX: edge->normal = Edge::Normal::XMIN; break;
+			case Edge::Direction::XMIN: edge->normal = Normal::YMIN; break;
+			case Edge::Direction::XMAX: edge->normal = Normal::YMAX; break;
+			case Edge::Direction::YMIN: edge->normal = Normal::XMAX; break;
+			case Edge::Direction::YMAX: edge->normal = Normal::XMIN; break;
 			default: break;
 			}
 		}
@@ -83,10 +86,10 @@ inline void Polygon::detect_edge_normal() {
 	case Rotation::CCW:
 		for(std::unique_ptr<Edge>& edge : edges) {
 			switch(edge->direction) {
-			case Edge::Direction::XMIN: edge->normal = Edge::Normal::YMAX; break;
-			case Edge::Direction::XMAX: edge->normal = Edge::Normal::YMIN; break;
-			case Edge::Direction::YMIN: edge->normal = Edge::Normal::XMIN; break;
-			case Edge::Direction::YMAX: edge->normal = Edge::Normal::XMAX; break;
+			case Edge::Direction::XMIN: edge->normal = Normal::YMAX; break;
+			case Edge::Direction::XMAX: edge->normal = Normal::YMIN; break;
+			case Edge::Direction::YMIN: edge->normal = Normal::XMIN; break;
+			case Edge::Direction::YMAX: edge->normal = Normal::XMAX; break;
 			default: break;
 			}
 		}
@@ -110,3 +113,10 @@ void Polygon::print() const {
 	}
 }
 
+//******************************************************************************
+bool are_possibly_overlapping(Polygon const& a, Polygon const& b) {
+	return (b.bounding[XMIN] > a.bounding[XMIN] && b.bounding[XMIN] < a.bounding[XMAX])
+		|| (b.bounding[XMAX] > a.bounding[XMIN] && b.bounding[XMAX] < a.bounding[XMAX])
+		|| (b.bounding[YMIN] > a.bounding[YMIN] && b.bounding[YMIN] < a.bounding[YMAX])
+		|| (b.bounding[YMAX] > a.bounding[YMIN] && b.bounding[YMAX] < a.bounding[YMAX]);
+}

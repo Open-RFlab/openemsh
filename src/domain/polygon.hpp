@@ -11,16 +11,24 @@
 #include <memory>
 #include <vector>
 
-#include "edge.hpp"
-#include "point.hpp"
+//#include "conflict.hpp"
+//#include "edge.hpp"
+#include "i_conflict_origin.hpp"
+#include "i_meshline_origin.hpp"
+//#include "point.hpp"
 
 using namespace std;
+
+class Conflict;
+class Edge;
+class MeshlineManager;
+class Point;
 
 //******************************************************************************
 enum { XMIN, XMAX, YMIN, YMAX };
 
 //******************************************************************************
-class Polygon {
+class Polygon : public IConflictOrigin, public IMeshLineOrigin {
 public:
 	enum class Rotation {
 		UNKNOWN,
@@ -36,7 +44,7 @@ public:
 	std::array<double, 4> bounding;
 	std::vector<std::unique_ptr<Point const>> points;
 	std::vector<std::unique_ptr<Edge>> edges;
-//	std::array<std::unique_ptr<Point>, 4> bounding;
+	std::vector<Conflict*> conflicts;
 
 	Polygon(Rotation _rotation, std::initializer_list<Point> _points);
 	inline void detect_rotation();
@@ -44,3 +52,6 @@ public:
 
 	void print() const;
 };
+
+//******************************************************************************
+bool are_possibly_overlapping(Polygon const& a, Polygon const& b);

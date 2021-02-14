@@ -6,17 +6,18 @@
 
 #include <iostream>
 
+#include "point.hpp"
+
 #include "edge.hpp"
 
 using namespace std;
 
 //******************************************************************************
-Edge::Edge(Point const* _p0, Point const* _p1, Status _status)
+Edge::Edge(Point const* _p0, Point const* _p1)
 : p0(_p0)
 , p1(_p1)
 , vec(make_unique<Point>(*p1 - *p0))
-, status(_status)
-, res_factor(1) {
+{
 	if(vec->x == 0) {
 		if(vec->y > 0)
 			direction = Direction::YMAX;

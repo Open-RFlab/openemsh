@@ -8,26 +8,29 @@
 
 #include <array>
 #include <memory>
+#include <vector>
 
-#include "point.hpp"
+//#include "conflict.hpp"
+//#include "meshline_manager.hpp"
+//#include "point.hpp"
+#include "global.hpp"
+#include "i_conflict_origin.hpp"
+#include "i_meshline_origin.hpp"
+
+class Conflict;
+class MeshlineManager;
+class Point;
 
 //******************************************************************************
-class Edge {
+class Edge : public IConflictOrigin, public IMeshLineOrigin {
 public:
-	Point const* p0;
-	Point const* p1;
-	std::unique_ptr<Point const> vec;
-//	std::array<MeshLine*, 2> meshlines;
+	bool is_enabled;
+	Point const* const p0;
+	Point const* const p1;
+	std::unique_ptr<Point const> const vec;
 
-	/// Describe meshing policy to apply to the edge.
-	///*************************************************************************
-	enum class Status {
-		DISABLED,    ///< Do not mesh this edge : if the edge is totally overlapping another
-		             /// or if the edge is inside a polygon.
-		HALFS,       ///< Apply halfs rule while meshing : when edges conflict on the direction.
-		THIRDS       ///< Apply thirds rule while meshing : normal case.
-//		ONELINE,     ///
-	} status; // TODO rename meshing_rule
+	std::vector<Conflict*> conflicts;
+	MeshlineManager* meshline_manager;
 
 	/// Direction of the edge itself. Useful to detect vertical or horizontal
 	/// edges.
@@ -43,21 +46,8 @@ public:
 //		POINT        // TODO is this usefull?
 	} direction;
 
-	/// Normal vector to the edge "from the inner side to the outer side"
-	/// of the polygon.
-	///*************************************************************************
-	enum class Normal {
-		XMIN,
-		XMAX,
-		YMIN,
-		YMAX,
-		NONE
-	} normal;
+	Normal normal;
 
-	double res_factor;
-
-//	std::vector<Conflict*> conflicts;
-
-	Edge(Point const* _p0, Point const* _p1, Status _status = Status::THIRDS);
+	Edge(Point const* _p0, Point const* _p1);
 	void print() const;
 };

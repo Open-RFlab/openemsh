@@ -7,14 +7,7 @@
 #pragma once
 
 //******************************************************************************
-class Point {
+class IConflictOrigin {
 public:
-	double const x;
-	double const y;
-
-	Point(double const _x, double const _y);
-	void print() const;
+	virtual ~IConflictOrigin() = default;
 };
-
-//******************************************************************************
-Point operator-(Point const& a, Point const& b);

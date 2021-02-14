@@ -4,17 +4,12 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#pragma once
+#include "meshline_manager.hpp"
 
 //******************************************************************************
-class Point {
-public:
-	double const x;
-	double const y;
-
-	Point(double const _x, double const _y);
-	void print() const;
-};
-
-//******************************************************************************
-Point operator-(Point const& a, Point const& b);
+MeshlineManager::MeshlineManager(Params& _params, double const _coord, bool const _is_enabled, double const _res_factor)
+: params(_params)
+, coord(_coord)
+, is_enabled(_is_enabled)
+, res_factor(_res_factor)
+{}
