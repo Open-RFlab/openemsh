@@ -18,10 +18,10 @@ Board::Board(vector<unique_ptr<Polygon>>& _polygons)
 
 //******************************************************************************
 void Board::detect_disabled_edges() {
-	for(unsigned long i = 0; i < polygons.size() ; ++i) {
-		for(unsigned long j = i + 1; j < polygons.size(); ++j) {
+	for(size_t i = 0; i < polygons.size() ; ++i) {
+		for(size_t j = i + 1; j < polygons.size(); ++j) {
 			if(are_possibly_overlapping(*polygons[i], *polygons[j])) {
-				
+
 			}
 		}
 	}
@@ -29,7 +29,7 @@ void Board::detect_disabled_edges() {
 
 //****************************************************************************** TODO handle conflicts
 void Board::detect_halfs_rule_edges() {
-	for(unsigned long i = 0; i < edges.size(); ++i) {
+	for(size_t i = 0; i < edges.size(); ++i) {
 		if(edges[i]->direction == Edge::Direction::DIAGONAL)
 			continue;
 /*

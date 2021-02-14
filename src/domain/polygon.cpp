@@ -44,8 +44,8 @@ inline void Polygon::detect_rotation() {
 	double left_sum = 0.0;
 	double right_sum = 0.0;
  
-	for(unsigned long i = 0; i < points.size(); ++i) {
-		unsigned long j = (i + 1) % points.size();
+	for(size_t i = 0; i < points.size(); ++i) {
+		size_t j = (i + 1) % points.size();
 		left_sum  += points[i]->x * points[j]->y;
 		right_sum += points[j]->x * points[i]->y;
 	}
