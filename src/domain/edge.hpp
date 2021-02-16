@@ -16,6 +16,7 @@
 #include "global.hpp"
 #include "i_conflict_origin.hpp"
 #include "i_meshline_origin.hpp"
+#include "relation.hpp"
 
 class Conflict;
 class MeshlineManager;
@@ -24,7 +25,7 @@ class Point;
 //******************************************************************************
 class Edge : public IConflictOrigin, public IMeshLineOrigin {
 public:
-	bool is_enabled;
+//s	bool is_enabled;
 	Point const* const p0;
 	Point const* const p1;
 	std::unique_ptr<Point const> const vec;
@@ -49,5 +50,11 @@ public:
 	Normal normal;
 
 	Edge(Point const* _p0, Point const* _p1);
+//	Relation is_crossing(Edge const* edge) const;
+	relation::EdgeEdge relation_to(Edge const* edge) const;
+	relation::EdgePoint relation_to(Point const* point) const;
+
 	void print() const;
 };
+
+bool are_colinear(Edge const& a, Edge const& b); // TODO this vs relation_to : good design?

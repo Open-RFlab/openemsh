@@ -16,6 +16,7 @@
 #include "i_conflict_origin.hpp"
 #include "i_meshline_origin.hpp"
 //#include "point.hpp"
+#include "relation.hpp"
 
 using namespace std;
 
@@ -33,7 +34,8 @@ public:
 	enum class Rotation {
 		UNKNOWN,
 		CW,
-		CCW
+		CCW,
+		COLINEAR
 	} rotation;
 
 	enum class Type {
@@ -47,11 +49,18 @@ public:
 	std::vector<Conflict*> conflicts;
 
 	Polygon(Rotation _rotation, std::initializer_list<Point> _points);
-	inline void detect_rotation();
+//	inline void detect_rotation();
 	inline void detect_edge_normal();
+//	void is_inside(Point const* point);
+//	relation::PolygonEdge relation_to(Edge const* edge);
+	relation::PolygonPoint relation_to(Point const* point);
 
 	void print() const;
 };
 
 //******************************************************************************
 bool are_possibly_overlapping(Polygon const& a, Polygon const& b);
+
+//******************************************************************************
+Polygon::Rotation detect_rotation(std::vector<std::unique_ptr<Point const>> const& points);
+Polygon::Rotation detect_rotation(std::vector<Point const*> const points);

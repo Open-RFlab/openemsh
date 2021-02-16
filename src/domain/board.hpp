@@ -31,7 +31,10 @@ public:
 //	Board(std::initializer_list<Polygon> _polygons);
 	Board(std::vector<unique_ptr<Polygon>>& _polygons);
 
-	void detect_disabled_edges();
-	void detect_halfs_rule_edges();
+	void detect_edges_in_polygons();
+	void detect_colinear_edges();
+
+	void add_conflict(Conflict::Kind kind, IConflictOrigin* a, IConflictOrigin* b); // Scan conflicts : append to a conflict / create one.
+
 	void print();
 };

@@ -18,7 +18,8 @@ class MeshlineManager;
 class Conflict : public IMeshLineOrigin {
 public:
 	enum class Kind {
-		EDGE_EDGE_MERGE
+		EDGE_IN_POLYGON,
+		COLINEAR_EDGES
 	} kind;
 
 	bool is_solved;

@@ -30,12 +30,14 @@ int main() {
 		tmp.push_back(make_unique<Polygon>(Polygon(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 3, 4 }, { 4, 2 }}))); //CW
 		tmp.push_back(make_unique<Polygon>(Polygon(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 4, 2 }, { 3, 4 }}))); //CCW
 		tmp.push_back(make_unique<Polygon>(Polygon(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 3, 4 }, { 5, 6 }}))); //LINE
+//		tmp.push_back(make_unique<Polygon>(Polygon(Polygon::Rotation::UNKNOWN, {{ 2, 1 }, { 3, 4 }, { 5, 6 }}))); //CROSSING
 		b = new Board(tmp);
 	}
 
 
 	b->print();
-	b->detect_halfs_rule_edges();
+	b->detect_colinear_edges();
+	b->detect_edges_in_polygons();
 
 
 	delete b;

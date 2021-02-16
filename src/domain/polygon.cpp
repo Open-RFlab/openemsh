@@ -18,7 +18,7 @@ Polygon::Polygon(Rotation _rotation, initializer_list<Point> _points)
 : rotation(_rotation)
 , bounding({ begin(_points)->x, begin(_points)->x, begin(_points)->y, begin(_points)->y }) {
 	for(Point const& point : _points) {
-		points.push_back(make_unique<Point>(point));
+		points.push_back(make_unique<Point>(point)); // TODO do not use initializer_list because of copies
 
 		if(point.x < bounding[XMIN]) bounding[XMIN] = point.x;
 		if(point.x > bounding[XMAX]) bounding[XMAX] = point.x;
@@ -26,7 +26,7 @@ Polygon::Polygon(Rotation _rotation, initializer_list<Point> _points)
 		if(point.y > bounding[YMAX]) bounding[YMAX] = point.y;
 	}
 
-	detect_rotation();
+	rotation = detect_rotation(points);
 
 	Point const* prev = points.back().get();
 	for(unique_ptr<Point const>& point : points) {
@@ -39,8 +39,13 @@ Polygon::Polygon(Rotation _rotation, initializer_list<Point> _points)
 
 /// Cf. https://rosettacode.org/wiki/Shoelace_formula_for_polygonal_area#C.2B.2B
 /// Cf. https://www.baeldung.com/cs/list-polygon-points-clockwise
+///
+/// Due to floating point calcul, might fail to detect colinear polygons if
+/// if those are not also colinear to x or y axis? Not problematic though since
+/// FDTD mesh is orthogonal.
 ///*****************************************************************************
-inline void Polygon::detect_rotation() {
+template<class T>
+inline Polygon::Rotation detect_rotation(T& points) {
 	double left_sum = 0.0;
 	double right_sum = 0.0;
  
@@ -53,9 +58,21 @@ inline void Polygon::detect_rotation() {
 	double area = 0.5 * (left_sum - right_sum);
 
 	if(area > 0)
-		rotation = Rotation::CCW;
+		return Polygon::Rotation::CCW;
 	else if(area < 0)
-		rotation = Rotation::CW;
+		return Polygon::Rotation::CW;
+	else
+		return Polygon::Rotation::COLINEAR;
+}
+
+//******************************************************************************
+Polygon::Rotation detect_rotation(vector<unique_ptr<Point const>> const& points) {
+	return detect_rotation<vector<unique_ptr<Point const>> const&>(points);
+}
+
+//******************************************************************************
+Polygon::Rotation detect_rotation(vector<Point const*> const points) {
+	return detect_rotation<vector<Point const*> const>(points);
 }
 
 ///           YMAX          |           YMAX
@@ -109,14 +126,15 @@ void Polygon::print() const {
 	switch(rotation) {
 	case Rotation::CW: cout << "CW" << endl; break;
 	case Rotation::CCW: cout << "CCW" << endl; break;
+	case Rotation::COLINEAR: cout << "COLINEAR" << endl; break;
 	case Rotation::UNKNOWN: cout << "UNKNOWN" << endl; break;
 	}
 }
 
-//******************************************************************************
+///*****************************************************************************
 bool are_possibly_overlapping(Polygon const& a, Polygon const& b) {
-	return (b.bounding[XMIN] > a.bounding[XMIN] && b.bounding[XMIN] < a.bounding[XMAX])
-		|| (b.bounding[XMAX] > a.bounding[XMIN] && b.bounding[XMAX] < a.bounding[XMAX])
-		|| (b.bounding[YMIN] > a.bounding[YMIN] && b.bounding[YMIN] < a.bounding[YMAX])
-		|| (b.bounding[YMAX] > a.bounding[YMIN] && b.bounding[YMAX] < a.bounding[YMAX]);
+	return (b.bounding[XMIN] >= a.bounding[XMIN] && b.bounding[XMIN] <= a.bounding[XMAX])
+		|| (b.bounding[XMAX] >= a.bounding[XMIN] && b.bounding[XMAX] <= a.bounding[XMAX])
+		|| (b.bounding[YMIN] >= a.bounding[YMIN] && b.bounding[YMIN] <= a.bounding[YMAX])
+		|| (b.bounding[YMAX] >= a.bounding[YMIN] && b.bounding[YMAX] <= a.bounding[YMAX]);
 }
