@@ -18,3 +18,12 @@ public:
 
 //******************************************************************************
 Point operator-(Point const& a, Point const& b);
+
+//******************************************************************************
+Point operator+(Point const& a, Point const& b);
+
+//******************************************************************************
+template<typename T>
+Point operator*(T const n, Point const& p) {
+	return std::move(Point(p.x * n, p.y * n));
+}

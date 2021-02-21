@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+#include <limits>
+
 #include "edge.hpp"
 #include "point.hpp"
 
@@ -87,7 +89,7 @@ Polygon::Rotation detect_rotation(vector<Point const*> const points) {
 ///          YMIN           |          YMIN
 ///           CW            |           CCW
 ///*****************************************************************************
-inline void Polygon::detect_edge_normal() {
+void Polygon::detect_edge_normal() {
 	switch(rotation) {
 	case Rotation::CW: 
 		for(std::unique_ptr<Edge>& edge : edges) {
@@ -115,6 +117,25 @@ inline void Polygon::detect_edge_normal() {
 	}	
 }
 
+// TODO handle polygon edges colinear to ray.
+//******************************************************************************
+relation::PolygonPoint Polygon::relation_to(Point const* point) const {
+	Point p(numeric_limits<double>::infinity(), point->y);
+	Edge ray(point, &p);
+
+	unsigned int count = 0;
+	for(unique_ptr<Edge> const& edge : edges) {
+		if(edge->relation_to(&ray) == relation::EdgeEdge::CROSSING)
+			++count;
+	}
+
+	if(count % 2)
+		return relation::PolygonPoint::IN;
+	else
+		return relation::PolygonPoint::OUT;
+}
+
+
 //******************************************************************************
 void Polygon::print() const {
 	for(unique_ptr<Point const> const& point : points)
@@ -131,6 +152,7 @@ void Polygon::print() const {
 	}
 }
 
+/// Check if the boundings of two polygons overlap or just touch each other.
 ///*****************************************************************************
 bool are_possibly_overlapping(Polygon const& a, Polygon const& b) {
 	return (b.bounding[XMIN] >= a.bounding[XMIN] && b.bounding[XMIN] <= a.bounding[XMAX])

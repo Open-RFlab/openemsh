@@ -18,8 +18,6 @@
 //#include "point.hpp"
 #include "relation.hpp"
 
-using namespace std;
-
 class Conflict;
 class Edge;
 class MeshlineManager;
@@ -50,10 +48,10 @@ public:
 
 	Polygon(Rotation _rotation, std::initializer_list<Point> _points);
 //	inline void detect_rotation();
-	inline void detect_edge_normal();
+	void detect_edge_normal();
 //	void is_inside(Point const* point);
 //	relation::PolygonEdge relation_to(Edge const* edge);
-	relation::PolygonPoint relation_to(Point const* point);
+	relation::PolygonPoint relation_to(Point const* point) const;
 
 	void print() const;
 };

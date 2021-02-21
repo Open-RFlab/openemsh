@@ -4,9 +4,16 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#include "conflict.hpp"
+#include <iostream>
+
+#include "point.hpp"
+
+#include "range.hpp"
+
+using namespace std;
 
 //******************************************************************************
-Conflict::Conflict(Kind const _kind)
-: kind(_kind)
+Range::Range(Point const* _p0, Point const* _p1)
+: p0(_p0)
+, p1(_p1)
 {}

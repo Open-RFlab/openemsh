@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <array>
+//#include <array>
 #include <memory>
 #include <vector>
 
@@ -21,6 +21,7 @@
 class Conflict;
 class MeshlineManager;
 class Point;
+class Range;
 
 //******************************************************************************
 class Edge : public IConflictOrigin, public IMeshLineOrigin {
@@ -52,9 +53,12 @@ public:
 	Edge(Point const* _p0, Point const* _p1);
 //	Relation is_crossing(Edge const* edge) const;
 	relation::EdgeEdge relation_to(Edge const* edge) const;
-	relation::EdgePoint relation_to(Point const* point) const;
+	relation::EdgePoint relation_to(Point const* point) const; // TODO
 
 	void print() const;
 };
 
 bool are_colinear(Edge const& a, Edge const& b); // TODO this vs relation_to : good design?
+Point* intersection(Edge const* a, Edge const* b); // TODO ?
+Range* overlap(Edge const* a, Edge const* b);
+//std::array<Point, 2>* overlap(Edge const& a, Edge const& b);

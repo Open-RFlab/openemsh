@@ -12,15 +12,18 @@
 #include <vector>
 
 #include "conflict.hpp"
+#include "conflict_manager.hpp"
 #include "edge.hpp"
 #include "global.hpp"
 #include "meshline_manager.hpp"
 #include "point.hpp"
 #include "polygon.hpp"
+//#include "range.hpp"
 
 //******************************************************************************
 class Board {
 private:
+	ConflictManager conflict_manager;
 	std::vector<std::unique_ptr<Polygon>> polygons;
 	std::array<std::vector<std::unique_ptr<MeshlineManager>>, 2> line_managers;
 	std::vector<std::unique_ptr<Conflict>> conflicts;
@@ -29,7 +32,7 @@ private:
 
 public:
 //	Board(std::initializer_list<Polygon> _polygons);
-	Board(std::vector<unique_ptr<Polygon>>& _polygons);
+	Board(std::vector<std::unique_ptr<Polygon>>& _polygons);
 
 	void detect_edges_in_polygons();
 	void detect_colinear_edges();

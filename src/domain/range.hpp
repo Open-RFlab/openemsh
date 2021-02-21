@@ -4,9 +4,18 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#include "conflict.hpp"
+#pragma once
+
+#include "i_conflict_origin.hpp"
+#include "i_meshline_origin.hpp"
+
+class Point;
 
 //******************************************************************************
-Conflict::Conflict(Kind const _kind)
-: kind(_kind)
-{}
+class Range : public IConflictOrigin, public IMeshLineOrigin {
+public:
+	Point const* const p0;
+	Point const* const p1;
+
+	Range(Point const* _p0, Point const* _p1);
+};

@@ -10,6 +10,7 @@
 
 #include "point.hpp"
 #include "polygon.hpp"
+#include "range.hpp"
 
 #include "edge.hpp"
 
@@ -71,7 +72,7 @@ relation::EdgeEdge Edge::relation_to(Edge const* edge) const {
 		e[YMAX] = edge->p0->y > edge->p1->y ? edge->p0->y : edge->p1->y;
 		if(((p0->x >= e[XMIN] && p0->x <= e[XMAX]) || (p1->x >= e[XMIN] && p1->x <= e[XMAX]))
 		&& ((p0->y >= e[YMIN] && p0->y <= e[YMAX]) || (p1->y >= e[YMIN] && p1->y <= e[YMAX])))
-			return relation::EdgeEdge::COLINEAR_CROSSING;
+			return relation::EdgeEdge::OVERLAPPING;
 		else
 			return relation::EdgeEdge::COLINEAR;
 	} else if(r1 != r2 && r3 != r4) {
@@ -79,4 +80,54 @@ relation::EdgeEdge Edge::relation_to(Edge const* edge) const {
 	} else {
 		return relation::EdgeEdge::APART;
 	}
+}
+
+/// Returns the intersection point between two edges.
+/// Returns nullptr if edges are overlapping, colinear or apart.
+/// Assume the edges are crossing.
+///
+/// Cf. https://openclassrooms.com/forum/sujet/calcul-du-point-d-intersection-de-deux-segments-21661
+///*****************************************************************************
+Point* intersection(Edge const* a, Edge const* b) {
+	if((a->direction == Edge::Direction::XMIN || a->direction == Edge::Direction::XMAX)
+	&& (b->direction == Edge::Direction::YMIN || b->direction == Edge::Direction::YMAX)) {
+		// Orthogonal
+		return new Point(b->p0->x, a->p0->y);
+	} else if((a->direction == Edge::Direction::YMIN || a->direction == Edge::Direction::YMAX)
+	       && (b->direction == Edge::Direction::XMIN || b->direction == Edge::Direction::XMAX)) {
+		// Orthogonal
+		return new Point(a->p0->x, b->p0->y);
+	} else if(a->direction == Edge::Direction::DIAGONAL || b->direction == Edge::Direction::DIAGONAL) {
+		double m = 0;
+		double div = a->vec->x * b->vec->y - a->vec->y * b->vec->x;
+
+		if(div != 0) {
+			m = (a->vec->x * a->p0->y
+			  - a->vec->x * b->p0->y
+			  - a->vec->y * a->p0->x
+			  + a->vec->y * b->p0->x)
+			  / div;
+			if(m >= 0 && m <= 1)
+				return new Point(*(b->p0) + m * *(b->vec));
+		}
+	}
+	return nullptr;
+}
+
+/// Returns the overlap range between two edges only if both are horizontal or
+/// if both are vertical. Diagonal overlaps are not handled for now.
+///*****************************************************************************
+Range* overlap(Edge const* a, Edge const* b) {
+//array<Point, 2>* overlap(Edge const& a, Edge const& b) {
+//Edge* overlap(Edge const& a, Edge const& b) {
+	if((a->direction == Edge::Direction::XMIN || a->direction == Edge::Direction::XMAX)
+	&& (b->direction == Edge::Direction::XMIN || b->direction == Edge::Direction::XMAX)) {
+		// Parallel |
+
+	} else if((a->direction == Edge::Direction::YMIN || a->direction == Edge::Direction::YMAX)
+	       && (b->direction == Edge::Direction::YMIN || b->direction == Edge::Direction::YMAX)) {
+		// Parallel _
+//		return new Range();
+	}
+	return nullptr;
 }

@@ -11,10 +11,10 @@ namespace relation {
 /// Relation between edges.
 ///*****************************************************************************
 enum class EdgeEdge {
-	APART,               ///< Edges do not intersect nor colinear overlap.
-	CROSSING,            ///< Edges intersect.
-	COLINEAR,            ///< Edges are colinear.
-	COLINEAR_CROSSING    ///< Edges are colinear and overlapping.
+	APART,         ///< Edges do not intersect nor colinear overlap.
+	CROSSING,      ///< Edges intersect.
+	COLINEAR,      ///< Edges are colinear.
+	OVERLAPPING    ///< Edges are colinear and overlapping. OVERLAPPING
 };
 
 /// Relation between a point and an edge.
