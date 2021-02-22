@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+#include <utility>
+
 #include "conflict_edge_in_polygon.hpp"
 
 #include "board.hpp"

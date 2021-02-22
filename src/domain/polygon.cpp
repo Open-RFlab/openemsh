@@ -118,6 +118,7 @@ void Polygon::detect_edge_normal() {
 }
 
 // TODO handle polygon edges colinear to ray.
+// try all the 4 orthogonal rays? :/
 //******************************************************************************
 relation::PolygonPoint Polygon::relation_to(Point const* point) const {
 	Point p(numeric_limits<double>::infinity(), point->y);
@@ -155,8 +156,12 @@ void Polygon::print() const {
 /// Check if the boundings of two polygons overlap or just touch each other.
 ///*****************************************************************************
 bool are_possibly_overlapping(Polygon const& a, Polygon const& b) {
-	return (b.bounding[XMIN] >= a.bounding[XMIN] && b.bounding[XMIN] <= a.bounding[XMAX])
+	return((b.bounding[XMIN] >= a.bounding[XMIN] && b.bounding[XMIN] <= a.bounding[XMAX])
 		|| (b.bounding[XMAX] >= a.bounding[XMIN] && b.bounding[XMAX] <= a.bounding[XMAX])
-		|| (b.bounding[YMIN] >= a.bounding[YMIN] && b.bounding[YMIN] <= a.bounding[YMAX])
-		|| (b.bounding[YMAX] >= a.bounding[YMIN] && b.bounding[YMAX] <= a.bounding[YMAX]);
+		|| (a.bounding[XMIN] >= b.bounding[XMIN] && a.bounding[XMIN] <= b.bounding[XMAX])
+		|| (a.bounding[XMAX] >= b.bounding[XMIN] && a.bounding[XMAX] <= b.bounding[XMAX]))
+		&&((b.bounding[YMIN] >= a.bounding[YMIN] && b.bounding[YMIN] <= a.bounding[YMAX])
+		|| (b.bounding[YMAX] >= a.bounding[YMIN] && b.bounding[YMAX] <= a.bounding[YMAX])
+		|| (a.bounding[YMIN] >= b.bounding[YMIN] && a.bounding[YMIN] <= b.bounding[YMAX])
+		|| (a.bounding[YMAX] >= b.bounding[YMIN] && a.bounding[YMAX] <= b.bounding[YMAX]));
 }

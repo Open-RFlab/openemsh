@@ -23,6 +23,10 @@ class MeshlineManager;
 class Point;
 class Range;
 
+#ifdef UNITTEST
+#define private public
+#endif // UNITTEST
+
 //******************************************************************************
 class Edge : public IConflictOrigin, public IMeshLineOrigin {
 public:
@@ -57,6 +61,10 @@ public:
 
 	void print() const;
 };
+
+#ifdef UNITTEST
+#undef private
+#endif // UNITTEST
 
 bool are_colinear(Edge const& a, Edge const& b); // TODO this vs relation_to : good design?
 Point* intersection(Edge const* a, Edge const* b); // TODO ?
