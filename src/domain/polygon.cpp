@@ -16,11 +16,10 @@
 using namespace std;
 
 //******************************************************************************
-Polygon::Polygon(Rotation _rotation, initializer_list<Point> _points)
-: rotation(_rotation)
-, bounding({ begin(_points)->x, begin(_points)->x, begin(_points)->y, begin(_points)->y }) {
+Polygon::Polygon(initializer_list<Point> _points)
+: bounding({ begin(_points)->x, begin(_points)->x, begin(_points)->y, begin(_points)->y }) {
 	for(Point const& point : _points) {
-		points.push_back(make_unique<Point>(point)); // TODO do not use initializer_list because of copies
+		points.emplace_back(make_unique<Point>(point)); // TODO do not use initializer_list because of copies
 
 		if(point.x < bounding[XMIN]) bounding[XMIN] = point.x;
 		if(point.x > bounding[XMAX]) bounding[XMAX] = point.x;
@@ -32,7 +31,7 @@ Polygon::Polygon(Rotation _rotation, initializer_list<Point> _points)
 
 	Point const* prev = points.back().get();
 	for(unique_ptr<Point const>& point : points) {
-		edges.push_back(make_unique<Edge>(prev, point.get()));
+		edges.emplace_back(make_unique<Edge>(prev, point.get()));
 		prev = point.get();
 	}
 
@@ -118,7 +117,8 @@ void Polygon::detect_edge_normal() {
 }
 
 // TODO handle polygon edges colinear to ray.
-// try all the 4 orthogonal rays? :/
+// try all the 4 orthogonal rays? :/ then try diagonal rays
+// infinite -> boundary + 1
 //******************************************************************************
 relation::PolygonPoint Polygon::relation_to(Point const* point) const {
 	Point p(numeric_limits<double>::infinity(), point->y);
@@ -149,7 +149,6 @@ void Polygon::print() const {
 	case Rotation::CW: cout << "CW" << endl; break;
 	case Rotation::CCW: cout << "CCW" << endl; break;
 	case Rotation::COLINEAR: cout << "COLINEAR" << endl; break;
-	case Rotation::UNKNOWN: cout << "UNKNOWN" << endl; break;
 	}
 }
 

@@ -16,30 +16,30 @@ using namespace std;
 //******************************************************************************
 int main() {
 
-//	Polygon p(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 3, 4 }, { 5, 6 }});
+//	Polygon p({{ 1, 2 }, { 3, 4 }, { 5, 6 }});
 //	p.print();
 
 //	Polygon* q;
-//	q = new Polygon(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 3, 4 }, { 5, 6 }});
+//	q = new Polygon({{ 1, 2 }, { 3, 4 }, { 5, 6 }});
 //	q->print();
 //	delete q;
 
 	Board* b;
 	{
 		vector<unique_ptr<Polygon>> tmp;
-		tmp.push_back(make_unique<Polygon>(Polygon(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 3, 4 }, { 4, 2 }}))); //CW
-		tmp.push_back(make_unique<Polygon>(Polygon(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 4, 2 }, { 3, 4 }}))); //CCW
-		tmp.push_back(make_unique<Polygon>(Polygon(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 3, 4 }, { 5, 6 }}))); //LINE
-		tmp.push_back(make_unique<Polygon>(Polygon(Polygon::Rotation::UNKNOWN, {{ 2, 1 }, { 3, 4 }, { 5, 6 }}))); //CROSSING
+		tmp.emplace_back(make_unique<Polygon>(Polygon({{ 1, 2 }, { 3, 4 }, { 4, 2 }}))); //CW
+		tmp.emplace_back(make_unique<Polygon>(Polygon({{ 1, 2 }, { 4, 2 }, { 3, 4 }}))); //CCW
+		tmp.emplace_back(make_unique<Polygon>(Polygon({{ 1, 2 }, { 3, 4 }, { 5, 6 }}))); //LINE
+		tmp.emplace_back(make_unique<Polygon>(Polygon({{ 2, 1 }, { 3, 4 }, { 5, 6 }}))); //CROSSING
 		b = new Board(tmp);
 	}
 
 /*
 	Board* b = new Board(vector<unique_ptr<Polygon>>({
-		make_unique<Polygon>(Polygon(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 3, 4 }, { 4, 2 }})),
-		make_unique<Polygon>(Polygon(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 4, 2 }, { 3, 4 }})),
-		make_unique<Polygon>(Polygon(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 3, 4 }, { 5, 6 }})),
-		make_unique<Polygon>(Polygon(Polygon::Rotation::UNKNOWN, {{ 2, 1 }, { 3, 4 }, { 5, 6 }})) }));
+		make_unique<Polygon>(Polygon({{ 1, 2 }, { 3, 4 }, { 4, 2 }})),
+		make_unique<Polygon>(Polygon({{ 1, 2 }, { 4, 2 }, { 3, 4 }})),
+		make_unique<Polygon>(Polygon({{ 1, 2 }, { 3, 4 }, { 5, 6 }})),
+		make_unique<Polygon>(Polygon({{ 2, 1 }, { 3, 4 }, { 5, 6 }})) }));
 */
 
 	b->print();

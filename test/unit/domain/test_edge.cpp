@@ -6,13 +6,103 @@
 
 #include <catch2/catch_all.hpp>
 
+#include "domain/point.hpp"
+
 #include "domain/edge.hpp"
 
-SCENARIO("relation::EdgeEdge relation_to(Edge const* edge)", "[edge]") {
-	GIVEN("") {
-		WHEN("") {
-			THEN("") {
-//				REQUIRE();
+/// @test relation::EdgeEdge Edge::relation_to(Edge const* edge)
+///*****************************************************************************
+
+//******************************************************************************
+SCENARIO("relation::EdgeEdge Edge::relation_to(Edge const* edge)", "[edge]") {
+	GIVEN("Two edges") {
+		WHEN("A vertical edge and an horizontal edge are crossing") {
+			Point a0(1, 2), a1(3, 2);
+			Point b0(2, 1), b1(2, 3);
+			Edge a(&a0, &a1), b(&b0, &b1);
+			THEN("Should be detected as CROSSING") {
+				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::CROSSING);
+				REQUIRE(b.relation_to(&a) == relation::EdgeEdge::CROSSING);
+			}
+		}
+
+		WHEN("Two diagonal edges are crossing") {
+			Point a0(1, 1), a1(3, 3);
+			Point b0(3, 1), b1(1, 3);
+			Edge a(&a0, &a1), b(&b0, &b1);
+			THEN("Should be detected as CROSSING") {
+				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::CROSSING);
+				REQUIRE(b.relation_to(&a) == relation::EdgeEdge::CROSSING);
+			}
+		}
+
+		WHEN("Two vertical edges are colinear") {
+			Point a0(1, 1), a1(1, 2);
+			Point b0(1, 3), b1(1, 4);
+			Edge a(&a0, &a1), b(&b0, &b1);
+			THEN("Should be detected as COLINEAR") {
+				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::COLINEAR);
+				REQUIRE(b.relation_to(&a) == relation::EdgeEdge::COLINEAR);
+			}
+		}
+
+		WHEN("Two horizontal edges are colinear") {
+			Point a0(1, 1), a1(2, 1);
+			Point b0(3, 1), b1(4, 1);
+			Edge a(&a0, &a1), b(&b0, &b1);
+			THEN("Should be detected as COLINEAR") {
+				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::COLINEAR);
+				REQUIRE(b.relation_to(&a) == relation::EdgeEdge::COLINEAR);
+			}
+		}
+
+		WHEN("Two diagonal edges are colinear") {
+			Point a0(1, 1), a1(2, 2);
+			Point b0(3, 3), b1(4, 4);
+			Edge a(&a0, &a1), b(&b0, &b1);
+			THEN("Should be detected as COLINEAR") {
+				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::COLINEAR);
+				REQUIRE(b.relation_to(&a) == relation::EdgeEdge::COLINEAR);
+			}
+		}
+
+		WHEN("Two vertical edges are overlapping") {
+			Point a0(1, 1), a1(1, 3);
+			Point b0(1, 2), b1(1, 4);
+			Edge a(&a0, &a1), b(&b0, &b1);
+			THEN("Should be detected as OVERLAPPING") {
+				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::OVERLAPPING);
+				REQUIRE(b.relation_to(&a) == relation::EdgeEdge::OVERLAPPING);
+			}
+		}
+
+		WHEN("Two horizontal edges are overlapping") {
+			Point a0(1, 1), a1(3, 1);
+			Point b0(2, 1), b1(4, 1);
+			Edge a(&a0, &a1), b(&b0, &b1);
+			THEN("Should be detected as OVERLAPPING") {
+				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::OVERLAPPING);
+				REQUIRE(b.relation_to(&a) == relation::EdgeEdge::OVERLAPPING);
+			}
+		}
+
+		WHEN("Two diagonal edges are overlapping") {
+			Point a0(1, 1), a1(3, 3);
+			Point b0(2, 2), b1(4, 4);
+			Edge a(&a0, &a1), b(&b0, &b1);
+			THEN("Should be detected as OVERLAPPING") {
+				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::OVERLAPPING);
+				REQUIRE(b.relation_to(&a) == relation::EdgeEdge::OVERLAPPING);
+			}
+		}
+
+		WHEN("Two diagonal edges are apart") {
+			Point a0(1, 1), a1(2, 2);
+			Point b0(3, 3), b1(4, 5);
+			Edge a(&a0, &a1), b(&b0, &b1);
+			THEN("Should be detected as APART") {
+				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::APART);
+				REQUIRE(b.relation_to(&a) == relation::EdgeEdge::APART);
 			}
 		}
 	}

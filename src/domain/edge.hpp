@@ -35,9 +35,6 @@ public:
 	Point const* const p1;
 	std::unique_ptr<Point const> const vec;
 
-	std::vector<Conflict*> conflicts;
-	MeshlineManager* meshline_manager;
-
 	/// Direction of the edge itself. Useful to detect vertical or horizontal
 	/// edges.
 	///*************************************************************************
@@ -53,6 +50,9 @@ public:
 	} direction;
 
 	Normal normal;
+
+	std::vector<Conflict*> conflicts;
+	MeshlineManager* meshline_manager;
 
 	Edge(Point const* _p0, Point const* _p1);
 //	Relation is_crossing(Edge const* edge) const;

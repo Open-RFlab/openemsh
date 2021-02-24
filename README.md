@@ -1,13 +1,13 @@
 [![Liberapay patrons](https://img.shields.io/liberapay/patrons/thomaslepoix.svg?logo=liberapay)](https://liberapay.com/thomaslepoix/donate)
 [![Discord](https://img.shields.io/discord/616889479298547722?logo=discord)](https://discord.gg/P82fEmE)
 [![License](https://img.shields.io/github/license/Open-RFlab/openemsh)](LICENSE)
-<!-- [![Version](https://img.shields.io/github/v/release/Open-RFlab/openemsh)](https://github.com/Open-RFlab/openemsh/releases/latest) -->
+[![Version](https://img.shields.io/github/v/release/Open-RFlab/openemsh)](https://github.com/Open-RFlab/openemsh/releases/latest)
 
 # OpenEMSH : OpenEMS Mesher [WIP]
 
 ## Abstract
 
-This is an OpenEMS mesher draft. Meshing an OpenEMS structure is a difficult task often done manually. Some automatic meshers exist, shipped with either an Octave/Python API or a converter tool from a PCB design software.
+This is an OpenEMS mesher draft (with a H at the end, it looks like mesh poorly written). Meshing an OpenEMS structure is a difficult task often done manually. Some automatic meshers exist, shipped with either an Octave/Python API or a converter tool from a PCB design software.
 
 By creating myself one of those converter ([Qucs-RFlayout](https://github.com/thomaslepoix/Qucs-RFlayout)), discussing with other meshers authors, observing meshers behavior and looking into their code, I identified some pitfalls that end up to usability or mesh correctness issues :
 

@@ -2,7 +2,7 @@
 
 set( TESTS
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_point.cpp"
-#	"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_edge.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_edge.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_polygon.cpp"
 	)
 
@@ -35,6 +35,9 @@ target_compile_options( unittest
 	$<$<CONFIG:Debug>:-Wall>
 	$<$<CONFIG:Debug>:-Wextra>
 	$<$<CONFIG:Debug>:-fexceptions>
+	$<$<CONFIG:Coverage>:-Wall>
+	$<$<CONFIG:Coverage>:-Wextra>
+	$<$<CONFIG:Coverage>:-fexceptions>
 	$<$<CONFIG:Coverage>:--coverage>
 	$<$<CONFIG:Coverage>:-O0>
 	)

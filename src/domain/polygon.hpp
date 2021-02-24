@@ -30,7 +30,7 @@ enum { XMIN, XMAX, YMIN, YMAX };
 class Polygon : public IConflictOrigin, public IMeshLineOrigin {
 public:
 	enum class Rotation {
-		UNKNOWN,
+//		UNKNOWN,
 		CW,
 		CCW,
 		COLINEAR
@@ -43,10 +43,15 @@ public:
 
 	std::array<double, 4> bounding;
 	std::vector<std::unique_ptr<Point const>> points;
+
+	/// edge[0] is between points[n] & points[0]
+	/// edge[x] is between points[x-1] & points[x]
+	///*************************************************************************
 	std::vector<std::unique_ptr<Edge>> edges;
+
 	std::vector<Conflict*> conflicts;
 
-	Polygon(Rotation _rotation, std::initializer_list<Point> _points);
+	Polygon(std::initializer_list<Point> _points);
 //	inline void detect_rotation();
 	void detect_edge_normal();
 //	void is_inside(Point const* point);

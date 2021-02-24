@@ -11,11 +11,17 @@
 
 #include "domain/polygon.hpp"
 
+/// @test bool are_possibly_overlapping(Polygon const& a, Polygon const& b)
+/// @test template<class T> Polygon::Rotation detect_rotation(T& points)
+/// @test void Polygon::detect_edge_normal()
+///*****************************************************************************
+
+//******************************************************************************
 SCENARIO("bool are_possibly_overlapping(Polygon const& a, Polygon const& b)", "[polygon]") {
 	GIVEN("Two polygons") {
 		WHEN("The bounding boxes do not overlap") {
-			Polygon a(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 1, 4 }, { 4, 4 }});
-			Polygon b(Polygon::Rotation::UNKNOWN, {{ 5, 3 }, { 5, 1 }, { 6, 2 }});
+			Polygon a({{ 1, 2 }, { 1, 4 }, { 4, 4 }});
+			Polygon b({{ 5, 3 }, { 5, 1 }, { 6, 2 }});
 			THEN("Polygons should not possibly overlap") {
 				REQUIRE_FALSE(are_possibly_overlapping(a, b));
 				REQUIRE_FALSE(are_possibly_overlapping(b, a));
@@ -23,8 +29,8 @@ SCENARIO("bool are_possibly_overlapping(Polygon const& a, Polygon const& b)", "[
 		}
 
 		WHEN("The bounding boxes overlap but not the polygons") {
-			Polygon a(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 1, 4 }, { 4, 4 }});
-			Polygon b(Polygon::Rotation::UNKNOWN, {{ 3, 3 }, { 5, 3 }, { 4, 1 }});
+			Polygon a({{ 1, 2 }, { 1, 4 }, { 4, 4 }});
+			Polygon b({{ 3, 3 }, { 5, 3 }, { 4, 1 }});
 			THEN("Polygons should possibly overlap") {
 				REQUIRE(are_possibly_overlapping(a, b));
 				REQUIRE(are_possibly_overlapping(b, a));
@@ -32,8 +38,8 @@ SCENARIO("bool are_possibly_overlapping(Polygon const& a, Polygon const& b)", "[
 		}
 
 		WHEN("The bounding boxes and the polygons overlap") {
-			Polygon a(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 1, 4 }, { 4, 4 }});
-			Polygon b(Polygon::Rotation::UNKNOWN, {{ 2, 1 }, { 2, 3 }, { 5, 3 }});
+			Polygon a({{ 1, 2 }, { 1, 4 }, { 4, 4 }});
+			Polygon b({{ 2, 1 }, { 2, 3 }, { 5, 3 }});
 			THEN("Polygons should possibly overlap") {
 				REQUIRE(are_possibly_overlapping(a, b));
 				REQUIRE(are_possibly_overlapping(b, a));
@@ -42,8 +48,8 @@ SCENARIO("bool are_possibly_overlapping(Polygon const& a, Polygon const& b)", "[
 
 
 		WHEN("The bounding boxes of a polygons is totally inside the other") {
-			Polygon a(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 1, 4 }, { 4, 4 }});
-			Polygon b(Polygon::Rotation::UNKNOWN, {{ 2, 2.5 }, { 2, 3.5 }, { 3, 3 }});
+			Polygon a({{ 1, 2 }, { 1, 4 }, { 4, 4 }});
+			Polygon b({{ 2, 2.5 }, { 2, 3.5 }, { 3, 3 }});
 			THEN("Polygons should possibly overlap") {
 				REQUIRE(are_possibly_overlapping(a, b));
 				REQUIRE(are_possibly_overlapping(b, a));
@@ -51,8 +57,8 @@ SCENARIO("bool are_possibly_overlapping(Polygon const& a, Polygon const& b)", "[
 		}
 
 		WHEN("The bounding boxes just touch each other by a corner") {
-			Polygon a(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 1, 4 }, { 4, 4 }});
-			Polygon b(Polygon::Rotation::UNKNOWN, {{ 4, 4 }, { 5, 4 }, { 5, 5 }});
+			Polygon a({{ 1, 2 }, { 1, 4 }, { 4, 4 }});
+			Polygon b({{ 4, 4 }, { 5, 4 }, { 5, 5 }});
 			THEN("Polygons should possibly overlap") {
 				REQUIRE(are_possibly_overlapping(a, b));
 				REQUIRE(are_possibly_overlapping(b, a));
@@ -61,10 +67,11 @@ SCENARIO("bool are_possibly_overlapping(Polygon const& a, Polygon const& b)", "[
 	}
 }
 
-SCENARIO("Polygon::Rotation detect_rotation(T& points)", "[polygon]") {
+//******************************************************************************
+SCENARIO("template<class T> Polygon::Rotation detect_rotation(T& points)", "[polygon]") {
 	GIVEN("A polygon or a bunch of points") {
 		WHEN("Points order is oriented clockwise") {
-			Polygon a(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 1, 4 }, { 4, 4 }});
+			Polygon a({{ 1, 2 }, { 1, 4 }, { 4, 4 }});
 			std::vector<Point const*> b({a.points[0].get(), a.points[1].get(), a.points[2].get()});
 			THEN("Should be detected as CW") {
 				REQUIRE(detect_rotation(a.points) == Polygon::Rotation::CW);
@@ -73,7 +80,7 @@ SCENARIO("Polygon::Rotation detect_rotation(T& points)", "[polygon]") {
 		}
 
 		WHEN("Points order is oriented counter clockwise") {
-			Polygon a(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 4, 4 }, { 1, 4 }});
+			Polygon a({{ 1, 2 }, { 4, 4 }, { 1, 4 }});
 			std::vector<Point const*> b({a.points[0].get(), a.points[1].get(), a.points[2].get()});
 			THEN("Should be detected as CCW") {
 				REQUIRE(detect_rotation(a.points) == Polygon::Rotation::CCW);
@@ -82,7 +89,7 @@ SCENARIO("Polygon::Rotation detect_rotation(T& points)", "[polygon]") {
 		}
 
 		WHEN("Points are all aligned in an axis") {
-			Polygon a(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 1, 4 }, { 1, 1 }});
+			Polygon a({{ 1, 2 }, { 1, 4 }, { 1, 1 }});
 			std::vector<Point const*> b({a.points[0].get(), a.points[1].get(), a.points[2].get()});
 			THEN("Should be detected as COLINEAR") {
 				REQUIRE(detect_rotation(a.points) == Polygon::Rotation::COLINEAR);
@@ -91,11 +98,73 @@ SCENARIO("Polygon::Rotation detect_rotation(T& points)", "[polygon]") {
 		}
 
 		WHEN("Points are all aligned in diagonal") {
-			Polygon a(Polygon::Rotation::UNKNOWN, {{ 1, 2 }, { 4, 4 }, { 2.5, 3 }});
+			Polygon a({{ 1, 2 }, { 4, 4 }, { 2.5, 3 }});
 			std::vector<Point const*> b({a.points[0].get(), a.points[1].get(), a.points[2].get()});
 			THEN("Should be detected as COLINEAR") {
 				REQUIRE(detect_rotation(a.points) == Polygon::Rotation::COLINEAR);
 				REQUIRE(detect_rotation(b) == Polygon::Rotation::COLINEAR);
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("void Polygon::detect_edge_normal()", "[polygon]") {
+	GIVEN("An octogon : 2 horizontal edges, 2 verticals, 4 diagonals") {
+		WHEN("Points order is oriented clockwise") {
+			Polygon a({
+				{ 2, 1 }, { 1, 2 }, { 1, 3 }, { 2, 4 },
+				{ 3, 4 }, { 4, 3 }, { 4, 2 }, { 3, 1 }});
+			THEN("For edges going down to the X axis, the normal should go down to the Y") {
+				REQUIRE(a.edges[0]->normal == Normal::YMIN);
+			}
+			THEN("For edges going up to the X axis, the normal should go up to the Y") {
+				REQUIRE(a.edges[4]->normal == Normal::YMAX);
+			}
+			THEN("For edges going down to the Y axis, the normal should go up to the X") {
+				REQUIRE(a.edges[6]->normal == Normal::XMAX);
+			}
+			THEN("For edges going up to the Y axis, the normal should go down to the X") {
+				REQUIRE(a.edges[2]->normal == Normal::XMIN);
+			}
+			THEN("For diagonal edges, there should not be any normal") {
+				REQUIRE(a.edges[1]->normal == Normal::NONE);
+				REQUIRE(a.edges[3]->normal == Normal::NONE);
+				REQUIRE(a.edges[5]->normal == Normal::NONE);
+				REQUIRE(a.edges[7]->normal == Normal::NONE);
+			}
+		}
+
+		WHEN("Points order is oriented counter clockwise") {
+			Polygon a({
+				{ 2, 1 }, { 3, 1 }, { 4, 2 }, { 4, 3 },
+				{ 3, 4 }, { 2, 4 }, { 1, 3 }, { 1, 2 }});
+			THEN("For edges going down to the X axis, the normal should go up to the Y") {
+				REQUIRE(a.edges[5]->normal == Normal::YMAX);
+			}
+			THEN("For edges going up to the X axis, the normal should go down to the Y") {
+				REQUIRE(a.edges[1]->normal == Normal::YMIN);
+			}
+			THEN("For edges going down to the Y axis, the normal should go down to the X") {
+				REQUIRE(a.edges[7]->normal == Normal::XMIN);
+			}
+			THEN("For edges going up to the Y axis, the normal should go up to the X") {
+				REQUIRE(a.edges[3]->normal == Normal::XMAX);
+			}
+			THEN("For diagonal edges, there should not be any normal") {
+				REQUIRE(a.edges[0]->normal == Normal::NONE);
+				REQUIRE(a.edges[2]->normal == Normal::NONE);
+				REQUIRE(a.edges[4]->normal == Normal::NONE);
+				REQUIRE(a.edges[6]->normal == Normal::NONE);
+			}
+		}
+
+		WHEN("Points are all aligned") {
+			Polygon a({{ 1, 2 }, { 1, 4 }, { 1, 1 }});
+			THEN("There should not be any normal") {
+				REQUIRE(a.edges[0]->normal == Normal::NONE);
+				REQUIRE(a.edges[1]->normal == Normal::NONE);
+				REQUIRE(a.edges[2]->normal == Normal::NONE);
 			}
 		}
 	}

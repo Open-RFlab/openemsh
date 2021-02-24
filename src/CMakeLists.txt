@@ -48,6 +48,11 @@ target_compile_options( ${PROJECT_NAME}
 	$<$<CONFIG:Debug>:-Wall>
 	$<$<CONFIG:Debug>:-Wextra>
 	$<$<CONFIG:Debug>:-fexceptions>
+	$<$<CONFIG:Coverage>:-Wall>
+	$<$<CONFIG:Coverage>:-Wextra>
+	$<$<CONFIG:Coverage>:-fexceptions>
+	$<$<CONFIG:Coverage>:--coverage>
+	$<$<CONFIG:Coverage>:-O0>
 	)
 
 target_include_directories( ${PROJECT_NAME}

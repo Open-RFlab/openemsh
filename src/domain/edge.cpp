@@ -21,6 +21,7 @@ Edge::Edge(Point const* _p0, Point const* _p1)
 : p0(_p0)
 , p1(_p1)
 , vec(make_unique<Point>(*p1 - *p0))
+, normal(Normal::NONE)
 {
 	if(vec->x == 0) {
 		if(vec->y > 0)
