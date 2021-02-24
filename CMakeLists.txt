@@ -6,16 +6,10 @@ project( openemsh
 	DESCRIPTION "openEMS mesher"
 	)
 
-list( APPEND CMAKE_MODULE_PATH
-	"${CMAKE_SOURCE_DIR}/cmake"
-	)
-
 if( NOT CMAKE_BUILD_TYPE )
 	set( CMAKE_BUILD_TYPE "Release" )
 endif()
 message( STATUS "Build type: ${CMAKE_BUILD_TYPE}" )
-
-include( FixedShell )
 
 if( CMAKE_BUILD_TYPE MATCHES Coverage )
 	find_program( GCOV NAMES gcov )
