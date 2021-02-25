@@ -48,10 +48,10 @@ void Board::detect_edges_in_polygons() {
 							cout << "i: " << i << "\tj: " << j << "\t\tAPART" << endl;
 							break;
 						} case relation::EdgeEdge::CROSSING: {
-							unique_ptr<Point> p(intersection(polygons[i]->edges[k].get(), polygons[j]->edges[l].get()));
+							if(optional<Point> p = intersection(polygons[i]->edges[k].get(), polygons[j]->edges[l].get()))
+								p.value().print();
 
-							if(p)
-								p->print();
+//							if(p)
 							cout << "i: " << i << "\tj: " << j << "\t\tCROSSING" << endl;
 							break;
 						} case relation::EdgeEdge::COLINEAR: {
@@ -60,7 +60,7 @@ void Board::detect_edges_in_polygons() {
 							cout << "i: " << i << "\tj: " << j << "\t\tCOLINEAR" << endl;
 							break;
 						} case relation::EdgeEdge::OVERLAPPING: {
-							unique_ptr<Range> r(overlap(polygons[i]->edges[k].get(), polygons[j]->edges[l].get()));
+							if(optional<Range> r = overlap(polygons[i]->edges[k].get(), polygons[j]->edges[l].get()));
 
 							cout << "i: " << i << "\tj: " << j << "\t\tOVERLAPPING" << endl;
 							break;

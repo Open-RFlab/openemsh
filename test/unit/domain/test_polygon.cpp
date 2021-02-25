@@ -116,18 +116,26 @@ SCENARIO("void Polygon::detect_edge_normal()", "[polygon]") {
 				{ 2, 1 }, { 1, 2 }, { 1, 3 }, { 2, 4 },
 				{ 3, 4 }, { 4, 3 }, { 4, 2 }, { 3, 1 }});
 			THEN("For edges going down to the X axis, the normal should go down to the Y") {
+				REQUIRE(a.edges[0]->direction == Edge::Direction::XMIN);
 				REQUIRE(a.edges[0]->normal == Normal::YMIN);
 			}
 			THEN("For edges going up to the X axis, the normal should go up to the Y") {
+				REQUIRE(a.edges[4]->direction == Edge::Direction::XMAX);
 				REQUIRE(a.edges[4]->normal == Normal::YMAX);
 			}
 			THEN("For edges going down to the Y axis, the normal should go up to the X") {
+				REQUIRE(a.edges[6]->direction == Edge::Direction::YMIN);
 				REQUIRE(a.edges[6]->normal == Normal::XMAX);
 			}
 			THEN("For edges going up to the Y axis, the normal should go down to the X") {
+				REQUIRE(a.edges[2]->direction == Edge::Direction::YMAX);
 				REQUIRE(a.edges[2]->normal == Normal::XMIN);
 			}
 			THEN("For diagonal edges, there should not be any normal") {
+				REQUIRE(a.edges[1]->direction == Edge::Direction::DIAGONAL);
+				REQUIRE(a.edges[3]->direction == Edge::Direction::DIAGONAL);
+				REQUIRE(a.edges[5]->direction == Edge::Direction::DIAGONAL);
+				REQUIRE(a.edges[7]->direction == Edge::Direction::DIAGONAL);
 				REQUIRE(a.edges[1]->normal == Normal::NONE);
 				REQUIRE(a.edges[3]->normal == Normal::NONE);
 				REQUIRE(a.edges[5]->normal == Normal::NONE);
@@ -140,18 +148,26 @@ SCENARIO("void Polygon::detect_edge_normal()", "[polygon]") {
 				{ 2, 1 }, { 3, 1 }, { 4, 2 }, { 4, 3 },
 				{ 3, 4 }, { 2, 4 }, { 1, 3 }, { 1, 2 }});
 			THEN("For edges going down to the X axis, the normal should go up to the Y") {
+				REQUIRE(a.edges[5]->direction == Edge::Direction::XMIN);
 				REQUIRE(a.edges[5]->normal == Normal::YMAX);
 			}
 			THEN("For edges going up to the X axis, the normal should go down to the Y") {
+				REQUIRE(a.edges[1]->direction == Edge::Direction::XMAX);
 				REQUIRE(a.edges[1]->normal == Normal::YMIN);
 			}
 			THEN("For edges going down to the Y axis, the normal should go down to the X") {
+				REQUIRE(a.edges[7]->direction == Edge::Direction::YMIN);
 				REQUIRE(a.edges[7]->normal == Normal::XMIN);
 			}
 			THEN("For edges going up to the Y axis, the normal should go up to the X") {
+				REQUIRE(a.edges[3]->direction == Edge::Direction::YMAX);
 				REQUIRE(a.edges[3]->normal == Normal::XMAX);
 			}
 			THEN("For diagonal edges, there should not be any normal") {
+				REQUIRE(a.edges[0]->direction == Edge::Direction::DIAGONAL);
+				REQUIRE(a.edges[2]->direction == Edge::Direction::DIAGONAL);
+				REQUIRE(a.edges[4]->direction == Edge::Direction::DIAGONAL);
+				REQUIRE(a.edges[6]->direction == Edge::Direction::DIAGONAL);
 				REQUIRE(a.edges[0]->normal == Normal::NONE);
 				REQUIRE(a.edges[2]->normal == Normal::NONE);
 				REQUIRE(a.edges[4]->normal == Normal::NONE);
@@ -162,6 +178,7 @@ SCENARIO("void Polygon::detect_edge_normal()", "[polygon]") {
 		WHEN("Points are all aligned") {
 			Polygon a({{ 1, 2 }, { 1, 4 }, { 1, 1 }});
 			THEN("There should not be any normal") {
+				REQUIRE(a.rotation == Polygon::Rotation::COLINEAR);
 				REQUIRE(a.edges[0]->normal == Normal::NONE);
 				REQUIRE(a.edges[1]->normal == Normal::NONE);
 				REQUIRE(a.edges[2]->normal == Normal::NONE);

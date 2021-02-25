@@ -8,6 +8,7 @@
 
 //#include <array>
 #include <memory>
+#include <optional>
 #include <vector>
 
 //#include "conflict.hpp"
@@ -67,6 +68,6 @@ public:
 #endif // UNITTEST
 
 bool are_colinear(Edge const& a, Edge const& b); // TODO this vs relation_to : good design?
-Point* intersection(Edge const* a, Edge const* b); // TODO ?
-Range* overlap(Edge const* a, Edge const* b);
+std::optional<Point> intersection(Edge const* a, Edge const* b); // TODO ?
+std::optional<Range> overlap(Edge const* a, Edge const* b);
 //std::array<Point, 2>* overlap(Edge const& a, Edge const& b);

@@ -21,44 +21,49 @@ ConflictManager::ConflictManager(vector<unique_ptr<Conflict>>& _conflicts)
 // TODO register confglict in edges
 //******************************************************************************
 void ConflictManager::add_colinear_edges(Edge* a, Edge* b) {
-	bool does_conflict_exist = false;
-	for(unique_ptr<Conflict>& conflict : conflicts) {
-		if(conflict->kind == Conflict::Kind::COLINEAR_EDGES) {
-			auto c = dynamic_cast<ConflictColinearEdges*>(conflict.get());
-			bool is_a_registered = false;
-			bool is_b_registered = false;
+	if(((a->direction == Edge::Direction::XMIN || a->direction == Edge::Direction::XMAX)
+	&&  (b->direction == Edge::Direction::XMIN || b->direction == Edge::Direction::XMAX))
+	|| ((a->direction == Edge::Direction::YMIN || a->direction == Edge::Direction::YMAX)
+	&&  (b->direction == Edge::Direction::YMIN || b->direction == Edge::Direction::YMAX))) {
+		bool does_conflict_exist = false;
+		for(unique_ptr<Conflict>& conflict : conflicts) {
+			if(conflict->kind == Conflict::Kind::COLINEAR_EDGES) {
+				auto c = dynamic_cast<ConflictColinearEdges*>(conflict.get());
+				bool is_a_registered = false;
+				bool is_b_registered = false;
 
-			for(Edge* edge : c->edges) {
-				if(edge == a) {
-					is_a_registered = true;
-					if(is_b_registered)
-						break;
-				} else if(edge == b) {
-					is_b_registered = true;
-					if(is_a_registered)
-						break;
+				for(Edge* edge : c->edges) {
+					if(edge == a) {
+						is_a_registered = true;
+						if(is_b_registered)
+							break;
+					} else if(edge == b) {
+						is_b_registered = true;
+						if(is_a_registered)
+							break;
+					}
+				}
+
+				if(is_a_registered && !is_b_registered) {
+					does_conflict_exist = true;
+					c->append(b);
+					b->conflicts.push_back(conflict.get());
+					break;
+				} else if(!is_a_registered && is_b_registered) {
+					does_conflict_exist = true;
+					c->append(a);
+					a->conflicts.push_back(conflict.get());
+					break;
+				} else if(is_a_registered && is_b_registered) {
+					does_conflict_exist = true;
+					break;
 				}
 			}
-
-			if(is_a_registered && !is_b_registered) {
-				does_conflict_exist = true;
-				c->append(b);
-				b->conflicts.push_back(conflict.get());
-				break;
-			} else if(!is_a_registered && is_b_registered) {
-				does_conflict_exist = true;
-				c->append(a);
-				a->conflicts.push_back(conflict.get());
-				break;
-			} else if(is_a_registered && is_b_registered) {
-				does_conflict_exist = true;
-				break;
-			}
 		}
-	}
-	if(!does_conflict_exist) {
-		conflicts.push_back(make_unique<ConflictColinearEdges>(a, b));
-		a->conflicts.push_back(conflicts.back().get());
-		b->conflicts.push_back(conflicts.back().get());
+		if(!does_conflict_exist) {
+			conflicts.push_back(make_unique<ConflictColinearEdges>(a, b));
+			a->conflicts.push_back(conflicts.back().get());
+			b->conflicts.push_back(conflicts.back().get());
+		}
 	}
 }

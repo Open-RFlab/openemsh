@@ -84,21 +84,25 @@ relation::EdgeEdge Edge::relation_to(Edge const* edge) const {
 }
 
 /// Returns the intersection point between two edges.
-/// Returns nullptr if edges are overlapping, colinear or apart.
-/// Assume the edges are crossing.
+/// @warning Assume both edges are CROSSING.
 ///
+/// TODO should assume a relation vs check : assume
+/// TODO avoid return new! : ret Point, ret std::optional?
+///
+/// Returns nullopt if not crossing edges TODO apart edges
 /// Cf. https://openclassrooms.com/forum/sujet/calcul-du-point-d-intersection-de-deux-segments-21661
 ///*****************************************************************************
-Point* intersection(Edge const* a, Edge const* b) {
+optional<Point> intersection(Edge const* a, Edge const* b) {
 	if((a->direction == Edge::Direction::XMIN || a->direction == Edge::Direction::XMAX)
 	&& (b->direction == Edge::Direction::YMIN || b->direction == Edge::Direction::YMAX)) {
-		// Orthogonal
-		return new Point(b->p0->x, a->p0->y);
+		// Horizontal & vertical
+		return Point(b->p0->x, a->p0->y);
 	} else if((a->direction == Edge::Direction::YMIN || a->direction == Edge::Direction::YMAX)
 	       && (b->direction == Edge::Direction::XMIN || b->direction == Edge::Direction::XMAX)) {
-		// Orthogonal
-		return new Point(a->p0->x, b->p0->y);
+		// Vertical & horizontal
+		return Point(a->p0->x, b->p0->y);
 	} else if(a->direction == Edge::Direction::DIAGONAL || b->direction == Edge::Direction::DIAGONAL) {
+		// Diagonal
 		double m = 0;
 		double div = a->vec->x * b->vec->y - a->vec->y * b->vec->x;
 
@@ -108,17 +112,20 @@ Point* intersection(Edge const* a, Edge const* b) {
 			  - a->vec->y * a->p0->x
 			  + a->vec->y * b->p0->x)
 			  / div;
-			if(m >= 0 && m <= 1)
-				return new Point(*(b->p0) + m * *(b->vec));
+			if(m >= 0 && m <= 1) // When we are not sure edges are crossing.
+				return Point(*(b->p0) + m * *(b->vec));
 		}
 	}
-	return nullptr;
+	return nullopt;
 }
 
 /// Returns the overlap range between two edges only if both are horizontal or
 /// if both are vertical. Diagonal overlaps are not handled for now.
+/// @warning Assume both edges are OVERLAPPING and horizontal or vertical.
+/// Returns nullopt if not overlapping edges of if edges overlaps in diagonal
+/// TODO can easily work for diag!
 ///*****************************************************************************
-Range* overlap(Edge const* a, Edge const* b) {
+optional<Range> overlap(Edge const* a, Edge const* b) {
 //array<Point, 2>* overlap(Edge const& a, Edge const& b) {
 //Edge* overlap(Edge const& a, Edge const& b) {
 	if((a->direction == Edge::Direction::XMIN || a->direction == Edge::Direction::XMAX)
@@ -130,5 +137,5 @@ Range* overlap(Edge const* a, Edge const* b) {
 		// Parallel _
 //		return new Range();
 	}
-	return nullptr;
+	return nullopt;
 }
