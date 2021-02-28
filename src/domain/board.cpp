@@ -21,6 +21,8 @@ Board::Board(vector<unique_ptr<Polygon>>& _polygons)
 	for(unique_ptr<Polygon>& polygon : polygons)
 		for(unique_ptr<Edge>& edge : polygon->edges)
 			edges.push_back(edge.get());
+	polygons.shrink_to_fit();
+	edges.shrink_to_fit();
 }
 
 /// Detect all EDGE_IN_POLYGON. Will also detect some COLINEAR_EDGES.
@@ -49,7 +51,7 @@ void Board::detect_edges_in_polygons() {
 							break;
 						} case relation::EdgeEdge::CROSSING: {
 							if(optional<Point> p = intersection(polygons[i]->edges[k].get(), polygons[j]->edges[l].get()))
-								p.value().print();
+								p->print();
 
 //							if(p)
 							cout << "i: " << i << "\tj: " << j << "\t\tCROSSING" << endl;
@@ -60,7 +62,8 @@ void Board::detect_edges_in_polygons() {
 							cout << "i: " << i << "\tj: " << j << "\t\tCOLINEAR" << endl;
 							break;
 						} case relation::EdgeEdge::OVERLAPPING: {
-							if(optional<Range> r = overlap(polygons[i]->edges[k].get(), polygons[j]->edges[l].get()));
+							if(optional<Range> r = overlap(polygons[i]->edges[k].get(), polygons[j]->edges[l].get()))
+								r->print();
 
 							cout << "i: " << i << "\tj: " << j << "\t\tOVERLAPPING" << endl;
 							break;
@@ -76,19 +79,26 @@ void Board::detect_edges_in_polygons() {
 //****************************************************************************** TODO handle conflicts
 void Board::detect_colinear_edges() {
 	for(size_t i = 0; i < edges.size(); ++i) {
-		if(edges[i]->direction == Edge::Direction::DIAGONAL)
+		if(edges[i]->axis == Edge::Axis::DIAGONAL)
 			continue;
-/*
+
 		for(unsigned long j = i + 1; j < edges.size(); ++j) {
-			if((edges[j]->direction == edges[i]->direction)    // Different axis.
-			&& ((edges[i]->normal != edges[j]->normal)         // Opposite directions.
-			|| (edges[i]->policy == Edge::Policy::HALFS)       // More than 2 conflicting edges.
-			|| (edges[j]->policy == Edge::Policy::HALFS))) {
-				edges[i]->policy = Edge::Policy::HALFS;
-				edges[j]->policy = Edge::Policy::HALFS;
+			if(edges[j]->axis != edges[i]->axis)
+				continue;
+
+			switch(edges[i]->axis) {
+			case Edge::Axis::X:
+				if(edges[i]->p0->x == edges[j]->p0->x)
+					conflict_manager.add_colinear_edges(edges[i], edges[j]);
+				break;
+			case Edge::Axis::Y:
+				if(edges[i]->p0->y == edges[j]->p0->y)
+					conflict_manager.add_colinear_edges(edges[i], edges[j]);
+				break;
+			default:
+				break;
 			}
 		}
-*/
 	}
 }
 

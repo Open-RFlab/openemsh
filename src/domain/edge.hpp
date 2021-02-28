@@ -6,7 +6,7 @@
 
 #pragma once
 
-//#include <array>
+#include <array>
 #include <memory>
 #include <optional>
 #include <vector>
@@ -50,15 +50,22 @@ public:
 //		POINT        // TODO is this usefull?
 	} direction;
 
+	enum class Axis {
+		X,
+		Y,
+		DIAGONAL
+	} axis;
+
 	Normal normal;
 
+//	std::array<double, 4> bounding;
 	std::vector<Conflict*> conflicts;
 	MeshlineManager* meshline_manager;
 
 	Edge(Point const* _p0, Point const* _p1);
 //	Relation is_crossing(Edge const* edge) const;
 	relation::EdgeEdge relation_to(Edge const* edge) const;
-	relation::EdgePoint relation_to(Point const* point) const; // TODO
+	relation::EdgePoint relation_to(Point const* point) const;
 
 	void print() const;
 };

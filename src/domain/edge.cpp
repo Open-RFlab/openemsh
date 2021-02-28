@@ -6,7 +6,8 @@
 
 #include <iostream>
 
-#include <array>
+#include <algorithm>
+//#include <array>
 
 #include "point.hpp"
 #include "polygon.hpp"
@@ -22,18 +23,26 @@ Edge::Edge(Point const* _p0, Point const* _p1)
 , p1(_p1)
 , vec(make_unique<Point>(*p1 - *p0))
 , normal(Normal::NONE)
+//, bounding({
+//	(p0->x <= p1->x ? p0->x : p1->x),
+//	(p0->x >= p1->x ? p1->x : p0->x),
+//	(p0->y <= p1->y ? p0->y : p1->y),
+//	(p0->y >= p1->y ? p1->y : p0->y) })
 {
 	if(vec->x == 0) {
+		axis = Axis::Y;
 		if(vec->y > 0)
 			direction = Direction::YMAX;
 		else if(vec->y < 0)
 			direction = Direction::YMIN;
 	} else if(vec->y == 0) {
+		axis = Axis::X;
 		if(vec->x > 0)
 			direction = Direction::XMAX;
 		else if(vec->x < 0)
 			direction = Direction::XMIN;
 	} else {
+		axis = Axis::DIAGONAL;
 		direction = Direction::DIAGONAL;
 	}
 }
@@ -66,13 +75,20 @@ relation::EdgeEdge Edge::relation_to(Edge const* edge) const {
 
 	if(r1 == Polygon::Rotation::COLINEAR && r2 == Polygon::Rotation::COLINEAR
 	&& r3 == Polygon::Rotation::COLINEAR && r4 == Polygon::Rotation::COLINEAR) {
-		array<double, 4> e;
-		e[XMIN] = edge->p0->x <= edge->p1->x ? edge->p0->x : edge->p1->x;
-		e[XMAX] = edge->p0->x > edge->p1->x ? edge->p0->x : edge->p1->x;
-		e[YMIN] = edge->p0->y <= edge->p1->y ? edge->p0->y : edge->p1->y;
-		e[YMAX] = edge->p0->y > edge->p1->y ? edge->p0->y : edge->p1->y;
-		if(((p0->x >= e[XMIN] && p0->x <= e[XMAX]) || (p1->x >= e[XMIN] && p1->x <= e[XMAX]))
-		&& ((p0->y >= e[YMIN] && p0->y <= e[YMAX]) || (p1->y >= e[YMIN] && p1->y <= e[YMAX])))
+		array<double, 4> a_bnd;
+		a_bnd[XMIN] = edge->p0->x < edge->p1->x ? edge->p0->x : edge->p1->x;
+		a_bnd[XMAX] = edge->p0->x > edge->p1->x ? edge->p0->x : edge->p1->x;
+		a_bnd[YMIN] = edge->p0->y < edge->p1->y ? edge->p0->y : edge->p1->y;
+		a_bnd[YMAX] = edge->p0->y > edge->p1->y ? edge->p0->y : edge->p1->y;
+		array<double, 4> b_bnd;
+		b_bnd[XMIN] = p0->x < p1->x ? p0->x : p1->x;
+		b_bnd[XMAX] = p0->x > p1->x ? p0->x : p1->x;
+		b_bnd[YMIN] = p0->y < p1->y ? p0->y : p1->y;
+		b_bnd[YMAX] = p0->y > p1->y ? p0->y : p1->y;
+		if(((a_bnd[XMIN] >= b_bnd[XMIN] && a_bnd[XMIN] <= b_bnd[XMAX]) || (a_bnd[XMAX] >= b_bnd[XMIN] && a_bnd[XMAX] <= b_bnd[XMAX])
+		||  (b_bnd[XMIN] >= a_bnd[XMIN] && b_bnd[XMIN] <= a_bnd[XMAX]) || (b_bnd[XMAX] >= a_bnd[XMIN] && b_bnd[XMAX] <= a_bnd[XMAX]))
+		&& ((a_bnd[YMIN] >= b_bnd[YMIN] && a_bnd[YMIN] <= b_bnd[YMAX]) || (a_bnd[YMAX] >= b_bnd[YMIN] && a_bnd[YMAX] <= b_bnd[YMAX])
+		||  (b_bnd[YMIN] >= a_bnd[YMIN] && b_bnd[YMIN] <= a_bnd[YMAX]) || (b_bnd[YMAX] >= a_bnd[YMIN] && b_bnd[YMAX] <= a_bnd[YMAX])))
 			return relation::EdgeEdge::OVERLAPPING;
 		else
 			return relation::EdgeEdge::COLINEAR;
@@ -81,6 +97,15 @@ relation::EdgeEdge Edge::relation_to(Edge const* edge) const {
 	} else {
 		return relation::EdgeEdge::APART;
 	}
+}
+
+//*****************************************************************************
+relation::EdgePoint Edge::relation_to(Point const* point) const {
+	return detect_rotation(vector<Point const*>({ p0, p1, point })) == Polygon::Rotation::COLINEAR
+		&& (point->x <= max(p0->x, p1->x) && point->x >= min(p0->x, p1->x)
+		&&  point->y <= max(p0->y, p1->y) && point->y >= min(p0->y, p1->y))
+		? relation::EdgePoint::ON
+		: relation::EdgePoint::OUT;
 }
 
 /// Returns the intersection point between two edges.
@@ -128,14 +153,55 @@ optional<Point> intersection(Edge const* a, Edge const* b) {
 optional<Range> overlap(Edge const* a, Edge const* b) {
 //array<Point, 2>* overlap(Edge const& a, Edge const& b) {
 //Edge* overlap(Edge const& a, Edge const& b) {
-	if((a->direction == Edge::Direction::XMIN || a->direction == Edge::Direction::XMAX)
-	&& (b->direction == Edge::Direction::XMIN || b->direction == Edge::Direction::XMAX)) {
-		// Parallel |
+	array<double, 4> a_bnd;
+	a_bnd[XMIN] = a->p0->x < a->p1->x ? a->p0->x : a->p1->x;
+	a_bnd[XMAX] = a->p0->x > a->p1->x ? a->p0->x : a->p1->x;
+	a_bnd[YMIN] = a->p0->y < a->p1->y ? a->p0->y : a->p1->y;
+	a_bnd[YMAX] = a->p0->y > a->p1->y ? a->p0->y : a->p1->y;
+	array<double, 4> b_bnd;
+	b_bnd[XMIN] = b->p0->x < b->p1->x ? b->p0->x : b->p1->x;
+	b_bnd[XMAX] = b->p0->x > b->p1->x ? b->p0->x : b->p1->x;
+	b_bnd[YMIN] = b->p0->y < b->p1->y ? b->p0->y : b->p1->y;
+	b_bnd[YMAX] = b->p0->y > b->p1->y ? b->p0->y : b->p1->y;
 
-	} else if((a->direction == Edge::Direction::YMIN || a->direction == Edge::Direction::YMAX)
-	       && (b->direction == Edge::Direction::YMIN || b->direction == Edge::Direction::YMAX)) {
+//	if((a->direction == Edge::Direction::XMIN || a->direction == Edge::Direction::XMAX)
+//	&& (b->direction == Edge::Direction::XMIN || b->direction == Edge::Direction::XMAX)) {
+	if(a->axis == Edge::Axis::X && b->axis == Edge::Axis::X) {
 		// Parallel _
-//		return new Range();
+		double xmin = 0;
+		double xmax = 0;
+		if(a_bnd[XMIN] >= b_bnd[XMIN] && a_bnd[XMIN] <= b_bnd[XMAX])
+			xmin = a_bnd[XMIN];
+		else if(b_bnd[XMIN] >= a_bnd[XMIN] && b_bnd[XMIN] <= a_bnd[XMAX])
+			xmin = b_bnd[XMIN];
+		else
+			return nullopt;
+
+		if(a_bnd[XMAX] >= b_bnd[XMIN] && a_bnd[XMAX] <= b_bnd[XMAX])
+			xmax = a_bnd[XMAX];
+		else if(b_bnd[XMAX] >= a_bnd[XMIN] && b_bnd[XMAX] <= a_bnd[XMAX])
+			xmax = b_bnd[XMAX];
+
+		return Range(Range::Axis::X, xmin, xmax);
+//	} else if((a->direction == Edge::Direction::YMIN || a->direction == Edge::Direction::YMAX)
+//	       && (b->direction == Edge::Direction::YMIN || b->direction == Edge::Direction::YMAX)) {
+	} else if(a->axis == Edge::Axis::Y && b->axis == Edge::Axis::Y) {
+		// Parallel |
+		double ymin = 0;
+		double ymax = 0;
+		if(a_bnd[YMIN] >= b_bnd[YMIN] && a_bnd[YMIN] <= b_bnd[YMAX])
+			ymin = a_bnd[YMIN];
+		else if(b_bnd[YMIN] >= a_bnd[YMIN] && b_bnd[YMIN] <= a_bnd[YMAX])
+			ymin = b_bnd[YMIN];
+		else
+			return nullopt;
+
+		if(a_bnd[YMAX] >= b_bnd[YMIN] && a_bnd[YMAX] <= b_bnd[YMAX])
+			ymax = a_bnd[YMAX];
+		else if(b_bnd[YMAX] >= a_bnd[YMIN] && b_bnd[YMAX] <= a_bnd[YMAX])
+			ymax = b_bnd[YMAX];
+
+		return Range(Range::Axis::Y, ymin, ymax);
 	}
 	return nullopt;
 }

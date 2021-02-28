@@ -10,6 +10,7 @@
 
 /// @test Point operator-(Point const& a, Point const& b)
 /// @test Point operator+(Point const& a, Point const& b)
+/// @test Point operator==(Point const& a, Point const& b)
 /// @test template<typename T> Point operator*(T const n, Point const& p)
 /// @test template<typename T> Point operator*(Point const& p, T const n)
 ///*****************************************************************************
@@ -17,7 +18,6 @@
 //******************************************************************************
 SCENARIO("Point operator-(Point const& a, Point const& b)", "[point]") {
 	GIVEN("Two points") {
-
 		Point a(5, 1);
 		Point b(2, 3.5);
 
@@ -34,7 +34,6 @@ SCENARIO("Point operator-(Point const& a, Point const& b)", "[point]") {
 //******************************************************************************
 SCENARIO("Point operator+(Point const& a, Point const& b)", "[point]") {
 	GIVEN("Two points") {
-
 		Point a(5, 1);
 		Point b(2, 3.5);
 
@@ -49,9 +48,29 @@ SCENARIO("Point operator+(Point const& a, Point const& b)", "[point]") {
 }
 
 //******************************************************************************
-SCENARIO("Point operator*(T const n, Point const& p)", "[point]") {
-	GIVEN("A point and a number") {
+SCENARIO("bool operator==(Point const& a, Point const& b)", "[point]") {
+	GIVEN("A point") {
+		Point a(5, 1);
 
+		WHEN("We compare it to an equivalent point") {
+			Point b(5, 1);
+			THEN("Should be equal") {
+				REQUIRE(a == b);
+			}
+		}
+
+		WHEN("We compare it to a different point") {
+			Point b(1, 1);
+			THEN("Should be equal") {
+				REQUIRE_FALSE(a == b);
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("template<typename T> Point operator*(T const n, Point const& p)", "[point]") {
+	GIVEN("A point and a number") {
 		Point a(5, 1);
 		double n = 3.5;
 

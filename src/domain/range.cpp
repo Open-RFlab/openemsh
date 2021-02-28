@@ -13,7 +13,16 @@
 using namespace std;
 
 //******************************************************************************
-Range::Range(Point const* _p0, Point const* _p1)
-: p0(_p0)
-, p1(_p1)
+//Range::Range(Point const* _p0, Point const* _p1)
+//: p0(_p0)
+//, p1(_p1)
+Range::Range(Axis _axis, double _beg, double _end)
+: axis(_axis)
+, beg(_beg)
+, end(_end)
 {}
+
+//******************************************************************************
+void Range::print() {
+	cout << (axis == Axis::X ? "x : " : "y : ") << beg << " <-> " << end << endl;
+}

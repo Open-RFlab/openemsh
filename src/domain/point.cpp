@@ -30,3 +30,8 @@ Point operator-(Point const& a, Point const& b) {
 Point operator+(Point const& a, Point const& b) {
 	return move(Point(a.x + b.x, a.y + b.y));
 }
+
+//******************************************************************************
+bool operator==(Point const& a, Point const& b) {
+	return (a.x == b.x && a.y == b.y);
+}

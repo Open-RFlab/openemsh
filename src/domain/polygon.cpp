@@ -6,8 +6,6 @@
 
 #include <iostream>
 
-#include <limits>
-
 #include "edge.hpp"
 #include "point.hpp"
 
@@ -26,6 +24,7 @@ Polygon::Polygon(initializer_list<Point> _points)
 		if(point.y < bounding[YMIN]) bounding[YMIN] = point.y;
 		if(point.y > bounding[YMAX]) bounding[YMAX] = point.y;
 	}
+	points.shrink_to_fit();
 
 	rotation = detect_rotation(points);
 
@@ -34,6 +33,7 @@ Polygon::Polygon(initializer_list<Point> _points)
 		edges.emplace_back(make_unique<Edge>(prev, point.get()));
 		prev = point.get();
 	}
+	edges.shrink_to_fit();
 
 	detect_edge_normal();
 }
@@ -116,19 +116,53 @@ void Polygon::detect_edge_normal() {
 	}	
 }
 
-// TODO handle polygon edges colinear to ray.
-// try all the 4 orthogonal rays? :/ then try diagonal rays
-// infinite -> boundary + 1
-//******************************************************************************
+/// Based on the ray casting method.
+/// Vertices on the chosen ray may false the result so multiple retrys may be
+/// needed. The first rays tried are the 4 orthogonal ones because detecting a
+/// crossing relation with an edge will be faster with these ones. Then
+/// diagonals will be tried.
+///*****************************************************************************
 relation::PolygonPoint Polygon::relation_to(Point const* point) const {
-	Point p(numeric_limits<double>::infinity(), point->y);
-	Edge ray(point, &p);
+	vector<Point> to_try({
+		{ bounding[XMIN] - 1, point->y },
+		{ bounding[XMAX] + 1, point->y },
+		{ point->x, bounding[YMIN] - 1 },
+		{ point->x, bounding[YMAX] + 1 }});
+		/* The followings are like that.
+		{ bounding[XMAX] + 1, point->y + n } */
 
-	unsigned int count = 0;
-	for(unique_ptr<Edge> const& edge : edges) {
-		if(edge->relation_to(&ray) == relation::EdgeEdge::CROSSING)
-			++count;
-	}
+	bool need_retry;
+	unsigned int count;
+	unsigned int n = 0;
+
+	do {
+		need_retry = false;
+		count = 0;
+		if(to_try.size() <= n)
+			to_try.emplace_back(Point(bounding[XMAX] + 1, point->y + n));
+		Edge ray(point, &to_try[n++]);
+
+		// Detect vertices on the ray.
+		for(unique_ptr<Point const> const& p : points) {
+			if(*p == *point) {
+				return relation::PolygonPoint::ON;
+			} else if(ray.relation_to(p.get()) == relation::EdgePoint::ON) {
+				need_retry = true;
+				break;
+			}
+		}
+		if(need_retry)
+			continue;
+
+		for(unique_ptr<Edge> const& edge : edges) {
+			if(edge->relation_to(point) == relation::EdgePoint::ON)
+				return relation::PolygonPoint::ON;
+
+			if(edge->relation_to(&ray) == relation::EdgeEdge::CROSSING) {
+				++count;
+			}
+		}
+	} while(need_retry);
 
 	if(count % 2)
 		return relation::PolygonPoint::IN;

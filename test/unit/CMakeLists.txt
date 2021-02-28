@@ -8,6 +8,7 @@ set( TESTS
 
 set( SOURCES
 	"${CMAKE_SOURCE_DIR}/src/domain/point.cpp"
+	"${CMAKE_SOURCE_DIR}/src/domain/range.cpp"
 	"${CMAKE_SOURCE_DIR}/src/domain/edge.cpp"
 	"${CMAKE_SOURCE_DIR}/src/domain/polygon.cpp"
 	)

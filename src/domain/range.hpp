@@ -14,8 +14,18 @@ class Point;
 //******************************************************************************
 class Range : public IConflictOrigin, public IMeshLineOrigin {
 public:
-	Point const* const p0;
-	Point const* const p1;
+//	Point const* const p0;
+//	Point const* const p1;
 
-	Range(Point const* _p0, Point const* _p1);
+//	Range(Point const* _p0, Point const* _p1);
+	enum class Axis {
+		X,
+		Y
+	} axis;
+
+	double beg;
+	double end;
+
+	Range(Axis _axis, double _beg, double _end);
+	void print();
 };
