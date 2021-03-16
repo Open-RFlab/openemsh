@@ -1,4 +1,3 @@
-#include( Catch )
 
 set( TESTS
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_point.cpp"
