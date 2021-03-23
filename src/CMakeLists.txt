@@ -10,7 +10,7 @@ set( SOURCES
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflict_edge_in_polygon.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflict_manager.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/board.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/ui/main.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
 	)
 
 #[[
