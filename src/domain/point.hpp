@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <utility>
-
 //******************************************************************************
 class Point {
 public:
@@ -30,11 +28,11 @@ bool operator==(Point const& a, Point const& b);
 //******************************************************************************
 template<typename T>
 Point operator*(T const n, Point const& p) {
-	return std::move(Point(p.x * n, p.y * n));
+	return Point(p.x * n, p.y * n);
 }
 
 //******************************************************************************
 template<typename T>
 Point operator*(Point const& p, T const n) {
-	return std::move(Point(p.x * n, p.y * n));
+	return Point(p.x * n, p.y * n);
 }

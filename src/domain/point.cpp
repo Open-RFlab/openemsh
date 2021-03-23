@@ -23,12 +23,12 @@ void Point::print() const {
 
 //******************************************************************************
 Point operator-(Point const& a, Point const& b) {
-	return move(Point(a.x - b.x, a.y - b.y));
+	return Point(a.x - b.x, a.y - b.y);
 }
 
 //******************************************************************************
 Point operator+(Point const& a, Point const& b) {
-	return move(Point(a.x + b.x, a.y + b.y));
+	return Point(a.x + b.x, a.y + b.y);
 }
 
 //******************************************************************************
