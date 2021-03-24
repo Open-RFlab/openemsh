@@ -17,7 +17,7 @@ using namespace std;
 Polygon::Polygon(initializer_list<Point> _points)
 : bounding({ begin(_points)->x, begin(_points)->x, begin(_points)->y, begin(_points)->y }) {
 	for(Point const& point : _points) {
-		points.emplace_back(make_unique<Point>(point)); // TODO do not use initializer_list because of copies
+		points.push_back(make_unique<Point>(point)); // TODO do not use initializer_list because of copies
 
 		if(point.x < bounding[XMIN]) bounding[XMIN] = point.x;
 		if(point.x > bounding[XMAX]) bounding[XMAX] = point.x;
@@ -30,7 +30,7 @@ Polygon::Polygon(initializer_list<Point> _points)
 
 	Point const* prev = points.back().get();
 	for(unique_ptr<Point const>& point : points) {
-		edges.emplace_back(make_unique<Edge>(prev, point.get()));
+		edges.push_back(make_unique<Edge>(prev, point.get()));
 		prev = point.get();
 	}
 	edges.shrink_to_fit();
@@ -139,7 +139,7 @@ relation::PolygonPoint Polygon::relation_to(Point const* point) const {
 		need_retry = false;
 		count = 0;
 		if(to_try.size() <= n)
-			to_try.emplace_back(Point(bounding[XMAX] + 1, point->y + n));
+			to_try.emplace_back(bounding[XMAX] + 1, point->y + n);
 		Edge ray(point, &to_try[n++]);
 
 		// Detect vertices on the ray.

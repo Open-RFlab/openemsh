@@ -40,4 +40,16 @@ enum class PolygonPoint {
 	OUT    ///< Point outside the polygon.
 };
 
+//******************************************************************************
+PolygonPoint cast(PolygonEdge const a);
+
+//******************************************************************************
+PolygonEdge cast(PolygonPoint const a);
+
+//******************************************************************************
+void toggle(PolygonEdge& a);
+
+//******************************************************************************
+void toggle(PolygonPoint& a);
+
 }; // namespace relation

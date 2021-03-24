@@ -18,7 +18,8 @@ class Conflict : public IMeshLineOrigin {
 public:
 	enum class Kind {
 		USER_WILL, // TODO multiple cases ?
-		EDGE_IN_POLYGON, // TODO EDGE_IN_MULTIPLE_POLYGONS : store cross point, portion in / out ?
+		EDGE_IN_POLYGON,
+//		OVERLAPPING_EDGES, // TODO this or EDGE_IN_POLYGON subcase? try EOP first
 		COLINEAR_EDGES
 	} kind;
 

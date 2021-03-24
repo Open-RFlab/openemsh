@@ -7,6 +7,8 @@
 #pragma once
 
 #include <memory>
+#include <optional>
+#include <tuple>
 #include <vector>
 
 #include "conflict.hpp"
@@ -18,14 +20,13 @@ class Polygon;
 //******************************************************************************
 class ConflictEdgeInPolygon : public Conflict {
 public:
-	/// Assumes a correspondance between polygons and ranges order.
-	/// A nullptr range means the edge is totally in the polygon.
+	/// The optional overlap edge is reserved for when edge is overlapping an
+	/// edge of the polygon and not just the polygon itself.
 	///*************************************************************************
 	Edge const* edge;
-	std::vector<Polygon const*> polygons;
-	std::vector<std::unique_ptr<Range const>> ranges;
+	std::vector<std::tuple<Polygon const*, std::unique_ptr<Range const>, std::optional<Edge const*>>> overlaps;
 
-	ConflictEdgeInPolygon(Edge const* _edge, Polygon const* _polygon, Range const* _range);
+	ConflictEdgeInPolygon(Edge const* a, Polygon const* _polygon, Range const _range, std::optional<Edge const*> b);
 
 
 //	/// For all EDGE_PARTIALLY_IN_POLYGON conflict including the same edge,
@@ -34,5 +35,5 @@ public:
 //	void solve() override;
 
 //	bool is_between(IConflictOrigin* a, IConflictOrigin* b) const override;
-	void append(Polygon const* polygon, Range const* range);
+	void append(Polygon const* polygon, Range const range, std::optional<Edge const*> edge);
 };

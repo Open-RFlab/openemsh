@@ -42,6 +42,8 @@ public:
 	} type; // TODO usefull?
 
 	std::array<double, 4> bounding;
+
+	// TODO rm unique_ptr ?
 	std::vector<std::unique_ptr<Point const>> points;
 
 	/// edge[0] is between points[n] & points[0]

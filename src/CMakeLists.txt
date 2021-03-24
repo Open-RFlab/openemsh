@@ -1,5 +1,6 @@
 
 set( SOURCES_DOMAIN
+	"${CMAKE_CURRENT_SOURCE_DIR}/domain/relation.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/point.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/edge.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/range.cpp"

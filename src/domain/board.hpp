@@ -37,7 +37,5 @@ public:
 	void detect_edges_in_polygons();
 	void detect_colinear_edges();
 
-	void add_conflict(Conflict::Kind kind, IConflictOrigin* a, IConflictOrigin* b); // Scan conflicts : append to a conflict / create one.
-
 	void print();
 };

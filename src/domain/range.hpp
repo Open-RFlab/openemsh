@@ -8,24 +8,25 @@
 
 #include "i_conflict_origin.hpp"
 #include "i_meshline_origin.hpp"
+#include "point.hpp"
 
-class Point;
+//class Point;
 
 //******************************************************************************
 class Range : public IConflictOrigin, public IMeshLineOrigin {
 public:
-//	Point const* const p0;
-//	Point const* const p1;
-
-//	Range(Point const* _p0, Point const* _p1);
 	enum class Axis {
 		X,
-		Y
+		Y,
+		DIAGONAL
 	} axis;
 
-	double beg;
-	double end;
+	Point const p0;
+	Point const p1;
+	Point const vec;
 
-	Range(Axis _axis, double _beg, double _end);
-	void print();
+	Range(Point _p0, Point _p1);
 };
+
+//******************************************************************************
+bool operator==(Range const& a, Range const& b);

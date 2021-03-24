@@ -26,54 +26,121 @@ Board::Board(vector<unique_ptr<Polygon>>& _polygons)
 }
 
 /// Detect all EDGE_IN_POLYGON. Will also detect some COLINEAR_EDGES.
+/// Overlapping edges should be EDGE_IN_POLYGON and not COLINEAR_EDGES.
 ///*****************************************************************************
 void Board::detect_edges_in_polygons() {
-	for(size_t i = 0; i < polygons.size() ; ++i) {
-		for(size_t j = i + 1; j < polygons.size(); ++j) {
-			if(are_possibly_overlapping(*polygons[i], *polygons[j])) {
-//				for(unique_ptr<Edge>& edge_i : polygons[i]->edges) {
-//					for(unique_ptr<Edge>& edge_j : polygons[j]->edges) {
-//						relation::EdgeEdge e = edge_i->relation_to(edge_j.get());
+	for(unique_ptr<Polygon>& poly_a : polygons) {
+		for(unique_ptr<Polygon>& poly_b : polygons) {
+			if(poly_b == poly_a)
+				continue;
 
-				relation::PolygonEdge side; // TODO check if first point is in polygon
+			bool need_p0_check = true;
+			relation::PolygonPoint p0_pos;
+			relation::PolygonPoint current_pos;
+			for(unique_ptr<Edge>& edge_a : poly_a->edges) {
+				if(need_p0_check)
+					p0_pos = poly_b->relation_to(poly_a->points.front().get());
+				need_p0_check = false;
 
-				for(size_t k = 0; k < polygons[i]->edges.size(); ++k) {
-					for(size_t l = k + 1; l < polygons[j]->edges.size(); ++l) { // TODO k+1 -> broken for?
-
-
-						relation::EdgeEdge e = polygons[i]->edges[k]->relation_to(polygons[j]->edges[l].get()); // TODO e better name
-						polygons[i]->edges[k]->print();
-						polygons[j]->edges[l]->print();
-						switch(e) {
-						case relation::EdgeEdge::APART: {
-
-							cout << "i: " << i << "\tj: " << j << "\t\tAPART" << endl;
-							break;
-						} case relation::EdgeEdge::CROSSING: {
-							if(optional<Point> p = intersection(polygons[i]->edges[k].get(), polygons[j]->edges[l].get()))
-								p->print();
-
-//							if(p)
-							cout << "i: " << i << "\tj: " << j << "\t\tCROSSING" << endl;
-							break;
-						} case relation::EdgeEdge::COLINEAR: {
-							conflict_manager.add_colinear_edges(polygons[i]->edges[k].get(), polygons[j]->edges[l].get());
-
-							cout << "i: " << i << "\tj: " << j << "\t\tCOLINEAR" << endl;
-							break;
-						} case relation::EdgeEdge::OVERLAPPING: {
-							if(optional<Range> r = overlap(polygons[i]->edges[k].get(), polygons[j]->edges[l].get()))
-								r->print();
-
-							cout << "i: " << i << "\tj: " << j << "\t\tOVERLAPPING" << endl;
-							break;
-						}
-						}
+				unsigned int edge_a_intersections = 0;
+				for(unique_ptr<Edge>& edge_b : poly_b->edges) {
+					relation::EdgeEdge rel = edge_a->relation_to(edge_b.get());
+					switch(rel) {
+					case relation::EdgeEdge::APART: break;
+					case relation::EdgeEdge::CROSSING:
+						++edge_a_intersections;
+						toggle(current_pos);
+						break;
+					case relation::EdgeEdge::COLINEAR: break;
+					case relation::EdgeEdge::OVERLAPPING:
+//						++edge_a_intersections; // TODO is it an intersection? no, useless : ON invalidate toggle
+						current_pos = relation::PolygonPoint::ON;
+						break;
 					}
+				}
+
+				// TODO from current_pos & edge_a_intersections & p0_pos & p1_pos
+				// find if edge_a <-> poly_b relation
+				switch(current_pos) {
+				case relation::PolygonPoint::ON: {
+					break;
+				} case relation::PolygonPoint::IN: {
+					if(!edge_a_intersections) {
+						// edge_a is totally inside poly_b
+						switch(edge_a->axis) {
+						case Edge::Axis::X:
+						case Edge::Axis::Y:
+						case Edge::Axis::DIAGONAL: break;
+						}
+						conflict_manager.add_edge_in_polygon(edge_a.get(), poly_b.get());
+					}
+					break;
+				} case relation::PolygonPoint::OUT: {
+					break;
+				}
 				}
 			}
 		}
 	}
+/*
+	for(size_t i = 0; i < polygons.size() ; ++i) {
+		for(size_t j = i + 1; j < polygons.size(); ++j) {
+			if(!are_possibly_overlapping(*polygons[i], *polygons[j]))
+				continue;
+//				for(unique_ptr<Edge>& edge_i : polygons[i]->edges) {
+//					for(unique_ptr<Edge>& edge_j : polygons[j]->edges) {
+//						relation::EdgeEdge e = edge_i->relation_to(edge_j.get());
+
+			Polygon* poly_a = polygons[i].get();
+			Polygon* poly_b = polygons[j].get();
+
+			relation::PolygonEdge side = cast(poly_b->relation_to(poly_a->points.front().get())); // TODO check if first point is in polygon
+
+			for(size_t k = 0; k < poly_a->edges.size(); ++k) {
+				Edge* edge_a = poly_a->edges[k].get();
+
+				for(size_t l = k + 1; l < poly_b->edges.size(); ++l) { // TODO k+1 -> broken for?
+
+					Edge* edge_b = poly_b->edges[l].get();
+
+					relation::EdgeEdge e = edge_a->relation_to(edge_b); // TODO e better name
+//					edge_a->print();
+//					edge_b->print();
+					switch(e) {
+					case relation::EdgeEdge::APART: {
+						break;
+					} case relation::EdgeEdge::CROSSING: {
+						if(optional<Point> p = intersection(edge_a, edge_b)) {
+							relation::PolygonPoint r = poly_a->relation_to(&p.value());
+							switch(r) {
+							case relation::PolygonPoint::IN:
+							case relation::PolygonPoint::ON:
+							case relation::PolygonPoint::OUT:
+							}
+							p->print();
+						}
+
+						break;
+					} case relation::EdgeEdge::COLINEAR: {
+						conflict_manager.add_colinear_edges(edge_a, edge_b);
+
+						break;
+					} case relation::EdgeEdge::OVERLAPPING: {
+						if(optional<Range> r = overlap(edge_a, edge_b))
+							r->print();
+
+						break;
+					}
+					}
+				}
+			}
+//						cout << "i: " << i << "\tj: " << j << "\t\tAPART" << endl;
+//						cout << "i: " << i << "\tj: " << j << "\t\tCROSSING" << endl;
+//						cout << "i: " << i << "\tj: " << j << "\t\tCOLINEAR" << endl;
+//						cout << "i: " << i << "\tj: " << j << "\t\tOVERLAPPING" << endl;
+		}
+	}
+*/
 }
 
 //****************************************************************************** TODO handle conflicts
@@ -106,27 +173,4 @@ void Board::detect_colinear_edges() {
 void Board::print() {
 	for(unique_ptr<Polygon>& polygon : polygons)
 		polygon->print();
-}
-
-// TODO use add_conflict_edge_in_polygon instead of interface type & switch ?
-// TODO wrap all in a factory
-//******************************************************************************
-void Board::add_conflict(Conflict::Kind kind, IConflictOrigin* a, IConflictOrigin* b) {
-	switch(kind) {
-	case Conflict::Kind::EDGE_IN_POLYGON: {
-		bool exist = false;
-		for(unique_ptr<Conflict>& conflict : conflicts) {
-			if(conflict->kind == kind && dynamic_cast<ConflictEdgeInPolygon*>(conflict.get())->edge == a) {
-//				dynamic_cast<ConflictEdgeInPolygon*>(conflict.get())->append(b);
-				exist = true;
-				break;
-			}
-		}
-		if(!exist)
-//			conflicts.push_back(make_unique<ConflictEdgeInPolygon>(dynamic_cast<Edge*>(a), dynamic_cast<Polygon*>(b)));
-		break;
-	} default: {
-		break;
-	}
-	}
 }

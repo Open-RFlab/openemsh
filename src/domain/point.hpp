@@ -6,6 +6,8 @@
 
 #pragma once
 
+// TODO use std::complex instead of Point?
+
 //******************************************************************************
 class Point {
 public:

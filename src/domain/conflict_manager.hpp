@@ -7,6 +7,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "conflict.hpp"
@@ -22,6 +23,9 @@ private:
 	std::vector<std::unique_ptr<Conflict>>& conflicts;
 public:
 	ConflictManager(std::vector<std::unique_ptr<Conflict>>& _conflicts);
+
 	void add_colinear_edges(Edge* a, Edge* b);
-	void add_edge_in_polygon(Edge* _edge, Polygon* _polygon, Range const* _range); // TODO
+
+	void add_edge_in_polygon(Edge* a, Polygon* polygon, std::optional<Edge const*> b = std::nullopt);
+	void add_edge_in_polygon(Edge* a, Polygon* polygon, Range const range, std::optional<Edge const*> b = std::nullopt);
 };

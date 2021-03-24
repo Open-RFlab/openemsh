@@ -9,16 +9,13 @@
 using namespace std;
 
 //******************************************************************************
-ConflictEdgeInPolygon::ConflictEdgeInPolygon(Edge const* _edge, Polygon const* _polygon, Range const* _range)
+ConflictEdgeInPolygon::ConflictEdgeInPolygon(Edge const* a, Polygon const* _polygon, Range const _range, optional<Edge const*> b)
 : Conflict(Kind::EDGE_IN_POLYGON)
-, edge(_edge)
-, polygons({ _polygon }) {
-//, ranges({ unique_ptr<Range const>(_range) }) { // TODO why?
-	ranges.push_back(unique_ptr<Range const>(_range));
+, edge(a) {
+	overlaps.emplace_back(_polygon, make_unique<Range const>(_range), b);
 }
 
 //******************************************************************************
-void ConflictEdgeInPolygon::append(Polygon const* polygon, Range const* range) {
-	polygons.push_back(polygon);
-	ranges.push_back(unique_ptr<Range const>(range));
+void ConflictEdgeInPolygon::append(Polygon const* polygon, Range const range, optional<Edge const*> edge) {
+	overlaps.emplace_back(polygon, make_unique<Range const>(range), edge);
 }

@@ -6,23 +6,25 @@
 
 #include <iostream>
 
-#include "point.hpp"
-
 #include "range.hpp"
 
 using namespace std;
 
 //******************************************************************************
-//Range::Range(Point const* _p0, Point const* _p1)
-//: p0(_p0)
-//, p1(_p1)
-Range::Range(Axis _axis, double _beg, double _end)
-: axis(_axis)
-, beg(_beg)
-, end(_end)
-{}
+Range::Range(Point const _p0, Point const _p1)
+: p0(_p0)
+, p1(_p1)
+, vec(p1 - p0) {
+	if(vec.x == 0) {
+		axis = Axis::Y;
+	} else if(vec.y == 0) {
+		axis = Axis::X;
+	} else {
+		axis = Axis::DIAGONAL;
+	}
+}
 
 //******************************************************************************
-void Range::print() {
-	cout << (axis == Axis::X ? "x : " : "y : ") << beg << " <-> " << end << endl;
+bool operator==(Range const& a, Range const& b) {
+	return (a.p0 == b.p0 && a.p1 == b.p1);
 }

@@ -317,6 +317,7 @@ SCENARIO("std::optional<Point> intersection(Edge const* a, Edge const* b)", "[ed
 			Edge a(&a0, &a1), b(&b0, &b1);
 			std::optional<Point> p(intersection(&a, &b));
 			THEN("There should not be any intersection point") {
+// TODO
 //				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::APART);
 //				REQUIRE_FALSE(p);
 			}
@@ -338,12 +339,16 @@ SCENARIO("std::optional<Range> overlap(Edge const* a, Edge const* b)", "[edge]")
 				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::OVERLAPPING);
 				REQUIRE(r);
 				REQUIRE(r->axis == Range::Axis::X);
-				REQUIRE(r->beg == 2);
-				REQUIRE(r->end == 3);
+				REQUIRE(r->p0.x == 2);
+				REQUIRE(r->p1.x == 3);
+				REQUIRE(r->p0.y == 1);
+				REQUIRE(r->p1.y == 1);
 				REQUIRE(s);
 				REQUIRE(s->axis == Range::Axis::X);
-				REQUIRE(s->beg == 2);
-				REQUIRE(s->end == 3);
+				REQUIRE(s->p0.x == 2);
+				REQUIRE(s->p1.x == 3);
+				REQUIRE(s->p0.y == 1);
+				REQUIRE(s->p1.y == 1);
 			}
 		}
 
@@ -357,12 +362,16 @@ SCENARIO("std::optional<Range> overlap(Edge const* a, Edge const* b)", "[edge]")
 				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::OVERLAPPING);
 				REQUIRE(r);
 				REQUIRE(r->axis == Range::Axis::X);
-				REQUIRE(r->beg == 2);
-				REQUIRE(r->end == 3);
+				REQUIRE(r->p0.x == 2);
+				REQUIRE(r->p1.x == 3);
+				REQUIRE(r->p0.y == 1);
+				REQUIRE(r->p1.y == 1);
 				REQUIRE(s);
 				REQUIRE(s->axis == Range::Axis::X);
-				REQUIRE(s->beg == 2);
-				REQUIRE(s->end == 3);
+				REQUIRE(s->p0.x == 2);
+				REQUIRE(s->p1.x == 3);
+				REQUIRE(s->p0.y == 1);
+				REQUIRE(s->p1.y == 1);
 			}
 		}
 
@@ -402,12 +411,16 @@ SCENARIO("std::optional<Range> overlap(Edge const* a, Edge const* b)", "[edge]")
 				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::OVERLAPPING);
 				REQUIRE(r);
 				REQUIRE(r->axis == Range::Axis::Y);
-				REQUIRE(r->beg == 2);
-				REQUIRE(r->end == 3);
+				REQUIRE(r->p0.y == 2);
+				REQUIRE(r->p1.y == 3);
+				REQUIRE(r->p0.x == 1);
+				REQUIRE(r->p1.x == 1);
 				REQUIRE(s);
 				REQUIRE(s->axis == Range::Axis::Y);
-				REQUIRE(s->beg == 2);
-				REQUIRE(s->end == 3);
+				REQUIRE(s->p0.y == 2);
+				REQUIRE(s->p1.y == 3);
+				REQUIRE(s->p0.x == 1);
+				REQUIRE(s->p1.x == 1);
 			}
 		}
 
@@ -421,12 +434,16 @@ SCENARIO("std::optional<Range> overlap(Edge const* a, Edge const* b)", "[edge]")
 				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::OVERLAPPING);
 				REQUIRE(r);
 				REQUIRE(r->axis == Range::Axis::Y);
-				REQUIRE(r->beg == 2);
-				REQUIRE(r->end == 3);
+				REQUIRE(r->p0.y == 2);
+				REQUIRE(r->p1.y == 3);
+				REQUIRE(r->p0.x == 1);
+				REQUIRE(r->p1.x == 1);
 				REQUIRE(s);
 				REQUIRE(s->axis == Range::Axis::Y);
-				REQUIRE(s->beg == 2);
-				REQUIRE(s->end == 3);
+				REQUIRE(s->p0.y == 2);
+				REQUIRE(s->p1.y == 3);
+				REQUIRE(s->p0.x == 1);
+				REQUIRE(s->p1.x == 1);
 			}
 		}
 
@@ -464,8 +481,18 @@ SCENARIO("std::optional<Range> overlap(Edge const* a, Edge const* b)", "[edge]")
 			std::optional<Range> s(overlap(&b, &a));
 			THEN("There should not be any overlap range") {
 				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::OVERLAPPING);
-				REQUIRE_FALSE(r);
-				REQUIRE_FALSE(s);
+				REQUIRE(r);
+				REQUIRE(r->axis == Range::Axis::DIAGONAL);
+				REQUIRE(r->p0.x == 2);
+				REQUIRE(r->p1.x == 3);
+				REQUIRE(r->p0.y == 2);
+				REQUIRE(r->p1.y == 3);
+				REQUIRE(s);
+				REQUIRE(s->axis == Range::Axis::DIAGONAL);
+				REQUIRE(s->p0.x == 2);
+				REQUIRE(s->p1.x == 3);
+				REQUIRE(s->p0.y == 2);
+				REQUIRE(s->p1.y == 3);
 			}
 		}
 
