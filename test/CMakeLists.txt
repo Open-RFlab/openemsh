@@ -26,7 +26,8 @@ add_test( NAME Unittest
 if( CMAKE_BUILD_TYPE MATCHES Coverage )
 
 	add_custom_target( coverage
-		COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure Unittest
+#		COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure Unittest
+		COMMAND bash env -c "${CMAKE_CTEST_COMMAND} --output-on-failure Unittest ;:;"
 		COMMAND ${LCOV} -d "${CMAKE_CURRENT_BINARY_DIR}/unit/CMakeFiles/unittest.dir/__/__/src" -c -o "${CMAKE_CURRENT_BINARY_DIR}/coverage.tmp.info"
 		COMMAND ${LCOV} -q -r "${CMAKE_CURRENT_BINARY_DIR}/coverage.tmp.info" '${CMAKE_CURRENT_BINARY_DIR}/unittest_autogen/*' '/usr/*' -o "${CMAKE_CURRENT_BINARY_DIR}/coverage.info"
 		COMMAND ${GENHTML} "${CMAKE_CURRENT_BINARY_DIR}/coverage.info" -o "${CMAKE_CURRENT_BINARY_DIR}/coverage"
