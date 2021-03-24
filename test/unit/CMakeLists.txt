@@ -5,18 +5,15 @@ set( TESTS
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_polygon.cpp"
 	)
 
-set( SOURCES
-	"${CMAKE_SOURCE_DIR}/src/domain/point.cpp"
-	"${CMAKE_SOURCE_DIR}/src/domain/range.cpp"
-	"${CMAKE_SOURCE_DIR}/src/domain/edge.cpp"
-	"${CMAKE_SOURCE_DIR}/src/domain/polygon.cpp"
+get_property( SOURCES_DOMAIN GLOBAL
+	PROPERTY "GLOBAL_SOURCES_DOMAIN"
 	)
 
 add_executable( unittest EXCLUDE_FROM_ALL )
 
 target_sources( unittest
 	PRIVATE
-	${SOURCES}
+	${SOURCES_DOMAIN}
 	${TESTS}
 	)
 

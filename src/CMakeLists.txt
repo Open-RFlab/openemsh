@@ -1,5 +1,5 @@
 
-set( SOURCES
+set( SOURCES_DOMAIN
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/point.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/edge.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/range.cpp"
@@ -10,7 +10,10 @@ set( SOURCES
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflict_edge_in_polygon.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflict_manager.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/board.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
+	)
+
+set_property( GLOBAL
+	PROPERTY "GLOBAL_SOURCES_DOMAIN" "${SOURCES_DOMAIN}"
 	)
 
 #[[
@@ -26,7 +29,8 @@ add_executable( ${PROJECT_NAME} )
 
 target_sources( ${PROJECT_NAME}
 	PRIVATE
-	${SOURCES}
+	${SOURCES_DOMAIN}
+	"${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
 	)
 
 #[[
