@@ -143,7 +143,7 @@ void Board::detect_edges_in_polygons() {
 */
 }
 
-//****************************************************************************** TODO handle conflicts
+//******************************************************************************
 void Board::detect_colinear_edges() {
 	for(size_t i = 0; i < edges.size(); ++i) {
 		if(edges[i]->axis == Edge::Axis::DIAGONAL)
@@ -155,11 +155,11 @@ void Board::detect_colinear_edges() {
 
 			switch(edges[i]->axis) {
 			case Edge::Axis::X:
-				if(edges[i]->p0->x == edges[j]->p0->x)
+				if(edges[i]->p0->y == edges[j]->p0->y)
 					conflict_manager.add_colinear_edges(edges[i], edges[j]);
 				break;
 			case Edge::Axis::Y:
-				if(edges[i]->p0->y == edges[j]->p0->y)
+				if(edges[i]->p0->x == edges[j]->p0->x)
 					conflict_manager.add_colinear_edges(edges[i], edges[j]);
 				break;
 			default:

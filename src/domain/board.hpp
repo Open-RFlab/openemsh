@@ -20,6 +20,10 @@
 #include "polygon.hpp"
 //#include "range.hpp"
 
+#ifdef UNITTEST
+#define private public
+#endif // UNITTEST
+
 //******************************************************************************
 class Board {
 private:
@@ -39,3 +43,7 @@ public:
 
 	void print();
 };
+
+#ifdef UNITTEST
+#undef private
+#endif // UNITTEST
