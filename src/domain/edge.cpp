@@ -150,50 +150,51 @@ optional<Point> intersection(Edge const* a, Edge const* b) {
 /// Returns nullopt if not overlapping edges.
 ///*****************************************************************************
 optional<Range> overlap(Edge const* a, Edge const* b) {
-	array<double, 4> a_bnd;
-	a_bnd[XMIN] = a->p0->x < a->p1->x ? a->p0->x : a->p1->x;
-	a_bnd[XMAX] = a->p0->x > a->p1->x ? a->p0->x : a->p1->x;
-	a_bnd[YMIN] = a->p0->y < a->p1->y ? a->p0->y : a->p1->y;
-	a_bnd[YMAX] = a->p0->y > a->p1->y ? a->p0->y : a->p1->y;
-	array<double, 4> b_bnd;
-	b_bnd[XMIN] = b->p0->x < b->p1->x ? b->p0->x : b->p1->x;
-	b_bnd[XMAX] = b->p0->x > b->p1->x ? b->p0->x : b->p1->x;
-	b_bnd[YMIN] = b->p0->y < b->p1->y ? b->p0->y : b->p1->y;
-	b_bnd[YMAX] = b->p0->y > b->p1->y ? b->p0->y : b->p1->y;
-
-	double xmin = 0;
-	double xmax = 0;
-	if(a_bnd[XMIN] >= b_bnd[XMIN] && a_bnd[XMIN] <= b_bnd[XMAX])
-		xmin = a_bnd[XMIN];
-	else if(b_bnd[XMIN] >= a_bnd[XMIN] && b_bnd[XMIN] <= a_bnd[XMAX])
-		xmin = b_bnd[XMIN];
-	else
-		return nullopt;
-
-	if(a_bnd[XMAX] >= b_bnd[XMIN] && a_bnd[XMAX] <= b_bnd[XMAX])
-		xmax = a_bnd[XMAX];
-	else if(b_bnd[XMAX] >= a_bnd[XMIN] && b_bnd[XMAX] <= a_bnd[XMAX])
-		xmax = b_bnd[XMAX];
-
-	double ymin = 0;
-	double ymax = 0;
-	if(a_bnd[YMIN] >= b_bnd[YMIN] && a_bnd[YMIN] <= b_bnd[YMAX])
-		ymin = a_bnd[YMIN];
-	else if(b_bnd[YMIN] >= a_bnd[YMIN] && b_bnd[YMIN] <= a_bnd[YMAX])
-		ymin = b_bnd[YMIN];
-	else
-		return nullopt;
-
-	if(a_bnd[YMAX] >= b_bnd[YMIN] && a_bnd[YMAX] <= b_bnd[YMAX])
-		ymax = a_bnd[YMAX];
-	else if(b_bnd[YMAX] >= a_bnd[YMIN] && b_bnd[YMAX] <= a_bnd[YMAX])
-		ymax = b_bnd[YMAX];
-
+//optional<pair<Point>> overlap(Edge const* a, Edge const* b) { // TODO ?
 	if((a->axis == Edge::Axis::X && b->axis == Edge::Axis::X)
 	|| (a->axis == Edge::Axis::Y && b->axis == Edge::Axis::Y)
-	|| (a->vec->y / a->vec->x == b->vec->y / b->vec->x))
-		return Range(Point(xmin, ymin), Point(xmax, ymax));
+	|| (a->vec->y / a->vec->x == b->vec->y / b->vec->x)) {
+		array<double, 4> a_bnd;
+		a_bnd[XMIN] = a->p0->x < a->p1->x ? a->p0->x : a->p1->x;
+		a_bnd[XMAX] = a->p0->x > a->p1->x ? a->p0->x : a->p1->x;
+		a_bnd[YMIN] = a->p0->y < a->p1->y ? a->p0->y : a->p1->y;
+		a_bnd[YMAX] = a->p0->y > a->p1->y ? a->p0->y : a->p1->y;
+		array<double, 4> b_bnd;
+		b_bnd[XMIN] = b->p0->x < b->p1->x ? b->p0->x : b->p1->x;
+		b_bnd[XMAX] = b->p0->x > b->p1->x ? b->p0->x : b->p1->x;
+		b_bnd[YMIN] = b->p0->y < b->p1->y ? b->p0->y : b->p1->y;
+		b_bnd[YMAX] = b->p0->y > b->p1->y ? b->p0->y : b->p1->y;
 
+		double xmin = 0;
+		double xmax = 0;
+		if(a_bnd[XMIN] >= b_bnd[XMIN] && a_bnd[XMIN] <= b_bnd[XMAX])
+			xmin = a_bnd[XMIN];
+		else if(b_bnd[XMIN] >= a_bnd[XMIN] && b_bnd[XMIN] <= a_bnd[XMAX])
+			xmin = b_bnd[XMIN];
+		else
+			return nullopt;
+
+		if(a_bnd[XMAX] >= b_bnd[XMIN] && a_bnd[XMAX] <= b_bnd[XMAX])
+			xmax = a_bnd[XMAX];
+		else if(b_bnd[XMAX] >= a_bnd[XMIN] && b_bnd[XMAX] <= a_bnd[XMAX])
+			xmax = b_bnd[XMAX];
+
+		double ymin = 0;
+		double ymax = 0;
+		if(a_bnd[YMIN] >= b_bnd[YMIN] && a_bnd[YMIN] <= b_bnd[YMAX])
+			ymin = a_bnd[YMIN];
+		else if(b_bnd[YMIN] >= a_bnd[YMIN] && b_bnd[YMIN] <= a_bnd[YMAX])
+			ymin = b_bnd[YMIN];
+		else
+			return nullopt;
+
+		if(a_bnd[YMAX] >= b_bnd[YMIN] && a_bnd[YMAX] <= b_bnd[YMAX])
+			ymax = a_bnd[YMAX];
+		else if(b_bnd[YMAX] >= a_bnd[YMIN] && b_bnd[YMAX] <= a_bnd[YMAX])
+			ymax = b_bnd[YMAX];
+
+		return Range(Point(xmin, ymin), Point(xmax, ymax));
+	}
 	return nullopt;
 }
 
