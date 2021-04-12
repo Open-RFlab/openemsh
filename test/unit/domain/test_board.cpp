@@ -13,9 +13,117 @@
 
 #include "domain/board.hpp"
 
+/// @test void sort_points_by_vector_orientation(std::vector<Point>& points, Point const& vector)
 /// @test void detect_edges_in_polygons()
 /// @test void detect_colinear_edges()
 ///*****************************************************************************
+
+//******************************************************************************
+SCENARIO("void sort_points_by_vector_orientation(std::vector<Point>& points, Point const& vector)", "[board]") {
+	GIVEN("Unordered colinear points in (+, 0) direction") {
+		std::vector<Point> points({{ 4, 1 }, { 2, 1 }, { 3, 1 }, { 1, 1 }});
+		Point v(points[0] - points[3]);
+		sort_points_by_vector_orientation(points, v);
+		THEN("Points should be ordered") {
+			REQUIRE(points.size() == 4);
+			REQUIRE(points[0] == Point(1, 1));
+			REQUIRE(points[1] == Point(2, 1));
+			REQUIRE(points[2] == Point(3, 1));
+			REQUIRE(points[3] == Point(4, 1));
+		}
+	}
+
+	GIVEN("Unordered colinear points in (0, +) direction") {
+		std::vector<Point> points({{ 1, 4 }, { 1, 2 }, { 1, 3 }, { 1, 1 }});
+		Point v(points[0] - points[3]);
+		sort_points_by_vector_orientation(points, v);
+		THEN("Points should be ordered") {
+			REQUIRE(points.size() == 4);
+			REQUIRE(points[0] == Point(1, 1));
+			REQUIRE(points[1] == Point(1, 2));
+			REQUIRE(points[2] == Point(1, 3));
+			REQUIRE(points[3] == Point(1, 4));
+		}
+	}
+
+	GIVEN("Unordered colinear points in (-, 0) direction") {
+		std::vector<Point> points({{ 4, 1 }, { 2, 1 }, { 3, 1 }, { 1, 1 }});
+		Point v(points[3] - points[0]);
+		sort_points_by_vector_orientation(points, v);
+		THEN("Points should be ordered") {
+			REQUIRE(points.size() == 4);
+			REQUIRE(points[0] == Point(4, 1));
+			REQUIRE(points[1] == Point(3, 1));
+			REQUIRE(points[2] == Point(2, 1));
+			REQUIRE(points[3] == Point(1, 1));
+		}
+	}
+
+	GIVEN("Unordered colinear points in (0, -) direction") {
+		std::vector<Point> points({{ 1, 4 }, { 1, 2 }, { 1, 3 }, { 1, 1 }});
+		Point v(points[3] - points[0]);
+		sort_points_by_vector_orientation(points, v);
+		THEN("Points should be ordered") {
+			REQUIRE(points.size() == 4);
+			REQUIRE(points[0] == Point(1, 4));
+			REQUIRE(points[1] == Point(1, 3));
+			REQUIRE(points[2] == Point(1, 2));
+			REQUIRE(points[3] == Point(1, 1));
+		}
+	}
+
+	GIVEN("Unordered colinear points in (+, +) direction") {
+		std::vector<Point> points({{ 4, 4 }, { 2, 2 }, { 3, 3 }, { 1, 1 }});
+		Point v(points[0] - points[3]);
+		sort_points_by_vector_orientation(points, v);
+		THEN("Points should be ordered") {
+			REQUIRE(points.size() == 4);
+			REQUIRE(points[0] == Point(1, 1));
+			REQUIRE(points[1] == Point(2, 2));
+			REQUIRE(points[2] == Point(3, 3));
+			REQUIRE(points[3] == Point(4, 4));
+		}
+	}
+
+	GIVEN("Unordered colinear points in (-, +) direction") {
+		std::vector<Point> points({{ 1, 4 }, { 3, 2 }, { 2, 3 }, { 4, 1 }});
+		Point v(points[0] - points[3]);
+		sort_points_by_vector_orientation(points, v);
+		THEN("Points should be ordered") {
+			REQUIRE(points.size() == 4);
+			REQUIRE(points[0] == Point(4, 1));
+			REQUIRE(points[1] == Point(3, 2));
+			REQUIRE(points[2] == Point(2, 3));
+			REQUIRE(points[3] == Point(1, 4));
+		}
+	}
+
+	GIVEN("Unordered colinear points in (-, -) direction") {
+		std::vector<Point> points({{ 4, 4 }, { 2, 2 }, { 3, 3 }, { 1, 1 }});
+		Point v(points[3] - points[0]);
+		sort_points_by_vector_orientation(points, v);
+		THEN("Points should be ordered") {
+			REQUIRE(points.size() == 4);
+			REQUIRE(points[0] == Point(4, 4));
+			REQUIRE(points[1] == Point(3, 3));
+			REQUIRE(points[2] == Point(2, 2));
+			REQUIRE(points[3] == Point(1, 1));
+		}
+	}
+
+	GIVEN("Unordered colinear points in (+, -) direction") {
+		std::vector<Point> points({{ 1, 4 }, { 3, 2 }, { 2, 3 }, { 4, 1 }});
+		Point v(points[3] - points[0]);
+		sort_points_by_vector_orientation(points, v);
+		THEN("Points should be ordered") {
+			REQUIRE(points.size() == 4);
+			REQUIRE(points[0] == Point(1, 4));
+			REQUIRE(points[1] == Point(2, 3));
+			REQUIRE(points[2] == Point(3, 2));
+			REQUIRE(points[3] == Point(4, 1));
+		}
+	}
+}
 
 //******************************************************************************
 SCENARIO("void detect_edges_in_polygons()", "[board]") {

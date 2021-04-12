@@ -26,6 +26,53 @@ int8_t signum(T const& a) {
 		return 0;
 }
 
+/// @warning Undefined behavior if points are not all colinear.
+///*****************************************************************************
+void sort_points_by_vector_orientation(vector<Point>& points, Point const& vector) {
+	int8_t x_sign = signum(vector.x);
+	int8_t y_sign = signum(vector.y);
+	if(x_sign > 0 && y_sign == 0)
+		sort(begin(points), end(points),
+			[](Point const& a, Point const& b)->bool {
+				return (a.x < b.x);
+			});
+	else if(x_sign == 0 && y_sign > 0)
+		sort(begin(points), end(points),
+			[](Point const& a, Point const& b)->bool {
+				return (a.y < b.y);
+			});
+	else if(x_sign < 0 && y_sign == 0)
+		sort(begin(points), end(points),
+			[](Point const& a, Point const& b)->bool {
+				return (a.x > b.x);
+			});
+	else if(x_sign == 0 && y_sign < 0)
+		sort(begin(points), end(points),
+			[](Point const& a, Point const& b)->bool {
+				return (a.y > b.y);
+			});
+	else if(x_sign > 0 && y_sign > 0)
+		sort(begin(points), end(points),
+			[](Point const& a, Point const& b)->bool {
+				return (a.x < b.x && a.y < b.y);
+			});
+	else if(x_sign < 0 && y_sign > 0)
+		sort(begin(points), end(points),
+			[](Point const& a, Point const& b)->bool {
+				return (a.x > b.x && a.y < b.y);
+			});
+	else if(x_sign < 0 && y_sign < 0)
+		sort(begin(points), end(points),
+			[](Point const& a, Point const& b)->bool {
+				return (a.x > b.x && a.y > b.y);
+			});
+	else if(x_sign > 0 && y_sign < 0)
+		sort(begin(points), end(points),
+			[](Point const& a, Point const& b)->bool {
+				return (a.x < b.x && a.y > b.y);
+			});
+}
+
 //******************************************************************************
 Board::Board(vector<unique_ptr<Polygon>>& _polygons)
 : conflict_manager(conflicts)
@@ -119,49 +166,7 @@ void Board::detect_edges_in_polygons() {
 					intersections.push_back(*edge_a->p0);
 					intersections.push_back(*edge_a->p1);
 
-					// Sort points depending on the edge vector orientation.
-					int8_t x_sign = signum(edge_a->vec->x);
-					int8_t y_sign = signum(edge_a->vec->y);
-					if(x_sign > 0 && y_sign == 0)
-						sort(begin(intersections), end(intersections),
-							[](Point const& a, Point const& b)->bool {
-								return (a.x < b.x);
-							});
-					else if(x_sign == 0 && y_sign > 0)
-						sort(begin(intersections), end(intersections),
-							[](Point const& a, Point const& b)->bool {
-								return (a.y < b.y);
-							});
-					else if(x_sign < 0 && y_sign == 0)
-						sort(begin(intersections), end(intersections),
-							[](Point const& a, Point const& b)->bool {
-								return (a.x > b.x);
-							});
-					else if(x_sign == 0 && y_sign < 0)
-						sort(begin(intersections), end(intersections),
-							[](Point const& a, Point const& b)->bool {
-								return (a.y > b.y);
-							});
-					else if(x_sign > 0 && y_sign > 0)
-						sort(begin(intersections), end(intersections),
-							[](Point const& a, Point const& b)->bool {
-								return (a.x < b.x && a.y < b.y);
-							});
-					else if(x_sign < 0 && y_sign > 0)
-						sort(begin(intersections), end(intersections),
-							[](Point const& a, Point const& b)->bool {
-								return (a.x > b.x && a.y < b.y);
-							});
-					else if(x_sign < 0 && y_sign < 0)
-						sort(begin(intersections), end(intersections),
-							[](Point const& a, Point const& b)->bool {
-								return (a.x > b.x && a.y > b.y);
-							});
-					else if(x_sign > 0 && y_sign < 0)
-						sort(begin(intersections), end(intersections),
-							[](Point const& a, Point const& b)->bool {
-								return (a.x < b.x && a.y > b.y);
-							});
+					sort_points_by_vector_orientation(intersections, *edge_a->vec);
 					auto last = unique(begin(intersections), end(intersections));
 					intersections.erase(last, end(intersections));
 

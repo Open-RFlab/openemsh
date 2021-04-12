@@ -46,4 +46,6 @@ public:
 
 #ifdef UNITTEST
 #undef private
+
+void sort_points_by_vector_orientation(std::vector<Point>& points, Point const& vector);
 #endif // UNITTEST
