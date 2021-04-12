@@ -75,7 +75,9 @@ public:
 	bool is_y() const;
 	bool is_diagonal() const;
 
+#ifdef DEBUG
 	void print() const;
+#endif // DEBUG
 };
 
 #ifdef UNITTEST

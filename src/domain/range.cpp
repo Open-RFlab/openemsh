@@ -4,7 +4,9 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#ifdef DEBUG
 #include <iostream>
+#endif // DEBUG
 
 #include "range.hpp"
 
@@ -26,13 +28,6 @@ Range::Range(Point const _p0, Point const _p1)
 }
 
 //******************************************************************************
-void Range::print() const {
-	cout << "range:" << endl;
-	p0.print();
-	p1.print();
-}
-
-//******************************************************************************
 bool operator==(Range const& a, Range const& b) {
 	return (a.p0 == b.p0 && a.p1 == b.p1) || (a.p0 == b.p1 && a.p1 == b.p0);
 }
@@ -41,3 +36,12 @@ bool operator==(Range const& a, Range const& b) {
 Point mid(Range const a) {
 	return mid(a.p0, a.p1);
 }
+
+#ifdef DEBUG
+//******************************************************************************
+void Range::print() const {
+	cout << "range:" << endl;
+	p0.print();
+	p1.print();
+}
+#endif // DEBUG

@@ -4,7 +4,9 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#ifdef DEBUG
 #include <iostream>
+#endif // DEBUG
 
 #include <cmath>
 
@@ -24,11 +26,6 @@ Point::Point(double _x, double _y)
 : x(_x)
 , y(_y)
 {}
-
-//******************************************************************************
-void Point::print() const {
-	cout << "x: " << x << "\ty: " << y << endl;
-}
 
 //******************************************************************************
 Point operator-(Point const& a, Point const& b) {
@@ -56,3 +53,10 @@ bool operator!=(Point const& a, Point const& b) {
 Point mid(Point const& a, Point const& b) {
 	return Point((a.x + b.x) / 2, (a.y + b.y) / 2);
 }
+
+#ifdef DEBUG
+//******************************************************************************
+void Point::print() const {
+	cout << "x: " << x << "\ty: " << y << endl;
+}
+#endif // DEBUG

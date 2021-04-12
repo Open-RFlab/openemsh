@@ -4,7 +4,9 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#ifdef DEBUG
 #include <iostream>
+#endif // DEBUG
 
 #include <algorithm>
 //#include <array>
@@ -44,24 +46,6 @@ Edge::Edge(Point const* _p0, Point const* _p1)
 	} else {
 		axis = Axis::DIAGONAL;
 		direction = Direction::DIAGONAL;
-	}
-}
-
-//******************************************************************************
-void Edge::print() const {
-	cout << "x0: " << p0->x << "\ty0: " << p0->y << "\t\tx1: " << p1->x << "\ty1: " << p1->y << "\t\t";
-	switch(direction) {
-	case Direction::XMIN:
-	case Direction::XMAX:
-		cout << "_" << endl;
-		break;
-	case Direction::YMIN:
-	case Direction::YMAX:
-		cout << "|" << endl;
-		break;
-	case Direction::DIAGONAL:
-		cout << "X" << endl;
-		break;
 	}
 }
 
@@ -199,6 +183,7 @@ optional<Range> overlap(Edge const* a, Edge const* b) {
 }
 
 //******************************************************************************
+/*
 Range::Axis cast(Edge::Axis a) {
 	switch(a) {
 	case Edge::Axis::X: return Range::Axis::X;
@@ -206,3 +191,24 @@ Range::Axis cast(Edge::Axis a) {
 	case Edge::Axis::DIAGONAL: return Range::Axis::DIAGONAL;
 	}
 }
+*/
+
+#ifdef DEBUG
+//******************************************************************************
+void Edge::print() const {
+	cout << "x0: " << p0->x << "\ty0: " << p0->y << "\t\tx1: " << p1->x << "\ty1: " << p1->y << "\t\t";
+	switch(direction) {
+	case Direction::XMIN:
+	case Direction::XMAX:
+		cout << "_" << endl;
+		break;
+	case Direction::YMIN:
+	case Direction::YMAX:
+		cout << "|" << endl;
+		break;
+	case Direction::DIAGONAL:
+		cout << "X" << endl;
+		break;
+	}
+}
+#endif // DEBUG

@@ -20,5 +20,8 @@ public:
 	ConflictColinearEdges(Edge* a, Edge* b);
 
 	void append(Edge* edge);
+
+#ifdef DEBUG
 	void print() const override {} // TODO
+#endif // DEBUG
 };

@@ -22,6 +22,7 @@ target_sources( unittest
 target_compile_definitions( unittest
 	PRIVATE
 	UNITTEST
+	$<$<CONFIG:Debug>:DEBUG>
 	)
 
 target_compile_features( unittest

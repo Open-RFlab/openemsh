@@ -29,8 +29,10 @@ public:
 
 	Conflict(Kind const _kind);
 
-	virtual void print() const = 0;
 //	virtual void solve();
 //	virtual bool is_between(IConflictOrigin* a, IConflictOrigin* b) const = 0;
 
+#ifdef DEBUG
+	virtual void print() const = 0;
+#endif // DEBUG
 };

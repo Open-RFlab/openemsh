@@ -4,7 +4,9 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#ifdef DEBUG
 #include <iostream>
+#endif // DEBUG
 
 #include "edge.hpp"
 #include "polygon.hpp"
@@ -25,6 +27,7 @@ void ConflictEdgeInPolygon::append(Polygon const* polygon, Range const range, op
 	overlaps.emplace_back(polygon, make_unique<Range const>(range), edge);
 }
 
+#ifdef DEBUG
 //******************************************************************************
 void ConflictEdgeInPolygon::print() const {
 	cout << "ConflictEdgeInPolygon :" << endl;
@@ -49,3 +52,4 @@ void ConflictEdgeInPolygon::print() const {
 		}
 	}
 }
+#endif // DEBUG

@@ -41,7 +41,9 @@ public:
 	void detect_edges_in_polygons();
 	void detect_colinear_edges();
 
+#ifdef DEBUG
 	void print();
+#endif // DEBUG
 };
 
 #ifdef UNITTEST

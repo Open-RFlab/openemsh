@@ -15,7 +15,10 @@ public:
 	double y;
 
 	Point(double _x, double _y);
+
+#ifdef DEBUG
 	void print() const;
+#endif // DEBUG
 };
 
 //******************************************************************************

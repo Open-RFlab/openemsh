@@ -24,7 +24,10 @@ public:
 	Point const p1;
 
 	Range(Point const _p0, Point const _p1);
+
+#ifdef DEBUG
 	void print() const;
+#endif // DEBUG
 };
 
 //******************************************************************************

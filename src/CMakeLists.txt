@@ -34,14 +34,10 @@ target_sources( ${PROJECT_NAME}
 	"${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
 	)
 
-#[[
 target_compile_definitions( ${PROJECT_NAME}
 	PRIVATE
-	${QT_DEPRECATED_WARNINGS}
-	QRFL_VERSION="${PROJECT_VERSION}"
-	$<$<QT:false>:NO_QT>
+	$<$<CONFIG:Debug>:DEBUG>
 	)
-#]]
 
 target_compile_features( ${PROJECT_NAME}
 	PRIVATE

@@ -4,7 +4,9 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#ifdef DEBUG
 #include <iostream>
+#endif // DEBUG
 
 #include <algorithm>
 #include <utility>
@@ -109,7 +111,7 @@ void Board::detect_edges_in_polygons() {
 					, rel_to_poly_b(_rel_to_poly_b)
 					, mid(nullopt)
 					{}
-/*
+#ifdef DEBUG
 					void print() {
 						cout << "range : " << endl;
 						range.p0.print();
@@ -126,7 +128,7 @@ void Board::detect_edges_in_polygons() {
 							cout << endl;
 						}
 					}
-*/
+#endif // DEBUG
 				};
 
 				vector<Point> intersections;
@@ -249,8 +251,10 @@ void Board::detect_colinear_edges() {
 	}
 }
 
+#ifdef DEBUG
 //******************************************************************************
 void Board::print() {
 	for(unique_ptr<Polygon>& polygon : polygons)
 		polygon->print();
 }
+#endif // DEBUG

@@ -4,7 +4,9 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#ifdef DEBUG
 #include <iostream>
+#endif // DEBUG
 
 #include "edge.hpp"
 #include "point.hpp"
@@ -170,7 +172,20 @@ relation::PolygonPoint Polygon::relation_to(Point const* point) const {
 		return relation::PolygonPoint::OUT;
 }
 
+/// Check if the boundings of two polygons overlap or just touch each other.
+///*****************************************************************************
+bool are_possibly_overlapping(Polygon const& a, Polygon const& b) {
+	return((b.bounding[XMIN] >= a.bounding[XMIN] && b.bounding[XMIN] <= a.bounding[XMAX])
+		|| (b.bounding[XMAX] >= a.bounding[XMIN] && b.bounding[XMAX] <= a.bounding[XMAX])
+		|| (a.bounding[XMIN] >= b.bounding[XMIN] && a.bounding[XMIN] <= b.bounding[XMAX])
+		|| (a.bounding[XMAX] >= b.bounding[XMIN] && a.bounding[XMAX] <= b.bounding[XMAX]))
+		&&((b.bounding[YMIN] >= a.bounding[YMIN] && b.bounding[YMIN] <= a.bounding[YMAX])
+		|| (b.bounding[YMAX] >= a.bounding[YMIN] && b.bounding[YMAX] <= a.bounding[YMAX])
+		|| (a.bounding[YMIN] >= b.bounding[YMIN] && a.bounding[YMIN] <= b.bounding[YMAX])
+		|| (a.bounding[YMAX] >= b.bounding[YMIN] && a.bounding[YMAX] <= b.bounding[YMAX]));
+}
 
+#ifdef DEBUG
 //******************************************************************************
 void Polygon::print() const {
 	for(unique_ptr<Point const> const& point : points)
@@ -185,16 +200,4 @@ void Polygon::print() const {
 	case Rotation::COLINEAR: cout << "COLINEAR" << endl; break;
 	}
 }
-
-/// Check if the boundings of two polygons overlap or just touch each other.
-///*****************************************************************************
-bool are_possibly_overlapping(Polygon const& a, Polygon const& b) {
-	return((b.bounding[XMIN] >= a.bounding[XMIN] && b.bounding[XMIN] <= a.bounding[XMAX])
-		|| (b.bounding[XMAX] >= a.bounding[XMIN] && b.bounding[XMAX] <= a.bounding[XMAX])
-		|| (a.bounding[XMIN] >= b.bounding[XMIN] && a.bounding[XMIN] <= b.bounding[XMAX])
-		|| (a.bounding[XMAX] >= b.bounding[XMIN] && a.bounding[XMAX] <= b.bounding[XMAX]))
-		&&((b.bounding[YMIN] >= a.bounding[YMIN] && b.bounding[YMIN] <= a.bounding[YMAX])
-		|| (b.bounding[YMAX] >= a.bounding[YMIN] && b.bounding[YMAX] <= a.bounding[YMAX])
-		|| (a.bounding[YMIN] >= b.bounding[YMIN] && a.bounding[YMIN] <= b.bounding[YMAX])
-		|| (a.bounding[YMAX] >= b.bounding[YMIN] && a.bounding[YMAX] <= b.bounding[YMAX]));
-}
+#endif // DEBUG
