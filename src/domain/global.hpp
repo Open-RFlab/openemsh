@@ -21,3 +21,5 @@ enum class Normal {
 	YMAX,
 	NONE
 };
+
+inline double equality_tolerance = 1e-8;

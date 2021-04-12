@@ -6,9 +6,18 @@
 
 #include <iostream>
 
+#include <cmath>
+
+#include "global.hpp"
+
 #include "point.hpp"
 
 using namespace std;
+
+//******************************************************************************
+bool are_equal(double const a, double const b) {
+	return (abs(a - b) < equality_tolerance);
+}
 
 //******************************************************************************
 Point::Point(double const _x, double const _y)
@@ -33,5 +42,12 @@ Point operator+(Point const& a, Point const& b) {
 
 //******************************************************************************
 bool operator==(Point const& a, Point const& b) {
-	return (a.x == b.x && a.y == b.y);
+//	return (a.x == b.x && a.y == b.y);
+	return (are_equal(a.x, b.x) && are_equal(a.y, b.y));
+}
+
+//******************************************************************************
+bool operator!=(Point const& a, Point const& b) {
+//	return (a.x != b.x || a.y != b.y);
+	return (!are_equal(a.x, b.x) || !are_equal(a.y, b.y));
 }

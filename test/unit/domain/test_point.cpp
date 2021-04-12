@@ -6,6 +6,8 @@
 
 #include <catch2/catch_all.hpp>
 
+#include "domain/global.hpp"
+
 #include "domain/point.hpp"
 
 /// @test Point operator-(Point const& a, Point const& b)
@@ -61,7 +63,21 @@ SCENARIO("bool operator==(Point const& a, Point const& b)", "[point]") {
 
 		WHEN("We compare it to a different point") {
 			Point b(1, 1);
+			THEN("Should not be equal") {
+				REQUIRE_FALSE(a == b);
+			}
+		}
+
+		WHEN("We compare it to a point just below the equality tolerance") {
+			Point b(5, 1 + equality_tolerance - equality_tolerance / 2);
 			THEN("Should be equal") {
+				REQUIRE(a == b);
+			}
+		}
+
+		WHEN("We compare it to a point just after the equality tolerance") {
+			Point b(5, 1 + equality_tolerance + equality_tolerance / 2);
+			THEN("Should not be equal") {
 				REQUIRE_FALSE(a == b);
 			}
 		}

@@ -28,6 +28,9 @@ Point operator+(Point const& a, Point const& b);
 bool operator==(Point const& a, Point const& b);
 
 //******************************************************************************
+//bool operator!=(Point const& a, Point const& b);
+
+//******************************************************************************
 template<typename T>
 Point operator*(T const n, Point const& p) {
 	return Point(p.x * n, p.y * n);
