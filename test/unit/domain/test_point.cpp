@@ -15,6 +15,7 @@
 /// @test Point operator==(Point const& a, Point const& b)
 /// @test template<typename T> Point operator*(T const n, Point const& p)
 /// @test template<typename T> Point operator*(Point const& p, T const n)
+/// @test Point mid(Point const& a, Point const& b)
 ///*****************************************************************************
 
 //******************************************************************************
@@ -103,6 +104,39 @@ SCENARIO("template<typename T> Point operator*(T const n, Point const& p)", "[po
 			THEN("Each coord of the resulting point should be the multiplication of the a equivalent coord by n") {
 				REQUIRE(b.x == a.x * n);
 				REQUIRE(b.y == a.y * n);
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("Point mid(Point const& a, Point const& b)", "[point]") {
+	GIVEN("Two points") {
+		WHEN("The points form a vertical segment") {
+			Point a(1, 1);
+			Point b(1, 3);
+			Point c(mid(a, b));
+			THEN("Should calcul the midpoint") {
+				REQUIRE(c.x == 1);
+				REQUIRE(c.y == 2);
+			}
+		}
+		WHEN("The points form an horizontal segment") {
+			Point a(1, 1);
+			Point b(3, 1);
+			Point c(mid(a, b));
+			THEN("Should calcul the midpoint") {
+				REQUIRE(c.x == 2);
+				REQUIRE(c.y == 1);
+			}
+		}
+		WHEN("The points form a diagonal segment") {
+			Point a(1, 1);
+			Point b(3, 3);
+			Point c(mid(a, b));
+			THEN("Should calcul the midpoint") {
+				REQUIRE(c.x == 2);
+				REQUIRE(c.y == 2);
 			}
 		}
 	}

@@ -41,3 +41,6 @@ template<typename T>
 Point operator*(Point const& p, T const n) {
 	return Point(p.x * n, p.y * n);
 }
+
+//******************************************************************************
+Point mid(Point const& a, Point const& b);
