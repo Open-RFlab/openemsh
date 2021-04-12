@@ -156,6 +156,57 @@ SCENARIO("relation::EdgeEdge Edge::relation_to(Edge const* edge) const", "[edge]
 			}
 		}
 
+		WHEN("Two vertical edges are colinear and touching by just an extremity") {
+			Point a0(1, 1), a1(1, 2);
+			Point b0(1, 2), b1(1, 3);
+			Edge a(&a0, &a1), b(&b0, &b1);
+			Edge c(&a1, &a0), d(&b1, &b0);
+			THEN("Should be detected as OVERLAPPING") {
+				REQUIRE(a.axis == Edge::Axis::Y);
+				REQUIRE(b.axis == Edge::Axis::Y);
+				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::OVERLAPPING);
+				REQUIRE(b.relation_to(&a) == relation::EdgeEdge::OVERLAPPING);
+				REQUIRE(c.axis == Edge::Axis::Y);
+				REQUIRE(d.axis == Edge::Axis::Y);
+				REQUIRE(c.relation_to(&d) == relation::EdgeEdge::OVERLAPPING);
+				REQUIRE(d.relation_to(&c) == relation::EdgeEdge::OVERLAPPING);
+			}
+		}
+
+		WHEN("Two horizontal edges are colinear and touching by just an extremity") {
+			Point a0(1, 1), a1(2, 1);
+			Point b0(2, 1), b1(3, 1);
+			Edge a(&a0, &a1), b(&b0, &b1);
+			Edge c(&a1, &a0), d(&b1, &b0);
+			THEN("Should be detected as OVERLAPPING") {
+				REQUIRE(a.axis == Edge::Axis::X);
+				REQUIRE(b.axis == Edge::Axis::X);
+				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::OVERLAPPING);
+				REQUIRE(b.relation_to(&a) == relation::EdgeEdge::OVERLAPPING);
+				REQUIRE(c.axis == Edge::Axis::X);
+				REQUIRE(d.axis == Edge::Axis::X);
+				REQUIRE(c.relation_to(&d) == relation::EdgeEdge::OVERLAPPING);
+				REQUIRE(d.relation_to(&c) == relation::EdgeEdge::OVERLAPPING);
+			}
+		}
+
+		WHEN("Two diagonal edges are colinear and touching by just an extremity") {
+			Point a0(1, 1), a1(2, 2);
+			Point b0(2, 2), b1(3, 3);
+			Edge a(&a0, &a1), b(&b0, &b1);
+			Edge c(&a1, &a0), d(&b1, &b0);
+			THEN("Should be detected as OVERLAPPING") {
+				REQUIRE(a.axis == Edge::Axis::DIAGONAL);
+				REQUIRE(b.axis == Edge::Axis::DIAGONAL);
+				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::OVERLAPPING);
+				REQUIRE(b.relation_to(&a) == relation::EdgeEdge::OVERLAPPING);
+				REQUIRE(c.axis == Edge::Axis::DIAGONAL);
+				REQUIRE(d.axis == Edge::Axis::DIAGONAL);
+				REQUIRE(c.relation_to(&d) == relation::EdgeEdge::OVERLAPPING);
+				REQUIRE(d.relation_to(&c) == relation::EdgeEdge::OVERLAPPING);
+			}
+		}
+
 		WHEN("A vertical edge is totally inside an other vertical edge") {
 			Point a0(1, 1), a1(1, 4);
 			Point b0(1, 2), b1(1, 3);
@@ -311,6 +362,17 @@ SCENARIO("std::optional<Point> intersection(Edge const* a, Edge const* b)", "[ed
 			}
 		}
 
+		WHEN("Two edges are colinear and touching by just an extremity") {
+			Point a0(1, 1), a1(1, 2);
+			Point b0(1, 2), b1(1, 3);
+			Edge a(&a0, &a1), b(&b0, &b1);
+			std::optional<Point> p(intersection(&a, &b));
+			THEN("") {
+				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::OVERLAPPING);
+				REQUIRE_FALSE(p);
+			}
+		}
+
 		WHEN("Two edges are apart") {
 			Point a0(1, 1), a1(2, 2);
 			Point b0(3, 3), b1(4, 5);
@@ -370,6 +432,31 @@ SCENARIO("std::optional<Range> overlap(Edge const* a, Edge const* b)", "[edge]")
 				REQUIRE(s->axis == Range::Axis::X);
 				REQUIRE(s->p0.x == 2);
 				REQUIRE(s->p1.x == 3);
+				REQUIRE(s->p0.y == 1);
+				REQUIRE(s->p1.y == 1);
+			}
+		}
+
+		WHEN("Two horizontal edges are colinear and touching by just an extremity") {
+			Point a0(1, 1), a1(2, 1);
+			Point b0(2, 1), b1(3, 1);
+			Edge a(&a0, &a1), b(&b0, &b1);
+			std::optional<Range> r(overlap(&a, &b));
+			std::optional<Range> s(overlap(&a, &b));
+			THEN("Should calcul overlap range that should be made of two equal points") {
+				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::OVERLAPPING);
+				REQUIRE(r);
+				REQUIRE(r->axis == Range::Axis::POINT);
+				REQUIRE(r->p0 == r->p1);
+				REQUIRE(r->p0.x == 2);
+				REQUIRE(r->p1.x == 2);
+				REQUIRE(r->p0.y == 1);
+				REQUIRE(r->p1.y == 1);
+				REQUIRE(s);
+				REQUIRE(s->axis == Range::Axis::POINT);
+				REQUIRE(s->p0 == s->p1);
+				REQUIRE(s->p0.x == 2);
+				REQUIRE(s->p1.x == 2);
 				REQUIRE(s->p0.y == 1);
 				REQUIRE(s->p1.y == 1);
 			}
@@ -447,6 +534,31 @@ SCENARIO("std::optional<Range> overlap(Edge const* a, Edge const* b)", "[edge]")
 			}
 		}
 
+		WHEN("Two vertical edges are colinear and touching by just an extremity") {
+			Point a0(1, 1), a1(1, 2);
+			Point b0(1, 2), b1(1, 3);
+			Edge a(&a0, &a1), b(&b0, &b1);
+			std::optional<Range> r(overlap(&a, &b));
+			std::optional<Range> s(overlap(&a, &b));
+			THEN("Should calcul overlap range that should be made of two equal points") {
+				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::OVERLAPPING);
+				REQUIRE(r);
+				REQUIRE(r->axis == Range::Axis::POINT);
+				REQUIRE(r->p0 == r->p1);
+				REQUIRE(r->p0.x == 1);
+				REQUIRE(r->p1.x == 1);
+				REQUIRE(r->p0.y == 2);
+				REQUIRE(r->p1.y == 2);
+				REQUIRE(s);
+				REQUIRE(s->axis == Range::Axis::POINT);
+				REQUIRE(s->p0 == s->p1);
+				REQUIRE(s->p0.x == 1);
+				REQUIRE(s->p1.x == 1);
+				REQUIRE(s->p0.y == 2);
+				REQUIRE(s->p1.y == 2);
+			}
+		}
+
 		WHEN("Two vertical edges are colinear") {
 			Point a0(1, 1), a1(1, 2);
 			Point b0(1, 3), b1(1, 4);
@@ -479,7 +591,7 @@ SCENARIO("std::optional<Range> overlap(Edge const* a, Edge const* b)", "[edge]")
 			Edge a(&a0, &a1), b(&b0, &b1);
 			std::optional<Range> r(overlap(&a, &b));
 			std::optional<Range> s(overlap(&b, &a));
-			THEN("There should not be any overlap range") {
+			THEN("Should calcul overlap range") {
 				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::OVERLAPPING);
 				REQUIRE(r);
 				REQUIRE(r->axis == Range::Axis::DIAGONAL);
@@ -493,6 +605,31 @@ SCENARIO("std::optional<Range> overlap(Edge const* a, Edge const* b)", "[edge]")
 				REQUIRE(s->p1.x == 3);
 				REQUIRE(s->p0.y == 2);
 				REQUIRE(s->p1.y == 3);
+			}
+		}
+
+		WHEN("Two diagonal edges are colinear and touching by just an extremity") {
+			Point a0(1, 1), a1(2, 2);
+			Point b0(2, 2), b1(3, 3);
+			Edge a(&a0, &a1), b(&b0, &b1);
+			std::optional<Range> r(overlap(&a, &b));
+			std::optional<Range> s(overlap(&a, &b));
+			THEN("Should calcul overlap range that should be made of two equal points") {
+				REQUIRE(a.relation_to(&b) == relation::EdgeEdge::OVERLAPPING);
+				REQUIRE(r);
+				REQUIRE(r->axis == Range::Axis::POINT);
+				REQUIRE(r->p0 == r->p1);
+				REQUIRE(r->p0.x == 2);
+				REQUIRE(r->p1.x == 2);
+				REQUIRE(r->p0.y == 2);
+				REQUIRE(r->p1.y == 2);
+				REQUIRE(s);
+				REQUIRE(s->axis == Range::Axis::POINT);
+				REQUIRE(s->p0 == s->p1);
+				REQUIRE(s->p0.x == 2);
+				REQUIRE(s->p1.x == 2);
+				REQUIRE(s->p0.y == 2);
+				REQUIRE(s->p1.y == 2);
 			}
 		}
 
