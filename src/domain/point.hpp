@@ -11,10 +11,10 @@
 //******************************************************************************
 class Point {
 public:
-	double const x;
-	double const y;
+	double x;
+	double y;
 
-	Point(double const _x, double const _y);
+	Point(double _x, double _y);
 	void print() const;
 };
 

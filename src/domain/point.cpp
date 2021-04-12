@@ -20,7 +20,7 @@ bool are_equal(double const a, double const b) {
 }
 
 //******************************************************************************
-Point::Point(double const _x, double const _y)
+Point::Point(double _x, double _y)
 : x(_x)
 , y(_y)
 {}
