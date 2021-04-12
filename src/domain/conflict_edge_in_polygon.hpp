@@ -36,4 +36,6 @@ public:
 
 //	bool is_between(IConflictOrigin* a, IConflictOrigin* b) const override;
 	void append(Polygon const* polygon, Range const range, std::optional<Edge const*> edge);
+
+	void print() const override;
 };

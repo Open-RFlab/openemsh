@@ -4,6 +4,11 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <iostream>
+
+#include "edge.hpp"
+#include "polygon.hpp"
+
 #include "conflict_edge_in_polygon.hpp"
 
 using namespace std;
@@ -18,4 +23,29 @@ ConflictEdgeInPolygon::ConflictEdgeInPolygon(Edge const* a, Polygon const* _poly
 //******************************************************************************
 void ConflictEdgeInPolygon::append(Polygon const* polygon, Range const range, optional<Edge const*> edge) {
 	overlaps.emplace_back(polygon, make_unique<Range const>(range), edge);
+}
+
+//******************************************************************************
+void ConflictEdgeInPolygon::print() const {
+	cout << "ConflictEdgeInPolygon :" << endl;
+	if(edge) {
+		cout << "edge : " << edge << endl;
+		edge->print();
+	} else {
+		cout << "edge : nullptr" << endl;
+	}
+	cout << "overlaps : " << overlaps.size() << endl;
+	for(auto const& overlap : overlaps) {
+		cout << "overlap :" << endl;
+		cout << "polygon : " << get<0>(overlap) << endl;
+//		get<0>(overlap)->print();
+//		cout << "range :" << endl;
+		get<1>(overlap)->print();
+		if(get<2>(overlap).has_value()) {
+			cout << "optedge : " << get<2>(overlap).value() << endl;
+			get<2>(overlap).value()->print();
+		} else {
+			cout << "optedge : nullopt" << endl;
+		}
+	}
 }
