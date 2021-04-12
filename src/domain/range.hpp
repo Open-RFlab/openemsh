@@ -10,23 +10,25 @@
 #include "i_meshline_origin.hpp"
 #include "point.hpp"
 
-//class Point;
-
 //******************************************************************************
 class Range : public IConflictOrigin, public IMeshLineOrigin {
 public:
 	enum class Axis {
 		X,
 		Y,
-		DIAGONAL
+		DIAGONAL,
+		POINT
 	} axis;
 
 	Point const p0;
 	Point const p1;
-	Point const vec;
 
-	Range(Point _p0, Point _p1);
+	Range(Point const _p0, Point const _p1);
+	void print() const;
 };
 
 //******************************************************************************
 bool operator==(Range const& a, Range const& b);
+
+//******************************************************************************
+Point mid(Range const a);
