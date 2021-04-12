@@ -6,6 +6,7 @@
 
 #include <iostream>
 
+#include <algorithm>
 #include <utility>
 
 #include "conflict_edge_in_polygon.hpp"
@@ -13,6 +14,17 @@
 #include "board.hpp"
 
 using namespace std;
+
+//******************************************************************************
+template<typename T>
+int8_t signum(T const& a) {
+	if(a > 0)
+		return 1;
+	else if(a < 0)
+		return -1;
+	else
+		return 0;
+}
 
 //******************************************************************************
 Board::Board(vector<unique_ptr<Polygon>>& _polygons)
@@ -34,113 +46,176 @@ void Board::detect_edges_in_polygons() {
 			if(poly_b == poly_a)
 				continue;
 
-			bool need_p0_check = true;
-			relation::PolygonPoint p0_pos;
-			relation::PolygonPoint current_pos;
 			for(unique_ptr<Edge>& edge_a : poly_a->edges) {
-				if(need_p0_check)
-					p0_pos = poly_b->relation_to(poly_a->points.front().get());
-				need_p0_check = false;
 
-				unsigned int edge_a_intersections = 0;
+				struct RangeBtwIntersections {
+					Range const range;
+					optional<relation::PolygonPoint> rel_to_poly_b;
+					optional<Point> const mid;
+					RangeBtwIntersections(Range const& _range)
+					: range(_range)
+					, rel_to_poly_b(nullopt)
+					, mid(::mid(_range))
+					{}
+					RangeBtwIntersections(Range const& _range, relation::PolygonPoint _rel_to_poly_b)
+					: range(_range)
+					, rel_to_poly_b(_rel_to_poly_b)
+					, mid(nullopt)
+					{}
+/*
+					void print() {
+						cout << "range : " << endl;
+						range.p0.print();
+						range.p1.print();
+						cout << "mid : " << endl;
+						if(mid) mid->print();
+						if(rel_to_poly_b) {
+							cout << "rel : ";
+							switch(rel_to_poly_b.value()) {
+							case relation::PolygonPoint::IN: cout << "IN"; break;
+							case relation::PolygonPoint::ON: cout << "ON"; break;
+							case relation::PolygonPoint::OUT: cout << "OUT"; break;
+							}
+							cout << endl;
+						}
+					}
+*/
+				};
+
+				vector<Point> intersections;
+				vector<RangeBtwIntersections> ranges;
+
 				for(unique_ptr<Edge>& edge_b : poly_b->edges) {
 					relation::EdgeEdge rel = edge_a->relation_to(edge_b.get());
 					switch(rel) {
-					case relation::EdgeEdge::APART: break;
 					case relation::EdgeEdge::CROSSING:
-						++edge_a_intersections;
-						toggle(current_pos);
+						if(optional<Point> p = intersection(edge_a.get(), edge_b.get()))
+							intersections.push_back(p.value());
 						break;
-					case relation::EdgeEdge::COLINEAR: break;
 					case relation::EdgeEdge::OVERLAPPING:
-//						++edge_a_intersections; // TODO is it an intersection? no, useless : ON invalidate toggle
-						current_pos = relation::PolygonPoint::ON;
-						break;
-					}
-				}
-
-				// TODO from current_pos & edge_a_intersections & p0_pos & p1_pos
-				// find if edge_a <-> poly_b relation
-				switch(current_pos) {
-				case relation::PolygonPoint::ON: {
-					break;
-				} case relation::PolygonPoint::IN: {
-					if(!edge_a_intersections) {
-						// edge_a is totally inside poly_b
-						switch(edge_a->axis) {
-						case Edge::Axis::X:
-						case Edge::Axis::Y:
-						case Edge::Axis::DIAGONAL: break;
+						if(optional<Range> r = overlap(edge_a.get(), edge_b.get())) {
+							intersections.push_back(r->p0);
+							intersections.push_back(r->p1);
+							if(r->axis == Range::Axis::POINT)
+								break;
+							ranges.emplace_back(r.value(), relation::PolygonPoint::ON);
+							conflict_manager.add_edge_in_polygon(edge_a.get(), poly_b.get(), r.value(), edge_b.get());
 						}
-						conflict_manager.add_edge_in_polygon(edge_a.get(), poly_b.get());
-					}
-					break;
-				} case relation::PolygonPoint::OUT: {
-					break;
-				}
-				}
-			}
-		}
-	}
-/*
-	for(size_t i = 0; i < polygons.size() ; ++i) {
-		for(size_t j = i + 1; j < polygons.size(); ++j) {
-			if(!are_possibly_overlapping(*polygons[i], *polygons[j]))
-				continue;
-//				for(unique_ptr<Edge>& edge_i : polygons[i]->edges) {
-//					for(unique_ptr<Edge>& edge_j : polygons[j]->edges) {
-//						relation::EdgeEdge e = edge_i->relation_to(edge_j.get());
-
-			Polygon* poly_a = polygons[i].get();
-			Polygon* poly_b = polygons[j].get();
-
-			relation::PolygonEdge side = cast(poly_b->relation_to(poly_a->points.front().get())); // TODO check if first point is in polygon
-
-			for(size_t k = 0; k < poly_a->edges.size(); ++k) {
-				Edge* edge_a = poly_a->edges[k].get();
-
-				for(size_t l = k + 1; l < poly_b->edges.size(); ++l) { // TODO k+1 -> broken for?
-
-					Edge* edge_b = poly_b->edges[l].get();
-
-					relation::EdgeEdge e = edge_a->relation_to(edge_b); // TODO e better name
-//					edge_a->print();
-//					edge_b->print();
-					switch(e) {
-					case relation::EdgeEdge::APART: {
 						break;
-					} case relation::EdgeEdge::CROSSING: {
-						if(optional<Point> p = intersection(edge_a, edge_b)) {
-							relation::PolygonPoint r = poly_a->relation_to(&p.value());
-							switch(r) {
-							case relation::PolygonPoint::IN:
-							case relation::PolygonPoint::ON:
-							case relation::PolygonPoint::OUT:
+					default:
+						break;
+					}
+				}
+
+				relation::PolygonPoint rel_p0 = poly_b->relation_to(edge_a->p0);
+				relation::PolygonPoint rel_p1 = poly_b->relation_to(edge_a->p1);
+
+				if(!intersections.size()
+//				&& !ranges.size()
+				&& rel_p0 == relation::PolygonPoint::IN
+				&& rel_p1 == relation::PolygonPoint::IN) {
+					conflict_manager.add_edge_in_polygon(edge_a.get(), poly_b.get());
+				} else if(intersections.size()) {
+					intersections.push_back(*edge_a->p0);
+					intersections.push_back(*edge_a->p1);
+
+					// Sort points depending on the edge vector orientation.
+					int8_t x_sign = signum(edge_a->vec->x);
+					int8_t y_sign = signum(edge_a->vec->y);
+					if(x_sign > 0 && y_sign == 0)
+						sort(begin(intersections), end(intersections),
+							[](Point const& a, Point const& b)->bool {
+								return (a.x < b.x);
+							});
+					else if(x_sign == 0 && y_sign > 0)
+						sort(begin(intersections), end(intersections),
+							[](Point const& a, Point const& b)->bool {
+								return (a.y < b.y);
+							});
+					else if(x_sign < 0 && y_sign == 0)
+						sort(begin(intersections), end(intersections),
+							[](Point const& a, Point const& b)->bool {
+								return (a.x > b.x);
+							});
+					else if(x_sign == 0 && y_sign < 0)
+						sort(begin(intersections), end(intersections),
+							[](Point const& a, Point const& b)->bool {
+								return (a.y > b.y);
+							});
+					else if(x_sign > 0 && y_sign > 0)
+						sort(begin(intersections), end(intersections),
+							[](Point const& a, Point const& b)->bool {
+								return (a.x < b.x && a.y < b.y);
+							});
+					else if(x_sign < 0 && y_sign > 0)
+						sort(begin(intersections), end(intersections),
+							[](Point const& a, Point const& b)->bool {
+								return (a.x > b.x && a.y < b.y);
+							});
+					else if(x_sign < 0 && y_sign < 0)
+						sort(begin(intersections), end(intersections),
+							[](Point const& a, Point const& b)->bool {
+								return (a.x > b.x && a.y > b.y);
+							});
+					else if(x_sign > 0 && y_sign < 0)
+						sort(begin(intersections), end(intersections),
+							[](Point const& a, Point const& b)->bool {
+								return (a.x < b.x && a.y > b.y);
+							});
+					auto last = unique(begin(intersections), end(intersections));
+					intersections.erase(last, end(intersections));
+
+					// TODO if p0, p1 IN || OUT -> add Range(... IN || OUT)
+					if(rel_p0 == relation::PolygonPoint::IN
+					|| rel_p0 == relation::PolygonPoint::OUT)
+						ranges.emplace_back(Range(intersections[0], intersections[1]), rel_p0);
+					if(rel_p1 == relation::PolygonPoint::IN
+					|| rel_p1 == relation::PolygonPoint::OUT)
+						ranges.emplace_back(Range(intersections[intersections.size()-2], intersections.back()), rel_p1);
+
+					unsigned int overlapping_ranges = ranges.size();
+					for(unsigned int i = 1; i < intersections.size(); ++i) {
+						Range current_range(intersections[i - 1], intersections[i]);
+
+						bool is_already_there = false;
+						for(unsigned int j = 0; j < overlapping_ranges; ++j) {
+							if(ranges[j].range == current_range) {
+								is_already_there = true;
+								break;
 							}
-							p->print();
 						}
+						if(is_already_there)
+							continue;
 
-						break;
-					} case relation::EdgeEdge::COLINEAR: {
-						conflict_manager.add_colinear_edges(edge_a, edge_b);
-
-						break;
-					} case relation::EdgeEdge::OVERLAPPING: {
-						if(optional<Range> r = overlap(edge_a, edge_b))
-							r->print();
-
-						break;
+						ranges.emplace_back(move(current_range));
 					}
+
+					for(RangeBtwIntersections& range : ranges) {
+						if(range.mid.has_value()
+						&& poly_b->relation_to(&range.mid.value()) == relation::PolygonPoint::IN) {
+/*						|| poly_b->relation_to(&range.mid.value()) == relation::PolygonPoint::ON))
+*/							conflict_manager.add_edge_in_polygon(edge_a.get(), poly_b.get(), range.range);
+//							range.rel_to_poly_b = poly_b->relation_to(&range.mid.value()); //TODO useless
+						} else if(range.rel_to_poly_b == relation::PolygonPoint::IN) {
+							conflict_manager.add_edge_in_polygon(edge_a.get(), poly_b.get(), range.range);
+						}
 					}
+/*
+					for(RangeBtwIntersections& range : ranges) {
+						range.print();
+						cout << endl;
+					}
+
+					cout << "ranges : " << ranges.size() << endl;
+					cout << "intersections :" << endl;
+					for(Point& intersection : intersections)
+						intersection.print();
+					cout << endl;
+*/
 				}
 			}
-//						cout << "i: " << i << "\tj: " << j << "\t\tAPART" << endl;
-//						cout << "i: " << i << "\tj: " << j << "\t\tCROSSING" << endl;
-//						cout << "i: " << i << "\tj: " << j << "\t\tCOLINEAR" << endl;
-//						cout << "i: " << i << "\tj: " << j << "\t\tOVERLAPPING" << endl;
 		}
 	}
-*/
 }
 
 //******************************************************************************
