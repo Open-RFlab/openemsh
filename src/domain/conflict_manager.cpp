@@ -18,14 +18,11 @@ ConflictManager::ConflictManager(vector<unique_ptr<Conflict>>& _conflicts)
 : conflicts(_conflicts)
 {}
 
-// TODO add a filter a & b are H or V
-// TODO register confglict in edges
+// TODO register conflict in edges
 //******************************************************************************
 void ConflictManager::add_colinear_edges(Edge* a, Edge* b) {
-	if(((a->direction == Edge::Direction::XMIN || a->direction == Edge::Direction::XMAX)
-	&&  (b->direction == Edge::Direction::XMIN || b->direction == Edge::Direction::XMAX))
-	|| ((a->direction == Edge::Direction::YMIN || a->direction == Edge::Direction::YMAX)
-	&&  (b->direction == Edge::Direction::YMIN || b->direction == Edge::Direction::YMAX))) {
+	if((a->axis == Edge::Axis::X && b->axis == Edge::Axis::X)
+	|| (a->axis == Edge::Axis::Y && b->axis == Edge::Axis::Y)) {
 		bool does_conflict_exist = false;
 		for(unique_ptr<Conflict>& conflict : conflicts) {
 			if(conflict->kind == Conflict::Kind::COLINEAR_EDGES) {
