@@ -10,11 +10,12 @@
 #include "domain/conflict_edge_in_polygon.hpp"
 #include "domain/edge.hpp"
 #include "domain/point.hpp"
+#include "domain/polygon.hpp"
 
 #include "domain/conflict_manager.hpp"
 
 /// @test void ConflictManager::add_colinear_edges(Edge* a, Edge* b)
-/// @test void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const range, optional<Edge const*> b)
+/// @test void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const range, std::optional<Edge const*> b)
 ///*****************************************************************************
 
 //******************************************************************************
@@ -22,7 +23,7 @@ SCENARIO("void ConflictManager::add_colinear_edges(Edge* a, Edge* b)", "[conflic
 	GIVEN("A conflict vector, a conflict manager and some edges") {
 		std::vector<std::unique_ptr<Conflict>> conflicts;
 		ConflictManager cm(conflicts);
-		WHEN("Two vertical edges are colinear") {
+		WHEN("Two vertical edges that are colinear are reported as colinear") {
 			Point a0(1, 1), a1(1, 2);
 			Point b0(1, 3), b1(1, 4);
 			Edge a(&a0, &a1);
@@ -40,7 +41,7 @@ SCENARIO("void ConflictManager::add_colinear_edges(Edge* a, Edge* b)", "[conflic
 				REQUIRE(b.conflicts.size() == 1);
 				REQUIRE(b.conflicts[0] == conflict);
 			}
-			AND_WHEN("We add the same conflict another time") {
+			AND_WHEN("The same conflict is reported another time") {
 				cm.add_colinear_edges(&a, &b);
 				cm.add_colinear_edges(&b, &a);
 				THEN("No conflict should be added nor modified") {
@@ -52,7 +53,7 @@ SCENARIO("void ConflictManager::add_colinear_edges(Edge* a, Edge* b)", "[conflic
 					REQUIRE(b.conflicts.size() == 1);
 				}
 			}
-			AND_WHEN("A third vertical colinear edge is added") {
+			AND_WHEN("A third vertical colinear edge is reported as colinear") {
 				Point c0(1, 5), c1(1, 6);
 				Edge c(&c0, &c1);
 				THEN("It should be added to the existing conflict") {
@@ -76,7 +77,7 @@ SCENARIO("void ConflictManager::add_colinear_edges(Edge* a, Edge* b)", "[conflic
 					REQUIRE(c.conflicts[0] == conflict);
 				}
 			}
-			AND_WHEN("Two other edges are colinear elsewhere") {
+			AND_WHEN("Two other colinear edges elsewhere are reported as colinear") {
 				Point d0(2, 1), d1(2, 2);
 				Point e0(2, 3), e1(2, 4);
 				Edge d(&d0, &d1);
@@ -93,7 +94,7 @@ SCENARIO("void ConflictManager::add_colinear_edges(Edge* a, Edge* b)", "[conflic
 			}
 		}
 
-		WHEN("Two horizontal edges are colinear") {
+		WHEN("Two horizontal edges that are colinear are reported as colinear") {
 			Point a0(1, 1), a1(2, 1);
 			Point b0(3, 1), b1(4, 1);
 			Edge a(&a0, &a1);
@@ -111,7 +112,7 @@ SCENARIO("void ConflictManager::add_colinear_edges(Edge* a, Edge* b)", "[conflic
 				REQUIRE(b.conflicts.size() == 1);
 				REQUIRE(b.conflicts[0] == conflict);
 			}
-			AND_WHEN("We add the same conflict another time") {
+			AND_WHEN("The same conflict is reported another time") {
 				cm.add_colinear_edges(&a, &b);
 				cm.add_colinear_edges(&b, &a);
 				THEN("No conflict should be added nor modified") {
@@ -123,7 +124,7 @@ SCENARIO("void ConflictManager::add_colinear_edges(Edge* a, Edge* b)", "[conflic
 					REQUIRE(b.conflicts.size() == 1);
 				}
 			}
-			AND_WHEN("A third horizontal colinear edge is added") {
+			AND_WHEN("A third horizontal colinear edge is reported as colinear") {
 				Point c0(5, 1), c1(6, 1);
 				Edge c(&c0, &c1);
 				THEN("It should be added to the existing conflict") {
@@ -147,7 +148,7 @@ SCENARIO("void ConflictManager::add_colinear_edges(Edge* a, Edge* b)", "[conflic
 					REQUIRE(c.conflicts[0] == conflict);
 				}
 			}
-			AND_WHEN("Two other edges are colinear elsewhere") {
+			AND_WHEN("Two other colinear edges elsewhere are reported as colinear") {
 				Point d0(2, 1), d1(2, 2);
 				Point e0(2, 3), e1(2, 4);
 				Edge d(&d0, &d1);
@@ -164,9 +165,62 @@ SCENARIO("void ConflictManager::add_colinear_edges(Edge* a, Edge* b)", "[conflic
 			}
 		}
 
-		WHEN("Two diagonal edges are colinear") {
+		// TODO Is this good?
+		WHEN("Two vertical edges that are not colinear are reported as colinear") {
+			Point a0(1, 1), a1(1, 2);
+			Point b0(2, 3), b1(2, 4);
+			Edge a(&a0, &a1);
+			Edge b(&b0, &b1);
+			cm.add_colinear_edges(&a, &b);
+			THEN("A COLINEAR_EDGES conflict should be registered") {
+				REQUIRE(conflicts.size() == 1);
+				REQUIRE(conflicts[0]->kind == Conflict::Kind::COLINEAR_EDGES);
+				auto conflict = dynamic_cast<ConflictColinearEdges*>(conflicts[0].get());
+				REQUIRE(conflict->edges.size() == 2);
+				REQUIRE(conflict->edges[0] == &a);
+				REQUIRE(conflict->edges[1] == &b);
+				REQUIRE(a.conflicts.size() == 1);
+				REQUIRE(a.conflicts[0] == conflict);
+				REQUIRE(b.conflicts.size() == 1);
+				REQUIRE(b.conflicts[0] == conflict);
+			}
+		}
+
+		// TODO Is this good?
+		WHEN("Two horizontal edges that are not colinear are reported as colinear") {
+			Point a0(1, 1), a1(2, 1);
+			Point b0(3, 2), b1(4, 2);
+			Edge a(&a0, &a1);
+			Edge b(&b0, &b1);
+			cm.add_colinear_edges(&a, &b);
+			THEN("A COLINEAR_EDGES conflict should be registered") {
+				REQUIRE(conflicts.size() == 1);
+				REQUIRE(conflicts[0]->kind == Conflict::Kind::COLINEAR_EDGES);
+				auto conflict = dynamic_cast<ConflictColinearEdges*>(conflicts[0].get());
+				REQUIRE(conflict->edges.size() == 2);
+				REQUIRE(conflict->edges[0] == &a);
+				REQUIRE(conflict->edges[1] == &b);
+				REQUIRE(a.conflicts.size() == 1);
+				REQUIRE(a.conflicts[0] == conflict);
+				REQUIRE(b.conflicts.size() == 1);
+				REQUIRE(b.conflicts[0] == conflict);
+			}
+		}
+
+		WHEN("Two diagonal edges that are colinear are reported as colinear") {
 			Point a0(1, 1), a1(2, 2);
 			Point b0(3, 3), b1(4, 4);
+			Edge a(&a0, &a1);
+			Edge b(&b0, &b1);
+			cm.add_colinear_edges(&a, &b);
+			THEN("No conflict should be registered") {
+				REQUIRE_FALSE(conflicts.size());
+			}
+		}
+
+		WHEN("A vertical and an horizontal edges are reported as colinear") {
+			Point a0(1, 1), a1(1, 2);
+			Point b0(3, 3), b1(4, 3);
 			Edge a(&a0, &a1);
 			Edge b(&b0, &b1);
 			cm.add_colinear_edges(&a, &b);
@@ -178,5 +232,369 @@ SCENARIO("void ConflictManager::add_colinear_edges(Edge* a, Edge* b)", "[conflic
 }
 
 //******************************************************************************
-SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const range, optional<Edge const*> b)", "[conflict_manager]") {
+SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const range, std::optional<Edge const*> b)", "[conflict_manager]") {
+	GIVEN("A conflict vector, a conflict manager, an edge and some polygons") {
+		std::vector<std::unique_ptr<Conflict>> conflicts;
+		ConflictManager cm(conflicts);
+		Polygon p({
+			{ 3, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }, { 1, 3 },
+			{ 2, 3 }, { 2, 5 }, { 5, 5 }, { 5, 2 }, { 3, 2 }});
+		Polygon q({{ 0, 0 }, { 0, 8 }, { 8, 8 }, { 8, 0 }});
+		WHEN("A vertical edge that is in a polygon is reported as partially in this polygon") {
+			Point a0(4, 1), a1(4, 7);
+			Edge a(&a0, &a1);
+			cm.add_edge_in_polygon(&a, &p, Range({ 4, 1 }, { 4, 2 }));
+			THEN("An EDGE_IN_POLYGON conflict should be registered") {
+				REQUIRE(conflicts.size() == 1);
+				REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+				REQUIRE(conflict->edge == &a);
+				REQUIRE(conflict->overlaps.size() == 1);
+				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 4, 1 }, { 4, 2 }));
+				REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+				REQUIRE(a.conflicts.size() == 1);
+				REQUIRE(a.conflicts[0] == conflict);
+				REQUIRE(p.conflicts.size() == 1);
+				REQUIRE(p.conflicts[0] == conflict);
+			}
+			AND_WHEN("The same conflict is reported another time") {
+				cm.add_edge_in_polygon(&a, &p, Range({ 4, 1 }, { 4, 2 }));
+				THEN("No conflict should be added nor modified") {
+					REQUIRE(conflicts.size() == 1);
+					REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+					REQUIRE(conflict->overlaps.size() == 1);
+					REQUIRE(a.conflicts.size() == 1);
+					REQUIRE(p.conflicts.size() == 1);
+				}
+			}
+			AND_WHEN("The edge is reported as also partially in the same polygon but by another overlap range") {
+				cm.add_edge_in_polygon(&a, &p, Range({ 4, 5 }, { 4, 6 }));
+				THEN("It should be added to the existing conflict") {
+					REQUIRE(conflicts.size() == 1);
+					REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+					REQUIRE(conflict->overlaps.size() == 2);
+					REQUIRE(std::get<0>(conflict->overlaps[1]) == &p);
+					REQUIRE(*std::get<1>(conflict->overlaps[1]) == Range({ 4, 5 }, { 4, 6 }));
+					REQUIRE_FALSE(std::get<2>(conflict->overlaps[1]));
+					REQUIRE(a.conflicts.size() == 1);
+					REQUIRE(p.conflicts.size() == 1);
+				}
+			}
+			AND_WHEN("An other edge is reported as totally in the polygon") {
+				Point b0(5, 5), b1(5, 6);
+				Edge b(&b0, &b1);
+				cm.add_edge_in_polygon(&b, &p);
+				THEN("An other EDGE_IN_POLYGON conflict should be registered") {
+					REQUIRE(conflicts.size() == 2);
+					REQUIRE(conflicts[1]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[1].get());
+					REQUIRE(conflict->edge == &b);
+					REQUIRE(conflict->overlaps.size() == 1);
+					REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
+					REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 5, 5 }, { 5, 6 }));
+					REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+					REQUIRE(b.conflicts.size() == 1);
+					REQUIRE(b.conflicts[0] == conflict);
+					REQUIRE(p.conflicts.size() == 2);
+					REQUIRE(p.conflicts[1] == conflict);
+				}
+			}
+			AND_WHEN("The edge is reported as also totally in a second polygon") {
+				cm.add_edge_in_polygon(&a, &q);
+				THEN("It should be added to the existing conflict") {
+					REQUIRE(conflicts.size() == 1);
+					REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+					REQUIRE(conflict->overlaps.size() == 2);
+					REQUIRE(std::get<0>(conflict->overlaps[1]) == &q);
+					REQUIRE(*std::get<1>(conflict->overlaps[1]) == Range({ 4, 1 }, { 4, 7 }));
+					REQUIRE_FALSE(std::get<2>(conflict->overlaps[1]));
+					REQUIRE(a.conflicts.size() == 1);
+					REQUIRE(p.conflicts.size() == 1);
+				}
+			}
+		}
+
+		WHEN("An horizontal edge that is in a polygon is reported as partially in this polygon") {
+			Point a0(1, 4), a1(7, 4);
+			Edge a(&a0, &a1);
+			cm.add_edge_in_polygon(&a, &p, Range({ 1, 4 }, { 2, 4 }));
+			THEN("An EDGE_IN_POLYGON conflict should be registered") {
+				REQUIRE(conflicts.size() == 1);
+				REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+				REQUIRE(conflict->edge == &a);
+				REQUIRE(conflict->overlaps.size() == 1);
+				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 1, 4 }, { 2, 4 }));
+				REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+				REQUIRE(a.conflicts.size() == 1);
+				REQUIRE(a.conflicts[0] == conflict);
+				REQUIRE(p.conflicts.size() == 1);
+				REQUIRE(p.conflicts[0] == conflict);
+			}
+			AND_WHEN("The same conflict is reported another time") {
+				cm.add_edge_in_polygon(&a, &p, Range({ 1, 4 }, { 2, 4 }));
+				THEN("No conflict should be added nor modified") {
+					REQUIRE(conflicts.size() == 1);
+					REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+					REQUIRE(conflict->overlaps.size() == 1);
+					REQUIRE(a.conflicts.size() == 1);
+					REQUIRE(p.conflicts.size() == 1);
+				}
+			}
+			AND_WHEN("The edge is reported as also partially in the same polygon but by another overlap range") {
+				cm.add_edge_in_polygon(&a, &p, Range({ 5, 4 }, { 6, 4 }));
+				THEN("It should be added to the existing conflict") {
+					REQUIRE(conflicts.size() == 1);
+					REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+					REQUIRE(conflict->overlaps.size() == 2);
+					REQUIRE(std::get<0>(conflict->overlaps[1]) == &p);
+					REQUIRE(*std::get<1>(conflict->overlaps[1]) == Range({ 5, 4 }, { 6, 4 }));
+					REQUIRE_FALSE(std::get<2>(conflict->overlaps[1]));
+					REQUIRE(a.conflicts.size() == 1);
+					REQUIRE(p.conflicts.size() == 1);
+				}
+			}
+			AND_WHEN("An other edge is reported as totally in the polygon") {
+				Point b0(5, 5), b1(6, 5);
+				Edge b(&b0, &b1);
+				cm.add_edge_in_polygon(&b, &p);
+				THEN("An other EDGE_IN_POLYGON conflict should be registered") {
+					REQUIRE(conflicts.size() == 2);
+					REQUIRE(conflicts[1]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[1].get());
+					REQUIRE(conflict->edge == &b);
+					REQUIRE(conflict->overlaps.size() == 1);
+					REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
+					REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 5, 5 }, { 6, 5 }));
+					REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+					REQUIRE(b.conflicts.size() == 1);
+					REQUIRE(b.conflicts[0] == conflict);
+					REQUIRE(p.conflicts.size() == 2);
+					REQUIRE(p.conflicts[1] == conflict);
+				}
+			}
+			AND_WHEN("The edge is reported as also totally in a second polygon") {
+				cm.add_edge_in_polygon(&a, &q);
+				THEN("It should be added to the existing conflict") {
+					REQUIRE(conflicts.size() == 1);
+					REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+					REQUIRE(conflict->overlaps.size() == 2);
+					REQUIRE(std::get<0>(conflict->overlaps[1]) == &q);
+					REQUIRE(*std::get<1>(conflict->overlaps[1]) == Range({ 1, 4 }, { 7, 4 }));
+					REQUIRE_FALSE(std::get<2>(conflict->overlaps[1]));
+					REQUIRE(a.conflicts.size() == 1);
+					REQUIRE(p.conflicts.size() == 1);
+				}
+			}
+		}
+
+		WHEN("A diagonal edge that is in a polygon is reported as partially in this polygon") {
+			Point a0(2, 7), a1(7, 2);
+			Edge a(&a0, &a1);
+			cm.add_edge_in_polygon(&a, &p, Range({ 3, 6 }, { 4, 5 }));
+			THEN("An EDGE_IN_POLYGON conflict should be registered") {
+				REQUIRE(conflicts.size() == 1);
+				REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+				REQUIRE(conflict->edge == &a);
+				REQUIRE(conflict->overlaps.size() == 1);
+				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 3, 6 }, { 4, 5 }));
+				REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+				REQUIRE(a.conflicts.size() == 1);
+				REQUIRE(a.conflicts[0] == conflict);
+				REQUIRE(p.conflicts.size() == 1);
+				REQUIRE(p.conflicts[0] == conflict);
+			}
+			AND_WHEN("The same conflict is reported another time") {
+				cm.add_edge_in_polygon(&a, &p, Range({ 3, 6 }, { 4, 5 }));
+				THEN("No conflict should be added nor modified") {
+					REQUIRE(conflicts.size() == 1);
+					REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+					REQUIRE(conflict->overlaps.size() == 1);
+					REQUIRE(a.conflicts.size() == 1);
+					REQUIRE(p.conflicts.size() == 1);
+				}
+			}
+			AND_WHEN("The edge is reported as also partially in the same polygon but by another overlap range") {
+				cm.add_edge_in_polygon(&a, &p, Range({ 5, 4 }, { 6, 3 }));
+				THEN("It should be added to the existing conflict") {
+					REQUIRE(conflicts.size() == 1);
+					REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+					REQUIRE(conflict->overlaps.size() == 2);
+					REQUIRE(std::get<0>(conflict->overlaps[1]) == &p);
+					REQUIRE(*std::get<1>(conflict->overlaps[1]) == Range({ 5, 4 }, { 6, 3 }));
+					REQUIRE_FALSE(std::get<2>(conflict->overlaps[1]));
+					REQUIRE(a.conflicts.size() == 1);
+					REQUIRE(p.conflicts.size() == 1);
+				}
+			}
+			AND_WHEN("An other edge is reported as totally in the polygon") {
+				Point b0(5, 5), b1(6, 6);
+				Edge b(&b0, &b1);
+				cm.add_edge_in_polygon(&b, &p);
+				THEN("An other EDGE_IN_POLYGON conflict should be registered") {
+					REQUIRE(conflicts.size() == 2);
+					REQUIRE(conflicts[1]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[1].get());
+					REQUIRE(conflict->edge == &b);
+					REQUIRE(conflict->overlaps.size() == 1);
+					REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
+					REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 5, 5 }, { 6, 6 }));
+					REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+					REQUIRE(b.conflicts.size() == 1);
+					REQUIRE(b.conflicts[0] == conflict);
+					REQUIRE(p.conflicts.size() == 2);
+					REQUIRE(p.conflicts[1] == conflict);
+				}
+			}
+			AND_WHEN("The edge is reported as also totally in a second polygon") {
+				cm.add_edge_in_polygon(&a, &q);
+				THEN("It should be added to the existing conflict") {
+					REQUIRE(conflicts.size() == 1);
+					REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+					REQUIRE(conflict->overlaps.size() == 2);
+					REQUIRE(std::get<0>(conflict->overlaps[1]) == &q);
+					REQUIRE(*std::get<1>(conflict->overlaps[1]) == Range({ 2, 7 }, { 7, 2 }));
+					REQUIRE_FALSE(std::get<2>(conflict->overlaps[1]));
+					REQUIRE(a.conflicts.size() == 1);
+					REQUIRE(p.conflicts.size() == 1);
+				}
+			}
+		}
+
+		WHEN("A vertical edge that is not in a polygon is reported as in this polygon") {
+			Point a0(8, 8), a1(8, 9);
+			Edge a(&a0, &a1);
+			cm.add_edge_in_polygon(&a, &p);
+			THEN("An EDGE_IN_POLYGON conflict should be registered") {
+				REQUIRE(conflicts.size() == 1);
+				REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+				REQUIRE(conflict->edge == &a);
+				REQUIRE(conflict->overlaps.size() == 1);
+				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 8, 8 }, { 8, 9 }));
+				REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+				REQUIRE(a.conflicts.size() == 1);
+				REQUIRE(a.conflicts[0] == conflict);
+				REQUIRE(p.conflicts.size() == 1);
+				REQUIRE(p.conflicts[0] == conflict);
+			}
+		}
+
+		WHEN("An horizontal edge that is not in a polygon is reported as in this polygon") {
+			Point a0(8, 8), a1(9, 8);
+			Edge a(&a0, &a1);
+			cm.add_edge_in_polygon(&a, &p);
+			THEN("An EDGE_IN_POLYGON conflict should be registered") {
+				REQUIRE(conflicts.size() == 1);
+				REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+				REQUIRE(conflict->edge == &a);
+				REQUIRE(conflict->overlaps.size() == 1);
+				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 8, 8 }, { 9, 8 }));
+				REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+				REQUIRE(a.conflicts.size() == 1);
+				REQUIRE(a.conflicts[0] == conflict);
+				REQUIRE(p.conflicts.size() == 1);
+				REQUIRE(p.conflicts[0] == conflict);
+			}
+		}
+
+		WHEN("A diagonal edge that is not in a polygon is reported as in this polygon") {
+			Point a0(8, 8), a1(9, 9);
+			Edge a(&a0, &a1);
+			cm.add_edge_in_polygon(&a, &p);
+			THEN("An EDGE_IN_POLYGON conflict should be registered") {
+				REQUIRE(conflicts.size() == 1);
+				REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+				REQUIRE(conflict->edge == &a);
+				REQUIRE(conflict->overlaps.size() == 1);
+				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 8, 8 }, { 9, 9 }));
+				REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+				REQUIRE(a.conflicts.size() == 1);
+				REQUIRE(a.conflicts[0] == conflict);
+				REQUIRE(p.conflicts.size() == 1);
+				REQUIRE(p.conflicts[0] == conflict);
+			}
+		}
+
+		WHEN("A vertical edge that is on a polygon is reported as in this polygon and sharing an edge with it") {
+			Point a0(3, 1), a1(3, 3);
+			Edge a(&a0, &a1);
+			cm.add_edge_in_polygon(&a, &p, Range({ 3, 1 }, { 3, 2 }), p.edges[0].get());
+			THEN("An EDGE_IN_POLYGON conflict should be registered") {
+				REQUIRE(conflicts.size() == 1);
+				REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+				REQUIRE(conflict->edge == &a);
+				REQUIRE(conflict->overlaps.size() == 1);
+				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 3, 1 }, { 3, 2 }));
+				REQUIRE(std::get<2>(conflict->overlaps[0]));
+				REQUIRE(std::get<2>(conflict->overlaps[0]).value() == p.edges[0].get());
+				REQUIRE(a.conflicts.size() == 1);
+				REQUIRE(a.conflicts[0] == conflict);
+				REQUIRE(p.conflicts.size() == 1);
+				REQUIRE(p.conflicts[0] == conflict);
+			}
+		}
+
+		WHEN("An horizontal edge that is on a polygon is reported as in this polygon and sharing an edge with it") {
+			Point a0(1, 3), a1(3, 3);
+			Edge a(&a0, &a1);
+			cm.add_edge_in_polygon(&a, &p, Range({ 1, 3 }, { 2, 3 }), p.edges[5].get());
+			THEN("An EDGE_IN_POLYGON conflict should be registered") {
+				REQUIRE(conflicts.size() == 1);
+				REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+				REQUIRE(conflict->edge == &a);
+				REQUIRE(conflict->overlaps.size() == 1);
+				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 1, 3 }, { 2, 3 }));
+				REQUIRE(std::get<2>(conflict->overlaps[0]));
+				REQUIRE(std::get<2>(conflict->overlaps[0]).value() == p.edges[5].get());
+				REQUIRE(a.conflicts.size() == 1);
+				REQUIRE(a.conflicts[0] == conflict);
+				REQUIRE(p.conflicts.size() == 1);
+				REQUIRE(p.conflicts[0] == conflict);
+			}
+		}
+
+		WHEN("A diagonal edge that is not on a polygon is reported as in this polygon and sharing an edge with it") {
+			Point a0(1, 1), a1(3, 3);
+			Edge a(&a0, &a1);
+			cm.add_edge_in_polygon(&a, &p, p.edges[0].get());
+			THEN("An EDGE_IN_POLYGON conflict should be registered") {
+				REQUIRE(conflicts.size() == 1);
+				REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
+				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
+				REQUIRE(conflict->edge == &a);
+				REQUIRE(conflict->overlaps.size() == 1);
+				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 1, 1 }, { 3, 3 }));
+				REQUIRE(std::get<2>(conflict->overlaps[0]));
+				REQUIRE(std::get<2>(conflict->overlaps[0]).value() == p.edges[0].get());
+				REQUIRE(a.conflicts.size() == 1);
+				REQUIRE(a.conflicts[0] == conflict);
+				REQUIRE(p.conflicts.size() == 1);
+				REQUIRE(p.conflicts[0] == conflict);
+			}
+		}
+	}
 }

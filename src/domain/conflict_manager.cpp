@@ -18,8 +18,8 @@ ConflictManager::ConflictManager(vector<unique_ptr<Conflict>>& _conflicts)
 : conflicts(_conflicts)
 {}
 
-// TODO register conflict in edges
-//******************************************************************************
+/// @warning Allows geometrically inconsistent datas.
+///*****************************************************************************
 void ConflictManager::add_colinear_edges(Edge* a, Edge* b) {
 	if((a->axis == Edge::Axis::X && b->axis == Edge::Axis::X)
 	|| (a->axis == Edge::Axis::Y && b->axis == Edge::Axis::Y)) {
@@ -68,18 +68,21 @@ void ConflictManager::add_colinear_edges(Edge* a, Edge* b) {
 	}
 }
 
-//******************************************************************************
+/// @warning Allows geometrically inconsistent datas.
+///*****************************************************************************
 void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, optional<Edge const*> b) {
 	add_edge_in_polygon(a, polygon, Range(*a->p0, *a->p1), b);
 }
 
-//******************************************************************************
+/// @warning Allows geometrically inconsistent datas.
+///*****************************************************************************
 void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const range, optional<Edge const*> b) {
 	bool does_conflict_exist = false;
 	for(unique_ptr<Conflict>& conflict : conflicts) {
 		if(conflict->kind == Conflict::Kind::EDGE_IN_POLYGON) {
 			auto c = dynamic_cast<ConflictEdgeInPolygon*>(conflict.get());
 			bool is_a_registered = false;
+			bool is_polygon_registered = false;
 			bool is_overlap_registered = false;
 
 			if(c->edge == a) {
@@ -87,10 +90,13 @@ void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const
 
 				using Overlap = tuple<Polygon const*, std::unique_ptr<Range const>, std::optional<Edge const*>>;
 				for(Overlap& overlap : c->overlaps) {
-					if((get<0>(overlap) == polygon && *get<1>(overlap) == range)
-					&& (!get<2>(overlap) || (get<2>(overlap) && get<2>(overlap).value() == b))) {
-						is_overlap_registered = true;
-						break;
+					if(get<0>(overlap) == polygon) {
+						is_polygon_registered = true;
+						if((*get<1>(overlap) == range)
+						&& (!get<2>(overlap) || (get<2>(overlap) && get<2>(overlap).value() == b))) {
+							is_overlap_registered = true;
+							break;
+						}
 					}
 				}
 			}
@@ -99,7 +105,8 @@ void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const
 				does_conflict_exist = true;
 				c->append(polygon, range, b);
 //				b->conflicts.push_back(conflict.get()); // TODO needed?
-				polygon->conflicts.push_back(conflict.get());
+				if(!is_polygon_registered)
+					polygon->conflicts.push_back(conflict.get());
 				break;
 			} else if(is_a_registered && is_overlap_registered) {
 				does_conflict_exist = true;
