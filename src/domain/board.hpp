@@ -42,7 +42,7 @@ public:
 	void detect_colinear_edges();
 
 #ifdef DEBUG
-	void print();
+	void print() const;
 #endif // DEBUG
 };
 

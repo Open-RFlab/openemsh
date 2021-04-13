@@ -180,12 +180,12 @@ void Board::detect_edges_in_polygons() {
 					|| rel_p1 == relation::PolygonPoint::OUT)
 						ranges.emplace_back(Range(intersections[intersections.size()-2], intersections.back()), rel_p1);
 
-					unsigned int overlapping_ranges = ranges.size();
-					for(unsigned int i = 1; i < intersections.size(); ++i) {
+					size_t overlapping_ranges = ranges.size();
+					for(size_t i = 1; i < intersections.size(); ++i) {
 						Range current_range(intersections[i - 1], intersections[i]);
 
 						bool is_already_there = false;
-						for(unsigned int j = 0; j < overlapping_ranges; ++j) {
+						for(size_t j = 0; j < overlapping_ranges; ++j) {
 							if(ranges[j].range == current_range) {
 								is_already_there = true;
 								break;
@@ -231,7 +231,7 @@ void Board::detect_colinear_edges() {
 		if(edges[i]->axis == Edge::Axis::DIAGONAL)
 			continue;
 
-		for(unsigned long j = i + 1; j < edges.size(); ++j) {
+		for(size_t j = i + 1; j < edges.size(); ++j) {
 			if(edges[j]->axis != edges[i]->axis)
 				continue;
 
@@ -253,7 +253,7 @@ void Board::detect_colinear_edges() {
 
 #ifdef DEBUG
 //******************************************************************************
-void Board::print() {
+void Board::print() const {
 	for(unique_ptr<Polygon>& polygon : polygons)
 		polygon->print();
 }
