@@ -235,18 +235,10 @@ void Board::detect_colinear_edges() {
 			if(edges[j]->axis != edges[i]->axis)
 				continue;
 
-			switch(edges[i]->axis) {
-			case Edge::Axis::X:
-				if(edges[i]->p0->y == edges[j]->p0->y)
-					conflict_manager.add_colinear_edges(edges[i], edges[j]);
-				break;
-			case Edge::Axis::Y:
-				if(edges[i]->p0->x == edges[j]->p0->x)
-					conflict_manager.add_colinear_edges(edges[i], edges[j]);
-				break;
-			default:
-				break;
-			}
+			if(edges[i]->axis == Edge::Axis::X && edges[i]->p0->y == edges[j]->p0->y)
+				conflict_manager.add_colinear_edges(edges[i], edges[j]);
+			else if(edges[i]->axis == Edge::Axis::Y && edges[i]->p0->x == edges[j]->p0->x)
+				conflict_manager.add_colinear_edges(edges[i], edges[j]);
 		}
 	}
 }
