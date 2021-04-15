@@ -32,6 +32,7 @@ if( CMAKE_BUILD_TYPE MATCHES Coverage )
 		COMMAND ${LCOV} -d "${CMAKE_CURRENT_BINARY_DIR}/unit/CMakeFiles/unittest.dir/__/__/src" -c -o "${CMAKE_CURRENT_BINARY_DIR}/coverage.tmp.info"
 		COMMAND ${LCOV} -q -r "${CMAKE_CURRENT_BINARY_DIR}/coverage.tmp.info" '${CMAKE_CURRENT_BINARY_DIR}/unittest_autogen/*' '/usr/*' -o "${CMAKE_CURRENT_BINARY_DIR}/coverage.info"
 		COMMAND ${GENHTML} "${CMAKE_CURRENT_BINARY_DIR}/coverage.info" -o "${CMAKE_CURRENT_BINARY_DIR}/coverage"
+		COMMAND ${LCOV} -l "${CMAKE_CURRENT_BINARY_DIR}/coverage.info"
 		COMMENT "Run unit tests, perform code coverage, generate lcov report"
 		DEPENDS unittest
 		)
