@@ -246,7 +246,7 @@ void Board::detect_colinear_edges() {
 #ifdef DEBUG
 //******************************************************************************
 void Board::print() const {
-	for(unique_ptr<Polygon>& polygon : polygons)
+	for(unique_ptr<Polygon> const& polygon : polygons)
 		polygon->print();
 }
 #endif // DEBUG
