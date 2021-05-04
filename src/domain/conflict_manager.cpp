@@ -21,8 +21,8 @@ ConflictManager::ConflictManager(vector<unique_ptr<Conflict>>& _conflicts)
 /// @warning Allows geometrically inconsistent datas.
 ///*****************************************************************************
 void ConflictManager::add_colinear_edges(Edge* a, Edge* b) {
-	if((a->axis == Edge::Axis::X && b->axis == Edge::Axis::X)
-	|| (a->axis == Edge::Axis::Y && b->axis == Edge::Axis::Y)) {
+	if((a->axis == Segment::Axis::X && b->axis == Segment::Axis::X)
+	|| (a->axis == Segment::Axis::Y && b->axis == Segment::Axis::Y)) {
 		bool does_conflict_exist = false;
 		for(unique_ptr<Conflict>& conflict : conflicts) {
 			if(conflict->kind == Conflict::Kind::COLINEAR_EDGES) {
@@ -71,7 +71,7 @@ void ConflictManager::add_colinear_edges(Edge* a, Edge* b) {
 /// @warning Allows geometrically inconsistent datas.
 ///*****************************************************************************
 void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, optional<Edge const*> b) {
-	add_edge_in_polygon(a, polygon, Range(*a->p0, *a->p1), b);
+	add_edge_in_polygon(a, polygon, Range(a->p0(), a->p1()), b);
 }
 
 /// @warning Allows geometrically inconsistent datas.

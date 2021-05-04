@@ -7,18 +7,18 @@
 #pragma once
 
 #include <array>
-#include <memory>
 #include <optional>
 #include <vector>
 
 //#include "conflict.hpp"
 //#include "meshline_manager.hpp"
 //#include "point.hpp"
-#include "global.hpp"
 #include "i_conflict_origin.hpp"
 #include "i_meshline_origin.hpp"
 #include "range.hpp"
 #include "relation.hpp"
+#include "segment.hpp"
+#include "types.hpp"
 
 class Conflict;
 class MeshlineManager;
@@ -30,17 +30,21 @@ class Point;
 #endif // UNITTEST
 
 //******************************************************************************
-class Edge : public IConflictOrigin, public IMeshLineOrigin {
+class Edge : public Segment, public IConflictOrigin, public IMeshLineOrigin {
+private:
+	Point const* const _p0;
+	Point const* const _p1;
+
 public:
-//s	bool is_enabled;
-	Point const* const p0;
-	Point const* const p1;
-	std::unique_ptr<Point const> const vec;
+//	bool is_enabled;
+
+	/// Vector from p0 to p1.
+	///*************************************************************************
+	Point const vec;
 	// TODO vec & normal -> std::complex
 	// enums -> funcs? vars? enums?
 
-	/// Direction of the edge itself. Useful to detect vertical or horizontal
-	/// edges.
+	/// Direction from p0 to p1.
 	///*************************************************************************
 	enum class Direction {
 		XMIN,
@@ -48,32 +52,19 @@ public:
 		YMIN,
 		YMAX,
 		DIAGONAL
-//		XAXIS,
-//		YAXIS,
 //		POINT        // TODO is this usefull?
 	} direction;
 
-	enum class Axis {
-		X,
-		Y,
-		DIAGONAL
-	} axis;
-
 	Normal normal;
 
-//	std::array<double, 4> bounding;
+//	Bounding bounding;
 	std::vector<Conflict*> conflicts;
 	MeshlineManager* meshline_manager;
 
-	Edge(Point const* _p0, Point const* _p1);
-//	Relation is_crossing(Edge const* edge) const;
-	relation::EdgeEdge relation_to(Edge const* edge) const;
-	relation::EdgePoint relation_to(Point const* point) const;
+	Edge(Point const* p0, Point const* p1);
 
-	// TODO instead of axis
-	bool is_x() const;
-	bool is_y() const;
-	bool is_diagonal() const;
+	Point const& p0() const override;
+	Point const& p1() const override;
 
 #ifdef DEBUG
 	void print() const;
@@ -84,8 +75,4 @@ public:
 #undef private
 #endif // UNITTEST
 
-bool are_colinear(Edge const& a, Edge const& b); // TODO this vs relation_to : good design?
-std::optional<Point> intersection(Edge const* a, Edge const* b); // TODO ?
-std::optional<Range> overlap(Edge const* a, Edge const* b);
-
-//Range::Axis cast(Edge::Axis a);
+std::optional<Range> merge(Edge const& a, Edge const& b) = delete;

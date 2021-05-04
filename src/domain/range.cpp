@@ -13,9 +13,9 @@
 using namespace std;
 
 //******************************************************************************
-Range::Range(Point const _p0, Point const _p1)
-: p0(_p0)
-, p1(_p1) {
+Range::Range(Point const p0, Point const p1)
+: _p0(p0)
+, _p1(p1) {
 	if(p0 == p1) {
 		axis = Axis::POINT;
 	} else if(p0.x == p1.x) {
@@ -28,20 +28,25 @@ Range::Range(Point const _p0, Point const _p1)
 }
 
 //******************************************************************************
-bool operator==(Range const& a, Range const& b) {
-	return (a.p0 == b.p0 && a.p1 == b.p1) || (a.p0 == b.p1 && a.p1 == b.p0);
+Point const& Range::p0() const {
+	return _p0;
 }
 
 //******************************************************************************
-Point mid(Range const a) {
-	return mid(a.p0, a.p1);
+Point const& Range::p1() const {
+	return _p1;
+}
+
+//******************************************************************************
+bool operator==(Range const& a, Range const& b) {
+	return (a.p0() == b.p0() && a.p1() == b.p1()) || (a.p0() == b.p1() && a.p1() == b.p0());
 }
 
 #ifdef DEBUG
 //******************************************************************************
 void Range::print() const {
 	cout << "range:" << endl;
-	p0.print();
-	p1.print();
+	p0().print();
+	p1().print();
 }
 #endif // DEBUG

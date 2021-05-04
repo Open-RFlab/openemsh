@@ -9,21 +9,19 @@
 #include "i_conflict_origin.hpp"
 #include "i_meshline_origin.hpp"
 #include "point.hpp"
+#include "segment.hpp"
 
 //******************************************************************************
-class Range : public IConflictOrigin, public IMeshLineOrigin {
+class Range : public Segment, public IConflictOrigin, public IMeshLineOrigin {
+private:
+	Point const _p0;
+	Point const _p1;
+
 public:
-	enum class Axis {
-		X,
-		Y,
-		DIAGONAL,
-		POINT
-	} axis;
+	Range(Point const p0, Point const p1);
 
-	Point const p0;
-	Point const p1;
-
-	Range(Point const _p0, Point const _p1);
+	Point const& p0() const override;
+	Point const& p1() const override;
 
 #ifdef DEBUG
 	void print() const;
@@ -32,6 +30,3 @@ public:
 
 //******************************************************************************
 bool operator==(Range const& a, Range const& b);
-
-//******************************************************************************
-Point mid(Range const a);

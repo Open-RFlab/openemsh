@@ -48,7 +48,7 @@ Polygon::Polygon(initializer_list<Point> _points)
 /// FDTD mesh is orthogonal.
 ///*****************************************************************************
 template<class T>
-inline Polygon::Rotation detect_rotation(T& points) {
+Polygon::Rotation detect_rotation(T& points) {
 	double left_sum = 0.0;
 	double right_sum = 0.0;
  
@@ -124,12 +124,12 @@ void Polygon::detect_edge_normal() {
 /// crossing relation with an edge will be faster with these ones. Then
 /// diagonals will be tried.
 ///*****************************************************************************
-relation::PolygonPoint Polygon::relation_to(Point const* point) const {
+relation::PolygonPoint Polygon::relation_to(Point const& point) const {
 	vector<Point> to_try({
-		{ bounding[XMIN] - 1, point->y },
-		{ bounding[XMAX] + 1, point->y },
-		{ point->x, bounding[YMIN] - 1 },
-		{ point->x, bounding[YMAX] + 1 }});
+		{ bounding[XMIN] - 1, point.y },
+		{ bounding[XMAX] + 1, point.y },
+		{ point.x, bounding[YMIN] - 1 },
+		{ point.x, bounding[YMAX] + 1 }});
 		/* The followings are like that.
 		{ bounding[XMAX] + 1, point->y + n } */
 
@@ -141,14 +141,14 @@ relation::PolygonPoint Polygon::relation_to(Point const* point) const {
 		need_retry = false;
 		count = 0;
 		if(to_try.size() <= n)
-			to_try.emplace_back(bounding[XMAX] + 1, point->y + n);
-		Edge ray(point, &to_try[n++]);
+			to_try.emplace_back(bounding[XMAX] + 1, point.y + n);
+		Edge ray(&point, &to_try[n++]);
 
 		// Detect vertices on the ray.
 		for(unique_ptr<Point const> const& p : points) {
-			if(*p == *point) {
+			if(*p == point) {
 				return relation::PolygonPoint::ON;
-			} else if(ray.relation_to(p.get()) == relation::EdgePoint::ON) {
+			} else if(ray.relation_to(*p) == relation::SegmentPoint::ON) {
 				need_retry = true;
 				break;
 			}
@@ -157,10 +157,10 @@ relation::PolygonPoint Polygon::relation_to(Point const* point) const {
 			continue;
 
 		for(unique_ptr<Edge> const& edge : edges) {
-			if(edge->relation_to(point) == relation::EdgePoint::ON)
+			if(edge->relation_to(point) == relation::SegmentPoint::ON)
 				return relation::PolygonPoint::ON;
 
-			if(edge->relation_to(&ray) == relation::EdgeEdge::CROSSING) {
+			if(edge->relation_to(ray) == relation::SegmentSegment::CROSSING) {
 				++count;
 			}
 		}

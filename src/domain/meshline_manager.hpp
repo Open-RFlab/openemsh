@@ -13,6 +13,7 @@
 #include "global.hpp"
 #include "i_conflict_origin.hpp"
 #include "i_meshline_origin.hpp"
+#include "types.hpp"
 
 class Conflict;
 class Meshline;

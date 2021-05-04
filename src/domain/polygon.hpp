@@ -17,6 +17,7 @@
 #include "i_meshline_origin.hpp"
 //#include "point.hpp"
 #include "relation.hpp"
+#include "types.hpp"
 
 class Conflict;
 class Edge;
@@ -24,10 +25,10 @@ class MeshlineManager;
 class Point;
 
 //******************************************************************************
-enum { XMIN, XMAX, YMIN, YMAX };
-
-//******************************************************************************
 class Polygon : public IConflictOrigin, public IMeshLineOrigin {
+private:
+	void detect_edge_normal();
+
 public:
 	enum class Rotation {
 //		UNKNOWN,
@@ -41,7 +42,7 @@ public:
 		PORT
 	} type; // TODO usefull?
 
-	std::array<double, 4> bounding;
+	Bounding bounding;
 
 	// TODO rm unique_ptr ?
 	std::vector<std::unique_ptr<Point const>> points;
@@ -54,11 +55,9 @@ public:
 	std::vector<Conflict*> conflicts;
 
 	Polygon(std::initializer_list<Point> _points);
-//	inline void detect_rotation();
-	void detect_edge_normal();
-//	void is_inside(Point const* point);
+
 //	relation::PolygonEdge relation_to(Edge const* edge);
-	relation::PolygonPoint relation_to(Point const* point) const;
+	relation::PolygonPoint relation_to(Point const& point) const;
 
 #ifdef DEBUG
 	void print() const;

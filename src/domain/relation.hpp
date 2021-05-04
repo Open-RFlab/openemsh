@@ -10,7 +10,7 @@ namespace relation {
 
 /// Relation between edges.
 ///*****************************************************************************
-enum class EdgeEdge {
+enum class SegmentSegment {
 	APART,         ///< Edges do not intersect nor colinear overlap.
 	CROSSING,      ///< Edges intersect.
 	COLINEAR,      ///< Edges are colinear.
@@ -19,14 +19,14 @@ enum class EdgeEdge {
 
 /// Relation between a point and an edge.
 ///*****************************************************************************
-enum class EdgePoint {
+enum class SegmentPoint {
 	OUT,    ///< Point not on the edge.
 	ON      ///< Point on the edge.
 };
 
 /// Relation between an edge and a polygon.
 ///*****************************************************************************
-enum class PolygonEdge {
+enum class PolygonSegment {
 	IN,    ///< Edge totally inside the polygon.
 	ON,    ///< Edge COLINEAR_CROSSING an edge of the polygon.
 	OUT    ///< Edge totally outside the polygon.
@@ -41,15 +41,15 @@ enum class PolygonPoint {
 };
 
 //******************************************************************************
-PolygonPoint cast(PolygonEdge const a);
+//PolygonPoint cast(PolygonSegment const a);
 
 //******************************************************************************
-PolygonEdge cast(PolygonPoint const a);
+//PolygonSegment cast(PolygonPoint const a);
 
 //******************************************************************************
-void toggle(PolygonEdge& a);
+//void toggle(PolygonSegment& a);
 
 //******************************************************************************
-void toggle(PolygonPoint& a);
+//void toggle(PolygonPoint& a);
 
 }; // namespace relation

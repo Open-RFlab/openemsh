@@ -9,28 +9,28 @@
 namespace relation {
 
 //******************************************************************************
-PolygonPoint cast(PolygonEdge const a) {
+PolygonPoint cast(PolygonSegment const a) {
 	switch(a) {
-	case PolygonEdge::IN: return PolygonPoint::IN;
-	case PolygonEdge::ON: return PolygonPoint::ON;
-	case PolygonEdge::OUT: return PolygonPoint::OUT;
+	case PolygonSegment::IN: return PolygonPoint::IN;
+	case PolygonSegment::ON: return PolygonPoint::ON;
+	case PolygonSegment::OUT: return PolygonPoint::OUT;
 	}
 }
 
 //******************************************************************************
-PolygonEdge cast(PolygonPoint const a) {
+PolygonSegment cast(PolygonPoint const a) {
 	switch(a) {
-	case PolygonPoint::IN: return PolygonEdge::IN;
-	case PolygonPoint::ON: return PolygonEdge::ON;
-	case PolygonPoint::OUT: return PolygonEdge::OUT;
+	case PolygonPoint::IN: return PolygonSegment::IN;
+	case PolygonPoint::ON: return PolygonSegment::ON;
+	case PolygonPoint::OUT: return PolygonSegment::OUT;
 	}
 }
 
 //******************************************************************************
-void toggle(PolygonEdge& a) {
+void toggle(PolygonSegment& a) {
 	switch(a) {
-	case PolygonEdge::IN: a = PolygonEdge::OUT; break;
-	case PolygonEdge::OUT: a = PolygonEdge::IN; break;
+	case PolygonSegment::IN: a = PolygonSegment::OUT; break;
+	case PolygonSegment::OUT: a = PolygonSegment::IN; break;
 	default: break;
 	}
 }

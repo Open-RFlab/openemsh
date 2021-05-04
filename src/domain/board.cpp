@@ -17,6 +17,8 @@
 
 using namespace std;
 
+// TODO unnamed namespace
+
 //******************************************************************************
 template<typename T>
 int8_t signum(T const& a) {
@@ -114,8 +116,8 @@ void Board::detect_edges_in_polygons() {
 #ifdef DEBUG
 					void print() {
 						cout << "range : " << endl;
-						range.p0.print();
-						range.p1.print();
+						range.p0().print();
+						range.p1().print();
 						cout << "mid : " << endl;
 						if(mid) mid->print();
 						if(rel_to_poly_b) {
@@ -135,17 +137,17 @@ void Board::detect_edges_in_polygons() {
 				vector<RangeBtwIntersections> ranges;
 
 				for(unique_ptr<Edge>& edge_b : poly_b->edges) {
-					relation::EdgeEdge rel = edge_a->relation_to(edge_b.get());
+					relation::SegmentSegment rel = edge_a->relation_to(*edge_b);
 					switch(rel) {
-					case relation::EdgeEdge::CROSSING:
-						if(optional<Point> p = intersection(edge_a.get(), edge_b.get()))
+					case relation::SegmentSegment::CROSSING:
+						if(optional<Point> p = intersection(*edge_a, *edge_b))
 							intersections.push_back(p.value());
 						break;
-					case relation::EdgeEdge::OVERLAPPING:
-						if(optional<Range> r = overlap(edge_a.get(), edge_b.get())) {
-							intersections.push_back(r->p0);
-							intersections.push_back(r->p1);
-							if(r->axis == Range::Axis::POINT)
+					case relation::SegmentSegment::OVERLAPPING:
+						if(optional<Range> r = overlap(*edge_a, *edge_b)) {
+							intersections.push_back(r->p0());
+							intersections.push_back(r->p1());
+							if(r->axis == Segment::Axis::POINT)
 								break;
 							ranges.emplace_back(r.value(), relation::PolygonPoint::ON);
 							conflict_manager.add_edge_in_polygon(edge_a.get(), poly_b.get(), r.value(), edge_b.get());
@@ -156,8 +158,8 @@ void Board::detect_edges_in_polygons() {
 					}
 				}
 
-				relation::PolygonPoint rel_p0 = poly_b->relation_to(edge_a->p0);
-				relation::PolygonPoint rel_p1 = poly_b->relation_to(edge_a->p1);
+				relation::PolygonPoint rel_p0 = poly_b->relation_to(edge_a->p0());
+				relation::PolygonPoint rel_p1 = poly_b->relation_to(edge_a->p1());
 
 				if(!intersections.size()
 //				&& !ranges.size()
@@ -165,10 +167,10 @@ void Board::detect_edges_in_polygons() {
 				&& rel_p1 == relation::PolygonPoint::IN) {
 					conflict_manager.add_edge_in_polygon(edge_a.get(), poly_b.get());
 				} else if(intersections.size()) {
-					intersections.push_back(*edge_a->p0);
-					intersections.push_back(*edge_a->p1);
+					intersections.push_back(edge_a->p0());
+					intersections.push_back(edge_a->p1());
 
-					sort_points_by_vector_orientation(intersections, *edge_a->vec);
+					sort_points_by_vector_orientation(intersections, edge_a->vec);
 					auto last = unique(begin(intersections), end(intersections));
 					intersections.erase(last, end(intersections));
 
@@ -199,7 +201,7 @@ void Board::detect_edges_in_polygons() {
 
 					for(RangeBtwIntersections& range : ranges) {
 						if(range.mid.has_value()
-						&& poly_b->relation_to(&range.mid.value()) == relation::PolygonPoint::IN) {
+						&& poly_b->relation_to(range.mid.value()) == relation::PolygonPoint::IN) {
 /*						|| poly_b->relation_to(&range.mid.value()) == relation::PolygonPoint::ON))
 */							conflict_manager.add_edge_in_polygon(edge_a.get(), poly_b.get(), range.range);
 //							range.rel_to_poly_b = poly_b->relation_to(&range.mid.value()); //TODO useless
@@ -228,16 +230,16 @@ void Board::detect_edges_in_polygons() {
 //******************************************************************************
 void Board::detect_colinear_edges() {
 	for(size_t i = 0; i < edges.size(); ++i) {
-		if(edges[i]->axis == Edge::Axis::DIAGONAL)
+		if(edges[i]->axis == Segment::Axis::DIAGONAL)
 			continue;
 
 		for(size_t j = i + 1; j < edges.size(); ++j) {
 			if(edges[j]->axis != edges[i]->axis)
 				continue;
 
-			if(edges[i]->axis == Edge::Axis::X && edges[i]->p0->y == edges[j]->p0->y)
+			if(edges[i]->axis == Segment::Axis::X && edges[i]->p0().y == edges[j]->p0().y)
 				conflict_manager.add_colinear_edges(edges[i], edges[j]);
-			else if(edges[i]->axis == Edge::Axis::Y && edges[i]->p0->x == edges[j]->p0->x)
+			else if(edges[i]->axis == Segment::Axis::Y && edges[i]->p0().x == edges[j]->p0().x)
 				conflict_manager.add_colinear_edges(edges[i], edges[j]);
 		}
 	}

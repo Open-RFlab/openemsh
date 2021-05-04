@@ -204,7 +204,7 @@ SCENARIO("relation::PolygonPoint Polygon::relation_to(Point const* point) const"
 		WHEN("A point is inside the polygon") {
 			Point p(2, 2);
 			THEN("Should be detected as IN") {
-				REQUIRE(poly.relation_to(&p) == relation::PolygonPoint::IN);
+				REQUIRE(poly.relation_to(p) == relation::PolygonPoint::IN);
 			}
 		}
 
@@ -213,23 +213,23 @@ SCENARIO("relation::PolygonPoint Polygon::relation_to(Point const* point) const"
 			Point q(4, 2);
 			Point r(2, 4);
 			THEN("Should be detected as OUT") {
-				REQUIRE(poly.relation_to(&p) == relation::PolygonPoint::OUT);
-				REQUIRE(poly.relation_to(&q) == relation::PolygonPoint::OUT);
-				REQUIRE(poly.relation_to(&r) == relation::PolygonPoint::OUT);
+				REQUIRE(poly.relation_to(p) == relation::PolygonPoint::OUT);
+				REQUIRE(poly.relation_to(q) == relation::PolygonPoint::OUT);
+				REQUIRE(poly.relation_to(r) == relation::PolygonPoint::OUT);
 			}
 		}
 
 		WHEN("A point is on an edge of the polygon") {
 			Point p(1, 2);
 			THEN("Should be detected as ON") {
-				REQUIRE(poly.relation_to(&p) == relation::PolygonPoint::ON);
+				REQUIRE(poly.relation_to(p) == relation::PolygonPoint::ON);
 			}
 		}
 
 		WHEN("A point is on a vertex of the polygon") {
 			Point p(1, 1);
 			THEN("Should be detected as ON") {
-				REQUIRE(poly.relation_to(&p) == relation::PolygonPoint::ON);
+				REQUIRE(poly.relation_to(p) == relation::PolygonPoint::ON);
 			}
 		}
 	}
@@ -241,7 +241,7 @@ SCENARIO("relation::PolygonPoint Polygon::relation_to(Point const* point) const"
 				{ 3, 5 }, { 3, 4 }, { 2, 3 }, { 1, 3 }});
 			Point p(3, 3);
 			THEN("Should be detected as IN") {
-				REQUIRE(poly.relation_to(&p) == relation::PolygonPoint::IN);
+				REQUIRE(poly.relation_to(p) == relation::PolygonPoint::IN);
 			}
 		}
 
@@ -249,7 +249,7 @@ SCENARIO("relation::PolygonPoint Polygon::relation_to(Point const* point) const"
 			Polygon poly({{ 2, 1 }, { 3, 2 }, { 2, 3 }, { 1, 2 }});
 			Point p(2, 2);
 			THEN("Should be detected as IN") {
-				REQUIRE(poly.relation_to(&p) == relation::PolygonPoint::IN);
+				REQUIRE(poly.relation_to(p) == relation::PolygonPoint::IN);
 			}
 		}
 	}
