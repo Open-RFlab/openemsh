@@ -44,10 +44,12 @@ bool operator==(Point const& a, Point const& b) {
 }
 
 //******************************************************************************
+/*
 bool operator!=(Point const& a, Point const& b) {
 //	return (a.x != b.x || a.y != b.y);
 	return (!are_equal(a.x, b.x) || !are_equal(a.y, b.y));
 }
+*/
 
 //******************************************************************************
 Point mid(Point const& a, Point const& b) {

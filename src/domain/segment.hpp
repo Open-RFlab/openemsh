@@ -9,8 +9,8 @@
 #include <array>
 #include <optional>
 
+#include "bounding.hpp"
 #include "relation.hpp"
-#include "types.hpp"
 
 class Point;
 class Range;
@@ -42,10 +42,10 @@ Bounding bounding(Segment const& a);
 std::optional<Point> intersection(Segment const& a, Segment const& b);
 
 //******************************************************************************
-std::optional<Range> merge(Segment const& a, Segment const& b);
+std::optional<Range> merge(Segment const& a, Segment const& b); // TODO -> Bounding?
 
 //******************************************************************************
 Point mid(Segment const& s);
 
 //******************************************************************************
-std::optional<Range> overlap(Segment const& a, Segment const& b);
+std::optional<Range> overlap(Segment const& a, Segment const& b); // TODO -> Bounding?

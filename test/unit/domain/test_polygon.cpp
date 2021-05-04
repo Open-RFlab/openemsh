@@ -11,59 +11,21 @@
 
 #include "domain/polygon.hpp"
 
-/// @test bool are_possibly_overlapping(Polygon const& a, Polygon const& b)
+/// @test void Polygon::detect_bounding()
 /// @test template<class T> Polygon::Rotation detect_rotation(T& points)
 /// @test void Polygon::detect_edge_normal()
 /// @test relation::PolygonPoint Polygon::relation_to(Point const* point) const
 ///*****************************************************************************
 
 //******************************************************************************
-SCENARIO("bool are_possibly_overlapping(Polygon const& a, Polygon const& b)", "[polygon]") {
-	GIVEN("Two polygons") {
-		WHEN("The bounding boxes do not overlap") {
-			Polygon a({{ 1, 2 }, { 1, 4 }, { 4, 4 }});
-			Polygon b({{ 5, 3 }, { 5, 1 }, { 6, 2 }});
-			THEN("Polygons should not possibly overlap") {
-				REQUIRE_FALSE(are_possibly_overlapping(a, b));
-				REQUIRE_FALSE(are_possibly_overlapping(b, a));
-			}
-		}
-
-		WHEN("The bounding boxes overlap but not the polygons") {
-			Polygon a({{ 1, 2 }, { 1, 4 }, { 4, 4 }});
-			Polygon b({{ 3, 3 }, { 5, 3 }, { 4, 1 }});
-			THEN("Polygons should possibly overlap") {
-				REQUIRE(are_possibly_overlapping(a, b));
-				REQUIRE(are_possibly_overlapping(b, a));
-			}
-		}
-
-		WHEN("The bounding boxes and the polygons overlap") {
-			Polygon a({{ 1, 2 }, { 1, 4 }, { 4, 4 }});
-			Polygon b({{ 2, 1 }, { 2, 3 }, { 5, 3 }});
-			THEN("Polygons should possibly overlap") {
-				REQUIRE(are_possibly_overlapping(a, b));
-				REQUIRE(are_possibly_overlapping(b, a));
-			}
-		}
-
-
-		WHEN("The bounding boxes of a polygons is totally inside the other") {
-			Polygon a({{ 1, 2 }, { 1, 4 }, { 4, 4 }});
-			Polygon b({{ 2, 2.5 }, { 2, 3.5 }, { 3, 3 }});
-			THEN("Polygons should possibly overlap") {
-				REQUIRE(are_possibly_overlapping(a, b));
-				REQUIRE(are_possibly_overlapping(b, a));
-			}
-		}
-
-		WHEN("The bounding boxes just touch each other by a corner") {
-			Polygon a({{ 1, 2 }, { 1, 4 }, { 4, 4 }});
-			Polygon b({{ 4, 4 }, { 5, 4 }, { 5, 5 }});
-			THEN("Polygons should possibly overlap") {
-				REQUIRE(are_possibly_overlapping(a, b));
-				REQUIRE(are_possibly_overlapping(b, a));
-			}
+SCENARIO("void Polygon::detect_bounding()", "[polygon]") {
+	GIVEN("A random polygon") {
+		Polygon a({{ 1, 2 }, { 1, 4 }, { 4, 4 }});
+		THEN("Should calcul bounding box") {
+			REQUIRE(a.bounding[XMIN] == 1);
+			REQUIRE(a.bounding[XMAX] == 4);
+			REQUIRE(a.bounding[YMIN] == 2);
+			REQUIRE(a.bounding[YMAX] == 4);
 		}
 	}
 }

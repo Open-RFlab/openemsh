@@ -11,14 +11,14 @@
 
 #include "domain/edge.hpp"
 
-/// @test relation::EdgeEdge Edge::relation_to(Edge const* edge) const
-/// @test relation::EdgePoint Edge::relation_to(Point const* point) const
-/// @test std::optional<Point> intersection(Edge const* a, Edge const* b)
-/// @test std::optional<Range> overlap(Edge const* a, Edge const* b)
+/// @test relation::SegmentSegment Segment::relation_to(Segment const* segment) const
+/// @test relation::SegmentPoint Segment::relation_to(Point const* point) const
+/// @test std::optional<Point> intersection(Segment const* a, Segment const* b)
+/// @test std::optional<Range> overlap(Segment const* a, Segment const* b)
 ///*****************************************************************************
 
 //******************************************************************************
-SCENARIO("relation::EdgeEdge Edge::relation_to(Edge const* edge) const", "[edge]") {
+SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) const", "[edge][segment]") {
 	GIVEN("Two edges") {
 		WHEN("A vertical edge and an horizontal edge are crossing") {
 			Point a0(1, 2), a1(3, 2);
@@ -274,7 +274,7 @@ SCENARIO("relation::EdgeEdge Edge::relation_to(Edge const* edge) const", "[edge]
 }
 
 //******************************************************************************
-SCENARIO("relation::EdgePoint Edge::relation_to(Point const* point) const", "[edge]") {
+SCENARIO("relation::SegmentPoint Segment::relation_to(Point const* point) const", "[edge][segment]") {
 	GIVEN("An edge") {
 		Point e0(1, 1), e1(3, 3);
 		Edge e(&e0, &e1);
@@ -302,7 +302,7 @@ SCENARIO("relation::EdgePoint Edge::relation_to(Point const* point) const", "[ed
 }
 
 //******************************************************************************
-SCENARIO("std::optional<Point> intersection(Edge const* a, Edge const* b)", "[edge]") {
+SCENARIO("std::optional<Point> intersection(Segment const* a, Segment const* b)", "[edge][segment]") {
 	GIVEN("Two edges") {
 		WHEN("A vertical edge and an horizontal edge are crossing") {
 			Point a0(1, 2), a1(3, 2); // Horizontal
@@ -389,7 +389,7 @@ SCENARIO("std::optional<Point> intersection(Edge const* a, Edge const* b)", "[ed
 }
 
 //******************************************************************************
-SCENARIO("std::optional<Range> overlap(Edge const* a, Edge const* b)", "[edge]") {
+SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[edge][segment]") {
 	GIVEN("Two edges") {
 		WHEN("Two horizontal edges are overlapping") {
 			Point a0(1, 1), a1(3, 1);
@@ -586,25 +586,33 @@ SCENARIO("std::optional<Range> overlap(Edge const* a, Edge const* b)", "[edge]")
 		}
 
 		WHEN("Two diagonal edges are overlapping") {
-			Point a0(1, 1), a1(3, 3);
-			Point b0(2, 2), b1(4, 4);
-			Edge a(&a0, &a1), b(&b0, &b1);
+			Point a0(1, 1), a1(3, 5);
+			Point b0(2, 3), b1(4, 7);
+			Edge a(&a0, &a1), b(&b0, &b1), c(&b1, &b0);
 			std::optional<Range> r(overlap(a, b));
 			std::optional<Range> s(overlap(b, a));
+			std::optional<Range> t(overlap(a, c));
 			THEN("Should calcul overlap range") {
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
+				REQUIRE(a.relation_to(c) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(r);
 				REQUIRE(r->axis == Segment::Axis::DIAGONAL);
 				REQUIRE(r->p0().x == 2);
 				REQUIRE(r->p1().x == 3);
-				REQUIRE(r->p0().y == 2);
-				REQUIRE(r->p1().y == 3);
+				REQUIRE(r->p0().y == 3);
+				REQUIRE(r->p1().y == 5);
 				REQUIRE(s);
 				REQUIRE(s->axis == Segment::Axis::DIAGONAL);
 				REQUIRE(s->p0().x == 2);
 				REQUIRE(s->p1().x == 3);
-				REQUIRE(s->p0().y == 2);
-				REQUIRE(s->p1().y == 3);
+				REQUIRE(s->p0().y == 3);
+				REQUIRE(s->p1().y == 5);
+				REQUIRE(t);
+				REQUIRE(t->axis == Segment::Axis::DIAGONAL);
+				REQUIRE(t->p0().x == 2);
+				REQUIRE(t->p1().x == 3);
+				REQUIRE(t->p0().y == 3);
+				REQUIRE(t->p1().y == 5);
 			}
 		}
 

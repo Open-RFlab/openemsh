@@ -18,13 +18,32 @@ using namespace std;
 //******************************************************************************
 Polygon::Polygon(initializer_list<Point> _points)
 : bounding({ begin(_points)->x, begin(_points)->x, begin(_points)->y, begin(_points)->y }) {
-	for(Point const& point : _points) {
+	for(Point const& point : _points)
 		points.push_back(make_unique<Point>(point)); // TODO do not use initializer_list because of copies
+	points.shrink_to_fit();
 
-		if(point.x < bounding[XMIN]) bounding[XMIN] = point.x;
-		if(point.x > bounding[XMAX]) bounding[XMAX] = point.x;
-		if(point.y < bounding[YMIN]) bounding[YMIN] = point.y;
-		if(point.y > bounding[YMAX]) bounding[YMAX] = point.y;
+	rotation = detect_rotation(points);
+
+	Point const* prev = points.back().get();
+	for(unique_ptr<Point const>& point : points) {
+		edges.push_back(make_unique<Edge>(prev, point.get()));
+		prev = point.get();
+	}
+	edges.shrink_to_fit();
+
+	detect_bounding();
+	detect_edge_normal();
+}
+
+//******************************************************************************
+/*
+Polygon::Polygon(vector<unique_ptr<Point const>> _points)
+: points(_points) {
+	for(unique_ptr<Point const>& point : points) {
+		if(point->x < bounding[XMIN]) bounding[XMIN] = point->x;
+		if(point->x > bounding[XMAX]) bounding[XMAX] = point->x;
+		if(point->y < bounding[YMIN]) bounding[YMIN] = point->y;
+		if(point->y > bounding[YMAX]) bounding[YMAX] = point->y;
 	}
 	points.shrink_to_fit();
 
@@ -39,6 +58,7 @@ Polygon::Polygon(initializer_list<Point> _points)
 
 	detect_edge_normal();
 }
+*/
 
 /// Cf. https://rosettacode.org/wiki/Shoelace_formula_for_polygonal_area#C.2B.2B
 /// Cf. https://www.baeldung.com/cs/list-polygon-points-clockwise
@@ -76,6 +96,16 @@ Polygon::Rotation detect_rotation(vector<unique_ptr<Point const>> const& points)
 //******************************************************************************
 Polygon::Rotation detect_rotation(vector<Point const*> const points) {
 	return detect_rotation<vector<Point const*> const>(points);
+}
+
+//******************************************************************************
+void Polygon::detect_bounding() {
+	for(std::unique_ptr<Point const>& point : points) {
+		if(point->x < bounding[XMIN]) bounding[XMIN] = point->x;
+		if(point->x > bounding[XMAX]) bounding[XMAX] = point->x;
+		if(point->y < bounding[YMIN]) bounding[YMIN] = point->y;
+		if(point->y > bounding[YMAX]) bounding[YMAX] = point->y;
+	}
 }
 
 ///           YMAX          |           YMAX
@@ -170,19 +200,6 @@ relation::PolygonPoint Polygon::relation_to(Point const& point) const {
 		return relation::PolygonPoint::IN;
 	else
 		return relation::PolygonPoint::OUT;
-}
-
-/// Check if the boundings of two polygons overlap or just touch each other.
-///*****************************************************************************
-bool are_possibly_overlapping(Polygon const& a, Polygon const& b) {
-	return((b.bounding[XMIN] >= a.bounding[XMIN] && b.bounding[XMIN] <= a.bounding[XMAX])
-		|| (b.bounding[XMAX] >= a.bounding[XMIN] && b.bounding[XMAX] <= a.bounding[XMAX])
-		|| (a.bounding[XMIN] >= b.bounding[XMIN] && a.bounding[XMIN] <= b.bounding[XMAX])
-		|| (a.bounding[XMAX] >= b.bounding[XMIN] && a.bounding[XMAX] <= b.bounding[XMAX]))
-		&&((b.bounding[YMIN] >= a.bounding[YMIN] && b.bounding[YMIN] <= a.bounding[YMAX])
-		|| (b.bounding[YMAX] >= a.bounding[YMIN] && b.bounding[YMAX] <= a.bounding[YMAX])
-		|| (a.bounding[YMIN] >= b.bounding[YMIN] && a.bounding[YMIN] <= b.bounding[YMAX])
-		|| (a.bounding[YMAX] >= b.bounding[YMIN] && a.bounding[YMAX] <= b.bounding[YMAX]));
 }
 
 #ifdef DEBUG

@@ -13,6 +13,7 @@
 //#include "conflict.hpp"
 //#include "meshline_manager.hpp"
 //#include "point.hpp"
+#include "bounding.hpp"
 #include "i_conflict_origin.hpp"
 #include "i_meshline_origin.hpp"
 #include "range.hpp"

@@ -42,7 +42,7 @@ int main() {
 		make_unique<Polygon>(Polygon({{ 2, 1 }, { 3, 4 }, { 5, 6 }})) }));
 */
 
-	b->print();
+//	b->print();
 	b->detect_colinear_edges();
 	b->detect_edges_in_polygons();
 

@@ -6,27 +6,27 @@
 
 #pragma once
 
-#include <array>
 #include <initializer_list>
 #include <memory>
 #include <vector>
 
+#include "bounding.hpp"
 //#include "conflict.hpp"
 //#include "edge.hpp"
+#include "global.hpp"
 #include "i_conflict_origin.hpp"
 #include "i_meshline_origin.hpp"
 //#include "point.hpp"
 #include "relation.hpp"
-#include "types.hpp"
 
 class Conflict;
 class Edge;
-class MeshlineManager;
 class Point;
 
 //******************************************************************************
 class Polygon : public IConflictOrigin, public IMeshLineOrigin {
 private:
+	void detect_bounding(); // TODO
 	void detect_edge_normal();
 
 public:
@@ -63,9 +63,6 @@ public:
 	void print() const;
 #endif // DEBUG
 };
-
-//******************************************************************************
-bool are_possibly_overlapping(Polygon const& a, Polygon const& b);
 
 //******************************************************************************
 Polygon::Rotation detect_rotation(std::vector<std::unique_ptr<Point const>> const& points);

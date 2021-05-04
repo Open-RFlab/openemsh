@@ -14,8 +14,8 @@
 
 using namespace std;
 
-/*
 //******************************************************************************
+/*
 Segment::Segment(Axis _axis)
 : axis(_axis)
 {}
@@ -101,8 +101,48 @@ optional<Point> intersection(Segment const& a, Segment const& b) {
 	return nullopt;
 }
 
-//******************************************************************************
+/// @warning Assume segments are OVERLAPPING.
+///*****************************************************************************
 optional<Range> merge(Segment const& a, Segment const& b) {
+	Point a_vec(a.p1() - a.p0());
+	Point b_vec(b.p1() - b.p0());
+	if((a.axis == Segment::Axis::X && b.axis == Segment::Axis::X)
+	|| (a.axis == Segment::Axis::Y && b.axis == Segment::Axis::Y)
+	|| (a_vec.y / a_vec.x == b_vec.y / b_vec.x)) {
+		Bounding a_bnd(bounding(a));
+		Bounding b_bnd(bounding(b));
+
+		double xmin = 0;
+		double xmax = 0;
+		if(a_bnd[XMIN] >= b_bnd[XMIN] && a_bnd[XMIN] <= b_bnd[XMAX])
+			xmin = b_bnd[XMIN];
+		else if(b_bnd[XMIN] >= a_bnd[XMIN] && b_bnd[XMIN] <= a_bnd[XMAX])
+			xmin = a_bnd[XMIN];
+		else
+			return nullopt;
+
+		if(a_bnd[XMAX] >= b_bnd[XMIN] && a_bnd[XMAX] <= b_bnd[XMAX])
+			xmax = b_bnd[XMAX];
+		else if(b_bnd[XMAX] >= a_bnd[XMIN] && b_bnd[XMAX] <= a_bnd[XMAX])
+			xmax = a_bnd[XMAX];
+
+		double ymin = 0;
+		double ymax = 0;
+		if(a_bnd[YMIN] >= b_bnd[YMIN] && a_bnd[YMIN] <= b_bnd[YMAX])
+			ymin = b_bnd[YMIN];
+		else if(b_bnd[YMIN] >= a_bnd[YMIN] && b_bnd[YMIN] <= a_bnd[YMAX])
+			ymin = a_bnd[YMIN];
+		else
+			return nullopt;
+
+		if(a_bnd[YMAX] >= b_bnd[YMIN] && a_bnd[YMAX] <= b_bnd[YMAX])
+			ymax = b_bnd[YMAX];
+		else if(b_bnd[YMAX] >= a_bnd[YMIN] && b_bnd[YMAX] <= a_bnd[YMAX])
+			ymax = a_bnd[YMAX];
+
+		return Range(Point(xmin, ymin), Point(xmax, ymax));
+	}
+	return nullopt;
 }
 
 //******************************************************************************
@@ -110,18 +150,16 @@ Point mid(Segment const& a) {
 	return mid(a.p0(), a.p1());
 }
 
-/// Returns the overlap range between two edges only if both are horizontal or
-/// if both are vertical. Diagonal overlaps are not handled for now.
-/// @warning Assume both edges are OVERLAPPING and horizontal or vertical.
-/// Returns nullopt if not overlapping edges.
+/// Returns the overlap range between two edges.
+/// @warning Assume both edges are OVERLAPPING.
+/// Returns nullopt if edges are not prallels or if boundings do not overlap.
 ///*****************************************************************************
 optional<Range> overlap(Segment const& a, Segment const& b) {
 	Point a_vec(a.p1() - a.p0());
 	Point b_vec(b.p1() - b.p0());
 	if((a.axis == Segment::Axis::X && b.axis == Segment::Axis::X)
 	|| (a.axis == Segment::Axis::Y && b.axis == Segment::Axis::Y)
-	|| (a_vec.y / a_vec.x == b_vec.y / b_vec.x)
-	|| (a_vec.y / a_vec.x == b_vec.x / b_vec.y)) {
+	|| (a_vec.y / a_vec.x == b_vec.y / b_vec.x)) {
 		Bounding a_bnd(bounding(a));
 		Bounding b_bnd(bounding(b));
 
