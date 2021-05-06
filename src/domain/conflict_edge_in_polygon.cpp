@@ -40,13 +40,13 @@ void ConflictEdgeInPolygon::print() const {
 	cout << "overlaps : " << overlaps.size() << endl;
 	for(auto const& overlap : overlaps) {
 		cout << "overlap :" << endl;
-		cout << "polygon : " << get<0>(overlap) << endl;
-//		get<0>(overlap)->print();
+		cout << "polygon : " << get<POLYGON>(overlap) << endl;
+//		get<POLYGON>(overlap)->print();
 //		cout << "range :" << endl;
-		get<1>(overlap)->print();
-		if(get<2>(overlap).has_value()) {
-			cout << "optedge : " << get<2>(overlap).value() << endl;
-			get<2>(overlap).value()->print();
+		get<RANGE>(overlap)->print();
+		if(get<EDGE>(overlap).has_value()) {
+			cout << "optedge : " << get<EDGE>(overlap).value() << endl;
+			get<EDGE>(overlap).value()->print();
 		} else {
 			cout << "optedge : nullopt" << endl;
 		}

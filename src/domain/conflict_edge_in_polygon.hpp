@@ -18,13 +18,22 @@ class Edge;
 class Polygon;
 
 //******************************************************************************
+using Overlap = std::tuple<Polygon const*, std::unique_ptr<Range const>, std::optional<Edge const*>>;
+enum OverlapIndex {
+	POLYGON,
+	RANGE,
+	EDGE,
+};
+
+//******************************************************************************
 class ConflictEdgeInPolygon : public Conflict {
 public:
 	/// The optional overlap edge is reserved for when edge is overlapping an
 	/// edge of the polygon and not just the polygon itself.
 	///*************************************************************************
 	Edge const* edge;
-	std::vector<std::tuple<Polygon const*, std::unique_ptr<Range const>, std::optional<Edge const*>>> overlaps;
+
+	std::vector<Overlap> overlaps;
 
 	ConflictEdgeInPolygon(Edge const* a, Polygon const* _polygon, Range const _range, std::optional<Edge const*> b);
 

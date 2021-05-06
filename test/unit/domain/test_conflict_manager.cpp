@@ -250,9 +250,9 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
 				REQUIRE(conflict->edge == &a);
 				REQUIRE(conflict->overlaps.size() == 1);
-				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
-				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 4, 1 }, { 4, 2 }));
-				REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+				REQUIRE(std::get<POLYGON>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<RANGE>(conflict->overlaps[0]) == Range({ 4, 1 }, { 4, 2 }));
+				REQUIRE_FALSE(std::get<EDGE>(conflict->overlaps[0]));
 				REQUIRE(a.conflicts.size() == 1);
 				REQUIRE(a.conflicts[0] == conflict);
 				REQUIRE(p.conflicts.size() == 1);
@@ -276,9 +276,9 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 					REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
 					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
 					REQUIRE(conflict->overlaps.size() == 2);
-					REQUIRE(std::get<0>(conflict->overlaps[1]) == &p);
-					REQUIRE(*std::get<1>(conflict->overlaps[1]) == Range({ 4, 5 }, { 4, 6 }));
-					REQUIRE_FALSE(std::get<2>(conflict->overlaps[1]));
+					REQUIRE(std::get<POLYGON>(conflict->overlaps[1]) == &p);
+					REQUIRE(*std::get<RANGE>(conflict->overlaps[1]) == Range({ 4, 5 }, { 4, 6 }));
+					REQUIRE_FALSE(std::get<EDGE>(conflict->overlaps[1]));
 					REQUIRE(a.conflicts.size() == 1);
 					REQUIRE(p.conflicts.size() == 1);
 				}
@@ -293,9 +293,9 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[1].get());
 					REQUIRE(conflict->edge == &b);
 					REQUIRE(conflict->overlaps.size() == 1);
-					REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
-					REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 5, 5 }, { 5, 6 }));
-					REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+					REQUIRE(std::get<POLYGON>(conflict->overlaps[0]) == &p);
+					REQUIRE(*std::get<RANGE>(conflict->overlaps[0]) == Range({ 5, 5 }, { 5, 6 }));
+					REQUIRE_FALSE(std::get<EDGE>(conflict->overlaps[0]));
 					REQUIRE(b.conflicts.size() == 1);
 					REQUIRE(b.conflicts[0] == conflict);
 					REQUIRE(p.conflicts.size() == 2);
@@ -309,9 +309,9 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 					REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
 					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
 					REQUIRE(conflict->overlaps.size() == 2);
-					REQUIRE(std::get<0>(conflict->overlaps[1]) == &q);
-					REQUIRE(*std::get<1>(conflict->overlaps[1]) == Range({ 4, 1 }, { 4, 7 }));
-					REQUIRE_FALSE(std::get<2>(conflict->overlaps[1]));
+					REQUIRE(std::get<POLYGON>(conflict->overlaps[1]) == &q);
+					REQUIRE(*std::get<RANGE>(conflict->overlaps[1]) == Range({ 4, 1 }, { 4, 7 }));
+					REQUIRE_FALSE(std::get<EDGE>(conflict->overlaps[1]));
 					REQUIRE(a.conflicts.size() == 1);
 					REQUIRE(p.conflicts.size() == 1);
 				}
@@ -328,9 +328,9 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
 				REQUIRE(conflict->edge == &a);
 				REQUIRE(conflict->overlaps.size() == 1);
-				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
-				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 1, 4 }, { 2, 4 }));
-				REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+				REQUIRE(std::get<POLYGON>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<RANGE>(conflict->overlaps[0]) == Range({ 1, 4 }, { 2, 4 }));
+				REQUIRE_FALSE(std::get<EDGE>(conflict->overlaps[0]));
 				REQUIRE(a.conflicts.size() == 1);
 				REQUIRE(a.conflicts[0] == conflict);
 				REQUIRE(p.conflicts.size() == 1);
@@ -354,9 +354,9 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 					REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
 					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
 					REQUIRE(conflict->overlaps.size() == 2);
-					REQUIRE(std::get<0>(conflict->overlaps[1]) == &p);
-					REQUIRE(*std::get<1>(conflict->overlaps[1]) == Range({ 5, 4 }, { 6, 4 }));
-					REQUIRE_FALSE(std::get<2>(conflict->overlaps[1]));
+					REQUIRE(std::get<POLYGON>(conflict->overlaps[1]) == &p);
+					REQUIRE(*std::get<RANGE>(conflict->overlaps[1]) == Range({ 5, 4 }, { 6, 4 }));
+					REQUIRE_FALSE(std::get<EDGE>(conflict->overlaps[1]));
 					REQUIRE(a.conflicts.size() == 1);
 					REQUIRE(p.conflicts.size() == 1);
 				}
@@ -371,9 +371,9 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[1].get());
 					REQUIRE(conflict->edge == &b);
 					REQUIRE(conflict->overlaps.size() == 1);
-					REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
-					REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 5, 5 }, { 6, 5 }));
-					REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+					REQUIRE(std::get<POLYGON>(conflict->overlaps[0]) == &p);
+					REQUIRE(*std::get<RANGE>(conflict->overlaps[0]) == Range({ 5, 5 }, { 6, 5 }));
+					REQUIRE_FALSE(std::get<EDGE>(conflict->overlaps[0]));
 					REQUIRE(b.conflicts.size() == 1);
 					REQUIRE(b.conflicts[0] == conflict);
 					REQUIRE(p.conflicts.size() == 2);
@@ -387,9 +387,9 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 					REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
 					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
 					REQUIRE(conflict->overlaps.size() == 2);
-					REQUIRE(std::get<0>(conflict->overlaps[1]) == &q);
-					REQUIRE(*std::get<1>(conflict->overlaps[1]) == Range({ 1, 4 }, { 7, 4 }));
-					REQUIRE_FALSE(std::get<2>(conflict->overlaps[1]));
+					REQUIRE(std::get<POLYGON>(conflict->overlaps[1]) == &q);
+					REQUIRE(*std::get<RANGE>(conflict->overlaps[1]) == Range({ 1, 4 }, { 7, 4 }));
+					REQUIRE_FALSE(std::get<EDGE>(conflict->overlaps[1]));
 					REQUIRE(a.conflicts.size() == 1);
 					REQUIRE(p.conflicts.size() == 1);
 				}
@@ -406,9 +406,9 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
 				REQUIRE(conflict->edge == &a);
 				REQUIRE(conflict->overlaps.size() == 1);
-				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
-				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 3, 6 }, { 4, 5 }));
-				REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+				REQUIRE(std::get<POLYGON>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<RANGE>(conflict->overlaps[0]) == Range({ 3, 6 }, { 4, 5 }));
+				REQUIRE_FALSE(std::get<EDGE>(conflict->overlaps[0]));
 				REQUIRE(a.conflicts.size() == 1);
 				REQUIRE(a.conflicts[0] == conflict);
 				REQUIRE(p.conflicts.size() == 1);
@@ -432,9 +432,9 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 					REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
 					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
 					REQUIRE(conflict->overlaps.size() == 2);
-					REQUIRE(std::get<0>(conflict->overlaps[1]) == &p);
-					REQUIRE(*std::get<1>(conflict->overlaps[1]) == Range({ 5, 4 }, { 6, 3 }));
-					REQUIRE_FALSE(std::get<2>(conflict->overlaps[1]));
+					REQUIRE(std::get<POLYGON>(conflict->overlaps[1]) == &p);
+					REQUIRE(*std::get<RANGE>(conflict->overlaps[1]) == Range({ 5, 4 }, { 6, 3 }));
+					REQUIRE_FALSE(std::get<EDGE>(conflict->overlaps[1]));
 					REQUIRE(a.conflicts.size() == 1);
 					REQUIRE(p.conflicts.size() == 1);
 				}
@@ -449,9 +449,9 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[1].get());
 					REQUIRE(conflict->edge == &b);
 					REQUIRE(conflict->overlaps.size() == 1);
-					REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
-					REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 5, 5 }, { 6, 6 }));
-					REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+					REQUIRE(std::get<POLYGON>(conflict->overlaps[0]) == &p);
+					REQUIRE(*std::get<RANGE>(conflict->overlaps[0]) == Range({ 5, 5 }, { 6, 6 }));
+					REQUIRE_FALSE(std::get<EDGE>(conflict->overlaps[0]));
 					REQUIRE(b.conflicts.size() == 1);
 					REQUIRE(b.conflicts[0] == conflict);
 					REQUIRE(p.conflicts.size() == 2);
@@ -465,9 +465,9 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 					REQUIRE(conflicts[0]->kind == Conflict::Kind::EDGE_IN_POLYGON);
 					auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
 					REQUIRE(conflict->overlaps.size() == 2);
-					REQUIRE(std::get<0>(conflict->overlaps[1]) == &q);
-					REQUIRE(*std::get<1>(conflict->overlaps[1]) == Range({ 2, 7 }, { 7, 2 }));
-					REQUIRE_FALSE(std::get<2>(conflict->overlaps[1]));
+					REQUIRE(std::get<POLYGON>(conflict->overlaps[1]) == &q);
+					REQUIRE(*std::get<RANGE>(conflict->overlaps[1]) == Range({ 2, 7 }, { 7, 2 }));
+					REQUIRE_FALSE(std::get<EDGE>(conflict->overlaps[1]));
 					REQUIRE(a.conflicts.size() == 1);
 					REQUIRE(p.conflicts.size() == 1);
 				}
@@ -484,9 +484,9 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
 				REQUIRE(conflict->edge == &a);
 				REQUIRE(conflict->overlaps.size() == 1);
-				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
-				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 8, 8 }, { 8, 9 }));
-				REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+				REQUIRE(std::get<POLYGON>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<RANGE>(conflict->overlaps[0]) == Range({ 8, 8 }, { 8, 9 }));
+				REQUIRE_FALSE(std::get<EDGE>(conflict->overlaps[0]));
 				REQUIRE(a.conflicts.size() == 1);
 				REQUIRE(a.conflicts[0] == conflict);
 				REQUIRE(p.conflicts.size() == 1);
@@ -504,9 +504,9 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
 				REQUIRE(conflict->edge == &a);
 				REQUIRE(conflict->overlaps.size() == 1);
-				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
-				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 8, 8 }, { 9, 8 }));
-				REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+				REQUIRE(std::get<POLYGON>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<RANGE>(conflict->overlaps[0]) == Range({ 8, 8 }, { 9, 8 }));
+				REQUIRE_FALSE(std::get<EDGE>(conflict->overlaps[0]));
 				REQUIRE(a.conflicts.size() == 1);
 				REQUIRE(a.conflicts[0] == conflict);
 				REQUIRE(p.conflicts.size() == 1);
@@ -524,9 +524,9 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
 				REQUIRE(conflict->edge == &a);
 				REQUIRE(conflict->overlaps.size() == 1);
-				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
-				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 8, 8 }, { 9, 9 }));
-				REQUIRE_FALSE(std::get<2>(conflict->overlaps[0]));
+				REQUIRE(std::get<POLYGON>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<RANGE>(conflict->overlaps[0]) == Range({ 8, 8 }, { 9, 9 }));
+				REQUIRE_FALSE(std::get<EDGE>(conflict->overlaps[0]));
 				REQUIRE(a.conflicts.size() == 1);
 				REQUIRE(a.conflicts[0] == conflict);
 				REQUIRE(p.conflicts.size() == 1);
@@ -544,10 +544,10 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
 				REQUIRE(conflict->edge == &a);
 				REQUIRE(conflict->overlaps.size() == 1);
-				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
-				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 3, 1 }, { 3, 2 }));
-				REQUIRE(std::get<2>(conflict->overlaps[0]));
-				REQUIRE(std::get<2>(conflict->overlaps[0]).value() == p.edges[0].get());
+				REQUIRE(std::get<POLYGON>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<RANGE>(conflict->overlaps[0]) == Range({ 3, 1 }, { 3, 2 }));
+				REQUIRE(std::get<EDGE>(conflict->overlaps[0]));
+				REQUIRE(std::get<EDGE>(conflict->overlaps[0]).value() == p.edges[0].get());
 				REQUIRE(a.conflicts.size() == 1);
 				REQUIRE(a.conflicts[0] == conflict);
 				REQUIRE(p.conflicts.size() == 1);
@@ -565,10 +565,10 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
 				REQUIRE(conflict->edge == &a);
 				REQUIRE(conflict->overlaps.size() == 1);
-				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
-				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 1, 3 }, { 2, 3 }));
-				REQUIRE(std::get<2>(conflict->overlaps[0]));
-				REQUIRE(std::get<2>(conflict->overlaps[0]).value() == p.edges[5].get());
+				REQUIRE(std::get<POLYGON>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<RANGE>(conflict->overlaps[0]) == Range({ 1, 3 }, { 2, 3 }));
+				REQUIRE(std::get<EDGE>(conflict->overlaps[0]));
+				REQUIRE(std::get<EDGE>(conflict->overlaps[0]).value() == p.edges[5].get());
 				REQUIRE(a.conflicts.size() == 1);
 				REQUIRE(a.conflicts[0] == conflict);
 				REQUIRE(p.conflicts.size() == 1);
@@ -586,10 +586,10 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 				auto conflict = dynamic_cast<ConflictEdgeInPolygon*>(conflicts[0].get());
 				REQUIRE(conflict->edge == &a);
 				REQUIRE(conflict->overlaps.size() == 1);
-				REQUIRE(std::get<0>(conflict->overlaps[0]) == &p);
-				REQUIRE(*std::get<1>(conflict->overlaps[0]) == Range({ 1, 1 }, { 3, 3 }));
-				REQUIRE(std::get<2>(conflict->overlaps[0]));
-				REQUIRE(std::get<2>(conflict->overlaps[0]).value() == p.edges[0].get());
+				REQUIRE(std::get<POLYGON>(conflict->overlaps[0]) == &p);
+				REQUIRE(*std::get<RANGE>(conflict->overlaps[0]) == Range({ 1, 1 }, { 3, 3 }));
+				REQUIRE(std::get<EDGE>(conflict->overlaps[0]));
+				REQUIRE(std::get<EDGE>(conflict->overlaps[0]).value() == p.edges[0].get());
 				REQUIRE(a.conflicts.size() == 1);
 				REQUIRE(a.conflicts[0] == conflict);
 				REQUIRE(p.conflicts.size() == 1);

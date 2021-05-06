@@ -88,12 +88,11 @@ void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const
 			if(c->edge == a) {
 				is_a_registered = true;
 
-				using Overlap = tuple<Polygon const*, std::unique_ptr<Range const>, std::optional<Edge const*>>;
 				for(Overlap& overlap : c->overlaps) {
-					if(get<0>(overlap) == polygon) {
+					if(get<POLYGON>(overlap) == polygon) {
 						is_polygon_registered = true;
-						if((*get<1>(overlap) == range)
-						&& (!get<2>(overlap) || (get<2>(overlap) && get<2>(overlap).value() == b))) {
+						if((*get<RANGE>(overlap) == range)
+						&& (!get<EDGE>(overlap) || (get<EDGE>(overlap) && get<EDGE>(overlap).value() == b))) {
 							is_overlap_registered = true;
 							break;
 						}
