@@ -14,8 +14,9 @@
 using namespace std;
 
 //******************************************************************************
-ConflictManager::ConflictManager(vector<unique_ptr<Conflict>>& _conflicts)
+ConflictManager::ConflictManager(vector<unique_ptr<Conflict>>& _conflicts, MeshlinePolicyManager* const _line_policy_manager)
 : conflicts(_conflicts)
+, line_policy_manager(_line_policy_manager)
 {}
 
 /// @warning Allows geometrically inconsistent datas.
@@ -25,8 +26,9 @@ void ConflictManager::add_colinear_edges(Edge* a, Edge* b) {
 	|| (a->axis == Segment::Axis::Y && b->axis == Segment::Axis::Y)) {
 		bool does_conflict_exist = false;
 		for(unique_ptr<Conflict>& conflict : conflicts) {
-			if(conflict->kind == Conflict::Kind::COLINEAR_EDGES) {
-				auto c = dynamic_cast<ConflictColinearEdges*>(conflict.get());
+//			if(conflict->kind == Conflict::Kind::COLINEAR_EDGES) {
+//				auto c = dynamic_cast<ConflictColinearEdges*>(conflict.get());
+			if(auto c = dynamic_cast<ConflictColinearEdges*>(conflict.get())) {
 				bool is_a_registered = false;
 				bool is_b_registered = false;
 
@@ -79,8 +81,9 @@ void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, optional<Ed
 void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const range, optional<Edge const*> b) {
 	bool does_conflict_exist = false;
 	for(unique_ptr<Conflict>& conflict : conflicts) {
-		if(conflict->kind == Conflict::Kind::EDGE_IN_POLYGON) {
-			auto c = dynamic_cast<ConflictEdgeInPolygon*>(conflict.get());
+//		if(conflict->kind == Conflict::Kind::EDGE_IN_POLYGON) {
+//			auto c = dynamic_cast<ConflictEdgeInPolygon*>(conflict.get());
+		if(auto c = dynamic_cast<ConflictEdgeInPolygon*>(conflict.get())) {
 			bool is_a_registered = false;
 			bool is_polygon_registered = false;
 			bool is_overlap_registered = false;
@@ -121,4 +124,20 @@ void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const
 //		b->conflicts.push_back(conflict); // TODO needed?
 		polygon->conflicts.push_back(conflict);
 	}
+}
+
+//******************************************************************************
+void ConflictManager::auto_solve_all_edge_in_polygon() {
+	for(unique_ptr<Conflict>& conflict : conflicts)
+		if(conflict->kind == Conflict::Kind::EDGE_IN_POLYGON)
+//		if(dynamic_cast<ConflictEdgeInPolygon*>(conflict.get()))
+			conflict->auto_solve(*line_policy_manager);
+}
+
+//******************************************************************************
+void ConflictManager::auto_solve_all_colinear_edges() {
+	for(unique_ptr<Conflict>& conflict : conflicts)
+		if(conflict->kind == Conflict::Kind::COLINEAR_EDGES)
+//		if(dynamic_cast<ConflictColinearEdges*>(conflict.get()))
+			conflict->auto_solve(*line_policy_manager);
 }
