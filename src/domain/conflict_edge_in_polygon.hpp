@@ -17,7 +17,9 @@
 class Edge;
 class Polygon;
 
-//******************************************************************************
+/// The optional overlap edge is reserved for when edge is overlapping an
+/// edge of the polygon and not just the polygon itself.
+///*****************************************************************************
 using Overlap = std::tuple<Polygon const*, std::unique_ptr<Range const>, std::optional<Edge const*>>;
 enum OverlapIndex {
 	POLYGON,
@@ -28,23 +30,15 @@ enum OverlapIndex {
 //******************************************************************************
 class ConflictEdgeInPolygon : public Conflict {
 public:
-	/// The optional overlap edge is reserved for when edge is overlapping an
-	/// edge of the polygon and not just the polygon itself.
-	///*************************************************************************
-	Edge const* edge;
+	Edge* const edge;
 
 	std::vector<Overlap> overlaps;
 
-	ConflictEdgeInPolygon(Edge const* a, Polygon const* _polygon, Range const _range, std::optional<Edge const*> b);
+	ConflictEdgeInPolygon(Edge* a, Polygon const* _polygon, Range const _range, std::optional<Edge const*> b);
 
-
-//	/// For all EDGE_PARTIALLY_IN_POLYGON conflict including the same edge,
-//	/// detect overlapping ranges and if the edge is totally in polygons or not.
-	//**************************************************************************
-//	void solve() override;
-
-//	bool is_between(IConflictOrigin* a, IConflictOrigin* b) const override;
 	void append(Polygon const* polygon, Range const range, std::optional<Edge const*> edge);
+
+	void auto_solve(MeshlinePolicyManager& line_policy_manager) override;
 
 #ifdef DEBUG
 	void print() const override;

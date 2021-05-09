@@ -11,7 +11,9 @@
 #include "i_conflict_origin.hpp"
 #include "i_meshline_origin.hpp"
 
-class MeshlineManager;
+class IConflictSolution;
+//class MeshlinePolicy;
+class MeshlinePolicyManager;
 
 //******************************************************************************
 class Conflict : public IMeshLineOrigin {
@@ -24,13 +26,13 @@ public:
 	} kind;
 
 	bool is_solved;
-	MeshlineManager* solution;
+//	MeshlinePolicy* solution;
+	IConflictSolution* solution;
 //	std::vector<IConflictOrigin*> between;
 
 	Conflict(Kind const _kind);
 
-//	virtual void solve();
-//	virtual bool is_between(IConflictOrigin* a, IConflictOrigin* b) const = 0;
+	virtual void auto_solve(MeshlinePolicyManager& line_policy_manager) = 0;
 
 #ifdef DEBUG
 	virtual void print() const = 0;

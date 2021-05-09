@@ -8,6 +8,8 @@
 #include <iostream>
 #endif // DEBUG
 
+#include <algorithm>
+
 #include "edge.hpp"
 #include "polygon.hpp"
 
@@ -16,7 +18,63 @@
 using namespace std;
 
 //******************************************************************************
-ConflictEdgeInPolygon::ConflictEdgeInPolygon(Edge const* a, Polygon const* _polygon, Range const _range, optional<Edge const*> b)
+template <typename T>
+int8_t signum(T const& a) {
+	return (T(0) < a) - (a < T(0));
+}
+
+//******************************************************************************
+void sort_overlaps_by_p0_by_vector_orientation(vector<Overlap>& overlaps, Point const& vector) {
+	int8_t x_sign = signum(vector.x);
+	int8_t y_sign = signum(vector.y);
+	if(x_sign > 0 && y_sign == 0)
+		sort(begin(overlaps), end(overlaps),
+			[](Overlap const& a, Overlap const& b)->bool {
+				return (get<RANGE>(a)->p0().x < get<RANGE>(b)->p0().x);
+			});
+	else if(x_sign == 0 && y_sign > 0)
+		sort(begin(overlaps), end(overlaps),
+			[](Overlap const& a, Overlap const& b)->bool {
+				return (get<RANGE>(a)->p0().y < get<RANGE>(b)->p0().y);
+			});
+	else if(x_sign < 0 && y_sign == 0)
+		sort(begin(overlaps), end(overlaps),
+			[](Overlap const& a, Overlap const& b)->bool {
+				return (get<RANGE>(a)->p0().x > get<RANGE>(b)->p0().x);
+			});
+	else if(x_sign == 0 && y_sign < 0)
+		sort(begin(overlaps), end(overlaps),
+			[](Overlap const& a, Overlap const& b)->bool {
+				return (get<RANGE>(a)->p0().y > get<RANGE>(b)->p0().y);
+			});
+	else if(x_sign > 0 && y_sign > 0)
+		sort(begin(overlaps), end(overlaps),
+			[](Overlap const& a, Overlap const& b)->bool {
+				return (get<RANGE>(a)->p0().x < get<RANGE>(b)->p0().x
+					&& get<RANGE>(a)->p0().y < get<RANGE>(b)->p0().y);
+			});
+	else if(x_sign < 0 && y_sign > 0)
+		sort(begin(overlaps), end(overlaps),
+			[](Overlap const& a, Overlap const& b)->bool {
+				return (get<RANGE>(a)->p0().x > get<RANGE>(b)->p0().x
+					&& get<RANGE>(a)->p0().y < get<RANGE>(b)->p0().y);
+			});
+	else if(x_sign < 0 && y_sign < 0)
+		sort(begin(overlaps), end(overlaps),
+			[](Overlap const& a, Overlap const& b)->bool {
+				return (get<RANGE>(a)->p0().x > get<RANGE>(b)->p0().x
+					&& get<RANGE>(a)->p0().y > get<RANGE>(b)->p0().y);
+			});
+	else if(x_sign > 0 && y_sign < 0)
+		sort(begin(overlaps), end(overlaps),
+			[](Overlap const& a, Overlap const& b)->bool {
+				return (get<RANGE>(a)->p0().x < get<RANGE>(b)->p0().x
+					&& get<RANGE>(a)->p0().y > get<RANGE>(b)->p0().y);
+			});
+}
+
+//******************************************************************************
+ConflictEdgeInPolygon::ConflictEdgeInPolygon(Edge* a, Polygon const* _polygon, Range const _range, optional<Edge const*> b)
 : Conflict(Kind::EDGE_IN_POLYGON)
 , edge(a) {
 	overlaps.emplace_back(_polygon, make_unique<Range const>(_range), b);
@@ -25,6 +83,45 @@ ConflictEdgeInPolygon::ConflictEdgeInPolygon(Edge const* a, Polygon const* _poly
 //******************************************************************************
 void ConflictEdgeInPolygon::append(Polygon const* polygon, Range const range, optional<Edge const*> edge) {
 	overlaps.emplace_back(polygon, make_unique<Range const>(range), edge);
+}
+
+//******************************************************************************
+void ConflictEdgeInPolygon::auto_solve(MeshlinePolicyManager& /*line_policy_manager*/) {
+	// TODO
+	// is edge totally overlapped?
+	// is edge totally overlapped by opposed normal?
+	sort_overlaps_by_p0_by_vector_orientation(overlaps, edge->vec);
+	Range merged_range(*get<RANGE>(overlaps.front()));
+
+	for(Overlap& overlap : overlaps) {
+		if(!get<EDGE>(overlap).has_value()
+		|| get<EDGE>(overlap).value()->normal != edge->normal) {
+			if(optional<Range> r = merge(*get<RANGE>(overlap), merged_range))
+				merged_range = r.value();
+			else
+				break;
+		}
+	}
+
+	edge->to_mesh = !(merged_range == *edge);
+	solution = edge;
+	is_solved = true;
+
+/*
+	if(merged_range == *edge) {
+		// Totally overlapped -> do not mesh
+		edge->to_mesh = false;
+		solution = edge;
+		is_solved = true;
+	} else {
+		// Not totally overlapped -> mesh
+		edge->to_mesh = true;
+		solution = edge;
+		is_solved = true;
+//		line_policy_manager.register_meshline(
+	}
+*/
+	// need Range::does_bounding_overlap (rename Polygon::are_possibly_overlapping)
 }
 
 #ifdef DEBUG

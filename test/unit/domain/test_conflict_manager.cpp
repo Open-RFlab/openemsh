@@ -22,7 +22,7 @@
 SCENARIO("void ConflictManager::add_colinear_edges(Edge* a, Edge* b)", "[conflict_manager]") {
 	GIVEN("A conflict vector, a conflict manager and some edges") {
 		std::vector<std::unique_ptr<Conflict>> conflicts;
-		ConflictManager cm(conflicts);
+		ConflictManager cm(conflicts, nullptr);
 		WHEN("Two vertical edges that are colinear are reported as colinear") {
 			Point a0(1, 1), a1(1, 2);
 			Point b0(1, 3), b1(1, 4);
@@ -235,7 +235,7 @@ SCENARIO("void ConflictManager::add_colinear_edges(Edge* a, Edge* b)", "[conflic
 SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const range, std::optional<Edge const*> b)", "[conflict_manager]") {
 	GIVEN("A conflict vector, a conflict manager, an edge and some polygons") {
 		std::vector<std::unique_ptr<Conflict>> conflicts;
-		ConflictManager cm(conflicts);
+		ConflictManager cm(conflicts, nullptr);
 		Polygon p({
 			{ 3, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }, { 1, 3 },
 			{ 2, 3 }, { 2, 5 }, { 5, 5 }, { 5, 2 }, { 3, 2 }});

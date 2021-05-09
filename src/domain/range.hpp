@@ -12,10 +12,10 @@
 #include "segment.hpp"
 
 //******************************************************************************
-class Range : public Segment, public IConflictOrigin, public IMeshLineOrigin {
+class Range : public Segment, /*public IConflictOrigin,*/ public IMeshLineOrigin {
 private:
-	Point const _p0;
-	Point const _p1;
+	Point _p0;
+	Point _p1;
 
 public:
 	Range(Point const p0, Point const p1);
