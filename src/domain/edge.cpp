@@ -25,11 +25,7 @@ Edge::Edge(Point const* p0, Point const* p1)
 , _p1(p1)
 , vec(*p1 - *p0)
 , normal(Normal::NONE)
-//, bounding({
-//	(p0->x <= p1->x ? p0->x : p1->x),
-//	(p0->x >= p1->x ? p1->x : p0->x),
-//	(p0->y <= p1->y ? p0->y : p1->y),
-//	(p0->y >= p1->y ? p1->y : p0->y) })
+//, bounding(bounding(*this))
 {
 	if(vec.x == 0) {
 		axis = Axis::Y;
