@@ -15,6 +15,7 @@
 /// @test relation::SegmentPoint Segment::relation_to(Point const* point) const
 /// @test std::optional<Point> intersection(Segment const* a, Segment const* b)
 /// @test std::optional<Range> overlap(Segment const* a, Segment const* b)
+/// @test bool operator==(Range const& a, Edge const& b)
 ///*****************************************************************************
 
 //******************************************************************************
@@ -665,6 +666,39 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 				REQUIRE_FALSE(r);
 				REQUIRE_FALSE(s);
 			}
+		}
+	}
+}
+
+SCENARIO("bool operator==(Range const& a, Edge const& b)", "[edge]") {
+	GIVEN("An edge and a range that are equals") {
+		Point a0(1, 1), a1(1, 2);
+		Edge e(&a0, &a1);
+		Range r(a0, a1);
+		THEN("Should be equal") {
+			REQUIRE(r == e);
+			REQUIRE(e == r);
+		}
+	}
+
+	GIVEN("An edge and a range that are equals but in the opposite direction") {
+		Point a0(1, 1), a1(1, 2);
+		Edge e(&a0, &a1);
+		Range r(a1, a0);
+		THEN("Should be equal") {
+			REQUIRE(r == e);
+			REQUIRE(e == r);
+		}
+	}
+
+	GIVEN("An edge and a range that are not equals") {
+		Point a0(1, 1), a1(1, 2);
+		Point b0(2, 2), b1(4, 4);
+		Edge e(&a0, &a1);
+		Range r(b0, b1);
+		THEN("Should not be equal") {
+			REQUIRE_FALSE(r == e);
+			REQUIRE_FALSE(e == r);
 		}
 	}
 }
