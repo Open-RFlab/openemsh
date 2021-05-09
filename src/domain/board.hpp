@@ -15,7 +15,8 @@
 #include "conflict_manager.hpp"
 #include "edge.hpp"
 #include "global.hpp"
-#include "meshline_manager.hpp"
+//#include "meshline_policy.hpp"
+#include "meshline_policy_manager.hpp"
 #include "point.hpp"
 #include "polygon.hpp"
 //#include "range.hpp"
@@ -28,8 +29,8 @@
 class Board {
 private:
 	ConflictManager conflict_manager;
+	MeshlinePolicyManager line_policy_manager;
 	std::vector<std::unique_ptr<Polygon>> polygons;
-	std::array<std::vector<std::unique_ptr<MeshlineManager>>, 2> line_managers;
 	std::vector<std::unique_ptr<Conflict>> conflicts;
 	std::vector<Edge*> edges;
 	Params params;
@@ -38,8 +39,18 @@ public:
 //	Board(std::initializer_list<Polygon> _polygons);
 	Board(std::vector<std::unique_ptr<Polygon>>& _polygons);
 
+	/// Mesh resolution independant detection tasks
+	///*************************************************************************
 	void detect_edges_in_polygons();
 	void detect_colinear_edges();
+	void detect_non_conflicting_edges();
+
+	/// Mesh resolution dependant detection tasks
+	///*************************************************************************
+	void detect_ranges_between_lines() {} // TODO
+	void detect_too_close_lines() {} // TODO
+
+	void auto_mesh() {} // TODO
 
 #ifdef DEBUG
 	void print() const;

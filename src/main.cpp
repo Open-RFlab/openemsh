@@ -43,8 +43,9 @@ int main() {
 */
 
 //	b->print();
-	b->detect_colinear_edges();
 	b->detect_edges_in_polygons();
+	b->detect_colinear_edges();
+	b->detect_non_conflicting_edges();
 
 
 	delete b;

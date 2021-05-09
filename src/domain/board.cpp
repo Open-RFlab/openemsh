@@ -20,14 +20,9 @@ using namespace std;
 // TODO unnamed namespace
 
 //******************************************************************************
-template<typename T>
+template <typename T>
 int8_t signum(T const& a) {
-	if(a > 0)
-		return 1;
-	else if(a < 0)
-		return -1;
-	else
-		return 0;
+	return (T(0) < a) - (a < T(0));
 }
 
 /// @warning Undefined behavior if points are not all colinear.
@@ -79,7 +74,8 @@ void sort_points_by_vector_orientation(vector<Point>& points, Point const& vecto
 
 //******************************************************************************
 Board::Board(vector<unique_ptr<Polygon>>& _polygons)
-: conflict_manager(conflicts)
+: conflict_manager(conflicts, &line_policy_manager)
+, line_policy_manager(params)
 , polygons(move(_polygons)) {
 	for(unique_ptr<Polygon>& polygon : polygons)
 		for(unique_ptr<Edge>& edge : polygon->edges)
@@ -241,6 +237,21 @@ void Board::detect_colinear_edges() {
 				conflict_manager.add_colinear_edges(edges[i], edges[j]);
 			else if(edges[i]->axis == Segment::Axis::Y && edges[i]->p0().x == edges[j]->p0().x)
 				conflict_manager.add_colinear_edges(edges[i], edges[j]);
+		}
+	}
+}
+
+//******************************************************************************
+void Board::detect_non_conflicting_edges() {
+	for(Edge* edge : edges) {
+		optional<MeshlinePolicy::Axis> axis = cast(edge->axis);
+		if(axis && !edge->conflicts.size()) {
+			edge->meshline_policy = line_policy_manager.add_meshline_policy(
+				edge,
+				axis.value(),
+				MeshlinePolicy::Policy::THIRDS,
+				edge->normal,
+				coord(edge->p0(), axis.value()));
 		}
 	}
 }
