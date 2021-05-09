@@ -75,4 +75,9 @@ public:
 #undef private
 #endif // UNITTEST
 
+//******************************************************************************
 std::optional<Range> merge(Edge const& a, Edge const& b) = delete;
+
+//******************************************************************************
+bool operator==(Range const& a, Edge const& b);
+bool operator==(Edge const& a, Range const& b);
