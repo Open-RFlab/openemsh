@@ -15,6 +15,10 @@
 
 class Meshline;
 
+#ifdef UNITTEST
+#define private public
+#endif // UNITTEST
+
 //******************************************************************************
 template<typename T>
 using Grid = typename std::array<T, 2>;
@@ -41,6 +45,10 @@ public:
 
 	void mesh(MeshlinePolicy& policy);
 };
+
+#ifdef UNITTEST
+#undef private
+#endif // UNITTEST
 
 //******************************************************************************
 GridAxis cast(MeshlinePolicy::Axis const a);

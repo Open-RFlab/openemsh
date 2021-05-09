@@ -22,7 +22,13 @@ MeshlinePolicy* MeshlinePolicyManager::add_meshline_policy(
 		double const coord,
 		bool const is_enabled) {
 
-	unique_ptr<MeshlinePolicy>& line_policy = line_policies[axis == MeshlinePolicy::Axis::X ? X : Y].emplace_back(make_unique<MeshlinePolicy>(
+	if((axis == MeshlinePolicy::Axis::X && (normal == Normal::YMIN || normal == Normal::YMAX))
+	|| (axis == MeshlinePolicy::Axis::Y && (normal == Normal::XMIN || normal == Normal::XMAX))
+	|| (policy == MeshlinePolicy::Policy::THIRDS && normal == Normal::NONE)
+	|| (policy != MeshlinePolicy::Policy::THIRDS && normal != Normal::NONE))
+		return nullptr;
+
+	unique_ptr<MeshlinePolicy>& line_policy = line_policies[cast(axis)].emplace_back(make_unique<MeshlinePolicy>(
 		axis, policy, normal, params, coord, is_enabled));
 
 	line_policy->origins.emplace_back(origin);
