@@ -6,6 +6,7 @@ set( TESTS
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_range.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_polygon.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_conflict_manager.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_meshline_policy_manager.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_board.cpp"
 	)
 
