@@ -6,12 +6,10 @@
 
 #pragma once
 
-class MeshlinePolicy;
-
 //******************************************************************************
-class IMeshLineOrigin {
+class IConflictSolution {
 public:
-	MeshlinePolicy* meshline_policy;
+	Conflict const* conflict; // TODO rename like conflict_from
 
-	virtual ~IMeshLineOrigin() = default;
+	virtual ~IConflictSolution() = default;
 };

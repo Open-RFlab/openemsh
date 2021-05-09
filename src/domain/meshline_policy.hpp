@@ -6,13 +6,16 @@
 
 #pragma once
 
-#include <memory>
+//#include <memory>
+#include <optional>
 #include <vector>
 
 //#include "conflict.hpp"
 #include "global.hpp"
 #include "i_conflict_origin.hpp"
+#include "i_conflict_solution.hpp"
 #include "i_meshline_origin.hpp"
+#include "segment.hpp"
 #include "types.hpp"
 
 class Conflict;
@@ -23,12 +26,12 @@ class Meshline;
 /// be produced by other entities than edges, like a whole polygon (port) or
 /// a conflict between lines that can require a modification of other lines.
 ///*****************************************************************************
-class MeshlineManager : public IConflictOrigin {
+class MeshlinePolicy : public IConflictOrigin, public IConflictSolution {
 public:
-	Params& params;
-	double coord;
-	bool is_enabled;
-	double res_factor;
+	enum class Axis {
+		X,
+		Y
+	} const axis;
 
 	/// Describe meshing policy to apply to the edge.
 	///*************************************************************************
@@ -43,11 +46,29 @@ public:
 
 	Normal normal;
 
-//	bool axis;
+	Params& params;
+	double const coord;
+	bool is_enabled;
+	double res_factor;
+
 	std::vector<IMeshLineOrigin*> origins;
-//	std::vector<std::unique_ptr<Meshline>> meshlines;
-	std::vector<Conflict*> conflicts;
+	std::vector<Meshline*> meshlines; // TODO unique_ptr or ptr?
+//	std::vector<Conflict*> conflicts;
 
-	MeshlineManager(Params& _params, double const _coord, bool const _is_enabled = true, double const _res_factor = 1);
+	MeshlinePolicy(
+		Axis const _axis,
+		Policy const _policy,
+		Normal _normal,
+		Params& _params,
+		double const _coord,
+		bool const _is_enabled = true,
+		double const _res_factor = 1);
 
+	Meshline mesh();
 };
+
+//******************************************************************************
+std::optional<MeshlinePolicy::Axis> cast(Segment::Axis const a);
+
+//******************************************************************************
+double coord(Point const& point, MeshlinePolicy::Axis const axis);

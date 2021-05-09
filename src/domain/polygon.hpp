@@ -52,8 +52,6 @@ public:
 	///*************************************************************************
 	std::vector<std::unique_ptr<Edge>> edges;
 
-	std::vector<Conflict*> conflicts;
-
 	Polygon(std::initializer_list<Point> _points);
 
 //	relation::PolygonEdge relation_to(Edge const* edge);

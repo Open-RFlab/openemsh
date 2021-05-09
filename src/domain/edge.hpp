@@ -15,6 +15,7 @@
 //#include "point.hpp"
 #include "bounding.hpp"
 #include "i_conflict_origin.hpp"
+#include "i_conflict_solution.hpp"
 #include "i_meshline_origin.hpp"
 #include "range.hpp"
 #include "relation.hpp"
@@ -22,7 +23,6 @@
 #include "types.hpp"
 
 class Conflict;
-class MeshlineManager;
 class Point;
 //class Range;
 
@@ -31,7 +31,7 @@ class Point;
 #endif // UNITTEST
 
 //******************************************************************************
-class Edge : public Segment, public IConflictOrigin, public IMeshLineOrigin {
+class Edge : public Segment, public IConflictOrigin, public IConflictSolution, public IMeshLineOrigin {
 private:
 	Point const* const _p0;
 	Point const* const _p1;
@@ -57,10 +57,9 @@ public:
 	} direction;
 
 	Normal normal;
+	bool to_mesh;
 
 //	Bounding bounding;
-	std::vector<Conflict*> conflicts;
-	MeshlineManager* meshline_manager;
 
 	Edge(Point const* p0, Point const* p1);
 

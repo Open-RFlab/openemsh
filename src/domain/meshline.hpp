@@ -9,9 +9,13 @@
 class MeshlinePolicy;
 
 //******************************************************************************
-class IMeshLineOrigin {
+class Meshline {
 public:
-	MeshlinePolicy* meshline_policy;
+	double coord;
+	MeshlinePolicy* const policy;
 
-	virtual ~IMeshLineOrigin() = default;
+	Meshline(double _coord, MeshlinePolicy* const _policy);
 };
+
+//******************************************************************************
+bool operator<(Meshline const& a, Meshline const& b);
