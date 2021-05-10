@@ -68,7 +68,7 @@ Polygon::Polygon(vector<unique_ptr<Point const>> _points)
 /// FDTD mesh is orthogonal.
 ///*****************************************************************************
 template<class T>
-Polygon::Rotation detect_rotation(T& points) {
+Polygon::Rotation detect_rotation(T const& points) {
 	double left_sum = 0.0;
 	double right_sum = 0.0;
  
@@ -89,14 +89,8 @@ Polygon::Rotation detect_rotation(T& points) {
 }
 
 //******************************************************************************
-Polygon::Rotation detect_rotation(vector<unique_ptr<Point const>> const& points) {
-	return detect_rotation<vector<unique_ptr<Point const>> const&>(points);
-}
-
-//******************************************************************************
-Polygon::Rotation detect_rotation(vector<Point const*> const points) {
-	return detect_rotation<vector<Point const*> const>(points);
-}
+template Polygon::Rotation detect_rotation(std::vector<std::unique_ptr<Point const>> const&);
+template Polygon::Rotation detect_rotation(std::vector<Point const*> const&);
 
 //******************************************************************************
 void Polygon::detect_bounding() {

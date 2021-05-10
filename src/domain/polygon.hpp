@@ -62,6 +62,8 @@ public:
 #endif // DEBUG
 };
 
-//******************************************************************************
-Polygon::Rotation detect_rotation(std::vector<std::unique_ptr<Point const>> const& points);
-Polygon::Rotation detect_rotation(std::vector<Point const*> const points);
+/// These are the two declaration authorized.
+///*****************************************************************************
+template<class T> Polygon::Rotation detect_rotation(T const& points);
+extern template Polygon::Rotation detect_rotation(std::vector<std::unique_ptr<Point const>> const&);
+extern template Polygon::Rotation detect_rotation(std::vector<Point const*> const&);

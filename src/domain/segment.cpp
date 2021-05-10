@@ -24,10 +24,14 @@ Segment::Segment(Axis _axis)
 /// Cf. https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect
 ///*****************************************************************************
 relation::SegmentSegment Segment::relation_to(Segment const& segment) const {
-	Polygon::Rotation r1 = detect_rotation(vector<Point const*>({ &p0(), &p1(), &segment.p0() }));
-	Polygon::Rotation r2 = detect_rotation(vector<Point const*>({ &p0(), &p1(), &segment.p1() }));
-	Polygon::Rotation r3 = detect_rotation(vector<Point const*>({ &segment.p0(), &segment.p1(), &p0() }));
-	Polygon::Rotation r4 = detect_rotation(vector<Point const*>({ &segment.p0(), &segment.p1(), &p1() }));
+	vector<Point const*> v1({ &p0(), &p1(), &segment.p0() });
+	vector<Point const*> v2({ &p0(), &p1(), &segment.p1() });
+	vector<Point const*> v3({ &segment.p0(), &segment.p1(), &p0() });
+	vector<Point const*> v4({ &segment.p0(), &segment.p1(), &p1() });
+	Polygon::Rotation r1(detect_rotation(v1));
+	Polygon::Rotation r2(detect_rotation(v2));
+	Polygon::Rotation r3(detect_rotation(v3));
+	Polygon::Rotation r4(detect_rotation(v4));
 
 	if(r1 == Polygon::Rotation::COLINEAR && r2 == Polygon::Rotation::COLINEAR
 	&& r3 == Polygon::Rotation::COLINEAR && r4 == Polygon::Rotation::COLINEAR) {
@@ -50,7 +54,8 @@ relation::SegmentSegment Segment::relation_to(Segment const& segment) const {
 
 //******************************************************************************
 relation::SegmentPoint Segment::relation_to(Point const& point) const {
-	return detect_rotation(vector<Point const*>({ &p0(), &p1(), &point })) == Polygon::Rotation::COLINEAR
+	vector<Point const*> v({ &p0(), &p1(), &point });
+	return detect_rotation(v) == Polygon::Rotation::COLINEAR
 		&& (point.x <= max(p0().x, p1().x) && point.x >= min(p0().x, p1().x)
 		&&  point.y <= max(p0().y, p1().y) && point.y >= min(p0().y, p1().y))
 		? relation::SegmentPoint::ON
