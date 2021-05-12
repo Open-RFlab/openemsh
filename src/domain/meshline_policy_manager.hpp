@@ -22,7 +22,7 @@ class Meshline;
 //******************************************************************************
 template<typename T>
 using Grid = typename std::array<T, 2>;
-enum GridAxis { X, Y };
+enum GridAxis { H, V };
 
 //******************************************************************************
 class MeshlinePolicyManager { // TODO MeshlineManager

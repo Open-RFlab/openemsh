@@ -19,8 +19,8 @@ class Range;
 class Segment {
 public:
 	enum class Axis {
-		X,
-		Y,
+		H,
+		V,
 		DIAGONAL,
 		POINT
 	} axis;

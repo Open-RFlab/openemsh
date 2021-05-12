@@ -22,8 +22,9 @@ MeshlinePolicy* MeshlinePolicyManager::add_meshline_policy(
 		double const coord,
 		bool const is_enabled) {
 
-	if((axis == MeshlinePolicy::Axis::X && (normal == Normal::YMIN || normal == Normal::YMAX))
-	|| (axis == MeshlinePolicy::Axis::Y && (normal == Normal::XMIN || normal == Normal::XMAX))
+	// TODO fix
+	if((axis == MeshlinePolicy::Axis::H && (normal == Normal::XMIN || normal == Normal::XMAX))
+	|| (axis == MeshlinePolicy::Axis::V && (normal == Normal::YMIN || normal == Normal::YMAX))
 	|| (policy == MeshlinePolicy::Policy::THIRDS && normal == Normal::NONE)
 	|| (policy != MeshlinePolicy::Policy::THIRDS && normal != Normal::NONE))
 		return nullptr;
@@ -43,10 +44,11 @@ void MeshlinePolicyManager::mesh(MeshlinePolicy& policy) {
 	policy.meshlines.push_back(line.get());
 }
 
+// TODO fix
 //******************************************************************************
 GridAxis cast(MeshlinePolicy::Axis const a) {
 	switch(a) {
-	case MeshlinePolicy::Axis::X: return X;
-	case MeshlinePolicy::Axis::Y: return Y;
+	case MeshlinePolicy::Axis::H: return H;
+	case MeshlinePolicy::Axis::V: return V;
 	}
 }

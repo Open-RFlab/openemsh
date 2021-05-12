@@ -19,9 +19,9 @@ Range::Range(Point const p0, Point const p1)
 	if(p0 == p1) {
 		axis = Axis::POINT;
 	} else if(p0.x == p1.x) {
-		axis = Axis::Y;
+		axis = Axis::V;
 	} else if(p0.y == p1.y) {
-		axis = Axis::X;
+		axis = Axis::H;
 	} else {
 		axis = Axis::DIAGONAL;
 	}

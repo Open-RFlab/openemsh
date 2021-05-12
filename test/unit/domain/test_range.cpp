@@ -21,12 +21,12 @@ SCENARIO("Bounding bounding(Segment const& a)", "[range][segment]") {
 		Bounding c = bounding(a);
 		Bounding d = bounding(b);
 		THEN("Should calcul the bounding box") {
-			REQUIRE(a.axis == Segment::Axis::X);
+			REQUIRE(a.axis == Segment::Axis::H);
 			REQUIRE(c[XMIN] == 1);
 			REQUIRE(c[XMAX] == 2);
 			REQUIRE(c[YMIN] == 1);
 			REQUIRE(c[YMAX] == 1);
-			REQUIRE(b.axis == Segment::Axis::X);
+			REQUIRE(b.axis == Segment::Axis::H);
 			REQUIRE(d[XMIN] == 1);
 			REQUIRE(d[XMAX] == 2);
 			REQUIRE(d[YMIN] == 1);
@@ -40,12 +40,12 @@ SCENARIO("Bounding bounding(Segment const& a)", "[range][segment]") {
 		Bounding c = bounding(a);
 		Bounding d = bounding(b);
 		THEN("Should calcul the bounding box") {
-			REQUIRE(a.axis == Segment::Axis::Y);
+			REQUIRE(a.axis == Segment::Axis::V);
 			REQUIRE(c[XMIN] == 1);
 			REQUIRE(c[XMAX] == 1);
 			REQUIRE(c[YMIN] == 1);
 			REQUIRE(c[YMAX] == 2);
-			REQUIRE(b.axis == Segment::Axis::Y);
+			REQUIRE(b.axis == Segment::Axis::V);
 			REQUIRE(d[XMIN] == 1);
 			REQUIRE(d[XMAX] == 1);
 			REQUIRE(d[YMIN] == 1);
@@ -85,13 +85,13 @@ SCENARIO("std::optional<Range> merge(Segment const* a, Segment const* b)", "[ran
 			THEN("Should calcul merged range") {
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(r);
-				REQUIRE(r->axis == Segment::Axis::X);
+				REQUIRE(r->axis == Segment::Axis::H);
 				REQUIRE(r->p0().x == 1);
 				REQUIRE(r->p1().x == 4);
 				REQUIRE(r->p0().y == 1);
 				REQUIRE(r->p1().y == 1);
 				REQUIRE(s);
-				REQUIRE(s->axis == Segment::Axis::X);
+				REQUIRE(s->axis == Segment::Axis::H);
 				REQUIRE(s->p0().x == 1);
 				REQUIRE(s->p1().x == 4);
 				REQUIRE(s->p0().y == 1);
@@ -108,13 +108,13 @@ SCENARIO("std::optional<Range> merge(Segment const* a, Segment const* b)", "[ran
 			THEN("Should calcul merged range") {
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(r);
-				REQUIRE(r->axis == Segment::Axis::X);
+				REQUIRE(r->axis == Segment::Axis::H);
 				REQUIRE(r->p0().x == 1);
 				REQUIRE(r->p1().x == 4);
 				REQUIRE(r->p0().y == 1);
 				REQUIRE(r->p1().y == 1);
 				REQUIRE(s);
-				REQUIRE(s->axis == Segment::Axis::X);
+				REQUIRE(s->axis == Segment::Axis::H);
 				REQUIRE(s->p0().x == 1);
 				REQUIRE(s->p1().x == 4);
 				REQUIRE(s->p0().y == 1);
@@ -131,13 +131,13 @@ SCENARIO("std::optional<Range> merge(Segment const* a, Segment const* b)", "[ran
 			THEN("Should calcul merged range") {
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(r);
-				REQUIRE(r->axis == Segment::Axis::X);
+				REQUIRE(r->axis == Segment::Axis::H);
 				REQUIRE(r->p0().x == 1);
 				REQUIRE(r->p1().x == 3);
 				REQUIRE(r->p0().y == 1);
 				REQUIRE(r->p1().y == 1);
 				REQUIRE(s);
-				REQUIRE(s->axis == Segment::Axis::X);
+				REQUIRE(s->axis == Segment::Axis::H);
 				REQUIRE(s->p0().x == 1);
 				REQUIRE(s->p1().x == 3);
 				REQUIRE(s->p0().y == 1);
@@ -180,13 +180,13 @@ SCENARIO("std::optional<Range> merge(Segment const* a, Segment const* b)", "[ran
 			THEN("Should calcul merged range") {
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(r);
-				REQUIRE(r->axis == Segment::Axis::Y);
+				REQUIRE(r->axis == Segment::Axis::V);
 				REQUIRE(r->p0().y == 1);
 				REQUIRE(r->p1().y == 4);
 				REQUIRE(r->p0().x == 1);
 				REQUIRE(r->p1().x == 1);
 				REQUIRE(s);
-				REQUIRE(s->axis == Segment::Axis::Y);
+				REQUIRE(s->axis == Segment::Axis::V);
 				REQUIRE(s->p0().y == 1);
 				REQUIRE(s->p1().y == 4);
 				REQUIRE(s->p0().x == 1);
@@ -203,13 +203,13 @@ SCENARIO("std::optional<Range> merge(Segment const* a, Segment const* b)", "[ran
 			THEN("Should calcul merged range") {
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(r);
-				REQUIRE(r->axis == Segment::Axis::Y);
+				REQUIRE(r->axis == Segment::Axis::V);
 				REQUIRE(r->p0().y == 1);
 				REQUIRE(r->p1().y == 4);
 				REQUIRE(r->p0().x == 1);
 				REQUIRE(r->p1().x == 1);
 				REQUIRE(s);
-				REQUIRE(s->axis == Segment::Axis::Y);
+				REQUIRE(s->axis == Segment::Axis::V);
 				REQUIRE(s->p0().y == 1);
 				REQUIRE(s->p1().y == 4);
 				REQUIRE(s->p0().x == 1);
@@ -226,13 +226,13 @@ SCENARIO("std::optional<Range> merge(Segment const* a, Segment const* b)", "[ran
 			THEN("Should calcul overlap range") {
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(r);
-				REQUIRE(r->axis == Segment::Axis::Y);
+				REQUIRE(r->axis == Segment::Axis::V);
 				REQUIRE(r->p0().y == 1);
 				REQUIRE(r->p1().y == 3);
 				REQUIRE(r->p0().x == 1);
 				REQUIRE(r->p1().x == 1);
 				REQUIRE(s);
-				REQUIRE(s->axis == Segment::Axis::Y);
+				REQUIRE(s->axis == Segment::Axis::V);
 				REQUIRE(s->p0().y == 1);
 				REQUIRE(s->p1().y == 3);
 				REQUIRE(s->p0().x == 1);

@@ -27,12 +27,12 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 			Edge a(&a0, &a1), b(&b0, &b1);
 			Edge c(&a1, &a0), d(&b1, &b0);
 			THEN("Should be detected as CROSSING") {
-				REQUIRE(a.axis == Segment::Axis::X);
-				REQUIRE(b.axis == Segment::Axis::Y);
+				REQUIRE(a.axis == Segment::Axis::H);
+				REQUIRE(b.axis == Segment::Axis::V);
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::CROSSING);
 				REQUIRE(b.relation_to(a) == relation::SegmentSegment::CROSSING);
-				REQUIRE(c.axis == Segment::Axis::X);
-				REQUIRE(d.axis == Segment::Axis::Y);
+				REQUIRE(c.axis == Segment::Axis::H);
+				REQUIRE(d.axis == Segment::Axis::V);
 				REQUIRE(c.relation_to(d) == relation::SegmentSegment::CROSSING);
 				REQUIRE(d.relation_to(c) == relation::SegmentSegment::CROSSING);
 			}
@@ -61,12 +61,12 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 			Edge a(&a0, &a1), b(&b0, &b1);
 			Edge c(&a1, &a0), d(&b1, &b0);
 			THEN("Should be detected as COLINEAR") {
-				REQUIRE(a.axis == Segment::Axis::Y);
-				REQUIRE(b.axis == Segment::Axis::Y);
+				REQUIRE(a.axis == Segment::Axis::V);
+				REQUIRE(b.axis == Segment::Axis::V);
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::COLINEAR);
 				REQUIRE(b.relation_to(a) == relation::SegmentSegment::COLINEAR);
-				REQUIRE(c.axis == Segment::Axis::Y);
-				REQUIRE(d.axis == Segment::Axis::Y);
+				REQUIRE(c.axis == Segment::Axis::V);
+				REQUIRE(d.axis == Segment::Axis::V);
 				REQUIRE(c.relation_to(d) == relation::SegmentSegment::COLINEAR);
 				REQUIRE(d.relation_to(c) == relation::SegmentSegment::COLINEAR);
 			}
@@ -78,12 +78,12 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 			Edge a(&a0, &a1), b(&b0, &b1);
 			Edge c(&a1, &a0), d(&b1, &b0);
 			THEN("Should be detected as COLINEAR") {
-				REQUIRE(a.axis == Segment::Axis::X);
-				REQUIRE(b.axis == Segment::Axis::X);
+				REQUIRE(a.axis == Segment::Axis::H);
+				REQUIRE(b.axis == Segment::Axis::H);
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::COLINEAR);
 				REQUIRE(b.relation_to(a) == relation::SegmentSegment::COLINEAR);
-				REQUIRE(c.axis == Segment::Axis::X);
-				REQUIRE(d.axis == Segment::Axis::X);
+				REQUIRE(c.axis == Segment::Axis::H);
+				REQUIRE(d.axis == Segment::Axis::H);
 				REQUIRE(c.relation_to(d) == relation::SegmentSegment::COLINEAR);
 				REQUIRE(d.relation_to(c) == relation::SegmentSegment::COLINEAR);
 			}
@@ -112,12 +112,12 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 			Edge a(&a0, &a1), b(&b0, &b1);
 			Edge c(&a1, &a0), d(&b1, &b0);
 			THEN("Should be detected as OVERLAPPING") {
-				REQUIRE(a.axis == Segment::Axis::Y);
-				REQUIRE(b.axis == Segment::Axis::Y);
+				REQUIRE(a.axis == Segment::Axis::V);
+				REQUIRE(b.axis == Segment::Axis::V);
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(b.relation_to(a) == relation::SegmentSegment::OVERLAPPING);
-				REQUIRE(c.axis == Segment::Axis::Y);
-				REQUIRE(d.axis == Segment::Axis::Y);
+				REQUIRE(c.axis == Segment::Axis::V);
+				REQUIRE(d.axis == Segment::Axis::V);
 				REQUIRE(c.relation_to(d) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(d.relation_to(c) == relation::SegmentSegment::OVERLAPPING);
 			}
@@ -129,12 +129,12 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 			Edge a(&a0, &a1), b(&b0, &b1);
 			Edge c(&a1, &a0), d(&b1, &b0);
 			THEN("Should be detected as OVERLAPPING") {
-				REQUIRE(a.axis == Segment::Axis::X);
-				REQUIRE(b.axis == Segment::Axis::X);
+				REQUIRE(a.axis == Segment::Axis::H);
+				REQUIRE(b.axis == Segment::Axis::H);
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(b.relation_to(a) == relation::SegmentSegment::OVERLAPPING);
-				REQUIRE(c.axis == Segment::Axis::X);
-				REQUIRE(d.axis == Segment::Axis::X);
+				REQUIRE(c.axis == Segment::Axis::H);
+				REQUIRE(d.axis == Segment::Axis::H);
 				REQUIRE(c.relation_to(d) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(d.relation_to(c) == relation::SegmentSegment::OVERLAPPING);
 			}
@@ -163,12 +163,12 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 			Edge a(&a0, &a1), b(&b0, &b1);
 			Edge c(&a1, &a0), d(&b1, &b0);
 			THEN("Should be detected as OVERLAPPING") {
-				REQUIRE(a.axis == Segment::Axis::Y);
-				REQUIRE(b.axis == Segment::Axis::Y);
+				REQUIRE(a.axis == Segment::Axis::V);
+				REQUIRE(b.axis == Segment::Axis::V);
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(b.relation_to(a) == relation::SegmentSegment::OVERLAPPING);
-				REQUIRE(c.axis == Segment::Axis::Y);
-				REQUIRE(d.axis == Segment::Axis::Y);
+				REQUIRE(c.axis == Segment::Axis::V);
+				REQUIRE(d.axis == Segment::Axis::V);
 				REQUIRE(c.relation_to(d) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(d.relation_to(c) == relation::SegmentSegment::OVERLAPPING);
 			}
@@ -180,12 +180,12 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 			Edge a(&a0, &a1), b(&b0, &b1);
 			Edge c(&a1, &a0), d(&b1, &b0);
 			THEN("Should be detected as OVERLAPPING") {
-				REQUIRE(a.axis == Segment::Axis::X);
-				REQUIRE(b.axis == Segment::Axis::X);
+				REQUIRE(a.axis == Segment::Axis::H);
+				REQUIRE(b.axis == Segment::Axis::H);
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(b.relation_to(a) == relation::SegmentSegment::OVERLAPPING);
-				REQUIRE(c.axis == Segment::Axis::X);
-				REQUIRE(d.axis == Segment::Axis::X);
+				REQUIRE(c.axis == Segment::Axis::H);
+				REQUIRE(d.axis == Segment::Axis::H);
 				REQUIRE(c.relation_to(d) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(d.relation_to(c) == relation::SegmentSegment::OVERLAPPING);
 			}
@@ -214,12 +214,12 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 			Edge a(&a0, &a1), b(&b0, &b1);
 			Edge c(&a1, &a0), d(&b1, &b0);
 			THEN("Should be detected as OVERLAPPING") {
-				REQUIRE(a.axis == Segment::Axis::Y);
-				REQUIRE(b.axis == Segment::Axis::Y);
+				REQUIRE(a.axis == Segment::Axis::V);
+				REQUIRE(b.axis == Segment::Axis::V);
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(b.relation_to(a) == relation::SegmentSegment::OVERLAPPING);
-				REQUIRE(c.axis == Segment::Axis::Y);
-				REQUIRE(d.axis == Segment::Axis::Y);
+				REQUIRE(c.axis == Segment::Axis::V);
+				REQUIRE(d.axis == Segment::Axis::V);
 				REQUIRE(c.relation_to(d) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(d.relation_to(c) == relation::SegmentSegment::OVERLAPPING);
 			}
@@ -231,12 +231,12 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 			Edge a(&a0, &a1), b(&b0, &b1);
 			Edge c(&a1, &a0), d(&b1, &b0);
 			THEN("Should be detected as OVERLAPPING") {
-				REQUIRE(a.axis == Segment::Axis::X);
-				REQUIRE(b.axis == Segment::Axis::X);
+				REQUIRE(a.axis == Segment::Axis::H);
+				REQUIRE(b.axis == Segment::Axis::H);
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(b.relation_to(a) == relation::SegmentSegment::OVERLAPPING);
-				REQUIRE(c.axis == Segment::Axis::X);
-				REQUIRE(d.axis == Segment::Axis::X);
+				REQUIRE(c.axis == Segment::Axis::H);
+				REQUIRE(d.axis == Segment::Axis::H);
 				REQUIRE(c.relation_to(d) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(d.relation_to(c) == relation::SegmentSegment::OVERLAPPING);
 			}
@@ -401,13 +401,13 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 			THEN("Should calcul overlap range") {
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(r);
-				REQUIRE(r->axis == Segment::Axis::X);
+				REQUIRE(r->axis == Segment::Axis::H);
 				REQUIRE(r->p0().x == 2);
 				REQUIRE(r->p1().x == 3);
 				REQUIRE(r->p0().y == 1);
 				REQUIRE(r->p1().y == 1);
 				REQUIRE(s);
-				REQUIRE(s->axis == Segment::Axis::X);
+				REQUIRE(s->axis == Segment::Axis::H);
 				REQUIRE(s->p0().x == 2);
 				REQUIRE(s->p1().x == 3);
 				REQUIRE(s->p0().y == 1);
@@ -424,13 +424,13 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 			THEN("Should calcul overlap range") {
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(r);
-				REQUIRE(r->axis == Segment::Axis::X);
+				REQUIRE(r->axis == Segment::Axis::H);
 				REQUIRE(r->p0().x == 2);
 				REQUIRE(r->p1().x == 3);
 				REQUIRE(r->p0().y == 1);
 				REQUIRE(r->p1().y == 1);
 				REQUIRE(s);
-				REQUIRE(s->axis == Segment::Axis::X);
+				REQUIRE(s->axis == Segment::Axis::H);
 				REQUIRE(s->p0().x == 2);
 				REQUIRE(s->p1().x == 3);
 				REQUIRE(s->p0().y == 1);
@@ -498,13 +498,13 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 			THEN("Should calcul overlap range") {
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(r);
-				REQUIRE(r->axis == Segment::Axis::Y);
+				REQUIRE(r->axis == Segment::Axis::V);
 				REQUIRE(r->p0().y == 2);
 				REQUIRE(r->p1().y == 3);
 				REQUIRE(r->p0().x == 1);
 				REQUIRE(r->p1().x == 1);
 				REQUIRE(s);
-				REQUIRE(s->axis == Segment::Axis::Y);
+				REQUIRE(s->axis == Segment::Axis::V);
 				REQUIRE(s->p0().y == 2);
 				REQUIRE(s->p1().y == 3);
 				REQUIRE(s->p0().x == 1);
@@ -521,13 +521,13 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 			THEN("Should calcul overlap range") {
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
 				REQUIRE(r);
-				REQUIRE(r->axis == Segment::Axis::Y);
+				REQUIRE(r->axis == Segment::Axis::V);
 				REQUIRE(r->p0().y == 2);
 				REQUIRE(r->p1().y == 3);
 				REQUIRE(r->p0().x == 1);
 				REQUIRE(r->p1().x == 1);
 				REQUIRE(s);
-				REQUIRE(s->axis == Segment::Axis::Y);
+				REQUIRE(s->axis == Segment::Axis::V);
 				REQUIRE(s->p0().y == 2);
 				REQUIRE(s->p1().y == 3);
 				REQUIRE(s->p0().x == 1);

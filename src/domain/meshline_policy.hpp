@@ -29,8 +29,8 @@ class Meshline;
 class MeshlinePolicy : public IConflictOrigin, public IConflictSolution {
 public:
 	enum class Axis {
-		X,
-		Y
+		H,
+		V
 	} const axis;
 
 	/// Describe meshing policy to apply to the edge.
@@ -41,7 +41,7 @@ public:
 		ONELINE,     ///< Place one line on the coord. typically produced by ports.
 		HALFS,       ///< Apply halfs rule while meshing : when edges conflict on the direction.
 		THIRDS,       ///< Apply thirds rule while meshing : normal case for edges.
-		RANGE
+		INTERVAL
 	} policy; // TODO rename meshing_rule
 
 	Normal normal;

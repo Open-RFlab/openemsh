@@ -81,10 +81,10 @@ Bounding bounding(Segment const& a) {
 /// Cf. https://openclassrooms.com/forum/sujet/calcul-du-point-d-intersection-de-deux-segments-21661
 ///*****************************************************************************
 optional<Point> intersection(Segment const& a, Segment const& b) {
-	if(a.axis == Segment::Axis::X && b.axis == Segment::Axis::Y) {
+	if(a.axis == Segment::Axis::H && b.axis == Segment::Axis::V) {
 		// Horizontal & vertical
 		return Point(b.p0().x, a.p0().y);
-	} else if(a.axis == Segment::Axis::Y && b.axis == Segment::Axis::X) {
+	} else if(a.axis == Segment::Axis::V && b.axis == Segment::Axis::H) {
 		// Vertical & horizontal
 		return Point(a.p0().x, b.p0().y);
 	} else if(a.axis == Segment::Axis::DIAGONAL || b.axis == Segment::Axis::DIAGONAL) {
@@ -111,8 +111,8 @@ optional<Point> intersection(Segment const& a, Segment const& b) {
 optional<Range> merge(Segment const& a, Segment const& b) {
 	Point a_vec(a.p1() - a.p0());
 	Point b_vec(b.p1() - b.p0());
-	if((a.axis == Segment::Axis::X && b.axis == Segment::Axis::X)
-	|| (a.axis == Segment::Axis::Y && b.axis == Segment::Axis::Y)
+	if((a.axis == Segment::Axis::H && b.axis == Segment::Axis::H)
+	|| (a.axis == Segment::Axis::V && b.axis == Segment::Axis::V)
 	|| (a_vec.y / a_vec.x == b_vec.y / b_vec.x)) {
 		Bounding a_bnd(bounding(a));
 		Bounding b_bnd(bounding(b));
@@ -162,8 +162,8 @@ Point mid(Segment const& a) {
 optional<Range> overlap(Segment const& a, Segment const& b) {
 	Point a_vec(a.p1() - a.p0());
 	Point b_vec(b.p1() - b.p0());
-	if((a.axis == Segment::Axis::X && b.axis == Segment::Axis::X)
-	|| (a.axis == Segment::Axis::Y && b.axis == Segment::Axis::Y)
+	if((a.axis == Segment::Axis::H && b.axis == Segment::Axis::H)
+	|| (a.axis == Segment::Axis::V && b.axis == Segment::Axis::V)
 	|| (a_vec.y / a_vec.x == b_vec.y / b_vec.x)) {
 		Bounding a_bnd(bounding(a));
 		Bounding b_bnd(bounding(b));

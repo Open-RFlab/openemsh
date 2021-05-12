@@ -28,13 +28,13 @@ Edge::Edge(Point const* p0, Point const* p1)
 //, bounding(bounding(*this))
 {
 	if(vec.x == 0) {
-		axis = Axis::Y;
+		axis = Axis::V;
 		if(vec.y > 0)
 			direction = Direction::YMAX;
 		else if(vec.y < 0)
 			direction = Direction::YMIN;
 	} else if(vec.y == 0) {
-		axis = Axis::X;
+		axis = Axis::H;
 		if(vec.x > 0)
 			direction = Direction::XMAX;
 		else if(vec.x < 0)

@@ -22,8 +22,8 @@ ConflictManager::ConflictManager(vector<unique_ptr<Conflict>>& _conflicts, Meshl
 /// @warning Allows geometrically inconsistent datas.
 ///*****************************************************************************
 void ConflictManager::add_colinear_edges(Edge* a, Edge* b) {
-	if((a->axis == Segment::Axis::X && b->axis == Segment::Axis::X)
-	|| (a->axis == Segment::Axis::Y && b->axis == Segment::Axis::Y)) {
+	if((a->axis == Segment::Axis::H && b->axis == Segment::Axis::H)
+	|| (a->axis == Segment::Axis::V && b->axis == Segment::Axis::V)) {
 		bool does_conflict_exist = false;
 		for(unique_ptr<Conflict>& conflict : conflicts) {
 //			if(conflict->kind == Conflict::Kind::COLINEAR_EDGES) {

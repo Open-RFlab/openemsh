@@ -233,9 +233,9 @@ void Board::detect_colinear_edges() {
 			if(edges[j]->axis != edges[i]->axis)
 				continue;
 
-			if(edges[i]->axis == Segment::Axis::X && edges[i]->p0().y == edges[j]->p0().y)
+			if(edges[i]->axis == Segment::Axis::H && edges[i]->p0().y == edges[j]->p0().y)
 				conflict_manager.add_colinear_edges(edges[i], edges[j]);
-			else if(edges[i]->axis == Segment::Axis::Y && edges[i]->p0().x == edges[j]->p0().x)
+			else if(edges[i]->axis == Segment::Axis::V && edges[i]->p0().x == edges[j]->p0().x)
 				conflict_manager.add_colinear_edges(edges[i], edges[j]);
 		}
 	}

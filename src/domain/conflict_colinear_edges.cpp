@@ -39,13 +39,13 @@ void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manage
 				continue;
 
 			switch(axis.value()) {
-			case MeshlinePolicy::Axis::X:
+			case MeshlinePolicy::Axis::H:
 				if(edge->normal == Normal::XMIN)
 					++normal_min;
 				else if(edge->normal == Normal::XMAX)
 					++normal_max;
 				break;
-			case MeshlinePolicy::Axis::Y:
+			case MeshlinePolicy::Axis::V:
 				if(edge->normal == Normal::YMIN)
 					++normal_min;
 				else if(edge->normal == Normal::YMAX)
@@ -56,8 +56,9 @@ void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manage
 
 		Normal normal;
 		switch(axis.value()) {
-		case MeshlinePolicy::Axis::X: normal = Normal::XMIN; break;
-		case MeshlinePolicy::Axis::Y: normal = Normal::YMIN; break;
+		// TODO fix
+		case MeshlinePolicy::Axis::H: normal = Normal::XMIN; break;
+		case MeshlinePolicy::Axis::V: normal = Normal::YMIN; break;
 		}
 
 		if(normal_min && normal_max) {

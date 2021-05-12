@@ -17,19 +17,19 @@
 
 SCENARIO("std::optional<MeshlinePolicy::Axis> cast(Segment::Axis const a)", "[meshline_policy]") {
 	GIVEN("A Segment::Axis enum class") {
-		WHEN("Segment::Axis::X") {
-			THEN("Should return MeshlinePolicy::Axis::X") {
-				std::optional<MeshlinePolicy::Axis> a(cast(Segment::Axis::X));
+		WHEN("Segment::Axis::H") {
+			THEN("Should return MeshlinePolicy::Axis::H") {
+				std::optional<MeshlinePolicy::Axis> a(cast(Segment::Axis::H));
 				REQUIRE(a.has_value());
-				REQUIRE(a.value() == MeshlinePolicy::Axis::X);
+				REQUIRE(a.value() == MeshlinePolicy::Axis::H);
 			}
 		}
 
-		WHEN("Segment::Axis::Y") {
-			THEN("Should return MeshlinePolicy::Axis::Y") {
-				std::optional<MeshlinePolicy::Axis> a(cast(Segment::Axis::Y));
+		WHEN("Segment::Axis::V") {
+			THEN("Should return MeshlinePolicy::Axis::V") {
+				std::optional<MeshlinePolicy::Axis> a(cast(Segment::Axis::V));
 				REQUIRE(a.has_value());
-				REQUIRE(a.value() == MeshlinePolicy::Axis::Y);
+				REQUIRE(a.value() == MeshlinePolicy::Axis::V);
 			}
 		}
 
@@ -53,8 +53,8 @@ SCENARIO("double coord(Point const& point, MeshlinePolicy::Axis const axis)", "[
 	GIVEN("A point") {
 		Point p(1, 2);
 		THEN("Should select the correct coordinate") {
-			REQUIRE(coord(p, MeshlinePolicy::Axis::X) == p.x);
-			REQUIRE(coord(p, MeshlinePolicy::Axis::Y) == p.y);
+			REQUIRE(coord(p, MeshlinePolicy::Axis::H) == p.y);
+			REQUIRE(coord(p, MeshlinePolicy::Axis::V) == p.x);
 		}
 	}
 }
