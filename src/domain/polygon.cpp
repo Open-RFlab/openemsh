@@ -123,7 +123,7 @@ void Polygon::detect_edge_normal() {
 			case Edge::Direction::XMAX: edge->normal = Normal::YMAX; break;
 			case Edge::Direction::YMIN: edge->normal = Normal::XMAX; break;
 			case Edge::Direction::YMAX: edge->normal = Normal::XMIN; break;
-			default: break;
+			default: edge->normal = Normal::NONE; break;
 			}
 		}
 		break;
@@ -134,7 +134,7 @@ void Polygon::detect_edge_normal() {
 			case Edge::Direction::XMAX: edge->normal = Normal::YMIN; break;
 			case Edge::Direction::YMIN: edge->normal = Normal::XMIN; break;
 			case Edge::Direction::YMAX: edge->normal = Normal::XMAX; break;
-			default: break;
+			default: edge->normal = Normal::NONE; break;
 			}
 		}
 		break;

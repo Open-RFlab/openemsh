@@ -25,7 +25,7 @@ public:
 		POINT
 	} axis;
 
-	Segment() = default;
+	Segment(Axis const _axis);
 	virtual ~Segment() = default;
 
 	virtual Point const& p0() const = 0;
@@ -34,6 +34,10 @@ public:
 	relation::SegmentSegment relation_to(Segment const& segment) const;
 	relation::SegmentPoint relation_to(Point const& point) const;
 };
+
+//******************************************************************************
+Segment::Axis axis(Point const& p0, Point const& p1);
+Segment::Axis axis(Point const& vector);
 
 //******************************************************************************
 Bounding bounding(Segment const& a);

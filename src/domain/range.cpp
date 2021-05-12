@@ -14,8 +14,11 @@ using namespace std;
 
 //******************************************************************************
 Range::Range(Point const p0, Point const p1)
-: _p0(p0)
-, _p1(p1) {
+: Segment(::axis(p0, p1))
+, _p0(p0)
+, _p1(p1)
+{}
+/*
 	if(p0 == p1) {
 		axis = Axis::POINT;
 	} else if(p0.x == p1.x) {
@@ -26,6 +29,7 @@ Range::Range(Point const p0, Point const p1)
 		axis = Axis::DIAGONAL;
 	}
 }
+*/
 
 //******************************************************************************
 Point const& Range::p0() const {

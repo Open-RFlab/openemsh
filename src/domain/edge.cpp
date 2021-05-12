@@ -21,12 +21,28 @@ using namespace std;
 
 //******************************************************************************
 Edge::Edge(Point const* p0, Point const* p1)
-: _p0(p0)
+: Segment(::axis(*p0, *p1))
+, _p0(p0)
 , _p1(p1)
 , vec(*p1 - *p0)
 , normal(Normal::NONE)
+, to_mesh(true)
 //, bounding(bounding(*this))
 {
+	if(axis == Axis::H) {
+		if(vec.x > 0)
+			direction = Direction::XMAX;
+		else if(vec.x < 0)
+			direction = Direction::XMIN;
+	} else if(axis == Axis::V) {
+		if(vec.y > 0)
+			direction = Direction::YMAX;
+		else if(vec.y < 0)
+			direction = Direction::YMIN;
+	} else {
+		direction = Direction::DIAGONAL;
+	}
+/*
 	if(vec.x == 0) {
 		axis = Axis::V;
 		if(vec.y > 0)
@@ -43,6 +59,7 @@ Edge::Edge(Point const* p0, Point const* p1)
 		axis = Axis::DIAGONAL;
 		direction = Direction::DIAGONAL;
 	}
+*/
 }
 
 //******************************************************************************

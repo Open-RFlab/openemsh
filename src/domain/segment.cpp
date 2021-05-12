@@ -15,11 +15,9 @@
 using namespace std;
 
 //******************************************************************************
-/*
-Segment::Segment(Axis _axis)
+Segment::Segment(Axis const _axis)
 : axis(_axis)
 {}
-*/
 
 /// Cf. https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect
 ///*****************************************************************************
@@ -60,6 +58,25 @@ relation::SegmentPoint Segment::relation_to(Point const& point) const {
 		&&  point.y <= max(p0().y, p1().y) && point.y >= min(p0().y, p1().y))
 		? relation::SegmentPoint::ON
 		: relation::SegmentPoint::OUT;
+}
+
+//******************************************************************************
+Segment::Axis axis(Point const& p0, Point const& p1) {
+	return axis(p1 - p0);
+/*
+	if(p0 == p1) return Segment::Axis::POINT;
+	else if(p0.x == p1.x) return Segment::Axis::Y;
+	else if(p0.y == p1.y) return Segment::Axis::X;
+	else return Segment::Axis::DIAGONAL;
+*/
+}
+
+//******************************************************************************
+Segment::Axis axis(Point const& vector) {
+	if(vector.x == 0 && vector.y == 0) return Segment::Axis::POINT;
+	else if(vector.x == 0) return Segment::Axis::V;
+	else if(vector.y == 0) return Segment::Axis::H;
+	else return Segment::Axis::DIAGONAL;
 }
 
 //******************************************************************************
