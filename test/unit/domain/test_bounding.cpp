@@ -8,11 +8,11 @@
 
 #include "domain/bounding.hpp"
 
-/// @test bool does_overlap(Bounding const& a, Bounding const&b)
+/// @test bool does_overlap(Bounding const& a, Bounding const& b)
 ///*****************************************************************************
 
 //******************************************************************************
-SCENARIO("bool does_overlap(Bounding const& a, Bounding const&b)", "[bounding]") {
+SCENARIO("bool does_overlap(Bounding const& a, Bounding const& b)", "[bounding]") {
 	GIVEN("Two bounding boxes that do not overlap") {
 		Bounding a;
 		a[XMIN] = 1;

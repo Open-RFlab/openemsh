@@ -13,4 +13,4 @@ using Bounding = std::array<double, 4>;
 enum BoundingIndex { XMIN, XMAX, YMIN, YMAX };
 
 //******************************************************************************
-bool does_overlap(Bounding const& a, Bounding const&b);
+bool does_overlap(Bounding const& a, Bounding const& b);
