@@ -18,18 +18,6 @@ Range::Range(Point const p0, Point const p1)
 , _p0(p0)
 , _p1(p1)
 {}
-/*
-	if(p0 == p1) {
-		axis = Axis::POINT;
-	} else if(p0.x == p1.x) {
-		axis = Axis::V;
-	} else if(p0.y == p1.y) {
-		axis = Axis::H;
-	} else {
-		axis = Axis::DIAGONAL;
-	}
-}
-*/
 
 //******************************************************************************
 Point const& Range::p0() const {

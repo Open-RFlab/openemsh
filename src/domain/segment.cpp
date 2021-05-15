@@ -63,12 +63,6 @@ relation::SegmentPoint Segment::relation_to(Point const& point) const {
 //******************************************************************************
 Segment::Axis axis(Point const& p0, Point const& p1) {
 	return axis(p1 - p0);
-/*
-	if(p0 == p1) return Segment::Axis::POINT;
-	else if(p0.x == p1.x) return Segment::Axis::Y;
-	else if(p0.y == p1.y) return Segment::Axis::X;
-	else return Segment::Axis::DIAGONAL;
-*/
 }
 
 //******************************************************************************
