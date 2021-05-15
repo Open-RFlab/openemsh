@@ -40,26 +40,8 @@ Edge::Edge(Point const* p0, Point const* p1)
 		else if(vec.y < 0)
 			direction = Direction::YMIN;
 	} else {
-		direction = Direction::DIAGONAL;
+		direction = Direction::NONE;
 	}
-/*
-	if(vec.x == 0) {
-		axis = Axis::V;
-		if(vec.y > 0)
-			direction = Direction::YMAX;
-		else if(vec.y < 0)
-			direction = Direction::YMIN;
-	} else if(vec.y == 0) {
-		axis = Axis::H;
-		if(vec.x > 0)
-			direction = Direction::XMAX;
-		else if(vec.x < 0)
-			direction = Direction::XMIN;
-	} else {
-		axis = Axis::DIAGONAL;
-		direction = Direction::DIAGONAL;
-	}
-*/
 }
 
 //******************************************************************************
@@ -96,7 +78,7 @@ void Edge::print() const {
 	case Direction::YMAX:
 		cout << "|" << endl;
 		break;
-	case Direction::DIAGONAL:
+	case Direction::NONE:
 		cout << "X" << endl;
 		break;
 	}

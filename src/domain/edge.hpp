@@ -52,8 +52,7 @@ public:
 		XMAX,
 		YMIN,
 		YMAX,
-		DIAGONAL
-//		POINT        // TODO is this usefull?
+		NONE
 	} direction;
 
 	Normal normal;

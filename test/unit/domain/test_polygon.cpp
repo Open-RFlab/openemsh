@@ -104,10 +104,10 @@ SCENARIO("void Polygon::detect_edge_normal()", "[polygon]") {
 				REQUIRE(a.edges[2]->normal == Normal::XMIN);
 			}
 			THEN("For diagonal edges, there should not be any normal") {
-				REQUIRE(a.edges[1]->direction == Edge::Direction::DIAGONAL);
-				REQUIRE(a.edges[3]->direction == Edge::Direction::DIAGONAL);
-				REQUIRE(a.edges[5]->direction == Edge::Direction::DIAGONAL);
-				REQUIRE(a.edges[7]->direction == Edge::Direction::DIAGONAL);
+				REQUIRE(a.edges[1]->direction == Edge::Direction::NONE);
+				REQUIRE(a.edges[3]->direction == Edge::Direction::NONE);
+				REQUIRE(a.edges[5]->direction == Edge::Direction::NONE);
+				REQUIRE(a.edges[7]->direction == Edge::Direction::NONE);
 				REQUIRE(a.edges[1]->normal == Normal::NONE);
 				REQUIRE(a.edges[3]->normal == Normal::NONE);
 				REQUIRE(a.edges[5]->normal == Normal::NONE);
@@ -136,10 +136,10 @@ SCENARIO("void Polygon::detect_edge_normal()", "[polygon]") {
 				REQUIRE(a.edges[3]->normal == Normal::XMAX);
 			}
 			THEN("For diagonal edges, there should not be any normal") {
-				REQUIRE(a.edges[0]->direction == Edge::Direction::DIAGONAL);
-				REQUIRE(a.edges[2]->direction == Edge::Direction::DIAGONAL);
-				REQUIRE(a.edges[4]->direction == Edge::Direction::DIAGONAL);
-				REQUIRE(a.edges[6]->direction == Edge::Direction::DIAGONAL);
+				REQUIRE(a.edges[0]->direction == Edge::Direction::NONE);
+				REQUIRE(a.edges[2]->direction == Edge::Direction::NONE);
+				REQUIRE(a.edges[4]->direction == Edge::Direction::NONE);
+				REQUIRE(a.edges[6]->direction == Edge::Direction::NONE);
 				REQUIRE(a.edges[0]->normal == Normal::NONE);
 				REQUIRE(a.edges[2]->normal == Normal::NONE);
 				REQUIRE(a.edges[4]->normal == Normal::NONE);
@@ -147,13 +147,14 @@ SCENARIO("void Polygon::detect_edge_normal()", "[polygon]") {
 			}
 		}
 
-		WHEN("Points are all aligned") {
-			Polygon a({{ 1, 2 }, { 1, 4 }, { 1, 1 }});
+		WHEN("Points are all aligned or at the same position") {
+			Polygon a({{ 1, 2 }, { 1, 4 }, { 1, 1 }, { 1, 1 }});
 			THEN("There should not be any normal") {
 				REQUIRE(a.rotation == Polygon::Rotation::COLINEAR);
 				REQUIRE(a.edges[0]->normal == Normal::NONE);
 				REQUIRE(a.edges[1]->normal == Normal::NONE);
 				REQUIRE(a.edges[2]->normal == Normal::NONE);
+				REQUIRE(a.edges[3]->normal == Normal::NONE);
 			}
 		}
 	}
