@@ -17,7 +17,7 @@ MeshlinePolicy::MeshlinePolicy(
 		Policy const _policy,
 		Normal _normal,
 		Params& _params,
-		double const _coord,
+		Coord const _coord,
 		bool const _is_enabled,
 		double const _res_factor)
 : axis(_axis)
@@ -44,7 +44,7 @@ optional<MeshlinePolicy::Axis> cast(Segment::Axis const a) {
 }
 
 //******************************************************************************
-double coord(Point const& point, MeshlinePolicy::Axis const axis) {
+Coord coord(Point const& point, MeshlinePolicy::Axis const axis) {
 	switch(axis) {
 	case MeshlinePolicy::Axis::H: return point.y;
 	case MeshlinePolicy::Axis::V: return point.x;

@@ -11,6 +11,7 @@
 #include <vector>
 
 //#include "conflict.hpp"
+#include "coord.hpp"
 #include "global.hpp"
 #include "i_conflict_origin.hpp"
 #include "i_conflict_solution.hpp"
@@ -47,7 +48,7 @@ public:
 	Normal normal;
 
 	Params& params;
-	double const coord;
+	Coord const coord;
 	bool is_enabled;
 	double res_factor;
 
@@ -60,7 +61,7 @@ public:
 		Policy const _policy,
 		Normal _normal,
 		Params& _params,
-		double const _coord,
+		Coord const _coord,
 		bool const _is_enabled = true,
 		double const _res_factor = 1);
 
@@ -71,4 +72,4 @@ public:
 std::optional<MeshlinePolicy::Axis> cast(Segment::Axis const a);
 
 //******************************************************************************
-double coord(Point const& point, MeshlinePolicy::Axis const axis);
+Coord coord(Point const& point, MeshlinePolicy::Axis const axis);

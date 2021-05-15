@@ -13,8 +13,8 @@
 /// @test Point operator-(Point const& a, Point const& b)
 /// @test Point operator+(Point const& a, Point const& b)
 /// @test Point operator==(Point const& a, Point const& b)
-/// @test template<typename T> Point operator*(T const n, Point const& p)
-/// @test template<typename T> Point operator*(Point const& p, T const n)
+/// @test template<typename T> Point operator*(T const& n, Point const& p)
+/// @test template<typename T> Point operator*(Point const& p, T const& n)
 /// @test Point mid(Point const& a, Point const& b)
 ///*****************************************************************************
 
@@ -86,7 +86,7 @@ SCENARIO("bool operator==(Point const& a, Point const& b)", "[point]") {
 }
 
 //******************************************************************************
-SCENARIO("template<typename T> Point operator*(T const n, Point const& p)", "[point]") {
+SCENARIO("template<typename T> Point operator*(T const& n, Point const& p)", "[point]") {
 	GIVEN("A point and a number") {
 		Point a(5, 1);
 		double n = 3.5;

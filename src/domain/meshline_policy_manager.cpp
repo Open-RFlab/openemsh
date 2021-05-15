@@ -19,7 +19,7 @@ MeshlinePolicy* MeshlinePolicyManager::add_meshline_policy(
 		MeshlinePolicy::Axis const axis,
 		MeshlinePolicy::Policy const policy,
 		Normal const normal,
-		double const coord,
+		Coord const coord,
 		bool const is_enabled) {
 
 	// TODO fix
@@ -44,7 +44,6 @@ void MeshlinePolicyManager::mesh(MeshlinePolicy& policy) {
 	policy.meshlines.push_back(line.get());
 }
 
-// TODO fix
 //******************************************************************************
 GridAxis cast(MeshlinePolicy::Axis const a) {
 	switch(a) {

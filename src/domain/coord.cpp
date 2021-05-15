@@ -4,15 +4,20 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#include "meshline.hpp"
+#include <cmath>
+
+#include "global.hpp"
+
+#include "coord.hpp"
+
+using namespace std;
 
 //******************************************************************************
-Meshline::Meshline(Coord _coord, MeshlinePolicy* const _policy)
-: coord(_coord)
-, policy(_policy)
-{}
+Coord::operator double() const {
+	return value;
+}
 
 //******************************************************************************
-bool operator<(Meshline const& a, Meshline const& b) {
-	return (a.coord < b.coord);
+bool Coord::operator==(Coord const& a) const {
+	return (abs(value - (double) a) < equality_tolerance);
 }

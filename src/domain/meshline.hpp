@@ -6,15 +6,17 @@
 
 #pragma once
 
+#include "coord.hpp"
+
 class MeshlinePolicy;
 
 //******************************************************************************
 class Meshline {
 public:
-	double coord;
+	Coord coord;
 	MeshlinePolicy* const policy;
 
-	Meshline(double _coord, MeshlinePolicy* const _policy);
+	Meshline(Coord _coord, MeshlinePolicy* const _policy);
 };
 
 //******************************************************************************

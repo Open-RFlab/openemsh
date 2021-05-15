@@ -1,6 +1,7 @@
 
 set( TESTS
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_bounding.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_coord.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_point.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_segment.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_edge.cpp"

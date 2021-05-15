@@ -12,7 +12,7 @@
 #include "domain/meshline_policy.hpp"
 
 /// @test std::optional<MeshlinePolicy::Axis> cast(Segment::Axis const a)
-/// @test double coord(Point const& point, MeshlinePolicy::Axis const axis)
+/// @test Coord coord(Point const& point, MeshlinePolicy::Axis const axis)
 ///*****************************************************************************
 
 SCENARIO("std::optional<MeshlinePolicy::Axis> cast(Segment::Axis const a)", "[meshline_policy]") {
@@ -49,7 +49,7 @@ SCENARIO("std::optional<MeshlinePolicy::Axis> cast(Segment::Axis const a)", "[me
 	}
 }
 
-SCENARIO("double coord(Point const& point, MeshlinePolicy::Axis const axis)", "[meshline_policy]") {
+SCENARIO("Coord coord(Point const& point, MeshlinePolicy::Axis const axis)", "[meshline_policy]") {
 	GIVEN("A point") {
 		Point p(1, 2);
 		THEN("Should select the correct coordinate") {

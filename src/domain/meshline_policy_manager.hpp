@@ -40,7 +40,7 @@ public:
 		MeshlinePolicy::Axis const axis,
 		MeshlinePolicy::Policy const policy,
 		Normal const normal,
-		double const coord,
+		Coord const coord,
 		bool const is_enabled = true);
 
 	void mesh(MeshlinePolicy& policy);
