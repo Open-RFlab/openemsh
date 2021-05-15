@@ -16,6 +16,7 @@
 /// @test std::optional<Point> intersection(Segment const* a, Segment const* b)
 /// @test std::optional<Range> overlap(Segment const* a, Segment const* b)
 /// @test bool operator==(Range const& a, Edge const& b)
+/// @test Edge::Edge(Point const* p0, Point const* p1)
 ///*****************************************************************************
 
 //******************************************************************************
@@ -313,8 +314,8 @@ SCENARIO("std::optional<Point> intersection(Segment const* a, Segment const* b)"
 			std::optional<Point> p_vh(intersection(b, a));
 			Point x(2, 2);
 			THEN("Should calcul intersection point") {
-				REQUIRE((a.direction == Edge::Direction::XMIN || a.direction == Edge::Direction::XMAX));
-				REQUIRE((b.direction == Edge::Direction::YMIN || b.direction == Edge::Direction::YMAX));
+				REQUIRE(a.axis == Segment::Axis::H);
+				REQUIRE(b.axis == Segment::Axis::V);
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::CROSSING);
 				REQUIRE(p_hv);
 				REQUIRE(p_vh);
@@ -331,8 +332,8 @@ SCENARIO("std::optional<Point> intersection(Segment const* a, Segment const* b)"
 			std::optional<Point> p_vh(intersection(b, a));
 			Point x(2, 2);
 			THEN("Should calcul intersection point") {
-				REQUIRE(a.direction == Edge::Direction::DIAGONAL);
-				REQUIRE(b.direction == Edge::Direction::DIAGONAL);
+				REQUIRE(a.axis == Segment::Axis::DIAGONAL);
+				REQUIRE(b.axis == Segment::Axis::DIAGONAL);
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::CROSSING);
 				REQUIRE(p_hv);
 				REQUIRE(p_vh);
@@ -670,6 +671,7 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 	}
 }
 
+//******************************************************************************
 SCENARIO("bool operator==(Range const& a, Edge const& b)", "[edge]") {
 	GIVEN("An edge and a range that are equals") {
 		Point a0(1, 1), a1(1, 2);
@@ -699,6 +701,81 @@ SCENARIO("bool operator==(Range const& a, Edge const& b)", "[edge]") {
 		THEN("Should not be equal") {
 			REQUIRE_FALSE(r == e);
 			REQUIRE_FALSE(e == r);
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("Edge::Edge(Point const* p0, Point const* p1)", "[edge]") {
+	GIVEN("A vertical edge that grow up to the Y") {
+		Point a0(0, 0), a1(0, 2);
+		Edge e(&a0, &a1);
+		THEN("Direction should be Edge::Direction::YMAX") {
+			REQUIRE(e.direction == Edge::Direction::YMAX);
+		}
+	}
+
+	GIVEN("A vertical edge that grow down to the Y") {
+		Point a0(0, 0), a1(0, 2);
+		Edge e(&a1, &a0);
+		THEN("Direction should be Edge::Direction::YMIN") {
+			REQUIRE(e.direction == Edge::Direction::YMIN);
+		}
+	}
+
+	GIVEN("An horizontal edge that grow up to the X") {
+		Point a0(0, 0), a1(2, 0);
+		Edge e(&a0, &a1);
+		THEN("Direction should be Edge::Direction::XMAX") {
+			REQUIRE(e.direction == Edge::Direction::XMAX);
+		}
+	}
+
+	GIVEN("An horizontal edge that grow down to the X") {
+		Point a0(0, 0), a1(2, 0);
+		Edge e(&a1, &a0);
+		THEN("Direction should be Edge::Direction::XMIN") {
+			REQUIRE(e.direction == Edge::Direction::XMIN);
+		}
+	}
+
+	GIVEN("A point edge") {
+		Point a0(0, 0), a1(0, 0);
+		Edge e(&a0, &a1);
+		THEN("Direction should be Edge::Direction::NONE") {
+			REQUIRE(e.direction == Edge::Direction::NONE);
+		}
+	}
+
+	GIVEN("A diagonal edge that grow up to the X and up to the Y") {
+		Point a0(0, 0), a1(1, 1);
+		Edge e(&a0, &a1);
+		THEN("Direction should be Edge::Direction::NONE") {
+			REQUIRE(e.direction == Edge::Direction::NONE);
+		}
+	}
+
+	GIVEN("A diagonal edge that grow down to the X and up to the Y") {
+		Point a0(0, 0), a1(-1, 1);
+		Edge e(&a0, &a1);
+		THEN("Direction should be Edge::Direction::NONE") {
+			REQUIRE(e.direction == Edge::Direction::NONE);
+		}
+	}
+
+	GIVEN("A diagonal edge that grow down to the X and down to the Y") {
+		Point a0(0, 0), a1(-1, -1);
+		Edge e(&a0, &a1);
+		THEN("Direction should be Edge::Direction::NONE") {
+			REQUIRE(e.direction == Edge::Direction::NONE);
+		}
+	}
+
+	GIVEN("A diagonal edge that grow up to the X and down to the Y") {
+		Point a0(0, 0), a1(1, -1);
+		Edge e(&a0, &a1);
+		THEN("Direction should be Edge::Direction::NONE") {
+			REQUIRE(e.direction == Edge::Direction::NONE);
 		}
 	}
 }
