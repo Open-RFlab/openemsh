@@ -44,3 +44,7 @@ public:
 	void print() const override;
 #endif // DEBUG
 };
+
+#ifdef UNITTEST
+void sort_overlaps_by_p0_by_vector_orientation(std::vector<Overlap>& overlaps, Point const& vector);
+#endif // UNITTEST
