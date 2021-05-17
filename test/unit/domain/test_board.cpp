@@ -14,8 +14,9 @@
 #include "domain/board.hpp"
 
 /// @test void sort_points_by_vector_orientation(std::vector<Point>& points, Point const& vector)
-/// @test void detect_edges_in_polygons()
-/// @test void detect_colinear_edges()
+/// @test void Board::detect_edges_in_polygons()
+/// @test void Board::detect_colinear_edges()
+/// @test void Board::detect_non_conflicting_edges()
 ///*****************************************************************************
 
 //******************************************************************************
@@ -126,7 +127,7 @@ SCENARIO("void sort_points_by_vector_orientation(std::vector<Point>& points, Poi
 }
 
 //******************************************************************************
-SCENARIO("void detect_edges_in_polygons()", "[board]") {
+SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 	GIVEN("A board holding two simple polygons (orthogonal squares)") {
 		WHEN("A polygon is totally inside the other") {
 			std::unique_ptr<Board> b;
@@ -676,7 +677,7 @@ SCENARIO("void detect_edges_in_polygons()", "[board]") {
 }
 
 //******************************************************************************
-SCENARIO("void detect_colinear_edges()", "[board]") {
+SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 	GIVEN("A board holding three polygons") {
 		WHEN("Three polygons share a colinear vertical edge") {
 			std::unique_ptr<Board> b;
@@ -777,6 +778,46 @@ SCENARIO("void detect_colinear_edges()", "[board]") {
 			THEN("There should not be any conflict registered") {
 				REQUIRE_FALSE(b->conflicts.size());
 			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("void Board::detect_non_conflicting_edges()", "[board]") {
+	GIVEN("Some conflicting edges and some non conflicting edges") {
+		std::unique_ptr<Board> b;
+		{
+			std::vector<std::unique_ptr<Polygon>> tmp;
+			tmp.push_back(std::make_unique<Polygon>(Polygon({{ 1, 1 }, { 1, 2 }, { 2, 2 }})));
+			tmp.push_back(std::make_unique<Polygon>(Polygon({{ 3, 3 }, { 3, 4 }, { 4, 4 }})));
+			b = std::make_unique<Board>(tmp);
+		}
+		REQUIRE(b->edges.size() == 6);
+		b->edges[0]->conflicts.push_back(nullptr);
+		b->edges[4]->conflicts.push_back(nullptr);
+		b->edges[5]->conflicts.push_back(nullptr);
+		b->detect_non_conflicting_edges();
+		THEN("Should add a thirds meshline policy in the meshline policy manager for each orthogonal and non conflicting edge") {
+			REQUIRE(b->edges[0]->conflicts.size() == 1);
+			REQUIRE(b->edges[1]->conflicts.size() == 0);
+			REQUIRE(b->edges[2]->conflicts.size() == 0);
+			REQUIRE(b->edges[3]->conflicts.size() == 0);
+			REQUIRE(b->edges[4]->conflicts.size() == 1);
+			REQUIRE(b->edges[5]->conflicts.size() == 1);
+			REQUIRE_FALSE(b->edges[0]->meshline_policy);
+			REQUIRE(b->edges[1]->meshline_policy);
+			REQUIRE(b->edges[2]->meshline_policy);
+			REQUIRE_FALSE(b->edges[3]->meshline_policy);
+			REQUIRE_FALSE(b->edges[4]->meshline_policy);
+			REQUIRE_FALSE(b->edges[5]->meshline_policy);
+			REQUIRE(b->line_policy_manager.line_policies[V].size() == 1);
+			REQUIRE(b->line_policy_manager.line_policies[V][0].get() == b->edges[1]->meshline_policy);
+			REQUIRE(b->line_policy_manager.line_policies[V][0]->origins.size() == 1);
+			REQUIRE(b->line_policy_manager.line_policies[V][0]->origins[0] == b->edges[1]);
+			REQUIRE(b->line_policy_manager.line_policies[H].size() == 1);
+			REQUIRE(b->line_policy_manager.line_policies[H][0].get() == b->edges[2]->meshline_policy);
+			REQUIRE(b->line_policy_manager.line_policies[H][0]->origins.size() == 1);
+			REQUIRE(b->line_policy_manager.line_policies[H][0]->origins[0] == b->edges[2]);
 		}
 	}
 }
