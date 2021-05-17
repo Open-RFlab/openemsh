@@ -87,9 +87,6 @@ void ConflictEdgeInPolygon::append(Polygon const* polygon, Range const range, op
 
 //******************************************************************************
 void ConflictEdgeInPolygon::auto_solve(MeshlinePolicyManager& /*line_policy_manager*/) {
-	// TODO
-	// is edge totally overlapped?
-	// is edge totally overlapped by opposed normal?
 	sort_overlaps_by_p0_by_vector_orientation(overlaps, edge->vec);
 	Range merged_range(*get<RANGE>(overlaps.front()));
 
@@ -100,28 +97,14 @@ void ConflictEdgeInPolygon::auto_solve(MeshlinePolicyManager& /*line_policy_mana
 				merged_range = r.value();
 			else
 				break;
+		} else {
+			break;
 		}
 	}
 
 	edge->to_mesh = !(merged_range == *edge);
 	solution = edge;
 	is_solved = true;
-
-/*
-	if(merged_range == *edge) {
-		// Totally overlapped -> do not mesh
-		edge->to_mesh = false;
-		solution = edge;
-		is_solved = true;
-	} else {
-		// Not totally overlapped -> mesh
-		edge->to_mesh = true;
-		solution = edge;
-		is_solved = true;
-//		line_policy_manager.register_meshline(
-	}
-*/
-	// need Range::does_bounding_overlap (rename Polygon::are_possibly_overlapping)
 }
 
 #ifdef DEBUG

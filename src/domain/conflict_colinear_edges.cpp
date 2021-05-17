@@ -24,12 +24,6 @@ void ConflictColinearEdges::append(Edge* edge) {
 
 //******************************************************************************
 void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manager) {
-	// list normal max
-	// list normal min
-	// do not list disabled edges
-	// 1 normal -> /3 rule
-	// 2 normal -> /2 rule
-
 	if(optional<MeshlinePolicy::Axis> axis = cast(edges.front()->axis)) {
 		size_t normal_min = 0;
 		size_t normal_max = 0;
