@@ -14,6 +14,7 @@ set( SOURCES_DOMAIN
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflict_colinear_edges.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflict_edge_in_polygon.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/i_conflict_origin.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/domain/i_meshline_origin.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/meshline_policy_manager.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflict_manager.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/board.cpp"

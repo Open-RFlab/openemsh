@@ -8,5 +8,6 @@
 
 //******************************************************************************
 Conflict::Conflict(Kind const _kind)
-: kind(_kind)
+: IMeshLineOrigin()
+, kind(_kind)
 {}

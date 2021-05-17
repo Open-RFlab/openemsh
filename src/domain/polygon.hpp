@@ -24,7 +24,7 @@ class Edge;
 class Point;
 
 //******************************************************************************
-class Polygon : public IConflictOrigin, public IMeshLineOrigin {
+class Polygon : public IConflictOrigin/*, public IMeshLineOrigin*/ {
 private:
 	void detect_bounding(); // TODO
 	void detect_edge_normal();

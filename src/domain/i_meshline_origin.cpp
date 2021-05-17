@@ -4,15 +4,9 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#pragma once
-
-class MeshlinePolicy;
+#include "i_meshline_origin.hpp"
 
 //******************************************************************************
-class IMeshLineOrigin {
-public:
-	MeshlinePolicy* meshline_policy;
-
-	IMeshLineOrigin();
-	virtual ~IMeshLineOrigin() = default;
-};
+IMeshLineOrigin::IMeshLineOrigin()
+: meshline_policy(nullptr)
+{}
