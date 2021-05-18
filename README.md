@@ -7,7 +7,7 @@
 
 ## Abstract
 
-This is an OpenEMS mesher draft (with a H at the end, it looks like mesh poorly written). Meshing an OpenEMS structure is a difficult task often done manually. Some automatic meshers exist, shipped with either an Octave/Python API or a converter tool from a PCB design software.
+This is an [OpenEMS](https://openems.de) mesher draft (with a H at the end, it looks like mesh poorly written). Meshing an OpenEMS structure is a difficult task often done manually. Some automatic meshers exist, shipped with either an Octave/Python API or a converter tool from a PCB design software.
 
 By creating myself one of those converter ([Qucs-RFlayout](https://github.com/thomaslepoix/Qucs-RFlayout)), discussing with other meshers authors, observing meshers behavior and looking into their code, I identified some pitfalls that end up to usability or mesh correctness issues :
 
