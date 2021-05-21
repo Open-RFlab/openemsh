@@ -34,8 +34,7 @@ Also I'd like this mesher to be a standalone tool, independant from any converte
 ### Additional dependencies
 
 - [Catch2](https://github.com/catchorg/Catch2/blob/devel/docs/cmake-integration.md#installing-catch2-from-git-repository)
-- `gcov`
-- `lcov`
+- Either `lcov` with GCC or `llvm` with Clang
 
 ### Build system configuration
 

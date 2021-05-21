@@ -40,14 +40,13 @@ target_compile_features( unittest
 
 target_compile_options( unittest
 	PRIVATE
-	$<$<CONFIG:Debug>:-Wall>
-	$<$<CONFIG:Debug>:-Wextra>
-	$<$<CONFIG:Debug>:-fexceptions>
-	$<$<CONFIG:Coverage>:-Wall>
-	$<$<CONFIG:Coverage>:-Wextra>
-	$<$<CONFIG:Coverage>:-fexceptions>
-	$<$<CONFIG:Coverage>:--coverage>
 	$<$<CONFIG:Coverage>:-O0>
+	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Wall>
+	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Wextra>
+	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-fexceptions>
+	$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:GNU>>:--coverage>
+	$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:Clang>>:-fprofile-instr-generate>
+	$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:Clang>>:-fcoverage-mapping>
 	)
 
 target_include_directories( unittest
@@ -57,7 +56,12 @@ target_include_directories( unittest
 
 target_link_libraries( unittest
 	Catch2::Catch2WithMain
-	$<$<CONFIG:Coverage>:-lgcov>
+	$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:GNU>>:-lgcov>
+	)
+
+target_link_options( unittest
+	PRIVATE
+	$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:Clang>>:-fprofile-instr-generate>
 	)
 
 set_target_properties( unittest PROPERTIES

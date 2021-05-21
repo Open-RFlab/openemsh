@@ -53,14 +53,10 @@ target_compile_features( ${PROJECT_NAME}
 
 target_compile_options( ${PROJECT_NAME}
 	PRIVATE
-	$<$<CONFIG:Debug>:-Wall>
-	$<$<CONFIG:Debug>:-Wextra>
-	$<$<CONFIG:Debug>:-fexceptions>
-	$<$<CONFIG:Coverage>:-Wall>
-	$<$<CONFIG:Coverage>:-Wextra>
-	$<$<CONFIG:Coverage>:-fexceptions>
-	$<$<CONFIG:Coverage>:--coverage>
 	$<$<CONFIG:Coverage>:-O0>
+	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Wall>
+	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Wextra>
+	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-fexceptions>
 	)
 
 target_include_directories( ${PROJECT_NAME}
@@ -78,8 +74,7 @@ qt5_use_modules( ${PROJECT_NAME}
 
 #[[
 set_target_properties( ${PROJECT_NAME} PROPERTIES
-	OUTPUT_NAME "qucsrflayout"
-	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/out"
+	OUTPUT_NAME "openemsh"
 	)
 #]]
 
