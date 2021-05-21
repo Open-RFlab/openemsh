@@ -15,9 +15,9 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y \
-            lcov
-#            clang-tools
-
+            clang \
+            llvm
+#            lcov
 
       - name: "Dependencies: Sonar"
         run: |
@@ -54,7 +54,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Configure
-        run: cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Coverage
+        run: cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Coverage -DCMAKE_CXX_COMPILER=clang++
 
       - name: Build
         run: |
@@ -65,7 +65,7 @@ jobs:
       - name: Coverage
         run: cmake --build build --target coverage
 
-      - name: Upload datas on SonarCloud
+      - name: Scan
         run: |
           /tmp/sonar/sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux/bin/sonar-scanner \
             -Dsonar.sourceEncoding=UTF-8 \
@@ -73,11 +73,17 @@ jobs:
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.organization=open-rflab \
             -Dsonar.projectKey=openemsh \
-            -Dsonar.projectName=openEMSH \
+            -Dsonar.projectName=openemsh \
+            -Dsonar.projectVersion=0.0.0 \
+            -Dsonar.projectDescription="openEMS mesher" \
+            -Dsonar.links.homepage="https://github.com/Open-RFlab/openemsh" \
+            -Dsonar.links.scm="https://github.com/Open-RFlab/openemsh" \
+            -Dsonar.links.issue="https://github.com/Open-RFlab/openemsh/issues" \
+            -Dsonar.links.ci="https://github.com/Open-RFlab/openemsh/actions" \
             -Dsonar.sources=src \
             -Dsonar.tests=test \
             -Dsonar.cfamily.build-wrapper-output=build_wrapper_output_directory \
-#            -Dsonar.cfamily.llvm-cov.reportPath=build/test/coverage.json
+            -Dsonar.cfamily.llvm-cov.reportPath=build/test/coverage.json \
+            -Dsonar.testExecutionReportPaths=build/test/unit/sonarqube_report.xml
 #            -Dsonar.coverageReportPaths=
-#            -Dsonar.testExecutionReportPaths=
 #            ${SONAR_OTHER_ARGS}
