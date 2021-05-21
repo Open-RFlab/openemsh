@@ -83,7 +83,9 @@ jobs:
             -Dsonar.sources=src \
             -Dsonar.tests=test \
             -Dsonar.cfamily.build-wrapper-output=build_wrapper_output_directory \
-            -Dsonar.cfamily.llvm-cov.reportPath=build/test/coverage.json \
-            -Dsonar.testExecutionReportPaths=build/test/unit/sonarqube_report.xml
+            -Dsonar.cfamily.llvm-cov.reportPath=build/test/coverage.txt \
+            -Dsonar.testExecutionReportPaths=build/test/unit/sonarqube_report.xml \
+            -Dsonar.cfamily.threads=4 \
+            -Dsonar.cfamily.cache.enabled=false
 #            -Dsonar.coverageReportPaths=
 #            ${SONAR_OTHER_ARGS}

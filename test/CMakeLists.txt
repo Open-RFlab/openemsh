@@ -65,7 +65,14 @@ if( CMAKE_BUILD_TYPE MATCHES Coverage )
 				-show-regions
 				-format="html"
 				-ignore-filename-regex="${CMAKE_SOURCE_DIR}/test/*"
-#				"${CMAKE_SOURCE_DIR}/src"
+			COMMAND ${LLVM_COV} show $<TARGET_FILE:unittest>
+				-instr-profile="${CMAKE_CURRENT_BINARY_DIR}/coverage.profdata"
+				-show-line-counts
+				-show-expansions
+				-show-regions
+				-format="text"
+				-ignore-filename-regex="${CMAKE_SOURCE_DIR}/test/*"
+				> ${CMAKE_CURRENT_BINARY_DIR}/coverage.txt
 			COMMAND ${LLVM_COV} export $<TARGET_FILE:unittest>
 				-instr-profile="${CMAKE_CURRENT_BINARY_DIR}/coverage.profdata"
 				-format="text"
