@@ -1,0 +1,83 @@
+name: Test SonarCloud
+
+on:
+  workflow_dispatch:
+
+env:
+  SONAR_SCANNER_VERSION: 4.6.2.2472
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Dependencies: APT"
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            lcov
+#            clang-tools
+
+
+      - name: "Dependencies: Sonar"
+        run: |
+          mkdir -p /tmp/sonar
+          curl \
+            -SLo \
+            /tmp/sonar/sonar-scanner.zip \
+            https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip
+          unzip \
+            -o /tmp/sonar/sonar-scanner.zip \
+            -d /tmp/sonar/
+          curl \
+            -SLo \
+            /tmp/sonar/build-wrapper-linux-x86.zip \
+            https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
+          unzip \
+            -o /tmp/sonar/build-wrapper-linux-x86.zip \
+            -d /tmp/sonar/
+#          wget \
+#            https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip \
+#            -O /tmp/sonar/sonar-scanner.zip
+#          wget \
+#            https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip \
+#            -O /tmp/sonar/build-wrapper-linux-x86.zip
+
+      - name: "Dependencies: Catch2"
+        run: |
+          git clone https://github.com/catchorg/Catch2.git
+          cd Catch2
+          cmake -Bbuild -H. -DBUILD_TESTING=OFF
+          sudo cmake --build build/ --target install
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure
+        run: cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Coverage
+
+      - name: Build
+        run: |
+          /tmp/sonar/build-wrapper-linux-x86/build-wrapper-linux-x86-64 \
+            --out-dir build_wrapper_output_directory \
+            cmake --build build --target unittest
+
+      - name: Coverage
+        run: cmake --build build --target coverage
+
+      - name: Upload datas on SonarCloud
+        run: |
+          /tmp/sonar/sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux/bin/sonar-scanner \
+            -Dsonar.sourceEncoding=UTF-8 \
+            -Dsonar.host.url="https://sonarcloud.io" \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.organization=open-rflab \
+            -Dsonar.projectKey=openemsh \
+            -Dsonar.projectName=openEMSH \
+            -Dsonar.sources=src \
+            -Dsonar.tests=test \
+            -Dsonar.cfamily.build-wrapper-output=build_wrapper_output_directory \
+#            -Dsonar.cfamily.llvm-cov.reportPath=build/test/coverage.json
+#            -Dsonar.coverageReportPaths=
+#            -Dsonar.testExecutionReportPaths=
+#            ${SONAR_OTHER_ARGS}
