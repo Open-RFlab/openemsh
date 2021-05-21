@@ -20,6 +20,13 @@ if( CMAKE_BUILD_TYPE MATCHES Coverage )
 			message( ERROR "Not found gcov: install it" )
 		endif()
 
+		find_program( GCOVR NAMES gcovr )
+		if( GCOVR )
+			message( STATUS "Found gcovr: ${GCOVR}" )
+		else()
+			message( ERROR "Not found gcovr: install it" )
+		endif()
+
 		find_program( LCOV NAMES lcov )
 		if( LCOV )
 			message( STATUS "Found lcov: ${LCOV}" )
