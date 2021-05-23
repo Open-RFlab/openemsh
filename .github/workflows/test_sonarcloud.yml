@@ -15,34 +15,34 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y \
-            clang \
-            llvm \
-            gcovr \
-            lcov
+            gcovr
+#            clang \
+#            llvm \
+#            lcov
 
       - name: "Dependencies: Sonar"
         run: |
           mkdir -p /tmp/sonar
-          curl \
-            -SLo \
-            /tmp/sonar/sonar-scanner.zip \
-            https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip
+          wget \
+            https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip \
+            -O /tmp/sonar/sonar-scanner.zip
           unzip \
             -o /tmp/sonar/sonar-scanner.zip \
             -d /tmp/sonar/
-          curl \
-            -SLo \
-            /tmp/sonar/build-wrapper-linux-x86.zip \
-            https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
+          wget \
+            https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip \
+            -O /tmp/sonar/build-wrapper-linux-x86.zip
           unzip \
             -o /tmp/sonar/build-wrapper-linux-x86.zip \
             -d /tmp/sonar/
-#          wget \
-#            https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip \
-#            -O /tmp/sonar/sonar-scanner.zip
-#          wget \
-#            https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip \
-#            -O /tmp/sonar/build-wrapper-linux-x86.zip
+#          curl \
+#            -SLo \
+#            /tmp/sonar/sonar-scanner.zip \
+#            https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip
+#          curl \
+#            -SLo \
+#            /tmp/sonar/build-wrapper-linux-x86.zip \
+#            https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
 
       - name: "Dependencies: Catch2"
         run: |
@@ -55,7 +55,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Configure
-        run: cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Coverage -DCMAKE_CXX_COMPILER=g++
+        run: |
+          cmake \
+            -S. \
+            -Bbuild \
+            -DCMAKE_BUILD_TYPE=Coverage \
+            -DCMAKE_CXX_COMPILER=g++ \
+            -DSONAR=ON
 
       - name: Build
         run: |
@@ -64,13 +70,14 @@ jobs:
             cmake --build build --target unittest
 
       - name: Coverage
-        run: cmake --build build --target coverage-ci
+        run: cmake --build build --target coverage
 
       - name: Scan
         run: |
           /tmp/sonar/sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux/bin/sonar-scanner \
             -Dproject.settings=.sonar-project.properties \
+            -Dsonar.cfamily.build-wrapper-output=build_wrapper_output_directory \
             -Dsonar.host.url="https://sonarcloud.io" \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.cfamily.threads=4 \
-            -Dsonar.cfamily.cache.enabled=false \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.cfamily.cache.enabled=false
