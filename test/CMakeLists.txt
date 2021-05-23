@@ -32,31 +32,29 @@ if( CMAKE_BUILD_TYPE MATCHES Coverage )
 					-r sonarqube
 					-o "${CMAKE_CURRENT_BINARY_DIR}/unit/sonarqube_report.xml"
 				COMMAND ${GCOVR}
-					--sonarqube
+					--sonarqube "${CMAKE_CURRENT_BINARY_DIR}/coverage.xml"
 					-r "${CMAKE_SOURCE_DIR}"
 					-e "${CMAKE_SOURCE_DIR}/test"
 					-f "${CMAKE_SOURCE_DIR}/src"
 					--exclude-unreachable-branches
 					--exclude-throw-branches
 					-s
-					--sonarqube "${CMAKE_CURRENT_BINARY_DIR}/coverage.xml"
 				COMMENT "Run unit tests, perform code coverage, generate sonarqube report"
-				DEPENDS unittest
 				)
+
 		else()
 
 			add_custom_target( coverage
-#				COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure Unittest
 #				COMMAND ${CMAKE_COMMAND} -E env bash -c
 #				"${CMAKE_CTEST_COMMAND} --output-on-failure Unittest ;:;"
 				COMMAND $<TARGET_FILE:unittest>
 				COMMAND ${LCOV} -c
-					-d "${CMAKE_CURRENT_BINARY_DIR}/unit/CMakeFiles/unittest.dir/__/__/src"
+					-d "${CMAKE_BINARY_DIR}/src/CMakeFiles/openemsh.dir"
 					-o "${CMAKE_CURRENT_BINARY_DIR}/coverage.tmp.info"
 					--rc lcov_branch_coverage=1
 				COMMAND ${LCOV} -r
 					"${CMAKE_CURRENT_BINARY_DIR}/coverage.tmp.info"
-					'${CMAKE_CURRENT_BINARY_DIR}/unittest_autogen/*'
+#					'${CMAKE_CURRENT_BINARY_DIR}/unittest_autogen/*'
 					'/usr/*'
 					-o "${CMAKE_CURRENT_BINARY_DIR}/coverage.info"
 					--rc lcov_branch_coverage=1
@@ -70,7 +68,6 @@ if( CMAKE_BUILD_TYPE MATCHES Coverage )
 					-l "${CMAKE_CURRENT_BINARY_DIR}/coverage.info"
 					--rc lcov_branch_coverage=1
 				COMMENT "Run unit tests, perform code coverage, generate lcov report"
-				DEPENDS unittest
 				)
 
 		endif()
@@ -88,16 +85,15 @@ if( CMAKE_BUILD_TYPE MATCHES Coverage )
 				COMMAND ${LLVM_PROFDATA} merge
 					-sparse "${CMAKE_CURRENT_BINARY_DIR}/coverage.profraw"
 					-o "${CMAKE_CURRENT_BINARY_DIR}/coverage.profdata"
-				COMMAND ${LLVM_COV} show $<TARGET_FILE:unittest>
+				COMMAND ${LLVM_COV} show $<TARGET_FILE:${PROJECT_NAME}>
 					-instr-profile="${CMAKE_CURRENT_BINARY_DIR}/coverage.profdata"
 					-show-line-counts
 					-show-expansions
 					-show-regions
 					-format="text"
-					-ignore-filename-regex='${CMAKE_SOURCE_DIR}/test/*'
+#					-ignore-filename-regex='${CMAKE_SOURCE_DIR}/test/*'
 					> ${CMAKE_CURRENT_BINARY_DIR}/coverage.txt
 				COMMENT "Run unit tests, perform code coverage, generate sonarqube report"
-				DEPENDS unittest
 				)
 #]]
 
@@ -109,19 +105,18 @@ if( CMAKE_BUILD_TYPE MATCHES Coverage )
 				COMMAND ${LLVM_PROFDATA} merge
 					-sparse "${CMAKE_CURRENT_BINARY_DIR}/coverage.profraw"
 					-o "${CMAKE_CURRENT_BINARY_DIR}/coverage.profdata"
-				COMMAND ${LLVM_COV} report $<TARGET_FILE:unittest>
+				COMMAND ${LLVM_COV} report $<TARGET_FILE:${PROJECT_NAME}>
 					-instr-profile="${CMAKE_CURRENT_BINARY_DIR}/coverage.profdata"
-					-ignore-filename-regex='${CMAKE_SOURCE_DIR}/test/*'
-				COMMAND ${LLVM_COV} show $<TARGET_FILE:unittest>
+#					-ignore-filename-regex='${CMAKE_SOURCE_DIR}/test/*'
+				COMMAND ${LLVM_COV} show $<TARGET_FILE:${PROJECT_NAME}>
 					-instr-profile="${CMAKE_CURRENT_BINARY_DIR}/coverage.profdata"
 					-output-dir="${CMAKE_CURRENT_BINARY_DIR}/coverage"
 					-show-line-counts
 					-show-expansions
 					-show-regions
 					-format="html"
-					-ignore-filename-regex='${CMAKE_SOURCE_DIR}/test/*'
+#					-ignore-filename-regex='${CMAKE_SOURCE_DIR}/test/*'
 				COMMENT "Run unit tests, perform code coverage, generate llvm-cov report"
-				DEPENDS unittest
 				)
 
 		endif()

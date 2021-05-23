@@ -20,10 +20,6 @@ set( SOURCES_DOMAIN
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/board.cpp"
 	)
 
-set_property( GLOBAL
-	PROPERTY "GLOBAL_SOURCES_DOMAIN" "${SOURCES_DOMAIN}"
-	)
-
 #[[
 set( HEADERS
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/board.hpp"
@@ -33,12 +29,12 @@ set( HEADERS
 	)
 #]]
 
-add_executable( ${PROJECT_NAME} )
+add_library( ${PROJECT_NAME} SHARED )
 
 target_sources( ${PROJECT_NAME}
 	PRIVATE
 	${SOURCES_DOMAIN}
-	"${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
+#	"${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
 	)
 
 target_compile_definitions( ${PROJECT_NAME}
@@ -56,7 +52,11 @@ target_compile_options( ${PROJECT_NAME}
 	$<$<CONFIG:Coverage>:-O0>
 	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Wall>
 	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Wextra>
+#	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Weffc++>
 	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-fexceptions>
+	$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:GNU>>:--coverage>
+	$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:Clang>>:-fprofile-instr-generate>
+	$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:Clang>>:-fcoverage-mapping>
 	)
 
 target_include_directories( ${PROJECT_NAME}
@@ -64,22 +64,23 @@ target_include_directories( ${PROJECT_NAME}
 	${CMAKE_CURRENT_SOURCE_DIR}
 	)
 
-#[[
-qt5_use_modules( ${PROJECT_NAME}
-	Core
-	Gui
-	OpenGL
+target_link_libraries( ${PROJECT_NAME}
+	$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:GNU>>:-lgcov>
 	)
-#]]
+
+target_link_options( ${PROJECT_NAME}
+	PRIVATE
+	$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:Clang>>:-fprofile-instr-generate>
+	)
 
 #[[
 set_target_properties( ${PROJECT_NAME} PROPERTIES
 	OUTPUT_NAME "openemsh"
 	)
-#]]
 
 install(
 	TARGETS ${PROJECT_NAME}
 	CONFIGURATIONS Release
 	RUNTIME DESTINATION "bin" #"${CMAKE_INSTALL_BINDIR}"
 	)
+#]]

@@ -16,15 +16,10 @@ if( Catch2_FOUND )
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_conflict_edge_in_polygon.cpp"
 		)
 
-	get_property( SOURCES_DOMAIN GLOBAL
-		PROPERTY "GLOBAL_SOURCES_DOMAIN"
-		)
-
 	add_executable( unittest EXCLUDE_FROM_ALL )
 
 	target_sources( unittest
 		PRIVATE
-		${SOURCES_DOMAIN}
 		${TESTS}
 		)
 
@@ -44,10 +39,8 @@ if( Catch2_FOUND )
 		$<$<CONFIG:Coverage>:-O0>
 		$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Wall>
 		$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Wextra>
+#		$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Weffc++>
 		$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-fexceptions>
-		$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:GNU>>:--coverage>
-		$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:Clang>>:-fprofile-instr-generate>
-		$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:Clang>>:-fcoverage-mapping>
 		)
 
 	target_include_directories( unittest
@@ -57,12 +50,7 @@ if( Catch2_FOUND )
 
 	target_link_libraries( unittest
 		Catch2::Catch2WithMain
-		$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:GNU>>:-lgcov>
-		)
-
-	target_link_options( unittest
-		PRIVATE
-		$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:Clang>>:-fprofile-instr-generate>
+		${PROJECT_NAME}
 		)
 
 	set_target_properties( unittest PROPERTIES
