@@ -35,14 +35,6 @@ jobs:
           unzip \
             -o /tmp/sonar/build-wrapper-linux-x86.zip \
             -d /tmp/sonar/
-#          curl \
-#            -SLo \
-#            /tmp/sonar/sonar-scanner.zip \
-#            https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip
-#          curl \
-#            -SLo \
-#            /tmp/sonar/build-wrapper-linux-x86.zip \
-#            https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
 
       - name: "Dependencies: Catch2"
         run: |
@@ -53,6 +45,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Configure
         run: |
