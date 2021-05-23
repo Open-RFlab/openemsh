@@ -3,6 +3,9 @@
 [![License](https://img.shields.io/github/license/Open-RFlab/openemsh)](LICENSE)
 [![Version](https://img.shields.io/github/v/release/Open-RFlab/openemsh)](https://github.com/Open-RFlab/openemsh/releases/latest)
 
+[![SonarCloud quality gate](https://sonarcloud.io/api/project_badges/measure?project=Open-RFlab_openemsh&metric=alert_status)](https://sonarcloud.io/dashboard?id=Open-RFlab_openemsh)
+[![SonarCloud coverage](https://sonarcloud.io/api/project_badges/measure?project=Open-RFlab_openemsh&metric=coverage)](https://sonarcloud.io/dashboard?id=Open-RFlab_openemsh)
+
 # OpenEMSH : OpenEMS Mesher [WIP]
 
 ## Abstract
