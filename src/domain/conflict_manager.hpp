@@ -10,12 +10,18 @@
 #include <optional>
 #include <vector>
 
-#include "conflict.hpp"
+//#include "conflict.hpp"
+#include "conflict_colinear_edges.hpp"
+#include "conflict_edge_in_polygon.hpp"
 
 class Edge;
 class MeshlinePolicyManager;
 class Polygon;
 class Range;
+
+#ifdef UNITTEST
+#define private public
+#endif // UNITTEST
 
 /// Create / append conflicts regarding already existing conflicts
 ///*****************************************************************************
@@ -23,9 +29,10 @@ class ConflictManager {
 private:
 	MeshlinePolicyManager* const line_policy_manager;
 
-public:
-	std::vector<std::unique_ptr<Conflict>> conflicts; // TODO multiple vectors (for each kind)
+	std::vector<std::unique_ptr<ConflictEdgeInPolygon>> all_edge_in_polygons;
+	std::vector<std::unique_ptr<ConflictColinearEdges>> all_colinear_edges;
 
+public:
 	ConflictManager(MeshlinePolicyManager* const line_policy_manager);
 
 	void add_colinear_edges(Edge* a, Edge* b);
@@ -39,3 +46,7 @@ public:
 	void auto_solve_all_colinear_edges();
 //	Conflict* find(std::vector<IConflictOrigin> const&);
 };
+
+#ifdef UNITTEST
+#undef private
+#endif // UNITTEST
