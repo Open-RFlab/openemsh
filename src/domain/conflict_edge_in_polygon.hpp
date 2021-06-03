@@ -34,7 +34,7 @@ public:
 
 	std::vector<Overlap> overlaps;
 
-	ConflictEdgeInPolygon(Edge* a, Polygon const* _polygon, Range const _range, std::optional<Edge const*> b);
+	ConflictEdgeInPolygon(Edge* a, Polygon const* polygon, Range const range, std::optional<Edge const*> b);
 
 	void append(Polygon const* polygon, Range const range, std::optional<Edge const*> edge);
 

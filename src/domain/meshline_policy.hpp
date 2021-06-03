@@ -57,13 +57,13 @@ public:
 //	std::vector<Conflict*> conflicts;
 
 	MeshlinePolicy(
-		Axis const _axis,
-		Policy const _policy,
-		Normal _normal,
-		Params& _params,
-		Coord const _coord,
-		bool const _is_enabled = true,
-		double const _res_factor = 1);
+		Axis const axis,
+		Policy const policy,
+		Normal normal,
+		Params& params,
+		Coord const coord,
+		bool const is_enabled = true,
+		double const res_factor = 1);
 
 	Meshline mesh();
 };

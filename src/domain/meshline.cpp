@@ -7,9 +7,9 @@
 #include "meshline.hpp"
 
 //******************************************************************************
-Meshline::Meshline(Coord _coord, MeshlinePolicy* const _policy)
-: coord(_coord)
-, policy(_policy)
+Meshline::Meshline(Coord coord, MeshlinePolicy* const policy)
+: coord(coord)
+, policy(policy)
 {}
 
 //******************************************************************************

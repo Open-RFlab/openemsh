@@ -74,10 +74,10 @@ void sort_overlaps_by_p0_by_vector_orientation(vector<Overlap>& overlaps, Point 
 }
 
 //******************************************************************************
-ConflictEdgeInPolygon::ConflictEdgeInPolygon(Edge* a, Polygon const* _polygon, Range const _range, optional<Edge const*> b)
+ConflictEdgeInPolygon::ConflictEdgeInPolygon(Edge* a, Polygon const* polygon, Range const range, optional<Edge const*> b)
 : Conflict(Kind::EDGE_IN_POLYGON)
 , edge(a) {
-	overlaps.emplace_back(_polygon, make_unique<Range const>(_range), b);
+	overlaps.emplace_back(polygon, make_unique<Range const>(range), b);
 }
 
 //******************************************************************************

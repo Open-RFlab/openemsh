@@ -52,7 +52,7 @@ public:
 	///*************************************************************************
 	std::vector<std::unique_ptr<Edge>> edges;
 
-	Polygon(std::initializer_list<Point> _points);
+	Polygon(std::initializer_list<Point> points);
 
 //	relation::PolygonEdge relation_to(Edge const* edge);
 	relation::PolygonPoint relation_to(Point const& point) const;

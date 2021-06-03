@@ -30,7 +30,7 @@ public:
 	IConflictSolution* solution;
 //	std::vector<IConflictOrigin*> between;
 
-	Conflict(Kind const _kind);
+	Conflict(Kind const kind);
 
 	virtual void auto_solve(MeshlinePolicyManager& line_policy_manager) = 0;
 

@@ -15,8 +15,8 @@
 using namespace std;
 
 //******************************************************************************
-Segment::Segment(Axis const _axis)
-: axis(_axis)
+Segment::Segment(Axis const axis)
+: axis(axis)
 {}
 
 /// Cf. https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect

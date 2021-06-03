@@ -17,7 +17,7 @@ private:
 
 public:
 	template<typename T>
-	Coord(T const& _value) : value(_value) {}
+	Coord(T const& value) : value(value) {}
 	operator double() const;
 	bool operator==(Coord const& a) const;
 };

@@ -13,20 +13,20 @@ using namespace std;
 
 //******************************************************************************
 MeshlinePolicy::MeshlinePolicy(
-		Axis const _axis,
-		Policy const _policy,
-		Normal _normal,
-		Params& _params,
-		Coord const _coord,
-		bool const _is_enabled,
-		double const _res_factor)
-: axis(_axis)
-, policy(_policy)
-, normal(_normal)
-, params(_params)
-, coord(_coord)
-, is_enabled(_is_enabled)
-, res_factor(_res_factor)
+		Axis const axis,
+		Policy const policy,
+		Normal normal,
+		Params& params,
+		Coord const coord,
+		bool const is_enabled,
+		double const res_factor)
+: axis(axis)
+, policy(policy)
+, normal(normal)
+, params(params)
+, coord(coord)
+, is_enabled(is_enabled)
+, res_factor(res_factor)
 {}
 
 //******************************************************************************

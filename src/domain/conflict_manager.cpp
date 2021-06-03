@@ -14,8 +14,8 @@
 using namespace std;
 
 //******************************************************************************
-ConflictManager::ConflictManager(MeshlinePolicyManager* const _line_policy_manager)
-: line_policy_manager(_line_policy_manager)
+ConflictManager::ConflictManager(MeshlinePolicyManager* const line_policy_manager)
+: line_policy_manager(line_policy_manager)
 {}
 
 /// @warning Allows geometrically inconsistent datas.

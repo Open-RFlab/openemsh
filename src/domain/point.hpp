@@ -16,7 +16,7 @@ public:
 	Coord x;
 	Coord y;
 
-	Point(Coord _x, Coord _y);
+	Point(Coord x, Coord y);
 
 #ifdef DEBUG
 	void print() const;

@@ -16,7 +16,7 @@ public:
 	Coord coord;
 	MeshlinePolicy* const policy;
 
-	Meshline(Coord _coord, MeshlinePolicy* const _policy);
+	Meshline(Coord coord, MeshlinePolicy* const policy);
 };
 
 //******************************************************************************

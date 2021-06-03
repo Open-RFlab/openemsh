@@ -73,14 +73,14 @@ void sort_points_by_vector_orientation(vector<Point>& points, Point const& vecto
 }
 
 //******************************************************************************
-Board::Board(vector<unique_ptr<Polygon>>& _polygons)
+Board::Board(vector<unique_ptr<Polygon>>& polygons)
 : conflict_manager(&line_policy_manager)
 , line_policy_manager(params)
-, polygons(move(_polygons)) {
-	for(unique_ptr<Polygon>& polygon : polygons)
+, polygons(move(polygons)) {
+	for(unique_ptr<Polygon>& polygon : this->polygons)
 		for(unique_ptr<Edge>& edge : polygon->edges)
 			edges.push_back(edge.get());
-	polygons.shrink_to_fit();
+	this->polygons.shrink_to_fit();
 	edges.shrink_to_fit();
 }
 

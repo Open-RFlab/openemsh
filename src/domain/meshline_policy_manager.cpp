@@ -9,8 +9,8 @@
 using namespace std;
 
 //******************************************************************************
-MeshlinePolicyManager::MeshlinePolicyManager(Params& _params)
-: params(_params)
+MeshlinePolicyManager::MeshlinePolicyManager(Params& params)
+: params(params)
 {}
 
 //******************************************************************************

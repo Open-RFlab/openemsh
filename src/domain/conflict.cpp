@@ -7,7 +7,7 @@
 #include "conflict.hpp"
 
 //******************************************************************************
-Conflict::Conflict(Kind const _kind)
+Conflict::Conflict(Kind const kind)
 : IMeshLineOrigin()
-, kind(_kind)
+, kind(kind)
 {}

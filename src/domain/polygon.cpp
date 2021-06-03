@@ -16,16 +16,16 @@
 using namespace std;
 
 //******************************************************************************
-Polygon::Polygon(initializer_list<Point> _points)
-: bounding({ begin(_points)->x, begin(_points)->x, begin(_points)->y, begin(_points)->y }) {
-	for(Point const& point : _points)
-		points.push_back(make_unique<Point>(point)); // TODO do not use initializer_list because of copies
-	points.shrink_to_fit();
+Polygon::Polygon(initializer_list<Point> points)
+: bounding({ begin(points)->x, begin(points)->x, begin(points)->y, begin(points)->y }) {
+	for(Point const& point : points)
+		this->points.push_back(make_unique<Point>(point)); // TODO do not use initializer_list because of copies
+	this->points.shrink_to_fit();
 
-	rotation = detect_rotation(points);
+	rotation = detect_rotation(this->points);
 
-	Point const* prev = points.back().get();
-	for(unique_ptr<Point const>& point : points) {
+	Point const* prev = this->points.back().get();
+	for(unique_ptr<Point const>& point : this->points) {
 		edges.push_back(make_unique<Edge>(prev, point.get()));
 		prev = point.get();
 	}

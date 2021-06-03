@@ -36,7 +36,7 @@ private:
 
 public:
 //	Board(std::initializer_list<Polygon> _polygons);
-	Board(std::vector<std::unique_ptr<Polygon>>& _polygons);
+	Board(std::vector<std::unique_ptr<Polygon>>& polygons);
 	Board(); // TODO
 
 	void add_polygon(Polygon const polygon); // TODO

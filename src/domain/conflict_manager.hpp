@@ -26,7 +26,7 @@ private:
 public:
 	std::vector<std::unique_ptr<Conflict>> conflicts; // TODO multiple vectors (for each kind)
 
-	ConflictManager(MeshlinePolicyManager* const _line_policy_manager);
+	ConflictManager(MeshlinePolicyManager* const line_policy_manager);
 
 	void add_colinear_edges(Edge* a, Edge* b);
 
