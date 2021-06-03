@@ -33,7 +33,7 @@ private:
 	Grid<std::vector<std::unique_ptr<Meshline>>> meshlines;
 
 public:
-	MeshlinePolicyManager(Params& params);
+	explicit MeshlinePolicyManager(Params& params);
 
 	MeshlinePolicy* add_meshline_policy(
 		IMeshLineOrigin* origin,

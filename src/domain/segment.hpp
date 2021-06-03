@@ -25,7 +25,7 @@ public:
 		POINT
 	} axis;
 
-	Segment(Axis const axis);
+	explicit Segment(Axis const axis);
 	virtual ~Segment() = default;
 
 	virtual Point const& p0() const = 0;

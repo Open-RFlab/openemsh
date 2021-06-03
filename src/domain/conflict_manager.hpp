@@ -33,7 +33,7 @@ private:
 	std::vector<std::unique_ptr<ConflictColinearEdges>> all_colinear_edges;
 
 public:
-	ConflictManager(MeshlinePolicyManager* const line_policy_manager);
+	explicit ConflictManager(MeshlinePolicyManager* const line_policy_manager);
 
 	void add_colinear_edges(Edge* a, Edge* b);
 

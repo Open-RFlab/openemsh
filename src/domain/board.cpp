@@ -99,7 +99,7 @@ void Board::detect_edges_in_polygons() {
 					Range const range;
 					optional<relation::PolygonPoint> rel_to_poly_b;
 					optional<Point> const mid;
-					RangeBtwIntersections(Range const& _range)
+					explicit RangeBtwIntersections(Range const& _range)
 					: range(_range)
 					, rel_to_poly_b(nullopt)
 					, mid(::mid(_range))
