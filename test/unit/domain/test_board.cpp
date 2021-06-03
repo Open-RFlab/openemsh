@@ -139,15 +139,15 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			}
 			b->detect_edges_in_polygons();
 			THEN("4 EDGE_IN_POLYGON conflicts should be registered") {
-				REQUIRE(b->conflicts.size() == 4);
-				for(std::unique_ptr<Conflict>& conflict : b->conflicts)
+				REQUIRE(b->conflict_manager.conflicts.size() == 4);
+				for(std::unique_ptr<Conflict>& conflict : b->conflict_manager.conflicts)
 					REQUIRE(conflict->kind == Conflict::Kind::EDGE_IN_POLYGON);
 				AND_THEN("The registered conflicts should be between the right edges and polygons") {
 					bool is_first_registered = false;
 					bool is_second_registered = false;
 					bool is_third_registered = false;
 					bool is_fourth_registered = false;
-					for(std::unique_ptr<Conflict>& conflict : b->conflicts) {
+					for(std::unique_ptr<Conflict>& conflict : b->conflict_manager.conflicts) {
 						auto c = dynamic_cast<ConflictEdgeInPolygon*>(conflict.get());
 						if(c->edge == b->polygons[1]->edges[0].get()) {
 							is_first_registered = true;
@@ -217,15 +217,15 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			}
 			b->detect_edges_in_polygons();
 			THEN("4 EDGE_IN_POLYGON conflicts should be registered") {
-				REQUIRE(b->conflicts.size() == 4);
-				for(std::unique_ptr<Conflict>& conflict : b->conflicts)
+				REQUIRE(b->conflict_manager.conflicts.size() == 4);
+				for(std::unique_ptr<Conflict>& conflict : b->conflict_manager.conflicts)
 					REQUIRE(conflict->kind == Conflict::Kind::EDGE_IN_POLYGON);
 				AND_THEN("The registered conflicts should be between the right edges and polygons") {
 					bool is_first_registered = false;
 					bool is_second_registered = false;
 					bool is_third_registered = false;
 					bool is_fourth_registered = false;
-					for(std::unique_ptr<Conflict>& conflict : b->conflicts) {
+					for(std::unique_ptr<Conflict>& conflict : b->conflict_manager.conflicts) {
 						auto c = dynamic_cast<ConflictEdgeInPolygon*>(conflict.get());
 						if(c->edge == b->polygons[0]->edges[1].get()) {
 							is_first_registered = true;
@@ -296,15 +296,15 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			}
 			b->detect_edges_in_polygons();
 			THEN("4 EDGE_IN_POLYGON conflicts should be registered") {
-				REQUIRE(b->conflicts.size() == 4);
-				for(std::unique_ptr<Conflict>& conflict : b->conflicts)
+				REQUIRE(b->conflict_manager.conflicts.size() == 4);
+				for(std::unique_ptr<Conflict>& conflict : b->conflict_manager.conflicts)
 					REQUIRE(conflict->kind == Conflict::Kind::EDGE_IN_POLYGON);
 				AND_THEN("The registered conflicts should be between the right edges and polygons") {
 					bool is_first_registered = false;
 					bool is_second_registered = false;
 					bool is_third_registered = false;
 					bool is_fourth_registered = false;
-					for(std::unique_ptr<Conflict>& conflict : b->conflicts) {
+					for(std::unique_ptr<Conflict>& conflict : b->conflict_manager.conflicts) {
 						auto c = dynamic_cast<ConflictEdgeInPolygon*>(conflict.get());
 						if(c->edge == b->polygons[0]->edges[1].get()) {
 							is_first_registered = true;
@@ -375,8 +375,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			}
 			b->detect_edges_in_polygons();
 			THEN("5 EDGE_IN_POLYGON conflicts should be registered") {
-				REQUIRE(b->conflicts.size() == 5);
-				for(std::unique_ptr<Conflict>& conflict : b->conflicts)
+				REQUIRE(b->conflict_manager.conflicts.size() == 5);
+				for(std::unique_ptr<Conflict>& conflict : b->conflict_manager.conflicts)
 					REQUIRE(conflict->kind == Conflict::Kind::EDGE_IN_POLYGON);
 				AND_THEN("The registered conflicts should be between the right edges and polygons") {
 					bool is_first_registered = false;
@@ -384,7 +384,7 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 					bool is_third_registered = false;
 					bool is_fourth_registered = false;
 					bool is_fifth_registered = false;
-					for(std::unique_ptr<Conflict>& conflict : b->conflicts) {
+					for(std::unique_ptr<Conflict>& conflict : b->conflict_manager.conflicts) {
 						auto c = dynamic_cast<ConflictEdgeInPolygon*>(conflict.get());
 						if(c->edge == b->polygons[0]->edges[2].get()) {
 							is_first_registered = true;
@@ -467,13 +467,13 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			}
 			b->detect_edges_in_polygons();
 			THEN("2 EDGE_IN_POLYGON conflicts should be registered") {
-				REQUIRE(b->conflicts.size() == 2);
-				for(std::unique_ptr<Conflict>& conflict : b->conflicts)
+				REQUIRE(b->conflict_manager.conflicts.size() == 2);
+				for(std::unique_ptr<Conflict>& conflict : b->conflict_manager.conflicts)
 					REQUIRE(conflict->kind == Conflict::Kind::EDGE_IN_POLYGON);
 				AND_THEN("The registered conflicts should be between the right edges and polygons") {
 					bool is_first_registered = false;
 					bool is_second_registered = false;
-					for(std::unique_ptr<Conflict>& conflict : b->conflicts) {
+					for(std::unique_ptr<Conflict>& conflict : b->conflict_manager.conflicts) {
 						auto c = dynamic_cast<ConflictEdgeInPolygon*>(conflict.get());
 						if(c->edge == b->polygons[0]->edges[1].get()) {
 							is_first_registered = true;
@@ -521,7 +521,7 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			}
 			b->detect_edges_in_polygons();
 			THEN("There should not be any conflict registered") {
-				REQUIRE_FALSE(b->conflicts.size());
+				REQUIRE_FALSE(b->conflict_manager.conflicts.size());
 			}
 		}
 
@@ -535,7 +535,7 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			}
 			b->detect_edges_in_polygons();
 			THEN("There should not be any conflict registered") {
-				REQUIRE_FALSE(b->conflicts.size());
+				REQUIRE_FALSE(b->conflict_manager.conflicts.size());
 			}
 		}
 	}
@@ -556,13 +556,13 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			}
 			b->detect_edges_in_polygons();
 			THEN("12 EDGE_IN_POLYGON conflicts should be registered") {
-				REQUIRE(b->conflicts.size() == 12);
-				for(std::unique_ptr<Conflict>& conflict : b->conflicts)
+				REQUIRE(b->conflict_manager.conflicts.size() == 12);
+				for(std::unique_ptr<Conflict>& conflict : b->conflict_manager.conflicts)
 					REQUIRE(conflict->kind == Conflict::Kind::EDGE_IN_POLYGON);
 				AND_THEN("The registered conflicts should be between the right edges and polygons") {
 					std::array<bool, 12> are_conflicts_registered;
 					are_conflicts_registered.fill(false);
-					for(std::unique_ptr<Conflict>& conflict : b->conflicts) {
+					for(std::unique_ptr<Conflict>& conflict : b->conflict_manager.conflicts) {
 						auto c = dynamic_cast<ConflictEdgeInPolygon*>(conflict.get());
 						if(c->edge == b->polygons[0]->edges[2].get()) {
 							are_conflicts_registered[0] = true;
@@ -690,10 +690,10 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 			}
 			b->detect_colinear_edges();
 			THEN("A COLINEAR_EDGES conflict should be registered") {
-				REQUIRE(b->conflicts.size() == 1);
-				REQUIRE(b->conflicts.back()->kind == Conflict::Kind::COLINEAR_EDGES);
+				REQUIRE(b->conflict_manager.conflicts.size() == 1);
+				REQUIRE(b->conflict_manager.conflicts.back()->kind == Conflict::Kind::COLINEAR_EDGES);
 				AND_THEN("The registered conflict should be between tree edges") {
-					auto c = dynamic_cast<ConflictColinearEdges*>(b->conflicts.back().get());
+					auto c = dynamic_cast<ConflictColinearEdges*>(b->conflict_manager.conflicts.back().get());
 					REQUIRE(c->edges.size() == 3);
 					bool is_first_registered = false;
 					bool is_second_registered = false;
@@ -711,7 +711,7 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 					REQUIRE(is_third_registered);
 				}
 				AND_THEN("The three edges should register the conflict") {
-					auto c = dynamic_cast<ConflictColinearEdges*>(b->conflicts.back().get());
+					auto c = dynamic_cast<ConflictColinearEdges*>(b->conflict_manager.conflicts.back().get());
 					REQUIRE(b->polygons[0]->edges[2]->conflicts.size() == 1);
 					REQUIRE(b->polygons[1]->edges[2]->conflicts.size() == 1);
 					REQUIRE(b->polygons[2]->edges[2]->conflicts.size() == 1);
@@ -733,10 +733,10 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 			}
 			b->detect_colinear_edges();
 			THEN("A COLINEAR_EDGES conflict should be registered") {
-				REQUIRE(b->conflicts.size() == 1);
-				REQUIRE(b->conflicts.back()->kind == Conflict::Kind::COLINEAR_EDGES);
+				REQUIRE(b->conflict_manager.conflicts.size() == 1);
+				REQUIRE(b->conflict_manager.conflicts.back()->kind == Conflict::Kind::COLINEAR_EDGES);
 				AND_THEN("The registered conflict should be between tree edges") {
-					auto c = dynamic_cast<ConflictColinearEdges*>(b->conflicts.back().get());
+					auto c = dynamic_cast<ConflictColinearEdges*>(b->conflict_manager.conflicts.back().get());
 					REQUIRE(c->edges.size() == 3);
 					bool is_first_registered = false;
 					bool is_second_registered = false;
@@ -754,7 +754,7 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 					REQUIRE(is_third_registered);
 				}
 				AND_THEN("The three edges should register the conflict") {
-					auto c = dynamic_cast<ConflictColinearEdges*>(b->conflicts.back().get());
+					auto c = dynamic_cast<ConflictColinearEdges*>(b->conflict_manager.conflicts.back().get());
 					REQUIRE(b->polygons[0]->edges[3]->conflicts.size() == 1);
 					REQUIRE(b->polygons[1]->edges[2]->conflicts.size() == 1);
 					REQUIRE(b->polygons[2]->edges[2]->conflicts.size() == 1);
@@ -776,7 +776,7 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 			}
 			b->detect_colinear_edges();
 			THEN("There should not be any conflict registered") {
-				REQUIRE_FALSE(b->conflicts.size());
+				REQUIRE_FALSE(b->conflict_manager.conflicts.size());
 			}
 		}
 	}

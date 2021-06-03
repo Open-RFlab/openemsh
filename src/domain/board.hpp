@@ -31,7 +31,6 @@ private:
 	ConflictManager conflict_manager;
 	MeshlinePolicyManager line_policy_manager;
 	std::vector<std::unique_ptr<Polygon>> polygons;
-	std::vector<std::unique_ptr<Conflict>> conflicts;
 	std::vector<Edge*> edges;
 	Params params;
 

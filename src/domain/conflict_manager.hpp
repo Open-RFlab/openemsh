@@ -21,11 +21,12 @@ class Range;
 ///*****************************************************************************
 class ConflictManager {
 private:
-	std::vector<std::unique_ptr<Conflict>>& conflicts; // TODO multiple vectors (for each kind)
 	MeshlinePolicyManager* const line_policy_manager;
 
 public:
-	ConflictManager(std::vector<std::unique_ptr<Conflict>>& _conflicts, MeshlinePolicyManager* const _line_policy_manager);
+	std::vector<std::unique_ptr<Conflict>> conflicts; // TODO multiple vectors (for each kind)
+
+	ConflictManager(MeshlinePolicyManager* const _line_policy_manager);
 
 	void add_colinear_edges(Edge* a, Edge* b);
 
