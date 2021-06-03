@@ -8,6 +8,8 @@
 
 # OpenEMSH : OpenEMS Mesher [WIP]
 
+_This project is under heavy development and not yet usable, for now the best way to contribute is to give a symbolic tip. :)_
+
 ## Abstract
 
 This is an [OpenEMS](https://openems.de) mesher draft (with a H at the end, it looks like mesh poorly written). Meshing an OpenEMS structure is a difficult task often done manually. Some automatic meshers exist, shipped with either an Octave/Python API or a converter tool from a PCB design software.
