@@ -8,18 +8,18 @@
 
 #include "domain/bounding.hpp"
 
-/// @test bool does_overlap(Bounding const& a, Bounding const& b)
+/// @test bool does_overlap(Bounding2D const& a, Bounding2D const& b)
 ///*****************************************************************************
 
 //******************************************************************************
-SCENARIO("bool does_overlap(Bounding const& a, Bounding const& b)", "[bounding]") {
+SCENARIO("bool does_overlap(Bounding2D const& a, Bounding2D const& b)", "[bounding]") {
 	GIVEN("Two bounding boxes that do not overlap") {
-		Bounding a;
+		Bounding2D a;
 		a[XMIN] = 1;
 		a[XMAX] = 4;
 		a[YMIN] = 2;
 		a[YMAX] = 4;
-		Bounding b;
+		Bounding2D b;
 		b[XMIN] = 5;
 		b[XMAX] = 6;
 		b[YMIN] = 1;
@@ -31,12 +31,12 @@ SCENARIO("bool does_overlap(Bounding const& a, Bounding const& b)", "[bounding]"
 	}
 
 	GIVEN("Two bounding boxes that overlap") {
-		Bounding a;
+		Bounding2D a;
 		a[XMIN] = 1;
 		a[XMAX] = 4;
 		a[YMIN] = 2;
 		a[YMAX] = 4;
-		Bounding b;
+		Bounding2D b;
 		b[XMIN] = 2;
 		b[XMAX] = 5;
 		b[YMIN] = 1;
@@ -48,12 +48,12 @@ SCENARIO("bool does_overlap(Bounding const& a, Bounding const& b)", "[bounding]"
 	}
 
 	GIVEN("A bounding box that is totally inside an other") {
-		Bounding a;
+		Bounding2D a;
 		a[XMIN] = 1;
 		a[XMAX] = 4;
 		a[YMIN] = 2;
 		a[YMAX] = 4;
-		Bounding b;
+		Bounding2D b;
 		b[XMIN] = 2;
 		b[XMAX] = 3;
 		b[YMIN] = 2.5;
@@ -65,12 +65,12 @@ SCENARIO("bool does_overlap(Bounding const& a, Bounding const& b)", "[bounding]"
 	}
 
 	GIVEN("Two bounding boxes that just touch each other by a corner") {
-		Bounding a;
+		Bounding2D a;
 		a[XMIN] = 1;
 		a[XMAX] = 4;
 		a[YMIN] = 2;
 		a[YMAX] = 4;
-		Bounding b;
+		Bounding2D b;
 		b[XMIN] = 4;
 		b[XMAX] = 5;
 		b[YMIN] = 4;

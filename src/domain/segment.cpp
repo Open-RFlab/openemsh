@@ -33,8 +33,8 @@ relation::SegmentSegment Segment::relation_to(Segment const& segment) const {
 
 	if(r1 == Polygon::Rotation::COLINEAR && r2 == Polygon::Rotation::COLINEAR
 	&& r3 == Polygon::Rotation::COLINEAR && r4 == Polygon::Rotation::COLINEAR) {
-		Bounding a_bnd(bounding(segment));
-		Bounding b_bnd(bounding(*this));
+		Bounding2D a_bnd(bounding(segment));
+		Bounding2D b_bnd(bounding(*this));
 
 		if(((a_bnd[XMIN] >= b_bnd[XMIN] && a_bnd[XMIN] <= b_bnd[XMAX]) || (a_bnd[XMAX] >= b_bnd[XMIN] && a_bnd[XMAX] <= b_bnd[XMAX])
 		||  (b_bnd[XMIN] >= a_bnd[XMIN] && b_bnd[XMIN] <= a_bnd[XMAX]) || (b_bnd[XMAX] >= a_bnd[XMIN] && b_bnd[XMAX] <= a_bnd[XMAX]))
@@ -74,8 +74,8 @@ Segment::Axis axis(Point const& vector) {
 }
 
 //******************************************************************************
-Bounding bounding(Segment const& a) {
-	Bounding bounding;
+Bounding2D bounding(Segment const& a) {
+	Bounding2D bounding;
 	bounding[XMIN] = a.p0().x < a.p1().x ? a.p0().x : a.p1().x;
 	bounding[XMAX] = a.p0().x > a.p1().x ? a.p0().x : a.p1().x;
 	bounding[YMIN] = a.p0().y < a.p1().y ? a.p0().y : a.p1().y;
@@ -125,8 +125,8 @@ optional<Range> merge(Segment const& a, Segment const& b) {
 	if((a.axis == Segment::Axis::H && b.axis == Segment::Axis::H)
 	|| (a.axis == Segment::Axis::V && b.axis == Segment::Axis::V)
 	|| (a_vec.y / a_vec.x == b_vec.y / b_vec.x)) {
-		Bounding a_bnd(bounding(a));
-		Bounding b_bnd(bounding(b));
+		Bounding2D a_bnd(bounding(a));
+		Bounding2D b_bnd(bounding(b));
 
 		double xmin = 0;
 		double xmax = 0;
@@ -176,8 +176,8 @@ optional<Range> overlap(Segment const& a, Segment const& b) {
 	if((a.axis == Segment::Axis::H && b.axis == Segment::Axis::H)
 	|| (a.axis == Segment::Axis::V && b.axis == Segment::Axis::V)
 	|| (a_vec.y / a_vec.x == b_vec.y / b_vec.x)) {
-		Bounding a_bnd(bounding(a));
-		Bounding b_bnd(bounding(b));
+		Bounding2D a_bnd(bounding(a));
+		Bounding2D b_bnd(bounding(b));
 
 		double xmin = 0;
 		double xmax = 0;

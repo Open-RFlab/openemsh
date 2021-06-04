@@ -40,16 +40,16 @@ Segment::Axis axis(Point const& p0, Point const& p1);
 Segment::Axis axis(Point const& vector);
 
 //******************************************************************************
-Bounding bounding(Segment const& a);
+Bounding2D bounding(Segment const& a);
 
 //******************************************************************************
 std::optional<Point> intersection(Segment const& a, Segment const& b);
 
 //******************************************************************************
-std::optional<Range> merge(Segment const& a, Segment const& b); // TODO -> Bounding?
+std::optional<Range> merge(Segment const& a, Segment const& b); // TODO -> Bounding2D?
 
 //******************************************************************************
 Point mid(Segment const& s);
 
 //******************************************************************************
-std::optional<Range> overlap(Segment const& a, Segment const& b); // TODO -> Bounding?
+std::optional<Range> overlap(Segment const& a, Segment const& b); // TODO -> Bounding2D?

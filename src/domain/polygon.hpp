@@ -42,7 +42,7 @@ public:
 		PORT
 	} type; // TODO usefull?
 
-	Bounding bounding;
+	Bounding2D bounding;
 
 	// TODO rm unique_ptr ?
 	std::vector<std::unique_ptr<Point const>> points;

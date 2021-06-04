@@ -8,7 +8,7 @@
 
 /// Check if two bounding boxes overlap or just touch each other.
 ///*****************************************************************************
-bool does_overlap(Bounding const& a, Bounding const& b) {
+bool does_overlap(Bounding2D const& a, Bounding2D const& b) {
 	return((b[XMIN] >= a[XMIN] && b[XMIN] <= a[XMAX])
 	    || (b[XMAX] >= a[XMIN] && b[XMAX] <= a[XMAX])
 	    || (a[XMIN] >= b[XMIN] && a[XMIN] <= b[XMAX])

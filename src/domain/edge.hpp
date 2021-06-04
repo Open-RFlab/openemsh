@@ -58,7 +58,7 @@ public:
 	Normal normal;
 	bool to_mesh;
 
-//	Bounding bounding;
+//	Bounding2D bounding;
 
 	Edge(Point const* p0, Point const* p1);
 

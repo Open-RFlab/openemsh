@@ -10,16 +10,16 @@
 
 #include "domain/range.hpp"
 
-/// @test Bounding bounding(Segment const& a)
+/// @test Bounding2D bounding(Segment const& a)
 /// @test std::optional<Range> merge(Segment const* a, Segment const* b)
 ///*****************************************************************************
 
-SCENARIO("Bounding bounding(Segment const& a)", "[range][segment]") {
+SCENARIO("Bounding2D bounding(Segment const& a)", "[range][segment]") {
 	GIVEN("An horizontal range") {
 		Point a0(1, 1), a1(2, 1);
 		Range a(a0, a1), b(a1, a0);
-		Bounding c = bounding(a);
-		Bounding d = bounding(b);
+		Bounding2D c = bounding(a);
+		Bounding2D d = bounding(b);
 		THEN("Should calcul the bounding box") {
 			REQUIRE(a.axis == Segment::Axis::H);
 			REQUIRE(c[XMIN] == 1);
@@ -37,8 +37,8 @@ SCENARIO("Bounding bounding(Segment const& a)", "[range][segment]") {
 	GIVEN("A vertical range") {
 		Point a0(1, 1), a1(1, 2);
 		Range a(a0, a1), b(a1, a0);
-		Bounding c = bounding(a);
-		Bounding d = bounding(b);
+		Bounding2D c = bounding(a);
+		Bounding2D d = bounding(b);
 		THEN("Should calcul the bounding box") {
 			REQUIRE(a.axis == Segment::Axis::V);
 			REQUIRE(c[XMIN] == 1);
@@ -56,8 +56,8 @@ SCENARIO("Bounding bounding(Segment const& a)", "[range][segment]") {
 	GIVEN("A diagonal range") {
 		Point a0(1, 1), a1(2, 2);
 		Range a(a0, a1), b(a1, a0);
-		Bounding c = bounding(a);
-		Bounding d = bounding(b);
+		Bounding2D c = bounding(a);
+		Bounding2D d = bounding(b);
 		THEN("Should calcul the bounding box") {
 			REQUIRE(a.axis == Segment::Axis::DIAGONAL);
 			REQUIRE(c[XMIN] == 1);

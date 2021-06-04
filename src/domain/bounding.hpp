@@ -9,8 +9,8 @@
 #include <array>
 
 //******************************************************************************
-using Bounding = std::array<double, 4>;
+using Bounding2D = std::array<double, 4>;
 enum BoundingIndex { XMIN, XMAX, YMIN, YMAX };
 
 //******************************************************************************
-bool does_overlap(Bounding const& a, Bounding const& b);
+bool does_overlap(Bounding2D const& a, Bounding2D const& b);
