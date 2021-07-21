@@ -84,3 +84,43 @@ install(
 	RUNTIME DESTINATION "bin" #"${CMAKE_INSTALL_BINDIR}"
 	)
 #]]
+
+file( GLOB_RECURSE ${PROJECT_NAME}_HEADERS "*.hpp" )
+
+static_analysis_lizard(
+	TARGET ${PROJECT_NAME}
+	ADDITIONAL_FILES ${${PROJECT_NAME}_HEADERS}
+	ARGS
+		--languages cpp
+		--sort cyclomatic_complexity
+	)
+
+static_analysis_iwyu(
+	TARGET ${PROJECT_NAME}
+	ARGS
+		--std=c++17 # Useless with -p ?
+#		-p="${CMAKE_BINARY_DIR}" # Outdated iwyu version.
+		-Xiwyu
+		--no_comments
+	)
+
+static_analysis_tidy(
+	TARGET ${PROJECT_NAME}
+	ARGS
+		-p="${CMAKE_BINARY_DIR}"
+		-checks=*
+	)
+
+static_analysis_format(
+	TARGET ${PROJECT_NAME}
+	ADDITIONAL_FILES ${${PROJECT_NAME}_HEADERS}
+	ARGS
+	)
+
+static_analysis_cppcheck(
+	TARGET ${PROJECT_NAME}
+	ADDITIONAL_FILES ${${PROJECT_NAME}_HEADERS}
+	ARGS
+#		--enable=all
+#		-v
+	)

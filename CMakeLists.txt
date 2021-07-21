@@ -11,6 +11,10 @@ if( NOT CMAKE_BUILD_TYPE )
 endif()
 message( STATUS "Build type: ${CMAKE_BUILD_TYPE}" )
 
+list( APPEND CMAKE_MODULE_PATH
+	"${CMAKE_SOURCE_DIR}/cmake"
+	)
+
 option( SONAR "The coverage target will produce SonarQube reports instead of console / HTML" OFF )
 
 if( CMAKE_BUILD_TYPE MATCHES Coverage )
@@ -88,6 +92,8 @@ set( CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
 	WORLD_EXECUTE
 	)
 #]]
+
+include( StaticTools )
 
 add_subdirectory( "${CMAKE_SOURCE_DIR}/src" )
 add_subdirectory( "${CMAKE_SOURCE_DIR}/test" )
