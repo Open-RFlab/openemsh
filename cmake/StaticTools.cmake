@@ -63,7 +63,7 @@ endif()
 #                        [ARGS arg1 [arg2] ...]
 #                        )
 # [TARGET]
-#       Target to analyse. Eavery sourcce file will be analysed.
+#       Target to analyse. Every sourcce file will be analysed.
 # [ADDITIONAL_FILES]
 #       Specify other files to analyse, headers for instance.
 # [ARGS]
@@ -108,12 +108,12 @@ endfunction()
 
 ################################################################################
 # static_analysis_iwyu(
-#                        [TARGET target]
-#                        [ADDITIONAL_FILES file1 [file2] ...]
-#                        [ARGS arg1 [arg2] ...]
-#                        )
+#                      [TARGET target]
+#                      [ADDITIONAL_FILES file1 [file2] ...]
+#                      [ARGS arg1 [arg2] ...]
+#                      )
 # [TARGET]
-#       Target to analyse. Eavery sourcce file will be analysed.
+#       Target to analyse. Every sourcce file will be analysed.
 # [ADDITIONAL_FILES]
 #       Specify other files to analyse, headers for instance.
 # [ARGS]
@@ -138,7 +138,7 @@ function( static_analysis_iwyu )
 	if( IWYU_TARGET )
 		get_target_property( IWYU_SRC ${IWYU_TARGET} SOURCES )
 	else()
-		message( ERROR "Specify a target!" )
+		message( ERROR " static_analysis_iwyu() : Specify a target!" )
 	endif()
 	foreach( ARG ${IWYU_ARGS} )
 		list( APPEND ALL_ARGS ${ARG} )
@@ -167,12 +167,12 @@ endfunction()
 #[[
 ################################################################################
 # static_analysis_include_fixer(
-#                        [TARGET target]
-#                        [ADDITIONAL_FILES file1 [file2] ...]
-#                        [ARGS arg1 [arg2] ...]
-#                        )
+#                               [TARGET target]
+#                               [ADDITIONAL_FILES file1 [file2] ...]
+#                               [ARGS arg1 [arg2] ...]
+#                               )
 # [TARGET]
-#       Target to analyse. Eavery sourcce file will be analysed.
+#       Target to analyse. Every sourcce file will be analysed.
 # [ADDITIONAL_FILES]
 #       Specify other files to analyse, headers for instance.
 # [ARGS]
@@ -197,7 +197,7 @@ function( static_analysis_include_fixer )
 	if( CLANG_INCLUDE_FIXER_TARGET )
 		get_target_property( CLANG_INCLUDE_FIXER_SRC ${CLANG_INCLUDE_FIXER_TARGET} SOURCES )
 	else()
-		message( ERROR "Specify a target!" )
+		message( ERROR " static_analysis_include_fixer() : Specify a target!" )
 	endif()
 	foreach( ARG ${CLANG_INCLUDE_FIXER_ARGS} )
 		list( APPEND ALL_ARGS ${ARG} )
@@ -226,12 +226,12 @@ endfunction()
 
 ################################################################################
 # static_analysis_tidy(
-#                        [TARGET target]
-#                        [ADDITIONAL_FILES file1 [file2] ...]
-#                        [ARGS arg1 [arg2] ...]
-#                        )
+#                      [TARGET target]
+#                      [ADDITIONAL_FILES file1 [file2] ...]
+#                      [ARGS arg1 [arg2] ...]
+#                      )
 # [TARGET]
-#       Target to analyse. Eavery sourcce file will be analysed.
+#       Target to analyse. Every sourcce file will be analysed.
 # [ADDITIONAL_FILES]
 #       Specify other files to analyse, headers for instance.
 # [ARGS]
@@ -261,7 +261,7 @@ function( static_analysis_tidy )
 	if( TIDY_TARGET )
 		get_target_property( TIDY_SRC ${TIDY_TARGET} SOURCES )
 	else()
-		message( ERROR "Specify a target!" )
+		message( ERROR " static_analysis_tidy() : Specify a target!" )
 	endif()
 	foreach( ARG ${TIDY_ARGS} )
 		list( APPEND ALL_ARGS ${ARG} )
@@ -315,7 +315,7 @@ endfunction()
 #                        [ARGS arg1 [arg2] ...]
 #                        )
 # [TARGET]
-#       Target to analyse. Eavery sourcce file will be analysed.
+#       Target to analyse. Every sourcce file will be analysed.
 # [ADDITIONAL_FILES]
 #       Specify other files to analyse, headers for instance.
 # [ARGS]
@@ -345,7 +345,7 @@ function( static_analysis_format )
 	if( FORMAT_TARGET )
 		get_target_property( FORMAT_SRC ${FORMAT_TARGET} SOURCES )
 	else()
-		message( ERROR "Specify a target!" )
+		message( ERROR " static_analysis_format() : Specify a target!" )
 	endif()
 	foreach( ARG ${FORMAT_ARGS} )
 		list( APPEND ALL_ARGS ${ARG} )
@@ -395,12 +395,12 @@ endfunction()
 
 ################################################################################
 # static_analysis_cppcheck(
-#                        [TARGET target]
-#                        [ADDITIONAL_FILES file1 [file2] ...]
-#                        [ARGS arg1 [arg2] ...]
-#                        )
+#                          [TARGET target]
+#                          [ADDITIONAL_FILES file1 [file2] ...]
+#                          [ARGS arg1 [arg2] ...]
+#                          )
 # [TARGET]
-#       Target to analyse. Eavery sourcce file will be analysed.
+#       Target to analyse. Every sourcce file will be analysed.
 # [ADDITIONAL_FILES]
 #       Specify other files to analyse, headers for instance.
 # [ARGS]
@@ -426,7 +426,7 @@ function( static_analysis_cppcheck )
 		get_target_property( CPPCHECK_SRC ${CPPCHECK_TARGET} SOURCES )
 		get_target_property( CPPCHECK_STD ${CPPCHECK_TARGET} CXX_STANDARD )
 	else()
-		message( ERROR "Specify a target!" )
+		message( ERROR " static_analysis_cppcheck() : Specify a target!" )
 	endif()
 	foreach( ARG ${CPPCHECK_ARGS} )
 		list( APPEND ALL_ARGS ${ARG} )
