@@ -124,3 +124,7 @@ static_analysis_cppcheck(
 #		--enable=all
 #		-v
 	)
+
+enable_clang_build_analyzer(
+	TARGET ${PROJECT_NAME}
+	)

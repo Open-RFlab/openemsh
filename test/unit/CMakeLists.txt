@@ -57,4 +57,8 @@ if( Catch2_FOUND )
 		OUTPUT_NAME "unittest_openemsh"
 #		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/out"
 		)
+
+	enable_clang_build_analyzer(
+		TARGET unittest
+		)
 endif()

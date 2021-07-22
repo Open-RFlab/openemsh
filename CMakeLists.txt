@@ -94,6 +94,7 @@ set( CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
 #]]
 
 include( StaticTools )
+include( ClangBuildAnalyzer )
 
 add_subdirectory( "${CMAKE_SOURCE_DIR}/src" )
 add_subdirectory( "${CMAKE_SOURCE_DIR}/test" )
