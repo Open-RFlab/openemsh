@@ -93,6 +93,19 @@ set( CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
 	)
 #]]
 
+include( CPM )
+
+CPMAddPackage(
+	NAME cmake-utils
+	GITHUB_REPOSITORY conformism/cmake-utils
+	GIT_TAG main
+	DOWNLOAD_ONLY
+	)
+
+list( APPEND CMAKE_MODULE_PATH
+	"${FETCHCONTENT_BASE_DIR}/cmake-utils-src"
+	)
+
 include( StaticTools )
 include( ClangBuildAnalyzer )
 
