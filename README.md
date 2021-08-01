@@ -40,6 +40,7 @@ Also I'd like this mesher to be a standalone tool, independant from any converte
 
 - [Catch2](https://github.com/catchorg/Catch2/blob/devel/docs/cmake-integration.md#installing-catch2-from-git-repository)
 - Either `lcov` with GCC or `llvm` with Clang
+- All the tools provided [here](https://github.com/conformism/cmake-utils), install the ones you want to use
 
 ### Build system configuration
 
