@@ -61,4 +61,8 @@ if( Catch2_FOUND )
 	enable_clang_build_analyzer(
 		TARGET unittest
 		)
+
+	enable_sanitizers(
+		TARGET unittest
+		)
 endif()

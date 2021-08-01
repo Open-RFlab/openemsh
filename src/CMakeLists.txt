@@ -128,3 +128,7 @@ static_analysis_cppcheck(
 enable_clang_build_analyzer(
 	TARGET ${PROJECT_NAME}
 	)
+
+enable_sanitizers(
+	TARGET ${PROJECT_NAME}
+	)

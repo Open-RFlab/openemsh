@@ -108,6 +108,7 @@ list( APPEND CMAKE_MODULE_PATH
 
 include( StaticTools )
 include( ClangBuildAnalyzer )
+include( Sanitizers )
 
 add_subdirectory( "${CMAKE_SOURCE_DIR}/src" )
 add_subdirectory( "${CMAKE_SOURCE_DIR}/test" )
