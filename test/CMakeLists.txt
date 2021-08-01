@@ -49,7 +49,7 @@ if( CMAKE_BUILD_TYPE MATCHES Coverage )
 #				"${CMAKE_CTEST_COMMAND} --output-on-failure Unittest ;:;"
 				COMMAND $<TARGET_FILE:unittest>
 				COMMAND ${LCOV} -c
-					-d "${CMAKE_BINARY_DIR}/src/CMakeFiles/openemsh.dir"
+					-d "${CMAKE_BINARY_DIR}/src/CMakeFiles/${PROJECT_NAME}.dir"
 					-o "${CMAKE_CURRENT_BINARY_DIR}/coverage.tmp.info"
 					--rc lcov_branch_coverage=1
 				COMMAND ${LCOV} -r
