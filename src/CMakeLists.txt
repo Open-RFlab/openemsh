@@ -87,7 +87,7 @@ install(
 
 file( GLOB_RECURSE ${PROJECT_NAME}_HEADERS "*.hpp" )
 
-static_analysis_lizard(
+lizard(
 	TARGET ${PROJECT_NAME}
 	ADDITIONAL_FILES ${${PROJECT_NAME}_HEADERS}
 	ARGS
@@ -95,7 +95,7 @@ static_analysis_lizard(
 		--sort cyclomatic_complexity
 	)
 
-static_analysis_iwyu(
+iwyu(
 	TARGET ${PROJECT_NAME}
 	ARGS
 		--std=c++17 # Useless with -p ?
@@ -104,20 +104,20 @@ static_analysis_iwyu(
 		--no_comments
 	)
 
-static_analysis_tidy(
+clang_tidy(
 	TARGET ${PROJECT_NAME}
 	ARGS
 		-p="${CMAKE_BINARY_DIR}"
 		-checks=*
 	)
 
-static_analysis_format(
+clang_format(
 	TARGET ${PROJECT_NAME}
 	ADDITIONAL_FILES ${${PROJECT_NAME}_HEADERS}
 	ARGS
 	)
 
-static_analysis_cppcheck(
+cppcheck(
 	TARGET ${PROJECT_NAME}
 	ADDITIONAL_FILES ${${PROJECT_NAME}_HEADERS}
 	ARGS

@@ -102,13 +102,20 @@ CPMAddPackage(
 	DOWNLOAD_ONLY
 	)
 
-list( APPEND CMAKE_MODULE_PATH
+list( PREPEND CMAKE_MODULE_PATH
 	"${FETCHCONTENT_BASE_DIR}/cmake-utils-src"
 	)
 
-include( StaticTools )
-include( ClangBuildAnalyzer )
-include( Sanitizers )
+set( CMAKE_UTILS
+	CLANG_BUILD_ANALYZER
+	CLANG_FORMAT
+	CLANG_TIDY
+	CPPCHECK
+	IWYU
+	LIZARD
+	SANITIZERS
+	)
+include( CMakeUtils )
 
 add_subdirectory( "${CMAKE_SOURCE_DIR}/src" )
 add_subdirectory( "${CMAKE_SOURCE_DIR}/test" )
