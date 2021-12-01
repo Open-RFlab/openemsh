@@ -1,5 +1,8 @@
 
-set( SOURCES_DOMAIN
+add_library( openemsh SHARED )
+
+target_sources( openemsh
+	PRIVATE
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/relation.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/bounding.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/coord.cpp"
@@ -20,83 +23,50 @@ set( SOURCES_DOMAIN
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/board.cpp"
 	)
 
-#[[
-set( HEADERS
-	"${CMAKE_CURRENT_SOURCE_DIR}/domain/board.hpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/domain/edge.hpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/domain/point.hpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/domain/polygon.hpp"
-	)
-#]]
-
-add_library( ${PROJECT_NAME} SHARED )
-
-target_sources( ${PROJECT_NAME}
-	PRIVATE
-	${SOURCES_DOMAIN}
-#	"${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
-	)
-
-target_compile_definitions( ${PROJECT_NAME}
+target_compile_definitions( openemsh
 	PRIVATE
 	$<$<CONFIG:Debug>:DEBUG>
 	)
 
-target_compile_features( ${PROJECT_NAME}
+target_compile_features( openemsh
 	PRIVATE
 	cxx_std_17
 	)
 
-target_compile_options( ${PROJECT_NAME}
+target_compile_options( openemsh
 	PRIVATE
 	$<$<CONFIG:Coverage>:-O0>
 	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Wall>
 	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Wextra>
 #	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Weffc++>
 	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-fexceptions>
-	$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:GNU>>:--coverage>
-	$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:Clang>>:-fprofile-instr-generate>
-	$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:Clang>>:-fcoverage-mapping>
 	)
 
-target_include_directories( ${PROJECT_NAME}
+target_include_directories( openemsh
 	PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}
 	)
 
-target_link_libraries( ${PROJECT_NAME}
-	$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:GNU>>:-lgcov>
-	)
-
-target_link_options( ${PROJECT_NAME}
-	PRIVATE
-	$<$<AND:$<CONFIG:Coverage>,$<CXX_COMPILER_ID:Clang>>:-fprofile-instr-generate>
-	)
-
 #[[
-set_target_properties( ${PROJECT_NAME} PROPERTIES
-	OUTPUT_NAME "openemsh"
-	)
-
 install(
-	TARGETS ${PROJECT_NAME}
+	TARGETS openemsh
 	CONFIGURATIONS Release
 	RUNTIME DESTINATION "bin" #"${CMAKE_INSTALL_BINDIR}"
 	)
 #]]
 
-file( GLOB_RECURSE ${PROJECT_NAME}_HEADERS "*.hpp" )
+file( GLOB_RECURSE OPENEMSH_HEADERS "*.hpp" )
 
 lizard(
-	TARGET ${PROJECT_NAME}
-	ADDITIONAL_FILES ${${PROJECT_NAME}_HEADERS}
+	TARGET openemsh
+	ADDITIONAL_FILES ${OPENEMSH_HEADERS}
 	ARGS
 		--languages cpp
 		--sort cyclomatic_complexity
 	)
 
 iwyu(
-	TARGET ${PROJECT_NAME}
+	TARGET openemsh
 	ARGS
 		--std=c++17 # Useless with -p ?
 #		-p="${CMAKE_BINARY_DIR}" # Outdated iwyu version.
@@ -105,30 +75,30 @@ iwyu(
 	)
 
 clang_tidy(
-	TARGET ${PROJECT_NAME}
+	TARGET openemsh
 	ARGS
 		-p="${CMAKE_BINARY_DIR}"
 		-checks=*
 	)
 
 clang_format(
-	TARGET ${PROJECT_NAME}
-	ADDITIONAL_FILES ${${PROJECT_NAME}_HEADERS}
+	TARGET openemsh
+	ADDITIONAL_FILES ${OPENEMSH_HEADERS}
 	ARGS
 	)
 
 cppcheck(
-	TARGET ${PROJECT_NAME}
-	ADDITIONAL_FILES ${${PROJECT_NAME}_HEADERS}
+	TARGET openemsh
+	ADDITIONAL_FILES ${OPENEMSH_HEADERS}
 	ARGS
 #		--enable=all
 #		-v
 	)
 
 enable_clang_build_analyzer(
-	TARGET ${PROJECT_NAME}
+	TARGET openemsh
 	)
 
 enable_sanitizers(
-	TARGET ${PROJECT_NAME}
+	TARGET openemsh
 	)
