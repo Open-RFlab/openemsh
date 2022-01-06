@@ -14,6 +14,19 @@
 
 using namespace std;
 
+namespace {
+
+//******************************************************************************
+bool are_parallel(Segment const& a, Segment const& b) {
+	Point a_vec(a.p1() - a.p0());
+	Point b_vec(b.p1() - b.p0());
+	return (a.axis == Segment::Axis::H && b.axis == Segment::Axis::H)
+		|| (a.axis == Segment::Axis::V && b.axis == Segment::Axis::V)
+		|| (a_vec.y / a_vec.x == b_vec.y / b_vec.x);
+}
+
+} // namespace
+
 //******************************************************************************
 Segment::Segment(Axis const axis)
 : axis(axis)
@@ -120,11 +133,7 @@ optional<Point> intersection(Segment const& a, Segment const& b) {
 /// @warning Assume segments are OVERLAPPING.
 ///*****************************************************************************
 optional<Range> merge(Segment const& a, Segment const& b) {
-	Point a_vec(a.p1() - a.p0());
-	Point b_vec(b.p1() - b.p0());
-	if((a.axis == Segment::Axis::H && b.axis == Segment::Axis::H)
-	|| (a.axis == Segment::Axis::V && b.axis == Segment::Axis::V)
-	|| (a_vec.y / a_vec.x == b_vec.y / b_vec.x)) {
+	if(are_parallel(a, b)) {
 		Bounding2D a_bnd(bounding(a));
 		Bounding2D b_bnd(bounding(b));
 
@@ -171,11 +180,7 @@ Point mid(Segment const& a) {
 /// Returns nullopt if edges are not prallels or if boundings do not overlap.
 ///*****************************************************************************
 optional<Range> overlap(Segment const& a, Segment const& b) {
-	Point a_vec(a.p1() - a.p0());
-	Point b_vec(b.p1() - b.p0());
-	if((a.axis == Segment::Axis::H && b.axis == Segment::Axis::H)
-	|| (a.axis == Segment::Axis::V && b.axis == Segment::Axis::V)
-	|| (a_vec.y / a_vec.x == b_vec.y / b_vec.x)) {
+	if(are_parallel(a, b)) {
 		Bounding2D a_bnd(bounding(a));
 		Bounding2D b_bnd(bounding(b));
 
