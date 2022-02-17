@@ -116,28 +116,30 @@ class Interval:
 			return c2_dmax
 
 	@staticmethod
-	def adjust_d(c: Couple, dmax: float, s: float, lmin: float) -> [float, bool]:
+	def adjust_d(c: Couple, dmax: float, s: float, lmin: float, iter_limit = np.inf) -> [float, bool]:
 		step = 1000
 		d = c.d
 
 		current_lz = c.lz
 		current_ls = c.ls
 
-		print("\nd : ", d)
 		counter = 0
 		error = False
-		while(np.size(current_lz) > np.size(current_ls) or current_ls[-1] < lmin):
+		while(np.size(current_lz) > np.size(current_ls) or np.size(current_ls[:-1]) < lmin):
 			d -= d / step
 			current_lz = Interval.find_lz(d, c.lmbda, dmax)
 			current_ls = Interval.find_ls(d, c.lmbda, dmax, s)
-			print("d : ", d)
 
 			counter += 1
-			if counter >= 100:
-				print("WARNING: adjusting d is not enough (" + str(np.size(current_ls)) + " lines)")
+			if counter >= iter_limit:
+				print("adjust_d() | WARNING : iteration limit reached")
 				error = True
 				break
 
+		print()
+		print("adjust_d() | iterations : " + str(counter))
+		print("adjust_d() | d : ", d)
+		print("adjust_d() | ls : " + str(np.size(current_ls)) + " lines")
 		return d, error
 
 	def solve(self):
