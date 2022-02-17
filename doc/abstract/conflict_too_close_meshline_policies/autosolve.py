@@ -109,8 +109,8 @@ class Interval:
 
 	@staticmethod
 	def find_dmax(c1: Couple, c2: Couple, dmax: float) -> float:
-		c1_dmax = Couple.find_dmax(c1, dmax)
-		c2_dmax = Couple.find_dmax(c2, dmax)
+		c1_dmax = c1.find_dmax(dmax)
+		c2_dmax = c2.find_dmax(dmax)
 		if c1_dmax > c2_dmax:
 			return c1_dmax
 		else:
@@ -205,39 +205,43 @@ class Scene:
 	def append_solved_stop_lines(self, solved_stop_lines: np.array):
 		self.solved_stop_lines = np.append(self.solved_stop_lines, solved_stop_lines)
 
-def to_scene(i: Interval) -> Scene:
+def to_scene(i: Interval, with_c1: bool = True, with_c2: bool = True) -> Scene:
 	s = Scene()
 
 	c1_x = i.c1_init.x
 	c2_x = i.c2_init.x
 	c1_init_pos = c1_x + i.c1_init.d/2
 	c2_init_pos = c2_x - i.c2_init.d/2
-
-	s.append_position_lines([c1_x, i.m, c2_x])
-	s.append_initial_rule_lines([c1_x - i.c1_init.d/2, c1_x + i.c1_init.d/2])
-	s.append_initial_rule_lines([c2_x - i.c2_init.d/2, c2_x + i.c2_init.d/2])
-#	s.append_initial_stop_lines([i.c1_init.ls[-1]] if np.size(i.c1_init.ls) >= 1 else [])
-	if np.size(i.c1_init.ls) >= 1:
-		s.append_initial_stop_lines([c1_init_pos + i.c1_init.ls[-1]])
-	if np.size(i.c2_init.ls) >= 1:
-		s.append_initial_stop_lines([c2_init_pos - i.c2_init.ls[-1]])
-	if np.size(i.c1_init.ls) >= 2:
-		s.append_initial_fill_lines(c1_init_pos + i.c1_init.ls[:-1])
-	if np.size(i.c2_init.ls) >= 2:
-		s.append_initial_fill_lines(c2_init_pos - i.c2_init.ls[:-1])
-
 	c1_solved_pos = c1_x + i.c1_solved.d/2
 	c2_solved_pos = c2_x - i.c2_solved.d/2
-	s.append_solved_rule_lines([c1_x - i.c1_solved.d/2, c1_x + i.c1_solved.d/2])
-	s.append_solved_rule_lines([c2_x - i.c2_solved.d/2, c2_x + i.c2_solved.d/2])
-	if np.size(i.c1_solved.ls) >= 1:
-		s.append_solved_stop_lines([c1_solved_pos + i.c1_solved.ls[-1]])
-	if np.size(i.c2_solved.ls) >= 1:
-		s.append_solved_stop_lines([c2_solved_pos - i.c2_solved.ls[-1]])
-	if np.size(i.c1_solved.ls) >= 2:
-		s.append_solved_fill_lines(c1_solved_pos + i.c1_solved.ls[:-1])
-	if np.size(i.c2_solved.ls) >= 2:
-		s.append_solved_fill_lines(c2_solved_pos - i.c2_solved.ls[:-1])
+
+	s.append_position_lines([c1_x, i.m, c2_x])
+
+	if with_c1:
+		s.append_initial_rule_lines([c1_x - i.c1_init.d/2, c1_x + i.c1_init.d/2])
+		if np.size(i.c1_init.ls) >= 1:
+			s.append_initial_stop_lines([c1_init_pos + i.c1_init.ls[-1]])
+		if np.size(i.c1_init.ls) >= 2:
+			s.append_initial_fill_lines(c1_init_pos + i.c1_init.ls[:-1])
+
+		s.append_solved_rule_lines([c1_x - i.c1_solved.d/2, c1_x + i.c1_solved.d/2])
+		if np.size(i.c1_solved.ls) >= 1:
+			s.append_solved_stop_lines([c1_solved_pos + i.c1_solved.ls[-1]])
+		if np.size(i.c1_solved.ls) >= 2:
+			s.append_solved_fill_lines(c1_solved_pos + i.c1_solved.ls[:-1])
+
+	if with_c2:
+		s.append_initial_rule_lines([c2_x - i.c2_init.d/2, c2_x + i.c2_init.d/2])
+		if np.size(i.c2_init.ls) >= 1:
+			s.append_initial_stop_lines([c2_init_pos - i.c2_init.ls[-1]])
+		if np.size(i.c2_init.ls) >= 2:
+			s.append_initial_fill_lines(c2_init_pos - i.c2_init.ls[:-1])
+
+		s.append_solved_rule_lines([c2_x - i.c2_solved.d/2, c2_x + i.c2_solved.d/2])
+		if np.size(i.c2_solved.ls) >= 1:
+			s.append_solved_stop_lines([c2_solved_pos - i.c2_solved.ls[-1]])
+		if np.size(i.c2_solved.ls) >= 2:
+			s.append_solved_fill_lines(c2_solved_pos - i.c2_solved.ls[:-1])
 
 	return s
 
@@ -333,7 +337,9 @@ def try_scene(
 	c1_x: float = 0,
 	c1_d_div: float = 0,
 	c2_x: float = 0,
-	c2_d_div: float = 0
+	c2_d_div: float = 0,
+	with_c1: bool = True,
+	with_c2: bool = True
 ):
 	i = Interval(
 		dmax,
@@ -342,25 +348,32 @@ def try_scene(
 		c2_x, dmax / c2_d_div)
 
 	i.solve()
-	draw_scene(to_scene(i), title)
+	draw_scene(to_scene(i, with_c1, with_c2), title)
 
 
 
 if __name__ == "__main__":
+
+	with_c1 = False
+	with_c2 = True
+
 	try_scene(
 		dmax=0.3,
-		lmin=7,
+		lmin=37,
 		c1_x=1.3, c1_d_div=100,
-		c2_x=6.0, c2_d_div=1.2)
+		c2_x=6.0, c2_d_div=1.2,
+		with_c1=with_c1, with_c2=with_c2)
 
 	try_scene(
 		dmax=2.5,
 		lmin=2,
 		c1_x=1.3, c1_d_div=100,
-		c2_x=6.0, c2_d_div=3.3)
+		c2_x=6.0, c2_d_div=3.3,
+		with_c1=with_c1, with_c2=with_c2)
 
 	try_scene(
 		dmax=3.5,
 		lmin=2,
 		c1_x=1.3, c1_d_div=2,
-		c2_x=6.0, c2_d_div=2)
+		c2_x=6.0, c2_d_div=2,
+		with_c1=with_c1, with_c2=with_c2)
