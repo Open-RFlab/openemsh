@@ -3,11 +3,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-#def dump(obj):
-#	for attr in dir(obj):
-#		if hasattr(obj, attr):
-#			print("obj.%s = %s" % (attr, getattr(obj, attr)))
-
 
 
 class Couple:
@@ -15,13 +10,147 @@ class Couple:
 	Couple of lines, describe 3rds rule or 2nds rule lines around an edge.
 	- x: Position of the couple (of the edge).
 	- d: Distance between 2 rule lines.
-	- lmbda: Smoothness factor [0.5, 2].
+	- lmbda: Factor between 2 adjacent d.
+	- lz: List of lines until dmax. Z is distance between rule line and last
+	  line before d = dmax. Last z line is after dmax.
+	- ls: List of lines until m. S is distance between rule line and m. Last
+	  s line is after m.
 	"""
+	lmbda: float = 2
+	x: float
+	d: float
+	lz: np.array(float) = []
+	ls: np.array(float) = []
 
-	def __init__(self, x: float, d: float, lmbda: float):
+	def __init__(self, x: float, d: float, dmax: float, s: float):
 		self.x = x
 		self.d = d
-		self.lmbda = lmbda
+		self.find_lz(dmax)
+		self.find_ls(dmax, s)
+
+	def find_dmax(self, dmax: float) -> float:
+		if np.size(self.lz) <= np.size(self.ls): 
+			return dmax
+		else:
+			return self.lz[np.size(self.ls)-1] - self.lz[np.size(self.ls)-2]
+
+	def find_lz(self, dmax: float):
+		self.lz = Interval.find_lz(self.d, self.lmbda, dmax)
+
+	def find_ls(self, dmax: float, s: float):
+		self.ls = Interval.find_ls(self.d, self.lmbda, dmax, s)
+
+	def adjust_d(self, dmax: float, s: float, lmin: float) -> bool:
+		self.d, error = Interval.adjust_d(self, dmax, s, lmin)
+		self.find_lz(dmax)
+		self.find_ls(dmax, s)
+		return error
+
+class Interval:
+	"""
+	- dmax: Local maximal distance between 2 adjacent lines.
+	- lmin: Local minimum of lines.
+	- m: Middle between c1.x and c2.x.
+	- s: Distance between c1.x and c2.x (or c1 and c2?).
+	"""
+
+	def __init__(self,
+		dmax: float,
+		lmin: int,
+		c1_x: float,
+		c1_d: float,
+		c2_x: float,
+		c2_d: float
+	):
+		self.dmax_init: float = dmax
+		self.lmin: int = lmin
+		self.m: float = (c1_x + c2_x) / 2
+		self.s: float = abs(c1_x - c2_x) / 2 # TODO between x or x + d/2 ?
+
+		self.c1_init: Couple = Couple(c1_x, c1_d, self.dmax_init, self.s)
+		self.c2_init: Couple = Couple(c2_x, c2_d, self.dmax_init, self.s)
+
+		self.dmax_solved: float = self.find_dmax(self.c1_init, self.c2_init, self.dmax_init)
+
+		self.c1_solved: Couple = Couple(c1_x, c1_d, self.dmax_solved, self.s)
+		self.c2_solved: Couple = Couple(c2_x, c2_d, self.dmax_solved, self.s)
+
+	@staticmethod
+	def find_lz(d: float, lmbda: float, dmax: float) -> np.array(float):
+		if lmbda == 1:
+			return [float('inf')]
+
+		z = 0
+		lz: np.array = []
+		current_d = d
+		while current_d < dmax:
+			current_d *= lmbda
+			if current_d < dmax:
+				z += current_d
+				lz = np.append(lz, z)
+
+		return lz
+
+	@staticmethod
+	def find_ls(d: float, lmbda: float, dmax: float, s: float) -> np.array(float):
+		current_s = 0
+		ls: np.array = []
+		current_d = d
+		while current_s < s:
+			if current_d < dmax:
+				current_d *= lmbda
+				if current_d > dmax:
+					current_d = dmax
+			current_s += current_d
+			ls = np.append(ls, current_s)
+
+		return ls
+
+	@staticmethod
+	def find_dmax(c1: Couple, c2: Couple, dmax: float) -> float:
+		c1_dmax = Couple.find_dmax(c1, dmax)
+		c2_dmax = Couple.find_dmax(c2, dmax)
+		if c1_dmax > c2_dmax:
+			return c1_dmax
+		else:
+			return c2_dmax
+
+	@staticmethod
+	def adjust_d(c: Couple, dmax: float, s: float, lmin: float) -> [float, bool]:
+		step = 1000
+		d = c.d
+
+		current_lz = c.lz
+		current_ls = c.ls
+
+		print("\nd : ", d)
+		counter = 0
+		error = False
+		while(np.size(current_lz) > np.size(current_ls) or current_ls[-1] < lmin):
+			d -= d / step
+			current_lz = Interval.find_lz(d, c.lmbda, dmax)
+			current_ls = Interval.find_ls(d, c.lmbda, dmax, s)
+			print("d : ", d)
+
+			counter += 1
+			if counter >= 100:
+				print("WARNING: adjusting d is not enough (" + str(np.size(current_ls)) + " lines)")
+				error = True
+				break
+
+		return d, error
+
+	def solve(self):
+		# TODO
+		# adjust d↓ to satisfy z <= s & ls >= lmin
+		# TODO.2 ^^^ why this condition??
+		# TODO.2 adjust d↓ to satisfy also ls[-1] = m || R.ls[-1] - L.ls[-1] = dmax_solved ???
+		# TODO.2 or between dmax and dmax_solved?
+		# adjust lambda↓ to satisfy ls[-1] = m || R.ls[-1] L.ls[-1] = dmax_solved
+		self.c1_solved.adjust_d(self.dmax_solved, self.s, self.lmin)
+		self.c2_solved.adjust_d(self.dmax_solved, self.s, self.lmin)
+
+
 
 class Scene:
 	"""
@@ -35,17 +164,19 @@ class Scene:
 
 	def __init__(self):
 		self.position_lines: np.array = []
-		self.rule_lines: np.array = []
+		self.initial_rule_lines: np.array = []
 		self.initial_fill_lines: np.array = []
 		self.initial_stop_lines: np.array = []
+		self.solved_rule_lines: np.array = []
 		self.solved_fill_lines: np.array = []
 		self.solved_stop_lines: np.array = []
 
 	def __iadd__(self, other):
 		self.position_lines = np.append(self.position_lines, other.position_lines)
-		self.rule_lines = np.append(self.rule_lines, other.rule_lines)
+		self.initial_rule_lines = np.append(self.initial_rule_lines, other.initial_rule_lines)
 		self.initial_fill_lines = np.append(self.initial_fill_lines, other.initial_fill_lines)
 		self.initial_stop_lines = np.append(self.initial_stop_lines, other.initial_stop_lines)
+		self.solved_rule_lines = np.append(self.solved_rule_lines, other.solved_rule_lines)
 		self.solved_fill_lines = np.append(self.solved_fill_lines, other.solved_fill_lines)
 		self.solved_stop_lines = np.append(self.solved_stop_lines, other.solved_stop_lines)
 		return self
@@ -53,8 +184,8 @@ class Scene:
 	def append_position_lines(self, position_lines: np.array):
 		self.position_lines = np.append(self.position_lines, position_lines)
 
-	def append_rule_lines(self, rule_lines: np.array):
-		self.rule_lines = np.append(self.rule_lines, rule_lines)
+	def append_initial_rule_lines(self, initial_rule_lines: np.array):
+		self.initial_rule_lines = np.append(self.initial_rule_lines, initial_rule_lines)
 
 	def append_initial_fill_lines(self, initial_fill_lines: np.array):
 		self.initial_fill_lines = np.append(self.initial_fill_lines, initial_fill_lines)
@@ -62,11 +193,50 @@ class Scene:
 	def append_initial_stop_lines(self, initial_stop_lines: np.array):
 		self.initial_stop_lines = np.append(self.initial_stop_lines, initial_stop_lines)
 
+	def append_solved_rule_lines(self, solved_rule_lines: np.array):
+		self.solved_rule_lines = np.append(self.solved_rule_lines, solved_rule_lines)
+
 	def append_solved_fill_lines(self, solved_fill_lines: np.array):
 		self.solved_fill_lines = np.append(self.solved_fill_lines, solved_fill_lines)
 
 	def append_solved_stop_lines(self, solved_stop_lines: np.array):
 		self.solved_stop_lines = np.append(self.solved_stop_lines, solved_stop_lines)
+
+def to_scene(i: Interval) -> Scene:
+	s = Scene()
+
+	c1_x = i.c1_init.x
+	c2_x = i.c2_init.x
+	c1_init_pos = c1_x + i.c1_init.d/2
+	c2_init_pos = c2_x - i.c2_init.d/2
+
+	s.append_position_lines([c1_x, i.m, c2_x])
+	s.append_initial_rule_lines([c1_x - i.c1_init.d/2, c1_x + i.c1_init.d/2])
+	s.append_initial_rule_lines([c2_x - i.c2_init.d/2, c2_x + i.c2_init.d/2])
+#	s.append_initial_stop_lines([i.c1_init.ls[-1]] if np.size(i.c1_init.ls) >= 1 else [])
+	if np.size(i.c1_init.ls) >= 1:
+		s.append_initial_stop_lines([c1_init_pos + i.c1_init.ls[-1]])
+	if np.size(i.c2_init.ls) >= 1:
+		s.append_initial_stop_lines([c2_init_pos - i.c2_init.ls[-1]])
+	if np.size(i.c1_init.ls) >= 2:
+		s.append_initial_fill_lines(c1_init_pos + i.c1_init.ls[:-1])
+	if np.size(i.c2_init.ls) >= 2:
+		s.append_initial_fill_lines(c2_init_pos - i.c2_init.ls[:-1])
+
+	c1_solved_pos = c1_x + i.c1_solved.d/2
+	c2_solved_pos = c2_x - i.c2_solved.d/2
+	s.append_solved_rule_lines([c1_x - i.c1_solved.d/2, c1_x + i.c1_solved.d/2])
+	s.append_solved_rule_lines([c2_x - i.c2_solved.d/2, c2_x + i.c2_solved.d/2])
+	if np.size(i.c1_solved.ls) >= 1:
+		s.append_solved_stop_lines([c1_solved_pos + i.c1_solved.ls[-1]])
+	if np.size(i.c2_solved.ls) >= 1:
+		s.append_solved_stop_lines([c2_solved_pos - i.c2_solved.ls[-1]])
+	if np.size(i.c1_solved.ls) >= 2:
+		s.append_solved_fill_lines(c1_solved_pos + i.c1_solved.ls[:-1])
+	if np.size(i.c2_solved.ls) >= 2:
+		s.append_solved_fill_lines(c2_solved_pos - i.c2_solved.ls[:-1])
+
+	return s
 
 def plot_matplotlib(
 	axs,
@@ -89,14 +259,14 @@ def plot_matplotlib(
 			color="grey",
 			linestyle="dotted",
 			linewidth=2)
-	for line in scene.rule_lines:
-		axs[plot_matplotlib.plot_counter].axvline(
-			x=line,
-			color="darkorange",
-			linestyle="solid",
-			linewidth=2)
 
 	if show_initial_lines:
+		for line in scene.initial_rule_lines:
+			axs[plot_matplotlib.plot_counter].axvline(
+				x=line,
+				color="darkorange",
+				linestyle="dotted",
+				linewidth=2)
 		for line in scene.initial_fill_lines:
 			axs[plot_matplotlib.plot_counter].axvline(
 				x=line,
@@ -112,6 +282,12 @@ def plot_matplotlib(
 					linewidth=1)
 
 	if show_solved_lines:
+		for line in scene.solved_rule_lines:
+			axs[plot_matplotlib.plot_counter].axvline(
+				x=line,
+				color="darkorange",
+				linestyle="solid",
+				linewidth=2)
 		for line in scene.solved_fill_lines:
 			axs[plot_matplotlib.plot_counter].axvline(
 				x=line,
@@ -128,125 +304,13 @@ def plot_matplotlib(
 	plot_matplotlib.plot_counter += 1
 plot_matplotlib.plot_counter = 0
 
-def solve_conflict(
-	algorithm: str,
-	lmin: float,
-	dmax: float,
-	c1: Couple,
-	c2: Couple,
-	solve_c1: bool = True,
-	solve_c2: bool = True
-) -> Scene:
-	mid = (c1.x + c2.x) / 2
-	scene: Scene = Scene()
-	scene.append_position_lines(c1.x)
-	scene.append_position_lines(c2.x)
-	scene.append_position_lines(mid)
-
-	scene.append_rule_lines(c1.x - c1.d / 2)
-	scene.append_rule_lines(c1.x + c1.d / 2)
-	scene.append_rule_lines(c2.x - c2.d / 2)
-	scene.append_rule_lines(c2.x + c2.d / 2)
-
-	if(algorithm == "A"):
-		if(solve_c1):
-			scene += fill_a(c1.x, mid, c1.d, c1.lmbda, dmax)
-		if(solve_c2):
-			scene += fill_a(c2.x, mid, c2.d, c2.lmbda, dmax)
-	return scene
-
-
-
-# Algorithm A functions
-################################################################################
-
-def findlines_a(
-	fromm: float,
-	to: float,
-	d: float,
-	lmbda: float,
-	dmax: float
-) -> np.array:
-	if(fromm < to):
-		dir_factor = 1
-	else:
-		dir_factor = -1
-
-	lines: np.array = []
-	n_line = 0
-	last_pos = fromm + d / 2 * dir_factor
-	current_d = d * lmbda
-	while((dir_factor == 1 and last_pos < to)
-		or (dir_factor == -1 and last_pos > to)
-	):
-		n_line += 1
-		if(current_d > dmax):
-			current_d = dmax
-
-		current_pos = last_pos + current_d * dir_factor
-
-		if(n_line != 0):
-			lines = np.append(lines, current_pos)
-
-		current_d = abs(current_pos - last_pos) * lmbda
-		last_pos = current_pos
-	return lines
-
-def fill_a(
-	fromm: float,
-	to : float,
-	d: float,
-	lmbda: float,
-	dmax: float
-) -> Scene:
-	"""
-	Smoothness min algorithm.
-	Try to find a suitable set of lines to fill the space between fromm and to
-	by increasing the smoothness of resolution transition (reducing lmbda, aka
-	the smoothness factor down to 1).
-	"""
-	step = lmbda / 1000
-
-	lines = findlines_a(fromm, to, d, lmbda, dmax)
-	n_lines = np.size(lines)
-	space = abs(lines[-1] - to)
-
-	scene = Scene()
-	scene.append_initial_fill_lines(lines[0:-1])
-	scene.append_initial_stop_lines(lines[-1])
-
-	while(lmbda >= 1):
-		lmbda = lmbda - step;
-		newlines = findlines_a(fromm, to, d, lmbda, dmax)
-		newspace = abs(newlines[-1] - to)
-		if(newspace < space):
-			space = newspace
-			lines = newlines
-		else:
-			break
-
-	scene.append_solved_fill_lines(lines[0:-1])
-	scene.append_solved_stop_lines(lines[-1])
-	return scene
-
-def draw_algorithm_a(
-	lmin: float,
-	dmax: float,
-	c1: Couple,
-	c2: Couple,
+def draw_scene(
+	s: Scene,
 	title: str = ""
 ):
-	"""
-	Draw a board with each step of the resolution of a conflict through the
-	algorithm A.
-	"""
-	s = solve_conflict("A", lmin, dmax, c1, c2,
-		solve_c1=True,
-		solve_c2=True)
-
-	fig = plt.figure(draw_algorithm_a.fig_counter, figsize=(25, 8))
+	fig = plt.figure(draw_scene.fig_counter, figsize=(25, 8))
 	axs = fig.subplots(4, 1, sharex=True)
-	fig.suptitle("Algorithm A : Increase smoothness only\n" + title, fontsize=16)
+	fig.suptitle(title, fontsize=16)
 
 	plot_matplotlib(axs, s, show_solved_lines=False)
 	plot_matplotlib(axs, s)
@@ -256,26 +320,44 @@ def draw_algorithm_a(
 	plt.show()
 
 	plot_matplotlib.plot_counter = 0
-	draw_algorithm_a.fig_counter += 1
-draw_algorithm_a.fig_counter = 1
+	draw_scene.fig_counter += 1
+draw_scene.fig_counter = 1
+
+def try_scene(
+	title: str = "",
+	dmax: float = 0,
+	lmin: int = 0,
+	c1_x: float = 0,
+	c1_d_div: float = 0,
+	c2_x: float = 0,
+	c2_d_div: float = 0
+):
+	i = Interval(
+		dmax,
+		lmin,
+		c1_x, dmax / c1_d_div,
+		c2_x, dmax / c2_d_div)
+
+	i.solve()
+	draw_scene(to_scene(i), title)
 
 
 
 if __name__ == "__main__":
-	lmin = 2
-	dmax = 0.3
-	c1 = Couple(1.3, dmax / 100, 2)
-	c2 = Couple(6.0, dmax / 1.2, 2)
-	draw_algorithm_a(lmin, dmax, c1, c2, "Does not work if d/dmax is too near of 1")
+	try_scene(
+		dmax=0.3,
+		lmin=7,
+		c1_x=1.3, c1_d_div=100,
+		c2_x=6.0, c2_d_div=1.2)
 
-	lmin = 2
-	dmax = 2.5
-	c1 = Couple(1.3, dmax / 100, 2)
-	c2 = Couple(6.0, dmax / 3.3, 2)
-	draw_algorithm_a(lmin, dmax, c1, c2)
+	try_scene(
+		dmax=2.5,
+		lmin=2,
+		c1_x=1.3, c1_d_div=100,
+		c2_x=6.0, c2_d_div=3.3)
 
-	lmin = 2
-	dmax = 3.5
-	c1 = Couple(1.3, dmax / 2, 2)
-	c2 = Couple(6.0, dmax / 2, 2)
-	draw_algorithm_a(lmin, dmax, c1, c2)
+	try_scene(
+		dmax=3.5,
+		lmin=2,
+		c1_x=1.3, c1_d_div=2,
+		c2_x=6.0, c2_d_div=2)
