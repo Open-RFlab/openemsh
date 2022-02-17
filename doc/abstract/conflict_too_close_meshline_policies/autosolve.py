@@ -51,7 +51,8 @@ class Interval:
 	- dmax: Local maximal distance between 2 adjacent lines.
 	- lmin: Local minimum of lines.
 	- m: Middle between c1.x and c2.x.
-	- s: Distance between c1.x and c2.x (or c1 and c2?).
+	- s: Distance between c1.x and c2.x (or c1 and c2?). Must consider d during
+	  calcul about s.
 	"""
 
 	def __init__(self,
@@ -96,7 +97,7 @@ class Interval:
 		current_s = 0
 		ls: np.array = []
 		current_d = d
-		while current_s < s:
+		while current_s < s - d / 2:
 			if current_d < dmax:
 				current_d *= lmbda
 				if current_d > dmax:
