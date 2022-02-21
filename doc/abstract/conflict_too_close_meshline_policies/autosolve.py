@@ -42,11 +42,14 @@ class Couple:
 	def find_ls(self, dmax: float, s: float):
 		self.ls = Interval.find_ls(self.d, self.lmbda, dmax, s)
 
-	def adjust_d(self, dmax: float, s: float) -> bool:
+	def adjust_d(self, dmax: float, s: float):
+		print()
 		self.d, error = Interval.adjust_d_for_dmax_lmin(self, dmax, s, self.lmin)
 		self.find_lz(dmax)
 		self.find_ls(dmax, s)
-		return error
+		self.d, error = Interval.adjust_d_for_s(self, dmax, s, self.lmin)
+		self.find_lz(dmax)
+		self.find_ls(dmax, s)
 
 class Interval:
 	"""
@@ -142,7 +145,6 @@ class Interval:
 
 	@staticmethod
 	def adjust_d_for_dmax_lmin(c: Couple, dmax: float, s: float, lmin: int, iter_limit = np.inf) -> [float, bool]:
-		print()
 		step = 1000
 		d = c.d
 
@@ -162,9 +164,37 @@ class Interval:
 				error = True
 				break
 
-		print("adjust_d() | iterations : " + str(counter))
-		print("adjust_d() | d : ", d)
-		print("adjust_d() | ls : " + str(np.size(current_ls)) + " lines")
+		print("adjust_d_for_dmax_lmin() | iterations : " + str(counter))
+		print("adjust_d_for_dmax_lmin() | d : ", d)
+		print("adjust_d_for_dmax_lmin() | ls : " + str(np.size(current_ls)) + " lines")
+		return d, error
+
+	@staticmethod
+	def adjust_d_for_s(c: Couple, dmax: float, s: float, lmin: int, iter_limit = np.inf) -> [float, bool]:
+		step = 1000
+		d = c.d
+
+		nlines = np.size(c.ls)
+
+		counter = 0
+		error = False
+		while True:
+			current_d = d - d / step
+			current_ls = Interval.find_ls(d, c.lmbda, dmax, s)
+			if np.size(current_ls) > nlines:
+				break
+
+			d = current_d
+
+			counter += 1
+			if counter >= iter_limit:
+				print("adjust_d_for_s() | WARNING : iteration limit reached")
+				error = True
+				break
+
+		print("adjust_d_for_s() | iterations : " + str(counter))
+		print("adjust_d_for_s() | d : ", d)
+		print("adjust_d_for_s() | spaces around middle line : " + str(s - current_ls[-2]) + " <- s -> " + str(current_ls[-1] - s))
 		return d, error
 
 	def solve(self):
