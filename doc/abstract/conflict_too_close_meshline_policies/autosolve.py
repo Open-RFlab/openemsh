@@ -17,14 +17,16 @@ class Couple:
 	  s line is after m.
 	"""
 	lmbda: float = 2
+	lmin: int 
 	x: float
 	d: float
 	lz: np.array(float) = []
 	ls: np.array(float) = []
 
-	def __init__(self, x: float, d: float, dmax: float, s: float):
+	def __init__(self, x: float, d: float, dmax: float, s: float, lmin: int):
 		self.x = x
 		self.d = d
+		self.lmin = lmin
 		self.find_lz(dmax)
 		self.find_ls(dmax, s)
 
@@ -40,8 +42,8 @@ class Couple:
 	def find_ls(self, dmax: float, s: float):
 		self.ls = Interval.find_ls(self.d, self.lmbda, dmax, s)
 
-	def adjust_d(self, dmax: float, s: float, lmin: float) -> bool:
-		self.d, error = Interval.adjust_d(self, dmax, s, lmin)
+	def adjust_d(self, dmax: float, s: float) -> bool:
+		self.d, error = Interval.adjust_d_for_dmax_lmin(self, dmax, s, self.lmin)
 		self.find_lz(dmax)
 		self.find_ls(dmax, s)
 		return error
@@ -61,20 +63,42 @@ class Interval:
 		c1_x: float,
 		c1_d: float,
 		c2_x: float,
-		c2_d: float
+		c2_d: float,
+		c1_lmin: int = 0, # Defaults to lmin
+		c2_lmin: int = 0  # Defaults to lmin
 	):
 		self.dmax_init: float = dmax
 		self.lmin: int = lmin
 		self.m: float = (c1_x + c2_x) / 2
 		self.s: float = abs(c1_x - c2_x) / 2 # TODO between x or x + d/2 ?
 
-		self.c1_init: Couple = Couple(c1_x, c1_d, self.dmax_init, self.s)
-		self.c2_init: Couple = Couple(c2_x, c2_d, self.dmax_init, self.s)
+		self.c1_init: Couple = Couple(
+			c1_x,
+			c1_d,
+			self.dmax_init,
+			self.s,
+			c1_lmin if c1_lmin else self.lmin)
+		self.c2_init: Couple = Couple(
+			c2_x,
+			c2_d,
+			self.dmax_init,
+			self.s,
+			c2_lmin if c2_lmin else self.lmin)
 
 		self.dmax_solved: float = self.find_dmax(self.c1_init, self.c2_init, self.dmax_init)
 
-		self.c1_solved: Couple = Couple(c1_x, c1_d, self.dmax_solved, self.s)
-		self.c2_solved: Couple = Couple(c2_x, c2_d, self.dmax_solved, self.s)
+		self.c1_solved: Couple = Couple(
+			c1_x,
+			c1_d,
+			self.dmax_solved,
+			self.s,
+			c1_lmin if c1_lmin else self.lmin)
+		self.c2_solved: Couple = Couple(
+			c2_x,
+			c2_d,
+			self.dmax_solved,
+			self.s,
+			c2_lmin if c2_lmin else self.lmin)
 
 	@staticmethod
 	def find_lz(d: float, lmbda: float, dmax: float) -> np.array(float):
@@ -117,7 +141,8 @@ class Interval:
 			return c2_dmax
 
 	@staticmethod
-	def adjust_d(c: Couple, dmax: float, s: float, lmin: float, iter_limit = np.inf) -> [float, bool]:
+	def adjust_d_for_dmax_lmin(c: Couple, dmax: float, s: float, lmin: int, iter_limit = np.inf) -> [float, bool]:
+		print()
 		step = 1000
 		d = c.d
 
@@ -126,7 +151,7 @@ class Interval:
 
 		counter = 0
 		error = False
-		while(np.size(current_lz) > np.size(current_ls) or np.size(current_ls[:-1]) < lmin):
+		while np.size(current_lz) > np.size(current_ls) or np.size(current_ls[:-1]) < lmin:
 			d -= d / step
 			current_lz = Interval.find_lz(d, c.lmbda, dmax)
 			current_ls = Interval.find_ls(d, c.lmbda, dmax, s)
@@ -137,7 +162,6 @@ class Interval:
 				error = True
 				break
 
-		print()
 		print("adjust_d() | iterations : " + str(counter))
 		print("adjust_d() | d : ", d)
 		print("adjust_d() | ls : " + str(np.size(current_ls)) + " lines")
@@ -150,8 +174,8 @@ class Interval:
 		# TODO.2 adjust d↓ to satisfy also ls[-1] = m || R.ls[-1] - L.ls[-1] = dmax_solved ???
 		# TODO.2 or between dmax and dmax_solved?
 		# adjust lambda↓ to satisfy ls[-1] = m || R.ls[-1] L.ls[-1] = dmax_solved
-		self.c1_solved.adjust_d(self.dmax_solved, self.s, self.lmin)
-		self.c2_solved.adjust_d(self.dmax_solved, self.s, self.lmin)
+		self.c1_solved.adjust_d(self.dmax_solved, self.s)
+		self.c2_solved.adjust_d(self.dmax_solved, self.s)
 
 
 
@@ -336,8 +360,10 @@ def try_scene(
 	lmin: int = 0,
 	c1_x: float = 0,
 	c1_d_div: float = 0,
+	c1_lmin: int = 0,
 	c2_x: float = 0,
 	c2_d_div: float = 0,
+	c2_lmin: int = 0,
 	with_c1: bool = True,
 	with_c2: bool = True
 ):
@@ -345,7 +371,9 @@ def try_scene(
 		dmax,
 		lmin,
 		c1_x, dmax / c1_d_div,
-		c2_x, dmax / c2_d_div)
+		c2_x, dmax / c2_d_div,
+		c1_lmin,
+		c2_lmin)
 
 	i.solve()
 	draw_scene(to_scene(i, with_c1, with_c2), title)
@@ -354,19 +382,19 @@ def try_scene(
 
 if __name__ == "__main__":
 
-	with_c1 = False
+	with_c1 = True
 	with_c2 = True
 
 	try_scene(
 		dmax=0.3,
 		lmin=37,
-		c1_x=1.3, c1_d_div=100,
+		c1_x=1.3, c1_d_div=100, c1_lmin=10,
 		c2_x=6.0, c2_d_div=1.2,
 		with_c1=with_c1, with_c2=with_c2)
 
 	try_scene(
 		dmax=2.5,
-		lmin=2,
+		lmin=10,
 		c1_x=1.3, c1_d_div=100,
 		c2_x=6.0, c2_d_div=3.3,
 		with_c1=with_c1, with_c2=with_c2)
@@ -375,5 +403,5 @@ if __name__ == "__main__":
 		dmax=3.5,
 		lmin=2,
 		c1_x=1.3, c1_d_div=2,
-		c2_x=6.0, c2_d_div=2,
+		c2_x=6.0, c2_d_div=2, c2_lmin=20,
 		with_c1=with_c1, with_c2=with_c2)
