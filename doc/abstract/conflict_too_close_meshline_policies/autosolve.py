@@ -81,20 +81,22 @@ class Interval:
 		self.c1: list(Couple) = []
 		self.c2: list(Couple) = []
 
-		self.c1.append(Couple(
+		c1 = Couple(
 			c1_x,
 			c1_d,
 			self.dmax_init,
 			self.s,
-			c1_lmin if c1_lmin else self.lmin))
-		self.c2.append(Couple(
+			c1_lmin if c1_lmin else self.lmin)
+		c2 = Couple(
 			c2_x,
 			c2_d,
 			self.dmax_init,
 			self.s,
-			c2_lmin if c2_lmin else self.lmin))
+			c2_lmin if c2_lmin else self.lmin)
 
-		self.dmax_solved: float = self.find_dmax(self.c1[0], self.c2[0], self.dmax_init)
+		self.dmax_solved: float = self.find_dmax(c1, c2, self.dmax_init)
+		print()
+		print("Interval | dmax : " + str(dmax) + " -> " + str(self.dmax_solved))
 
 		self.c1.append(Couple(
 			c1_x,
@@ -228,97 +230,67 @@ class Scene:
 	"""
 	- positions (edges + middle)
 	- rule lines
-	- initial fill lines
-	- initial stop lines
-	- solved fill lines
-	- solved stop lines
+	- fill lines
+	- stop lines
 	"""
 
 	def __init__(self):
 		self.position_lines: np.array = []
-		self.initial_rule_lines: np.array = []
-		self.initial_fill_lines: np.array = []
-		self.initial_stop_lines: np.array = []
-		self.solved_rule_lines: np.array = []
-		self.solved_fill_lines: np.array = []
-		self.solved_stop_lines: np.array = []
+		self.rule_lines: list(np.array) = []
+		self.fill_lines: list(np.array) = []
+		self.stop_lines: list(np.array) = []
 
-	def __iadd__(self, other):
-		self.position_lines = np.append(self.position_lines, other.position_lines)
-		self.initial_rule_lines = np.append(self.initial_rule_lines, other.initial_rule_lines)
-		self.initial_fill_lines = np.append(self.initial_fill_lines, other.initial_fill_lines)
-		self.initial_stop_lines = np.append(self.initial_stop_lines, other.initial_stop_lines)
-		self.solved_rule_lines = np.append(self.solved_rule_lines, other.solved_rule_lines)
-		self.solved_fill_lines = np.append(self.solved_fill_lines, other.solved_fill_lines)
-		self.solved_stop_lines = np.append(self.solved_stop_lines, other.solved_stop_lines)
-		return self
+	def new_step(self):
+		self.rule_lines.append([])
+		self.fill_lines.append([])
+		self.stop_lines.append([])
 
 	def append_position_lines(self, position_lines: np.array):
 		self.position_lines = np.append(self.position_lines, position_lines)
 
-	def append_initial_rule_lines(self, initial_rule_lines: np.array):
-		self.initial_rule_lines = np.append(self.initial_rule_lines, initial_rule_lines)
+	def append_rule_lines(self, rule_lines: np.array):
+		self.rule_lines[-1] = np.append(self.rule_lines[-1], rule_lines)
 
-	def append_initial_fill_lines(self, initial_fill_lines: np.array):
-		self.initial_fill_lines = np.append(self.initial_fill_lines, initial_fill_lines)
+	def append_fill_lines(self, fill_lines: np.array):
+		self.fill_lines[-1] = np.append(self.fill_lines[-1], fill_lines)
 
-	def append_initial_stop_lines(self, initial_stop_lines: np.array):
-		self.initial_stop_lines = np.append(self.initial_stop_lines, initial_stop_lines)
-
-	def append_solved_rule_lines(self, solved_rule_lines: np.array):
-		self.solved_rule_lines = np.append(self.solved_rule_lines, solved_rule_lines)
-
-	def append_solved_fill_lines(self, solved_fill_lines: np.array):
-		self.solved_fill_lines = np.append(self.solved_fill_lines, solved_fill_lines)
-
-	def append_solved_stop_lines(self, solved_stop_lines: np.array):
-		self.solved_stop_lines = np.append(self.solved_stop_lines, solved_stop_lines)
+	def append_stop_lines(self, stop_lines: np.array):
+		self.stop_lines[-1] = np.append(self.stop_lines[-1], stop_lines)
 
 def to_scene(i: Interval, with_c1: bool = True, with_c2: bool = True) -> Scene:
 	s = Scene()
 
 	c1_x = i.c1[0].x
 	c2_x = i.c2[0].x
-	c1_init_pos = c1_x + i.c1[0].d/2
-	c2_init_pos = c2_x - i.c2[0].d/2
-	c1_solved_pos = c1_x + i.c1[-1].d/2
-	c2_solved_pos = c2_x - i.c2[-1].d/2
-
 	s.append_position_lines([c1_x, i.m, c2_x])
 
-	if with_c1:
-		s.append_initial_rule_lines([c1_x - i.c1[0].d/2, c1_x + i.c1[0].d/2])
-		if np.size(i.c1[0].ls) >= 1:
-			s.append_initial_stop_lines([c1_init_pos + i.c1[0].ls[-1]])
-		if np.size(i.c1[0].ls) >= 2:
-			s.append_initial_fill_lines(c1_init_pos + i.c1[0].ls[:-1])
+	size = len(i.c1) if len(i.c1) == len(i.c2) else 0
+	for step in range(size):
+		s.new_step()
 
-		s.append_solved_rule_lines([c1_x - i.c1[-1].d/2, c1_x + i.c1[-1].d/2])
-		if np.size(i.c1[-1].ls) >= 1:
-			s.append_solved_stop_lines([c1_solved_pos + i.c1[-1].ls[-1]])
-		if np.size(i.c1[-1].ls) >= 2:
-			s.append_solved_fill_lines(c1_solved_pos + i.c1[-1].ls[:-1])
+		c1_pos = c1_x + i.c1[step].d/2
+		c2_pos = c2_x - i.c2[step].d/2
 
-	if with_c2:
-		s.append_initial_rule_lines([c2_x - i.c2[0].d/2, c2_x + i.c2[0].d/2])
-		if np.size(i.c2[0].ls) >= 1:
-			s.append_initial_stop_lines([c2_init_pos - i.c2[0].ls[-1]])
-		if np.size(i.c2[0].ls) >= 2:
-			s.append_initial_fill_lines(c2_init_pos - i.c2[0].ls[:-1])
+		if with_c1:
+			s.append_rule_lines([c1_x - i.c1[step].d/2, c1_x + i.c1[step].d/2])
+			if np.size(i.c1[step].ls) >= 1:
+				s.append_stop_lines([c1_pos + i.c1[step].ls[-1]])
+			if np.size(i.c1[step].ls) >= 2:
+				s.append_fill_lines(c1_pos + i.c1[step].ls[:-1])
 
-		s.append_solved_rule_lines([c2_x - i.c2[-1].d/2, c2_x + i.c2[-1].d/2])
-		if np.size(i.c2[-1].ls) >= 1:
-			s.append_solved_stop_lines([c2_solved_pos - i.c2[-1].ls[-1]])
-		if np.size(i.c2[-1].ls) >= 2:
-			s.append_solved_fill_lines(c2_solved_pos - i.c2[-1].ls[:-1])
+		if with_c2:
+			s.append_rule_lines([c2_x - i.c2[step].d/2, c2_x + i.c2[step].d/2])
+			if np.size(i.c2[step].ls) >= 1:
+				s.append_stop_lines([c2_pos - i.c2[step].ls[-1]])
+			if np.size(i.c2[step].ls) >= 2:
+				s.append_fill_lines(c2_pos - i.c2[step].ls[:-1])
 
 	return s
 
 def plot_matplotlib(
 	axs,
 	scene: Scene,
-	show_initial_lines: bool = True,
-	show_solved_lines: bool = True,
+	step: int,
 	show_stop_lines: bool = True
 ):
 	axs[plot_matplotlib.plot_counter].set_xlim(1, 7)
@@ -336,47 +308,25 @@ def plot_matplotlib(
 			linestyle="dotted",
 			linewidth=2)
 
-	if show_initial_lines:
-		for line in scene.initial_rule_lines:
+	for line in scene.rule_lines[step]:
+		axs[plot_matplotlib.plot_counter].axvline(
+			x=line,
+			color="darkorange",
+			linestyle="solid",
+			linewidth=2)
+	for line in scene.fill_lines[step]:
+		axs[plot_matplotlib.plot_counter].axvline(
+			x=line,
+			color="darkviolet",
+			linestyle="solid",
+			linewidth=1)
+	if show_stop_lines:
+		for line in scene.stop_lines[step]:
 			axs[plot_matplotlib.plot_counter].axvline(
 				x=line,
-				color="darkorange",
-				linestyle="dotted",
-				linewidth=2)
-		for line in scene.initial_fill_lines:
-			axs[plot_matplotlib.plot_counter].axvline(
-				x=line,
-				color="darkviolet",
+				color="lime",
 				linestyle="dotted",
 				linewidth=1)
-		if show_stop_lines:
-			for line in scene.initial_stop_lines:
-				axs[plot_matplotlib.plot_counter].axvline(
-					x=line,
-					color="lime",
-					linestyle="dotted",
-					linewidth=1)
-
-	if show_solved_lines:
-		for line in scene.solved_rule_lines:
-			axs[plot_matplotlib.plot_counter].axvline(
-				x=line,
-				color="darkorange",
-				linestyle="solid",
-				linewidth=2)
-		for line in scene.solved_fill_lines:
-			axs[plot_matplotlib.plot_counter].axvline(
-				x=line,
-				color="darkviolet",
-				linestyle="solid",
-				linewidth=1)
-		if show_stop_lines:
-			for line in scene.solved_stop_lines:
-				axs[plot_matplotlib.plot_counter].axvline(
-					x=line,
-					color="lime",
-					linestyle="solid",
-					linewidth=1)
 	plot_matplotlib.plot_counter += 1
 plot_matplotlib.plot_counter = 0
 
@@ -384,14 +334,14 @@ def draw_scene(
 	s: Scene,
 	title: str = ""
 ):
+	size = len(s.rule_lines) if len(s.rule_lines) == len(s.fill_lines) == len(s.stop_lines) else 0
+
 	fig = plt.figure(draw_scene.fig_counter, figsize=(25, 8))
-	axs = fig.subplots(4, 1, sharex=True)
+	axs = fig.subplots(size, 1, sharex=True)
 	fig.suptitle(title, fontsize=16)
 
-	plot_matplotlib(axs, s, show_solved_lines=False)
-	plot_matplotlib(axs, s)
-	plot_matplotlib(axs, s, show_initial_lines=False)
-	plot_matplotlib(axs, s, show_initial_lines=False, show_stop_lines=False)
+	for i in range(size):
+		plot_matplotlib(axs, s, i)
 
 	plt.show()
 
