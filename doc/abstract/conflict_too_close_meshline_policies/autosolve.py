@@ -2,6 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from copy import copy
 
 
 
@@ -42,11 +43,14 @@ class Couple:
 	def find_ls(self, dmax: float, s: float):
 		self.ls = Interval.find_ls(self.d, self.lmbda, dmax, s)
 
-	def adjust_d(self, dmax: float, s: float):
+	def adjust_d_for_dmax_lmin(self, dmax: float, s: float):
 		print()
 		self.d, error = Interval.adjust_d_for_dmax_lmin(self, dmax, s, self.lmin)
 		self.find_lz(dmax)
 		self.find_ls(dmax, s)
+
+	def adjust_d_for_s(self, dmax: float, s: float):
+		print()
 		self.d, error = Interval.adjust_d_for_s(self, dmax, s, self.lmin)
 		self.find_lz(dmax)
 		self.find_ls(dmax, s)
@@ -74,34 +78,36 @@ class Interval:
 		self.lmin: int = lmin
 		self.m: float = (c1_x + c2_x) / 2
 		self.s: float = abs(c1_x - c2_x) / 2 # TODO between x or x + d/2 ?
+		self.c1: list(Couple) = []
+		self.c2: list(Couple) = []
 
-		self.c1_init: Couple = Couple(
+		self.c1.append(Couple(
 			c1_x,
 			c1_d,
 			self.dmax_init,
 			self.s,
-			c1_lmin if c1_lmin else self.lmin)
-		self.c2_init: Couple = Couple(
+			c1_lmin if c1_lmin else self.lmin))
+		self.c2.append(Couple(
 			c2_x,
 			c2_d,
 			self.dmax_init,
 			self.s,
-			c2_lmin if c2_lmin else self.lmin)
+			c2_lmin if c2_lmin else self.lmin))
 
-		self.dmax_solved: float = self.find_dmax(self.c1_init, self.c2_init, self.dmax_init)
+		self.dmax_solved: float = self.find_dmax(self.c1[0], self.c2[0], self.dmax_init)
 
-		self.c1_solved: Couple = Couple(
+		self.c1.append(Couple(
 			c1_x,
 			c1_d,
 			self.dmax_solved,
 			self.s,
-			c1_lmin if c1_lmin else self.lmin)
-		self.c2_solved: Couple = Couple(
+			c1_lmin if c1_lmin else self.lmin))
+		self.c2.append(Couple(
 			c2_x,
 			c2_d,
 			self.dmax_solved,
 			self.s,
-			c2_lmin if c2_lmin else self.lmin)
+			c2_lmin if c2_lmin else self.lmin))
 
 	@staticmethod
 	def find_lz(d: float, lmbda: float, dmax: float) -> np.array(float):
@@ -197,6 +203,10 @@ class Interval:
 		print("adjust_d_for_s() | spaces around middle line : " + str(s - current_ls[-2]) + " <- s -> " + str(current_ls[-1] - s))
 		return d, error
 
+	def new_step(self):
+		self.c1.append(copy(self.c1[-1]))
+		self.c2.append(copy(self.c2[-1]))
+
 	def solve(self):
 		# TODO
 		# adjust d↓ to satisfy z <= s & ls >= lmin
@@ -204,8 +214,13 @@ class Interval:
 		# TODO.2 adjust d↓ to satisfy also ls[-1] = m || R.ls[-1] - L.ls[-1] = dmax_solved ???
 		# TODO.2 or between dmax and dmax_solved?
 		# adjust lambda↓ to satisfy ls[-1] = m || R.ls[-1] L.ls[-1] = dmax_solved
-		self.c1_solved.adjust_d(self.dmax_solved, self.s)
-		self.c2_solved.adjust_d(self.dmax_solved, self.s)
+		self.new_step()
+		self.c1[-1].adjust_d_for_dmax_lmin(self.dmax_solved, self.s)
+		self.c2[-1].adjust_d_for_dmax_lmin(self.dmax_solved, self.s)
+
+		self.new_step()
+		self.c1[-1].adjust_d_for_s(self.dmax_solved, self.s)
+		self.c2[-1].adjust_d_for_s(self.dmax_solved, self.s)
 
 
 
@@ -262,40 +277,40 @@ class Scene:
 def to_scene(i: Interval, with_c1: bool = True, with_c2: bool = True) -> Scene:
 	s = Scene()
 
-	c1_x = i.c1_init.x
-	c2_x = i.c2_init.x
-	c1_init_pos = c1_x + i.c1_init.d/2
-	c2_init_pos = c2_x - i.c2_init.d/2
-	c1_solved_pos = c1_x + i.c1_solved.d/2
-	c2_solved_pos = c2_x - i.c2_solved.d/2
+	c1_x = i.c1[0].x
+	c2_x = i.c2[0].x
+	c1_init_pos = c1_x + i.c1[0].d/2
+	c2_init_pos = c2_x - i.c2[0].d/2
+	c1_solved_pos = c1_x + i.c1[-1].d/2
+	c2_solved_pos = c2_x - i.c2[-1].d/2
 
 	s.append_position_lines([c1_x, i.m, c2_x])
 
 	if with_c1:
-		s.append_initial_rule_lines([c1_x - i.c1_init.d/2, c1_x + i.c1_init.d/2])
-		if np.size(i.c1_init.ls) >= 1:
-			s.append_initial_stop_lines([c1_init_pos + i.c1_init.ls[-1]])
-		if np.size(i.c1_init.ls) >= 2:
-			s.append_initial_fill_lines(c1_init_pos + i.c1_init.ls[:-1])
+		s.append_initial_rule_lines([c1_x - i.c1[0].d/2, c1_x + i.c1[0].d/2])
+		if np.size(i.c1[0].ls) >= 1:
+			s.append_initial_stop_lines([c1_init_pos + i.c1[0].ls[-1]])
+		if np.size(i.c1[0].ls) >= 2:
+			s.append_initial_fill_lines(c1_init_pos + i.c1[0].ls[:-1])
 
-		s.append_solved_rule_lines([c1_x - i.c1_solved.d/2, c1_x + i.c1_solved.d/2])
-		if np.size(i.c1_solved.ls) >= 1:
-			s.append_solved_stop_lines([c1_solved_pos + i.c1_solved.ls[-1]])
-		if np.size(i.c1_solved.ls) >= 2:
-			s.append_solved_fill_lines(c1_solved_pos + i.c1_solved.ls[:-1])
+		s.append_solved_rule_lines([c1_x - i.c1[-1].d/2, c1_x + i.c1[-1].d/2])
+		if np.size(i.c1[-1].ls) >= 1:
+			s.append_solved_stop_lines([c1_solved_pos + i.c1[-1].ls[-1]])
+		if np.size(i.c1[-1].ls) >= 2:
+			s.append_solved_fill_lines(c1_solved_pos + i.c1[-1].ls[:-1])
 
 	if with_c2:
-		s.append_initial_rule_lines([c2_x - i.c2_init.d/2, c2_x + i.c2_init.d/2])
-		if np.size(i.c2_init.ls) >= 1:
-			s.append_initial_stop_lines([c2_init_pos - i.c2_init.ls[-1]])
-		if np.size(i.c2_init.ls) >= 2:
-			s.append_initial_fill_lines(c2_init_pos - i.c2_init.ls[:-1])
+		s.append_initial_rule_lines([c2_x - i.c2[0].d/2, c2_x + i.c2[0].d/2])
+		if np.size(i.c2[0].ls) >= 1:
+			s.append_initial_stop_lines([c2_init_pos - i.c2[0].ls[-1]])
+		if np.size(i.c2[0].ls) >= 2:
+			s.append_initial_fill_lines(c2_init_pos - i.c2[0].ls[:-1])
 
-		s.append_solved_rule_lines([c2_x - i.c2_solved.d/2, c2_x + i.c2_solved.d/2])
-		if np.size(i.c2_solved.ls) >= 1:
-			s.append_solved_stop_lines([c2_solved_pos - i.c2_solved.ls[-1]])
-		if np.size(i.c2_solved.ls) >= 2:
-			s.append_solved_fill_lines(c2_solved_pos - i.c2_solved.ls[:-1])
+		s.append_solved_rule_lines([c2_x - i.c2[-1].d/2, c2_x + i.c2[-1].d/2])
+		if np.size(i.c2[-1].ls) >= 1:
+			s.append_solved_stop_lines([c2_solved_pos - i.c2[-1].ls[-1]])
+		if np.size(i.c2[-1].ls) >= 2:
+			s.append_solved_fill_lines(c2_solved_pos - i.c2[-1].ls[:-1])
 
 	return s
 
