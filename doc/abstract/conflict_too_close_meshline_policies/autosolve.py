@@ -55,6 +55,12 @@ class Couple:
 		self.find_lz(dmax)
 		self.find_ls(dmax, s)
 
+	def adjust_lmbda_for_s(self, dmax: float, s: float):
+		print()
+		self.lmbda, error = Interval.adjust_lmbda_for_s(self, dmax, s)
+		self.find_lz(dmax)
+		self.find_ls(dmax, s)
+
 class Interval:
 	"""
 	- dmax: Local maximal distance between 2 adjacent lines.
@@ -205,6 +211,36 @@ class Interval:
 		print("adjust_d_for_s() | spaces around middle line : " + str(s - current_ls[-2]) + " <- s -> " + str(current_ls[-1] - s))
 		return d, error
 
+	@staticmethod
+	def adjust_lmbda_for_s(c: Couple, dmax: float, s: float, iter_limit = np.inf) -> [float, bool]:
+		step = 10000
+		lmbda = c.lmbda
+
+		nlines = np.size(c.ls)
+		current_ls = c.ls
+
+		# TODO lmbda limits are based on lz
+		counter = 0
+		error = False
+		while lmbda > 1 and np.size(current_ls) <= nlines:
+			lmbda -= lmbda / step
+			if lmbda < 1:
+				lmbda = 1
+				print("adjust_lmbda_for_s() | WARNING : lmbda=1 limit reached")
+
+			current_ls = Interval.find_ls(c.d, lmbda, dmax, s)
+
+			counter += 1
+			if counter >= iter_limit:
+				print("adjust_lmbda_for_s() | WARNING : iteration limit reached")
+				error = True
+				break
+
+		print("adjust_lmbda_for_s() | iterations : " + str(counter))
+		print("adjust_lmbda_for_s() | lmbda : ", lmbda)
+		print("adjust_lmbda_for_s() | spaces around middle line : " + str(s - current_ls[-2]) + " <- s -> " + str(current_ls[-1] - s))
+		return lmbda, error
+
 	def new_step(self):
 		self.c1.append(copy(self.c1[-1]))
 		self.c2.append(copy(self.c2[-1]))
@@ -223,6 +259,10 @@ class Interval:
 		self.new_step()
 		self.c1[-1].adjust_d_for_s(self.dmax_solved, self.s)
 		self.c2[-1].adjust_d_for_s(self.dmax_solved, self.s)
+
+		self.new_step()
+		self.c1[-1].adjust_lmbda_for_s(self.dmax_solved, self.s)
+		self.c2[-1].adjust_lmbda_for_s(self.dmax_solved, self.s)
 
 
 
