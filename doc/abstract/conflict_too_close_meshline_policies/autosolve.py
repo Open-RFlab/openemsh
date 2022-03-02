@@ -245,24 +245,43 @@ class Interval:
 		self.c1.append(copy(self.c1[-1]))
 		self.c2.append(copy(self.c2[-1]))
 
-	def solve(self):
+	def solve(self,
+		with_c1: bool = True,
+		with_c2: bool = True,
+		with_adjust_d_for_dmax_lmin: bool = True,
+		with_adjust_d_for_s: bool = True,
+		with_adjust_lmbda_for_s: bool = True
+	):
 		# TODO
 		# adjust d↓ to satisfy z <= s & ls >= lmin
 		# TODO.2 ^^^ why this condition??
 		# TODO.2 adjust d↓ to satisfy also ls[-1] = m || R.ls[-1] - L.ls[-1] = dmax_solved ???
 		# TODO.2 or between dmax and dmax_solved?
 		# adjust lambda↓ to satisfy ls[-1] = m || R.ls[-1] L.ls[-1] = dmax_solved
-		self.new_step()
-		self.c1[-1].adjust_d_for_dmax_lmin(self.dmax_solved, self.s)
-		self.c2[-1].adjust_d_for_dmax_lmin(self.dmax_solved, self.s)
 
-		self.new_step()
-		self.c1[-1].adjust_d_for_s(self.dmax_solved, self.s)
-		self.c2[-1].adjust_d_for_s(self.dmax_solved, self.s)
+		if not with_c1 and not with_c2:
+			return
 
-		self.new_step()
-		self.c1[-1].adjust_lmbda_for_s(self.dmax_solved, self.s)
-		self.c2[-1].adjust_lmbda_for_s(self.dmax_solved, self.s)
+		if with_adjust_d_for_dmax_lmin:
+			self.new_step()
+			if with_c1:
+				self.c1[-1].adjust_d_for_dmax_lmin(self.dmax_solved, self.s)
+			if with_c2:
+				self.c2[-1].adjust_d_for_dmax_lmin(self.dmax_solved, self.s)
+
+		if with_adjust_d_for_s:
+			self.new_step()
+			if with_c1:
+				self.c1[-1].adjust_d_for_s(self.dmax_solved, self.s)
+			if with_c2:
+				self.c2[-1].adjust_d_for_s(self.dmax_solved, self.s)
+
+		if with_adjust_lmbda_for_s:
+			self.new_step()
+			if with_c1:
+				self.c1[-1].adjust_lmbda_for_s(self.dmax_solved, self.s)
+			if with_c2:
+				self.c2[-1].adjust_lmbda_for_s(self.dmax_solved, self.s)
 
 
 
@@ -400,7 +419,10 @@ def try_scene(
 	c2_d_div: float = 0,
 	c2_lmin: int = 0,
 	with_c1: bool = True,
-	with_c2: bool = True
+	with_c2: bool = True,
+	with_adjust_d_for_dmax_lmin: bool = True,
+	with_adjust_d_for_s: bool = True,
+	with_adjust_lmbda_for_s: bool = True
 ):
 	i = Interval(
 		dmax,
@@ -410,7 +432,13 @@ def try_scene(
 		c1_lmin,
 		c2_lmin)
 
-	i.solve()
+	i.solve(
+		with_c1,
+		with_c2,
+		with_adjust_d_for_dmax_lmin,
+		with_adjust_d_for_s,
+		with_adjust_lmbda_for_s)
+
 	draw_scene(to_scene(i, with_c1, with_c2), title)
 
 
@@ -419,24 +447,39 @@ if __name__ == "__main__":
 
 	with_c1 = True
 	with_c2 = True
+	with_adjust_d_for_dmax_lmin = True
+	with_adjust_d_for_s = True
+	with_adjust_lmbda_for_s = True
 
 	try_scene(
 		dmax=0.3,
 		lmin=37,
 		c1_x=1.3, c1_d_div=100, c1_lmin=10,
 		c2_x=6.0, c2_d_div=1.2,
-		with_c1=with_c1, with_c2=with_c2)
+		with_c1=with_c1,
+		with_c2=with_c2,
+		with_adjust_d_for_dmax_lmin=with_adjust_d_for_dmax_lmin,
+		with_adjust_d_for_s=with_adjust_d_for_s,
+		with_adjust_lmbda_for_s=with_adjust_lmbda_for_s)
 
 	try_scene(
 		dmax=2.5,
 		lmin=10,
 		c1_x=1.3, c1_d_div=100,
-		c2_x=6.0, c2_d_div=3.3,
-		with_c1=with_c1, with_c2=with_c2)
+		c2_x=6.0, c2_d_div=3.3, c2_lmin=3,
+		with_c1=with_c1,
+		with_c2=with_c2,
+		with_adjust_d_for_dmax_lmin=with_adjust_d_for_dmax_lmin,
+		with_adjust_d_for_s=with_adjust_d_for_s,
+		with_adjust_lmbda_for_s=with_adjust_lmbda_for_s)
 
 	try_scene(
 		dmax=3.5,
 		lmin=2,
 		c1_x=1.3, c1_d_div=2,
 		c2_x=6.0, c2_d_div=2, c2_lmin=20,
-		with_c1=with_c1, with_c2=with_c2)
+		with_c1=with_c1,
+		with_c2=with_c2,
+		with_adjust_d_for_dmax_lmin=with_adjust_d_for_dmax_lmin,
+		with_adjust_d_for_s=with_adjust_d_for_s,
+		with_adjust_lmbda_for_s=with_adjust_lmbda_for_s)
