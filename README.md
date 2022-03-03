@@ -29,6 +29,8 @@ Those considerations led me to think the key to create a correct mesher is about
 
 Also I'd like this mesher to be a standalone tool, independant from any converter or scripting API.
 
+The `doc/` directory contains some experimentations about meshing algorithms, such as [this Python script](doc/abstract/conflict_too_close_meshline_policies/autosolve.py).
+
 <!--
 ## Build & usage
 ### Dependencies
