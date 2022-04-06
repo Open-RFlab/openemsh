@@ -84,7 +84,7 @@ void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const
 			for(Overlap& overlap : conflict->overlaps) {
 				if(get<POLYGON>(overlap) == polygon) {
 					is_polygon_registered = true;
-					if((*get<RANGE>(overlap) == range)
+					if((get<RANGE>(overlap) == range)
 					&& (!get<EDGE>(overlap) || (get<EDGE>(overlap) && get<EDGE>(overlap).value() == b))) {
 						is_overlap_registered = true;
 						break;

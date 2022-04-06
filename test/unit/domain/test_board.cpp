@@ -152,25 +152,25 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 							is_first_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 3, 2 }, { 2, 2 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 3, 2 }, { 2, 2 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[1].get()) {
 							is_second_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 2, 2 }, { 2, 3 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 2, 2 }, { 2, 3 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[2].get()) {
 							is_third_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 2, 3 }, { 3, 3 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 2, 3 }, { 3, 3 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[3].get()) {
 							is_fourth_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 3, 3 }, { 3, 2 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 3, 3 }, { 3, 2 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						}
 					}
@@ -229,25 +229,25 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 							is_first_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[1].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 2, 2 }, { 3, 2 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 2, 2 }, { 3, 2 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[0]->edges[2].get()) {
 							is_second_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[1].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 3, 2 }, { 3, 3 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 3, 2 }, { 3, 3 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[0].get()) {
 							is_third_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 2, 3 }, { 2, 2 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 2, 3 }, { 2, 2 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[3].get()) {
 							is_fourth_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 3, 3 }, { 2, 3 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 3, 3 }, { 2, 3 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						}
 					}
@@ -307,25 +307,25 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 							is_first_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[1].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 2, 2 }, { 3, 2 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 2, 2 }, { 3, 2 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[0].get()) {
 							is_second_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 2, 3 }, { 2, 2 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 2, 3 }, { 2, 2 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[2].get()) {
 							is_third_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 3, 2 }, { 3, 3 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 3, 2 }, { 3, 3 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[3].get()) {
 							is_fourth_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 3, 3 }, { 2, 3 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 3, 3 }, { 2, 3 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						}
 					}
@@ -386,31 +386,31 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 							is_first_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[1].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 4, 3 }, { 4, 4 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 4, 3 }, { 4, 4 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[0]->edges[3].get()) {
 							is_second_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[1].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 4, 4 }, { 3, 4 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 4, 4 }, { 3, 4 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[0].get()) {
 							is_third_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 3, 4 }, { 2, 3 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 3, 4 }, { 2, 3 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[1].get()) {
 							is_fourth_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 2, 3 }, { 3, 2 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 2, 3 }, { 3, 2 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[2].get()) {
 							is_fifth_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 3, 2 }, { 4, 3 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 3, 2 }, { 4, 3 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						}
 					}
@@ -474,14 +474,14 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 							is_first_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[1].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 2, 2 }, { 3, 2 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 2, 2 }, { 3, 2 }));
 							REQUIRE(*std::get<EDGE>(c->overlaps[0]) == b->polygons[1]->edges[3].get());
 						} else if(c->edge == b->polygons[1]->edges[3].get()) {
 							is_second_registered = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 3, 2 }, { 2, 2 }));
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 2, 2 }, { 3, 2 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 3, 2 }, { 2, 2 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 2, 2 }, { 3, 2 }));
 							REQUIRE(*std::get<EDGE>(c->overlaps[0]) == b->polygons[0]->edges[1].get());
 						}
 					}
@@ -565,19 +565,19 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 							are_overlaps_registered.fill(false);
 							for(auto const& overlap : c->overlaps) {
 								if(std::get<POLYGON>(overlap) == b->polygons[1].get()
-								&& *std::get<RANGE>(overlap) == Range({ 10, 2 }, { 10, 2.75 })
+								&& std::get<RANGE>(overlap) == Range({ 10, 2 }, { 10, 2.75 })
 								&& std::get<EDGE>(overlap) == std::nullopt)
 									are_overlaps_registered[0] = true;
 								else if(std::get<POLYGON>(overlap) == b->polygons[1].get()
-								     && *std::get<RANGE>(overlap) == Range({ 10, 3.5 }, { 10, 5 })
+								     && std::get<RANGE>(overlap) == Range({ 10, 3.5 }, { 10, 5 })
 								     && std::get<EDGE>(overlap) == std::nullopt)
 									are_overlaps_registered[1] = true;
 								else if(std::get<POLYGON>(overlap) == b->polygons[1].get()
-								     && *std::get<RANGE>(overlap) == Range({ 10, 5 }, { 10, 6.3 })
+								     && std::get<RANGE>(overlap) == Range({ 10, 5 }, { 10, 6.3 })
 								     && std::get<EDGE>(overlap) == b->polygons[1]->edges[15].get())
 									are_overlaps_registered[2] = true;
 								else if(std::get<POLYGON>(overlap) == b->polygons[1].get()
-								     && *std::get<RANGE>(overlap) == Range({ 10, 8 }, { 10, 10 })
+								     && std::get<RANGE>(overlap) == Range({ 10, 8 }, { 10, 10 })
 								     && std::get<EDGE>(overlap) == std::nullopt)
 									are_overlaps_registered[3] = true;
 							}
@@ -590,11 +590,11 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 							are_overlaps_registered.fill(false);
 							for(auto const& overlap : c->overlaps) {
 								if(std::get<POLYGON>(overlap) == b->polygons[1].get()
-								&& *std::get<RANGE>(overlap) == Range({ 5, 10 }, { 6, 10 })
+								&& std::get<RANGE>(overlap) == Range({ 5, 10 }, { 6, 10 })
 								&& std::get<EDGE>(overlap) == std::nullopt)
 									are_overlaps_registered[0] = true;
 								else if(std::get<POLYGON>(overlap) == b->polygons[1].get()
-								     && *std::get<RANGE>(overlap) == Range({ 3, 10 }, { 2, 10 })
+								     && std::get<RANGE>(overlap) == Range({ 3, 10 }, { 2, 10 })
 								     && std::get<EDGE>(overlap) == b->polygons[1]->edges[7].get())
 									are_overlaps_registered[1] = true;
 							}
@@ -604,61 +604,61 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 							are_conflicts_registered[2] = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 10, 3.5 }, { 9, 3 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 10, 3.5 }, { 9, 3 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[2].get()) {
 							are_conflicts_registered[3] = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 9, 3 }, { 10, 2.75 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 9, 3 }, { 10, 2.75 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[3].get()) {
 							are_conflicts_registered[4] = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 10, 2 }, { 5, 2 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 10, 2 }, { 5, 2 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[4].get()) {
 							are_conflicts_registered[5] = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 5, 2 }, { 5, 10 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 5, 2 }, { 5, 10 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[7].get()) {
 							are_conflicts_registered[6] = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 3, 10 }, { 2, 10 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 3, 10 }, { 2, 10 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == b->polygons[0]->edges[3].get());
 						} else if(c->edge == b->polygons[1]->edges[10].get()) {
 							are_conflicts_registered[7] = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 6, 10 }, { 6, 9 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 6, 10 }, { 6, 9 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[11].get()) {
 							are_conflicts_registered[8] = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 6, 9 }, { 10, 10 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 6, 9 }, { 10, 10 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[13].get()) {
 							are_conflicts_registered[9] = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 10, 8 }, { 9, 7 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 10, 8 }, { 9, 7 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[14].get()) {
 							are_conflicts_registered[10] = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 9, 7 }, { 10, 6.3 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 9, 7 }, { 10, 6.3 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == std::nullopt);
 						} else if(c->edge == b->polygons[1]->edges[15].get()) {
 							are_conflicts_registered[11] = true;
 							REQUIRE(c->overlaps.size() == 1);
 							REQUIRE(std::get<POLYGON>(c->overlaps[0]) == b->polygons[0].get());
-							REQUIRE(*std::get<RANGE>(c->overlaps[0]) == Range({ 10, 6.3 }, { 10, 5 }));
+							REQUIRE(std::get<RANGE>(c->overlaps[0]) == Range({ 10, 6.3 }, { 10, 5 }));
 							REQUIRE(std::get<EDGE>(c->overlaps[0]) == b->polygons[0]->edges[2].get());
 						}
 					}

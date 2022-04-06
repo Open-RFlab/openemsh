@@ -20,7 +20,7 @@ class Polygon;
 /// The optional overlap edge is reserved for when edge is overlapping an
 /// edge of the polygon and not just the polygon itself.
 ///*****************************************************************************
-using Overlap = std::tuple<Polygon const*, std::unique_ptr<Range const>, std::optional<Edge const*>>;
+using Overlap = std::tuple<Polygon const*, Range, std::optional<Edge const*>>;
 enum OverlapIndex {
 	POLYGON,
 	RANGE,

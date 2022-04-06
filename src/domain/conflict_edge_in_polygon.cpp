@@ -30,46 +30,46 @@ void sort_overlaps_by_p0_by_vector_orientation(vector<Overlap>& overlaps, Point 
 	if(x_sign > 0 && y_sign == 0)
 		sort(begin(overlaps), end(overlaps),
 			[](Overlap const& a, Overlap const& b) {
-				return (get<RANGE>(a)->p0().x < get<RANGE>(b)->p0().x);
+				return (get<RANGE>(a).p0().x < get<RANGE>(b).p0().x);
 			});
 	else if(x_sign == 0 && y_sign > 0)
 		sort(begin(overlaps), end(overlaps),
 			[](Overlap const& a, Overlap const& b) {
-				return (get<RANGE>(a)->p0().y < get<RANGE>(b)->p0().y);
+				return (get<RANGE>(a).p0().y < get<RANGE>(b).p0().y);
 			});
 	else if(x_sign < 0 && y_sign == 0)
 		sort(begin(overlaps), end(overlaps),
 			[](Overlap const& a, Overlap const& b) {
-				return (get<RANGE>(a)->p0().x > get<RANGE>(b)->p0().x);
+				return (get<RANGE>(a).p0().x > get<RANGE>(b).p0().x);
 			});
 	else if(x_sign == 0 && y_sign < 0)
 		sort(begin(overlaps), end(overlaps),
 			[](Overlap const& a, Overlap const& b) {
-				return (get<RANGE>(a)->p0().y > get<RANGE>(b)->p0().y);
+				return (get<RANGE>(a).p0().y > get<RANGE>(b).p0().y);
 			});
 	else if(x_sign > 0 && y_sign > 0)
 		sort(begin(overlaps), end(overlaps),
 			[](Overlap const& a, Overlap const& b) {
-				return (get<RANGE>(a)->p0().x < get<RANGE>(b)->p0().x
-					&& get<RANGE>(a)->p0().y < get<RANGE>(b)->p0().y);
+				return (get<RANGE>(a).p0().x < get<RANGE>(b).p0().x
+					&& get<RANGE>(a).p0().y < get<RANGE>(b).p0().y);
 			});
 	else if(x_sign < 0 && y_sign > 0)
 		sort(begin(overlaps), end(overlaps),
 			[](Overlap const& a, Overlap const& b) {
-				return (get<RANGE>(a)->p0().x > get<RANGE>(b)->p0().x
-					&& get<RANGE>(a)->p0().y < get<RANGE>(b)->p0().y);
+				return (get<RANGE>(a).p0().x > get<RANGE>(b).p0().x
+					&& get<RANGE>(a).p0().y < get<RANGE>(b).p0().y);
 			});
 	else if(x_sign < 0 && y_sign < 0)
 		sort(begin(overlaps), end(overlaps),
 			[](Overlap const& a, Overlap const& b) {
-				return (get<RANGE>(a)->p0().x > get<RANGE>(b)->p0().x
-					&& get<RANGE>(a)->p0().y > get<RANGE>(b)->p0().y);
+				return (get<RANGE>(a).p0().x > get<RANGE>(b).p0().x
+					&& get<RANGE>(a).p0().y > get<RANGE>(b).p0().y);
 			});
 	else if(x_sign > 0 && y_sign < 0)
 		sort(begin(overlaps), end(overlaps),
 			[](Overlap const& a, Overlap const& b) {
-				return (get<RANGE>(a)->p0().x < get<RANGE>(b)->p0().x
-					&& get<RANGE>(a)->p0().y > get<RANGE>(b)->p0().y);
+				return (get<RANGE>(a).p0().x < get<RANGE>(b).p0().x
+					&& get<RANGE>(a).p0().y > get<RANGE>(b).p0().y);
 			});
 }
 
@@ -77,23 +77,23 @@ void sort_overlaps_by_p0_by_vector_orientation(vector<Overlap>& overlaps, Point 
 ConflictEdgeInPolygon::ConflictEdgeInPolygon(Edge* a, Polygon const* polygon, Range const range, optional<Edge const*> b)
 : Conflict(Kind::EDGE_IN_POLYGON)
 , edge(a) {
-	overlaps.emplace_back(polygon, make_unique<Range const>(range), b);
+	overlaps.emplace_back(polygon, range, b);
 }
 
 //******************************************************************************
 void ConflictEdgeInPolygon::append(Polygon const* polygon, Range const range, optional<Edge const*> edge) {
-	overlaps.emplace_back(polygon, make_unique<Range const>(range), edge);
+	overlaps.emplace_back(polygon, range, edge);
 }
 
 //******************************************************************************
 void ConflictEdgeInPolygon::auto_solve(MeshlinePolicyManager& /*line_policy_manager*/) {
 	sort_overlaps_by_p0_by_vector_orientation(overlaps, edge->vec);
-	Range merged_range(*get<RANGE>(overlaps.front()));
+	Range merged_range(get<RANGE>(overlaps.front()));
 
-	for(Overlap& overlap : overlaps) {
+	for(Overlap const& overlap : overlaps) {
 		if(!get<EDGE>(overlap).has_value()
 		|| get<EDGE>(overlap).value()->normal != edge->normal) {
-			if(optional<Range> r = merge(*get<RANGE>(overlap), merged_range))
+			if(optional<Range> r = merge(get<RANGE>(overlap), merged_range))
 				merged_range = r.value();
 			else
 				break;
@@ -123,7 +123,7 @@ void ConflictEdgeInPolygon::print() const {
 		cout << "polygon : " << get<POLYGON>(overlap) << endl;
 //		get<POLYGON>(overlap)->print();
 //		cout << "range :" << endl;
-		get<RANGE>(overlap)->print();
+		get<RANGE>(overlap).print();
 		if(get<EDGE>(overlap).has_value()) {
 			cout << "optedge : " << get<EDGE>(overlap).value() << endl;
 			get<EDGE>(overlap).value()->print();
