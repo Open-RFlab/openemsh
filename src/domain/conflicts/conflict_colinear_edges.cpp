@@ -4,8 +4,8 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#include "edge.hpp"
-#include "meshline_policy_manager.hpp"
+#include "domain/geometrics/edge.hpp"
+#include "domain/meshline_policy_manager.hpp"
 
 #include "conflict_colinear_edges.hpp"
 

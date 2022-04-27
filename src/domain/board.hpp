@@ -11,14 +11,14 @@
 #include <memory>
 #include <vector>
 
-#include "conflict.hpp"
+#include "conflicts/conflict.hpp"
+#include "geometrics/edge.hpp"
+#include "geometrics/point.hpp"
+#include "geometrics/polygon.hpp"
 #include "conflict_manager.hpp"
-#include "edge.hpp"
 #include "global.hpp"
-//#include "meshline_policy.hpp"
 #include "meshline_policy_manager.hpp"
-#include "point.hpp"
-#include "polygon.hpp"
+//#include "meshline_policy.hpp"
 //#include "range.hpp"
 
 #ifdef UNITTEST

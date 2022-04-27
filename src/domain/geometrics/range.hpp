@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "i_conflict_origin.hpp"
-#include "i_meshline_origin.hpp"
+#include "domain/conflicts/i_conflict_origin.hpp"
+#include "domain/mesh/i_meshline_origin.hpp"
 #include "point.hpp"
 #include "segment.hpp"
 

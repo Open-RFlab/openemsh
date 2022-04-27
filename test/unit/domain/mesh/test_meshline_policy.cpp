@@ -6,10 +6,10 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "domain/point.hpp"
-#include "domain/segment.hpp"
+#include "domain/geometrics/point.hpp"
+#include "domain/geometrics/segment.hpp"
 
-#include "domain/meshline_policy.hpp"
+#include "domain/mesh/meshline_policy.hpp"
 
 /// @test std::optional<MeshlinePolicy::Axis> cast(Segment::Axis const a)
 /// @test Coord coord(Point const& point, MeshlinePolicy::Axis const axis)

@@ -8,8 +8,8 @@
 
 #include <array>
 
-#include "domain/conflict_colinear_edges.hpp"
-#include "domain/conflict_edge_in_polygon.hpp"
+#include "domain/conflicts/conflict_colinear_edges.hpp"
+#include "domain/conflicts/conflict_edge_in_polygon.hpp"
 
 #include "domain/board.hpp"
 

@@ -6,8 +6,8 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "domain/edge.hpp"
-#include "domain/point.hpp"
+#include "domain/geometrics/edge.hpp"
+#include "domain/geometrics/point.hpp"
 
 #include "domain/meshline_policy_manager.hpp"
 

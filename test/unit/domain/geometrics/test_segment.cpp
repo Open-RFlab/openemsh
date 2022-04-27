@@ -6,9 +6,9 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "domain/point.hpp"
+#include "domain/geometrics/point.hpp"
 
-#include "domain/segment.hpp"
+#include "domain/geometrics/segment.hpp"
 
 /// @test Segment::Axis axis(Point const& vector)
 /// @test Segment::Axis axis(Point const& p0, Point const& p1)

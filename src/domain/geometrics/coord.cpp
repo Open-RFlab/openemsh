@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-#include "global.hpp"
+#include "domain/global.hpp"
 
 #include "coord.hpp"
 

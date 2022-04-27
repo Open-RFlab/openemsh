@@ -10,8 +10,8 @@
 
 #include <algorithm>
 
-#include "edge.hpp"
-#include "polygon.hpp"
+#include "domain/geometrics/edge.hpp"
+#include "domain/geometrics/polygon.hpp"
 
 #include "conflict_edge_in_polygon.hpp"
 

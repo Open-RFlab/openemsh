@@ -11,8 +11,8 @@
 #include <tuple>
 #include <vector>
 
+#include "domain/geometrics/range.hpp"
 #include "conflict.hpp"
-#include "range.hpp"
 
 class Edge;
 class Polygon;

@@ -10,8 +10,8 @@
 #include <memory>
 #include <vector>
 
-#include "meshline.hpp"
-#include "meshline_policy.hpp"
+#include "mesh/meshline.hpp"
+#include "mesh/meshline_policy.hpp"
 
 class Meshline;
 

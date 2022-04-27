@@ -6,10 +6,10 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "domain/point.hpp"
-#include "domain/range.hpp"
+#include "domain/geometrics/point.hpp"
+#include "domain/geometrics/range.hpp"
 
-#include "domain/edge.hpp"
+#include "domain/geometrics/edge.hpp"
 
 /// @test relation::SegmentSegment Segment::relation_to(Segment const* segment) const
 /// @test relation::SegmentPoint Segment::relation_to(Point const* point) const

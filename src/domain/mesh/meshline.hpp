@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "coord.hpp"
+#include "domain/geometrics/coord.hpp"
 
 class MeshlinePolicy;
 

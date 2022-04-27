@@ -6,11 +6,11 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "domain/conflict_colinear_edges.hpp"
-#include "domain/conflict_edge_in_polygon.hpp"
-#include "domain/edge.hpp"
-#include "domain/point.hpp"
-#include "domain/polygon.hpp"
+#include "domain/conflicts/conflict_colinear_edges.hpp"
+#include "domain/conflicts/conflict_edge_in_polygon.hpp"
+#include "domain/geometrics/edge.hpp"
+#include "domain/geometrics/point.hpp"
+#include "domain/geometrics/polygon.hpp"
 
 #include "domain/conflict_manager.hpp"
 

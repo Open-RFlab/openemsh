@@ -11,8 +11,8 @@
 #include <vector>
 
 //#include "conflict.hpp"
-#include "conflict_colinear_edges.hpp"
-#include "conflict_edge_in_polygon.hpp"
+#include "conflicts/conflict_colinear_edges.hpp"
+#include "conflicts/conflict_edge_in_polygon.hpp"
 
 class Edge;
 class MeshlinePolicyManager;

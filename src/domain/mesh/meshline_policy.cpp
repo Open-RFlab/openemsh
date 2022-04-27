@@ -4,8 +4,8 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include "domain/geometrics/point.hpp"
 #include "meshline.hpp"
-#include "point.hpp"
 
 #include "meshline_policy.hpp"
 

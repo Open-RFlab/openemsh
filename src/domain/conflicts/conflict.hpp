@@ -8,8 +8,8 @@
 
 //#include <vector>
 
+#include "domain/mesh/i_meshline_origin.hpp"
 #include "i_conflict_origin.hpp"
-#include "i_meshline_origin.hpp"
 
 class IConflictSolution;
 //class MeshlinePolicy;

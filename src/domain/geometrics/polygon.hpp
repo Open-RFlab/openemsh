@@ -10,13 +10,13 @@
 #include <memory>
 #include <vector>
 
-#include "bounding.hpp"
 //#include "conflict.hpp"
 //#include "edge.hpp"
-#include "global.hpp"
-#include "i_conflict_origin.hpp"
-#include "i_meshline_origin.hpp"
 //#include "point.hpp"
+#include "domain/conflicts/i_conflict_origin.hpp"
+#include "domain/mesh/i_meshline_origin.hpp"
+#include "domain/global.hpp"
+#include "bounding.hpp"
 #include "relation.hpp"
 
 class Conflict;

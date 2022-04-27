@@ -8,7 +8,7 @@
 
 #include "domain/global.hpp"
 
-#include "domain/coord.hpp"
+#include "domain/geometrics/coord.hpp"
 
 /// @test Coord::operator double() const
 /// @test bool Coord::operator==(Coord const& a) const

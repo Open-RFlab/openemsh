@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <utility>
 
-#include "conflict_edge_in_polygon.hpp"
+#include "conflicts/conflict_edge_in_polygon.hpp"
 
 #include "board.hpp"
 

@@ -6,12 +6,12 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "domain/edge.hpp"
+#include "domain/geometrics/edge.hpp"
+#include "domain/geometrics/point.hpp"
+#include "domain/geometrics/polygon.hpp"
 #include "domain/meshline_policy_manager.hpp"
-#include "domain/point.hpp"
-#include "domain/polygon.hpp"
 
-#include "domain/conflict_edge_in_polygon.hpp"
+#include "domain/conflicts/conflict_edge_in_polygon.hpp"
 
 /// @test void sort_overlaps_by_p0_by_vector_orientation(vector<Overlap>& overlaps, Point const& vector)
 /// @test void ConflictEdgeInPolygon::auto_solve(MeshlinePolicyManager&)

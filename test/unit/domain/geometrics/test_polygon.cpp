@@ -6,10 +6,10 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "domain/edge.hpp"
-#include "domain/point.hpp"
+#include "domain/geometrics/edge.hpp"
+#include "domain/geometrics/point.hpp"
 
-#include "domain/polygon.hpp"
+#include "domain/geometrics/polygon.hpp"
 
 /// @test void Polygon::detect_bounding()
 /// @test template<class T> Polygon::Rotation detect_rotation(T& points)

@@ -7,19 +7,19 @@ if( Catch2_FOUND )
 
 	target_sources( openemsh_unittest
 		PRIVATE
-		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_bounding.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_coord.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_point.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_segment.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_edge.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_range.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_polygon.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/test_bounding.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/test_coord.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/test_point.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/test_segment.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/test_edge.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/test_range.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/test_polygon.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflicts/test_conflict_colinear_edges.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflicts/test_conflict_edge_in_polygon.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/domain/mesh/test_meshline_policy.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_conflict_manager.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_meshline_policy.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_meshline_policy_manager.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_board.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_conflict_colinear_edges.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_conflict_edge_in_polygon.cpp"
 		)
 
 	target_compile_definitions( openemsh_unittest

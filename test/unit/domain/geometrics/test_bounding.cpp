@@ -6,7 +6,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "domain/bounding.hpp"
+#include "domain/geometrics/bounding.hpp"
 
 /// @test bool does_overlap(Bounding2D const& a, Bounding2D const& b)
 ///*****************************************************************************

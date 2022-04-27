@@ -11,13 +11,13 @@
 #include <vector>
 
 //#include "conflict.hpp"
-#include "coord.hpp"
-#include "global.hpp"
-#include "i_conflict_origin.hpp"
-#include "i_conflict_solution.hpp"
+#include "domain/conflicts/i_conflict_origin.hpp"
+#include "domain/conflicts/i_conflict_solution.hpp"
+#include "domain/geometrics/coord.hpp"
+#include "domain/geometrics/segment.hpp"
+#include "domain/geometrics/types.hpp"
+#include "domain/global.hpp"
 #include "i_meshline_origin.hpp"
-#include "segment.hpp"
-#include "types.hpp"
 
 class Conflict;
 class Meshline;

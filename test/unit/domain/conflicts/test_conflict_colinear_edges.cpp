@@ -6,11 +6,11 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "domain/edge.hpp"
+#include "domain/geometrics/edge.hpp"
+#include "domain/geometrics/point.hpp"
 #include "domain/meshline_policy_manager.hpp"
-#include "domain/point.hpp"
 
-#include "domain/conflict_colinear_edges.hpp"
+#include "domain/conflicts/conflict_colinear_edges.hpp"
 
 /// @test void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manager)
 ///*****************************************************************************

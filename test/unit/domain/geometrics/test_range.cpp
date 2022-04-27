@@ -6,9 +6,9 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "domain/point.hpp"
+#include "domain/geometrics/point.hpp"
 
-#include "domain/range.hpp"
+#include "domain/geometrics/range.hpp"
 
 /// @test Bounding2D bounding(Segment const& a)
 /// @test std::optional<Range> merge(Segment const* a, Segment const* b)

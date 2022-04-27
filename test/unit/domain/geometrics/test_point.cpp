@@ -8,7 +8,7 @@
 
 #include "domain/global.hpp"
 
-#include "domain/point.hpp"
+#include "domain/geometrics/point.hpp"
 
 /// @test Point operator-(Point const& a, Point const& b)
 /// @test Point operator+(Point const& a, Point const& b)

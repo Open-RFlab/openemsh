@@ -4,8 +4,8 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#include "edge.hpp"
-#include "polygon.hpp"
+#include "geometrics/edge.hpp"
+#include "geometrics/polygon.hpp"
 
 #include "conflict_manager.hpp"
 
