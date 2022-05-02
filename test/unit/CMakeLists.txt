@@ -20,6 +20,7 @@ if( Catch2_FOUND )
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_conflict_manager.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_meshline_policy_manager.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_board.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/utils/test_signum.cpp"
 		)
 
 	target_compile_definitions( openemsh_unittest

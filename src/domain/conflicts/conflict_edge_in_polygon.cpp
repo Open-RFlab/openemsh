@@ -10,18 +10,13 @@
 
 #include <algorithm>
 
+#include "utils/signum.hpp"
 #include "domain/geometrics/edge.hpp"
 #include "domain/geometrics/polygon.hpp"
 
 #include "conflict_edge_in_polygon.hpp"
 
 using namespace std;
-
-//******************************************************************************
-template <typename T>
-int8_t signum(T const& a) {
-	return (T(0) < a) - (a < T(0));
-}
 
 //******************************************************************************
 void sort_overlaps_by_p0_by_vector_orientation(vector<Overlap>& overlaps, Point const& vector) {

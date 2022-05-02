@@ -11,19 +11,12 @@
 #include <algorithm>
 #include <utility>
 
+#include "utils/signum.hpp"
 #include "conflicts/conflict_edge_in_polygon.hpp"
 
 #include "board.hpp"
 
 using namespace std;
-
-// TODO unnamed namespace
-
-//******************************************************************************
-template <typename T>
-int8_t signum(T const& a) {
-	return (T(0) < a) - (a < T(0));
-}
 
 /// @warning Undefined behavior if points are not all colinear.
 ///*****************************************************************************
