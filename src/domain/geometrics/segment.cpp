@@ -115,10 +115,10 @@ optional<Point> intersection(Segment const& a, Segment const& b) {
 		// Diagonal
 		Point a_vec(a.p1() - a.p0());
 		Point b_vec(b.p1() - b.p0());
-		double div = a_vec.x * b_vec.y - a_vec.y * b_vec.x;
+		double div = double (a_vec.x * b_vec.y - a_vec.y * b_vec.x);
 
 		if(div != 0) {
-			double m = (a_vec.x * a.p0().y
+			double m = double (a_vec.x * a.p0().y
 			         - a_vec.x * b.p0().y
 			         - a_vec.y * a.p0().x
 			         + a_vec.y * b.p0().x)
@@ -137,8 +137,8 @@ optional<Range> merge(Segment const& a, Segment const& b) {
 		Bounding2D a_bnd(bounding(a));
 		Bounding2D b_bnd(bounding(b));
 
-		double xmin = 0;
-		double xmax = 0;
+		Coord xmin = 0;
+		Coord xmax = 0;
 		if(a_bnd[XMIN] >= b_bnd[XMIN] && a_bnd[XMIN] <= b_bnd[XMAX])
 			xmin = b_bnd[XMIN];
 		else if(b_bnd[XMIN] >= a_bnd[XMIN] && b_bnd[XMIN] <= a_bnd[XMAX])
@@ -151,8 +151,8 @@ optional<Range> merge(Segment const& a, Segment const& b) {
 		else if(b_bnd[XMAX] >= a_bnd[XMIN] && b_bnd[XMAX] <= a_bnd[XMAX])
 			xmax = a_bnd[XMAX];
 
-		double ymin = 0;
-		double ymax = 0;
+		Coord ymin = 0;
+		Coord ymax = 0;
 		if(a_bnd[YMIN] >= b_bnd[YMIN] && a_bnd[YMIN] <= b_bnd[YMAX])
 			ymin = b_bnd[YMIN];
 		else if(b_bnd[YMIN] >= a_bnd[YMIN] && b_bnd[YMIN] <= a_bnd[YMAX])
@@ -184,8 +184,8 @@ optional<Range> overlap(Segment const& a, Segment const& b) {
 		Bounding2D a_bnd(bounding(a));
 		Bounding2D b_bnd(bounding(b));
 
-		double xmin = 0;
-		double xmax = 0;
+		Coord xmin = 0;
+		Coord xmax = 0;
 		if(a_bnd[XMIN] >= b_bnd[XMIN] && a_bnd[XMIN] <= b_bnd[XMAX])
 			xmin = a_bnd[XMIN];
 		else if(b_bnd[XMIN] >= a_bnd[XMIN] && b_bnd[XMIN] <= a_bnd[XMAX])
@@ -198,8 +198,8 @@ optional<Range> overlap(Segment const& a, Segment const& b) {
 		else if(b_bnd[XMAX] >= a_bnd[XMIN] && b_bnd[XMAX] <= a_bnd[XMAX])
 			xmax = b_bnd[XMAX];
 
-		double ymin = 0;
-		double ymax = 0;
+		Coord ymin = 0;
+		Coord ymax = 0;
 		if(a_bnd[YMIN] >= b_bnd[YMIN] && a_bnd[YMIN] <= b_bnd[YMAX])
 			ymin = a_bnd[YMIN];
 		else if(b_bnd[YMIN] >= a_bnd[YMIN] && b_bnd[YMIN] <= a_bnd[YMAX])

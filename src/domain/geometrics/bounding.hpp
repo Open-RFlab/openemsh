@@ -8,8 +8,10 @@
 
 #include <array>
 
+#include "coord.hpp"
+
 //******************************************************************************
-using Bounding2D = std::array<double, 4>;
+using Bounding2D = std::array<Coord, 4>;
 enum BoundingIndex { XMIN, XMAX, YMIN, YMAX };
 
 //******************************************************************************

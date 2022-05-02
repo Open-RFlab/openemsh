@@ -74,8 +74,8 @@ Polygon::Rotation detect_rotation(T const& points) {
  
 	for(size_t i = 0; i < points.size(); ++i) {
 		size_t j = (i + 1) % points.size();
-		left_sum  += points[i]->x * points[j]->y;
-		right_sum += points[j]->x * points[i]->y;
+		left_sum  += double (points[i]->x * points[j]->y);
+		right_sum += double (points[j]->x * points[i]->y);
 	}
 
 	double area = 0.5 * (left_sum - right_sum);

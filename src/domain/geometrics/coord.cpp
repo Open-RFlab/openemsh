@@ -14,10 +14,60 @@ using namespace std;
 
 //******************************************************************************
 Coord::operator double() const {
-	return value;
+	return val;
 }
 
 //******************************************************************************
-bool Coord::operator==(Coord const& a) const {
-	return (abs(value - (double) a) < equality_tolerance);
+double Coord::value() const {
+	return val;
+}
+
+//******************************************************************************
+bool operator==(Coord const& a, Coord const& b) {
+	return abs(a.value() - b.value()) < equality_tolerance;
+}
+
+//******************************************************************************
+bool operator!=(Coord const& a, Coord const& b) {
+	return !(a == b);
+}
+
+//******************************************************************************
+bool operator<=(Coord const& a, Coord const& b) {
+	return a.value() <= b.value();
+}
+
+//******************************************************************************
+bool operator>=(Coord const& a, Coord const& b) {
+	return a.value() >= b.value();
+}
+
+//******************************************************************************
+bool operator<(Coord const& a, Coord const& b) {
+	return a.value() < b.value();
+}
+
+//******************************************************************************
+bool operator>(Coord const& a, Coord const& b) {
+	return a.value() > b.value();
+}
+
+//******************************************************************************
+Coord operator+(Coord const& a, Coord const& b) {
+	return a.value() + b.value();
+}
+
+//******************************************************************************
+Coord operator-(Coord const& a, Coord const& b) {
+	return a.value() - b.value();
+}
+
+//******************************************************************************
+Coord operator*(Coord const& a, Coord const& b) {
+	return a.value() * b.value();
+}
+
+//******************************************************************************
+Coord operator/(Coord const& a, Coord const& b) {
+	return a.value() / b.value();
 }

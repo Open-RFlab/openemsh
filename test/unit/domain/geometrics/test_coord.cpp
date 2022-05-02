@@ -11,6 +11,7 @@
 #include "domain/geometrics/coord.hpp"
 
 /// @test Coord::operator double() const
+/// @test double Coord::value() const
 /// @test bool Coord::operator==(Coord const& a) const
 ///*****************************************************************************
 
@@ -20,8 +21,20 @@ SCENARIO("Coord::operator double() const", "[coord]") {
 		Coord a(5.5);
 		Coord b(-5.5);
 		THEN("A (double) cast should return the inner value") {
-			REQUIRE((double) a == a.value);
-			REQUIRE((double) b == b.value);
+			REQUIRE((double) a == 5.5);
+			REQUIRE((double) b == -5.5);
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("double Coord::value() const", "[coord]") {
+	GIVEN("A coord") {
+		Coord a(5.5);
+		Coord b(-5.5);
+		THEN("A (double) cast should return the inner value") {
+			REQUIRE(a.value() == 5.5);
+			REQUIRE(b.value() == -5.5);
 		}
 	}
 }

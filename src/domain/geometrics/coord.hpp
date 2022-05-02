@@ -6,34 +6,58 @@
 
 #pragma once
 
-#ifdef UNITTEST
-#define private public
-#endif // UNITTEST
-
 //******************************************************************************
 class Coord {
 private:
-	double value;
+	double val;
 
 public:
 	template<typename T>
-	Coord(T const& value) : value(value) {}
-	operator double() const;
-	bool operator==(Coord const& a) const;
+	Coord(T const& value) : val(value) {}
+	Coord() = default;
+
+	explicit operator double() const;
+	double value() const;
 };
 
-#ifdef UNITTEST
-#undef private
-#endif // UNITTEST
+//******************************************************************************
+bool operator==(Coord const& a, Coord const& b);
+
+//******************************************************************************
+bool operator!=(Coord const& a, Coord const& b);
+
+//******************************************************************************
+bool operator<=(Coord const& a, Coord const& b);
+
+//******************************************************************************
+bool operator>=(Coord const& a, Coord const& b);
+
+//******************************************************************************
+bool operator<(Coord const& a, Coord const& b);
+
+//******************************************************************************
+bool operator>(Coord const& a, Coord const& b);
+
+//******************************************************************************
+Coord operator+(Coord const& a, Coord const& b);
+
+//******************************************************************************
+Coord operator-(Coord const& a, Coord const& b);
+
+//******************************************************************************
+Coord operator*(Coord const& a, Coord const& b);
+
+//******************************************************************************
+Coord operator/(Coord const& a, Coord const& b);
 
 //******************************************************************************
 template<typename T>
 bool operator==(T const& a, Coord const& b) {
-	return (Coord(a) == b);
+	return Coord(a) == b;
 }
 
 //******************************************************************************
 template<typename T>
 bool operator==(Coord const& a, T const& b) {
-	return (a == Coord(b));
+	return a == Coord(b);
 }
