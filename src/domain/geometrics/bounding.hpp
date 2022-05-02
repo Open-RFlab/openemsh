@@ -15,4 +15,4 @@ using Bounding2D = std::array<Coord, 4>;
 enum BoundingIndex { XMIN, XMAX, YMIN, YMAX };
 
 //******************************************************************************
-bool does_overlap(Bounding2D const& a, Bounding2D const& b);
+bool does_overlap(Bounding2D const& a, Bounding2D const& b) noexcept;

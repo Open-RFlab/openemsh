@@ -13,6 +13,6 @@ Meshline::Meshline(Coord coord, MeshlinePolicy* const policy)
 {}
 
 //******************************************************************************
-bool operator<(Meshline const& a, Meshline const& b) {
+bool operator<(Meshline const& a, Meshline const& b) noexcept {
 	return (a.coord < b.coord);
 }

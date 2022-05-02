@@ -13,24 +13,24 @@
 using namespace std;
 
 //******************************************************************************
-Range::Range(Point const p0, Point const p1)
+Range::Range(Point const p0, Point const p1) noexcept
 : Segment(::axis(p0, p1))
 , _p0(p0)
 , _p1(p1)
 {}
 
 //******************************************************************************
-Point const& Range::p0() const {
+Point const& Range::p0() const noexcept {
 	return _p0;
 }
 
 //******************************************************************************
-Point const& Range::p1() const {
+Point const& Range::p1() const noexcept {
 	return _p1;
 }
 
 //******************************************************************************
-bool operator==(Range const& a, Range const& b) {
+bool operator==(Range const& a, Range const& b) noexcept {
 	return (a.p0() == b.p0() && a.p1() == b.p1()) || (a.p0() == b.p1() && a.p1() == b.p0());
 }
 

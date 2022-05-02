@@ -13,61 +13,61 @@
 using namespace std;
 
 //******************************************************************************
-Coord::operator double() const {
+Coord::operator double() const noexcept {
 	return val;
 }
 
 //******************************************************************************
-double Coord::value() const {
+double Coord::value() const noexcept {
 	return val;
 }
 
 //******************************************************************************
-bool operator==(Coord const& a, Coord const& b) {
+bool operator==(Coord const& a, Coord const& b) noexcept {
 	return abs(a.value() - b.value()) < equality_tolerance;
 }
 
 //******************************************************************************
-bool operator!=(Coord const& a, Coord const& b) {
+bool operator!=(Coord const& a, Coord const& b) noexcept {
 	return !(a == b);
 }
 
 //******************************************************************************
-bool operator<=(Coord const& a, Coord const& b) {
+bool operator<=(Coord const& a, Coord const& b) noexcept {
 	return a.value() <= b.value();
 }
 
 //******************************************************************************
-bool operator>=(Coord const& a, Coord const& b) {
+bool operator>=(Coord const& a, Coord const& b) noexcept {
 	return a.value() >= b.value();
 }
 
 //******************************************************************************
-bool operator<(Coord const& a, Coord const& b) {
+bool operator<(Coord const& a, Coord const& b) noexcept {
 	return a.value() < b.value();
 }
 
 //******************************************************************************
-bool operator>(Coord const& a, Coord const& b) {
+bool operator>(Coord const& a, Coord const& b) noexcept {
 	return a.value() > b.value();
 }
 
 //******************************************************************************
-Coord operator+(Coord const& a, Coord const& b) {
+Coord operator+(Coord const& a, Coord const& b) noexcept {
 	return a.value() + b.value();
 }
 
 //******************************************************************************
-Coord operator-(Coord const& a, Coord const& b) {
+Coord operator-(Coord const& a, Coord const& b) noexcept {
 	return a.value() - b.value();
 }
 
 //******************************************************************************
-Coord operator*(Coord const& a, Coord const& b) {
+Coord operator*(Coord const& a, Coord const& b) noexcept {
 	return a.value() * b.value();
 }
 
 //******************************************************************************
-Coord operator/(Coord const& a, Coord const& b) {
+Coord operator/(Coord const& a, Coord const& b) noexcept {
 	return a.value() / b.value();
 }

@@ -18,10 +18,10 @@ private:
 	Point _p1;
 
 public:
-	Range(Point const p0, Point const p1);
+	Range(Point const p0, Point const p1) noexcept;
 
-	Point const& p0() const override;
-	Point const& p1() const override;
+	Point const& p0() const noexcept override;
+	Point const& p1() const noexcept override;
 
 #ifdef DEBUG
 	void print() const;
@@ -29,4 +29,4 @@ public:
 };
 
 //******************************************************************************
-bool operator==(Range const& a, Range const& b);
+bool operator==(Range const& a, Range const& b) noexcept;

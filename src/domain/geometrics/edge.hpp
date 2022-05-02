@@ -62,8 +62,8 @@ public:
 
 	Edge(Point const* p0, Point const* p1);
 
-	Point const& p0() const override;
-	Point const& p1() const override;
+	Point const& p0() const noexcept override;
+	Point const& p1() const noexcept override;
 
 #ifdef DEBUG
 	void print() const;
@@ -78,5 +78,5 @@ public:
 std::optional<Range> merge(Edge const& a, Edge const& b) = delete;
 
 //******************************************************************************
-bool operator==(Range const& a, Edge const& b);
-bool operator==(Edge const& a, Range const& b);
+bool operator==(Range const& a, Edge const& b) noexcept;
+bool operator==(Edge const& a, Range const& b) noexcept;

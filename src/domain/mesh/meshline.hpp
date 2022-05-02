@@ -20,4 +20,4 @@ public:
 };
 
 //******************************************************************************
-bool operator<(Meshline const& a, Meshline const& b);
+bool operator<(Meshline const& a, Meshline const& b) noexcept;

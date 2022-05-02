@@ -17,7 +17,7 @@ using namespace std;
 namespace {
 
 //******************************************************************************
-bool are_parallel(Segment const& a, Segment const& b) {
+bool are_parallel(Segment const& a, Segment const& b) noexcept {
 	Point a_vec(a.p1() - a.p0());
 	Point b_vec(b.p1() - b.p0());
 	return (a.axis == Segment::Axis::H && b.axis == Segment::Axis::H)
@@ -28,7 +28,7 @@ bool are_parallel(Segment const& a, Segment const& b) {
 } // namespace
 
 //******************************************************************************
-Segment::Segment(Axis const axis)
+Segment::Segment(Axis const axis) noexcept
 : axis(axis)
 {}
 
@@ -74,12 +74,12 @@ relation::SegmentPoint Segment::relation_to(Point const& point) const {
 }
 
 //******************************************************************************
-Segment::Axis axis(Point const& p0, Point const& p1) {
+Segment::Axis axis(Point const& p0, Point const& p1) noexcept {
 	return axis(p1 - p0);
 }
 
 //******************************************************************************
-Segment::Axis axis(Point const& vector) {
+Segment::Axis axis(Point const& vector) noexcept {
 	if(vector.x == 0 && vector.y == 0) return Segment::Axis::POINT;
 	else if(vector.x == 0) return Segment::Axis::V;
 	else if(vector.y == 0) return Segment::Axis::H;
@@ -171,7 +171,7 @@ optional<Range> merge(Segment const& a, Segment const& b) {
 }
 
 //******************************************************************************
-Point mid(Segment const& a) {
+Point mid(Segment const& a) noexcept {
 	return mid(a.p0(), a.p1());
 }
 

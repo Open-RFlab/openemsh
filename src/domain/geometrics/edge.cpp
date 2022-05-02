@@ -46,22 +46,22 @@ Edge::Edge(Point const* p0, Point const* p1)
 }
 
 //******************************************************************************
-Point const& Edge::p0() const {
+Point const& Edge::p0() const noexcept {
 	return *_p0;
 }
 
 //******************************************************************************
-Point const& Edge::p1() const {
+Point const& Edge::p1() const noexcept {
 	return *_p1;
 }
 
 //******************************************************************************
-bool operator==(Range const& a, Edge const& b) {
+bool operator==(Range const& a, Edge const& b) noexcept {
 	return (b == a);
 }
 
 //******************************************************************************
-bool operator==(Edge const& a, Range const& b) {
+bool operator==(Edge const& a, Range const& b) noexcept {
 	return ((a.p0() == b.p0() && a.p1() == b.p1())
 	    ||  (a.p0() == b.p1() && a.p1() == b.p0()));
 }

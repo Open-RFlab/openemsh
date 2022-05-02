@@ -45,7 +45,7 @@ void MeshlinePolicyManager::mesh(MeshlinePolicy& policy) {
 }
 
 //******************************************************************************
-GridAxis cast(MeshlinePolicy::Axis const a) {
+GridAxis cast(MeshlinePolicy::Axis const a) noexcept {
 	switch(a) {
 	case MeshlinePolicy::Axis::H: return H;
 	case MeshlinePolicy::Axis::V: return V;

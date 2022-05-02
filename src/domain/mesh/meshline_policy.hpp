@@ -69,7 +69,7 @@ public:
 };
 
 //******************************************************************************
-std::optional<MeshlinePolicy::Axis> cast(Segment::Axis const a);
+std::optional<MeshlinePolicy::Axis> cast(Segment::Axis const a) noexcept;
 
 //******************************************************************************
-Coord coord(Point const& point, MeshlinePolicy::Axis const axis);
+Coord coord(Point const& point, MeshlinePolicy::Axis const axis) noexcept;

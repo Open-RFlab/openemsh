@@ -51,4 +51,4 @@ public:
 #endif // UNITTEST
 
 //******************************************************************************
-GridAxis cast(MeshlinePolicy::Axis const a);
+GridAxis cast(MeshlinePolicy::Axis const a) noexcept;

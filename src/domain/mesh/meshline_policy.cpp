@@ -35,7 +35,7 @@ Meshline MeshlinePolicy::mesh() {
 }
 
 //******************************************************************************
-optional<MeshlinePolicy::Axis> cast(Segment::Axis const a) {
+optional<MeshlinePolicy::Axis> cast(Segment::Axis const a) noexcept {
 	switch(a) {
 	case Segment::Axis::H: return MeshlinePolicy::Axis::H;
 	case Segment::Axis::V: return MeshlinePolicy::Axis::V;
@@ -44,7 +44,7 @@ optional<MeshlinePolicy::Axis> cast(Segment::Axis const a) {
 }
 
 //******************************************************************************
-Coord coord(Point const& point, MeshlinePolicy::Axis const axis) {
+Coord coord(Point const& point, MeshlinePolicy::Axis const axis) noexcept {
 	switch(axis) {
 	case MeshlinePolicy::Axis::H: return point.y;
 	case MeshlinePolicy::Axis::V: return point.x;

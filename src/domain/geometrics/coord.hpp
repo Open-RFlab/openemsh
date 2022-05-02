@@ -13,51 +13,51 @@ private:
 
 public:
 	template<typename T>
-	Coord(T const& value) : val(value) {}
+	Coord(T const& value) noexcept : val(value) {}
 	Coord() = default;
 
-	explicit operator double() const;
-	double value() const;
+	explicit operator double() const noexcept;
+	double value() const noexcept;
 };
 
 //******************************************************************************
-bool operator==(Coord const& a, Coord const& b);
+bool operator==(Coord const& a, Coord const& b) noexcept;
 
 //******************************************************************************
-bool operator!=(Coord const& a, Coord const& b);
+bool operator!=(Coord const& a, Coord const& b) noexcept;
 
 //******************************************************************************
-bool operator<=(Coord const& a, Coord const& b);
+bool operator<=(Coord const& a, Coord const& b) noexcept;
 
 //******************************************************************************
-bool operator>=(Coord const& a, Coord const& b);
+bool operator>=(Coord const& a, Coord const& b) noexcept;
 
 //******************************************************************************
-bool operator<(Coord const& a, Coord const& b);
+bool operator<(Coord const& a, Coord const& b) noexcept;
 
 //******************************************************************************
-bool operator>(Coord const& a, Coord const& b);
+bool operator>(Coord const& a, Coord const& b) noexcept;
 
 //******************************************************************************
-Coord operator+(Coord const& a, Coord const& b);
+Coord operator+(Coord const& a, Coord const& b) noexcept;
 
 //******************************************************************************
-Coord operator-(Coord const& a, Coord const& b);
+Coord operator-(Coord const& a, Coord const& b) noexcept;
 
 //******************************************************************************
-Coord operator*(Coord const& a, Coord const& b);
+Coord operator*(Coord const& a, Coord const& b) noexcept;
 
 //******************************************************************************
-Coord operator/(Coord const& a, Coord const& b);
+Coord operator/(Coord const& a, Coord const& b) noexcept;
 
 //******************************************************************************
 template<typename T>
-bool operator==(T const& a, Coord const& b) {
+bool operator==(T const& a, Coord const& b) noexcept {
 	return Coord(a) == b;
 }
 
 //******************************************************************************
 template<typename T>
-bool operator==(Coord const& a, T const& b) {
+bool operator==(Coord const& a, T const& b) noexcept {
 	return a == Coord(b);
 }

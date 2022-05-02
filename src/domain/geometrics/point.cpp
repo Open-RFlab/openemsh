@@ -13,23 +13,23 @@
 using namespace std;
 
 //******************************************************************************
-Point::Point(Coord x, Coord y)
+Point::Point(Coord x, Coord y) noexcept
 : x(x)
 , y(y)
 {}
 
 //******************************************************************************
-Point operator-(Point const& a, Point const& b) {
+Point operator-(Point const& a, Point const& b) noexcept {
 	return Point(a.x - b.x, a.y - b.y);
 }
 
 //******************************************************************************
-Point operator+(Point const& a, Point const& b) {
+Point operator+(Point const& a, Point const& b) noexcept {
 	return Point(a.x + b.x, a.y + b.y);
 }
 
 //******************************************************************************
-bool operator==(Point const& a, Point const& b) {
+bool operator==(Point const& a, Point const& b) noexcept {
 	return (a.x == b.x && a.y == b.y);
 }
 
@@ -42,7 +42,7 @@ bool operator!=(Point const& a, Point const& b) {
 */
 
 //******************************************************************************
-Point mid(Point const& a, Point const& b) {
+Point mid(Point const& a, Point const& b) noexcept {
 	return Point((a.x + b.x) / 2, (a.y + b.y) / 2);
 }
 
