@@ -2,6 +2,7 @@
 [![Discord](https://img.shields.io/discord/616889479298547722?logo=discord)](https://discord.gg/P82fEmE)
 [![License](https://img.shields.io/github/license/Open-RFlab/openemsh)](LICENSE)
 [![Version](https://img.shields.io/github/v/release/Open-RFlab/openemsh)](https://github.com/Open-RFlab/openemsh/releases/latest)
+[![Nix](https://img.shields.io/static/v1?logo=nixos&logoColor=white&label=&message=Built%20with%20Nix&color=41439a)](https://builtwithnix.org/)
 
 [![SonarCloud quality gate](https://sonarcloud.io/api/project_badges/measure?project=Open-RFlab_openemsh&metric=alert_status)](https://sonarcloud.io/dashboard?id=Open-RFlab_openemsh)
 [![SonarCloud coverage](https://sonarcloud.io/api/project_badges/measure?project=Open-RFlab_openemsh&metric=coverage)](https://sonarcloud.io/dashboard?id=Open-RFlab_openemsh)
@@ -38,13 +39,9 @@ The `doc/` directory contains some experimentations about meshing algorithms, su
 
 ## Developping
 
-### Additional dependencies
+The development environment is based on [Nix](https://nixos.org/) (which handles dependencies) and the tools provided by [cmake-utils](https://github.com/conformism/cmake-utils). Install Nix and take a look to cmake-utils for usage informations.
 
-- [Catch2](https://github.com/catchorg/Catch2/blob/devel/docs/cmake-integration.md#installing-catch2-from-git-repository)
-- Either `lcov` with GCC or `llvm` with Clang
-- All the tools provided [here](https://github.com/conformism/cmake-utils), install the ones you want to use
+- `nix flake update` For updating the dev env
+- `nix develop` For entering the dev env
 
-### Build system configuration
-
-- `-DCMAKE_BUILD_TYPE=<Release|Debug|Coverage>`
-- `make [check|checkall|coverage]`
+And then proceed as usual with CMake.

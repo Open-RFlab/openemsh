@@ -1,2 +1,4 @@
 *build*/
 .vscode/
+result/
+flake.lock

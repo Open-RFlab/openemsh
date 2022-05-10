@@ -4,16 +4,13 @@ project( openemsh
 	LANGUAGES CXX
 	VERSION 0.0.0
 	DESCRIPTION "openEMS mesher"
+	HOMEPAGE_URL "https://github.com/Open-RFlab/openemsh"
 	)
 
 if( NOT CMAKE_BUILD_TYPE )
 	set( CMAKE_BUILD_TYPE "Release" )
 endif()
 message( STATUS "Build type: ${CMAKE_BUILD_TYPE}" )
-
-list( APPEND CMAKE_MODULE_PATH
-	"${CMAKE_SOURCE_DIR}/cmake"
-	)
 
 #[[
 set( CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
@@ -27,34 +24,44 @@ set( CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
 	)
 #]]
 
-include( CPM )
+find_package( CMakeUtils QUIET )
+if( CMakeUtils_FOUND )
+	message( STATUS "Found CMakeUtils: ${CMakeUtils_DIR}" )
+else()
+	message( STATUS "Not found CMakeUtils: Trying to download it with CPM" )
 
-CPMAddPackage(
-	NAME cmake-utils
-	GITHUB_REPOSITORY conformism/cmake-utils
-	GIT_TAG main
-	DOWNLOAD_ONLY
-	)
+	list( APPEND CMAKE_MODULE_PATH
+		"${CMAKE_SOURCE_DIR}/cmake"
+		)
 
-list( PREPEND CMAKE_MODULE_PATH
-	"${FETCHCONTENT_BASE_DIR}/cmake-utils-src"
-	)
+	include( CPM )
 
-set( CMAKE_UTILS
-	CLANG_BUILD_ANALYZER
-	CLANG_FORMAT
-	CLANG_TIDY
-	COVERAGE
-	CPPCHECK
-	IWYU
-	LIZARD
-	SANITIZERS
-	)
+	CPMAddPackage(
+		NAME cmake-utils
+		GITHUB_REPOSITORY conformism/cmake-utils
+		GIT_TAG main
+		DOWNLOAD_ONLY
+		)
 
-set( COVERAGE_GLOBAL_ONLY ON )
-include( CMakeUtils )
+	set( CMakeUtils_DIR "${FETCHCONTENT_BASE_DIR}/cmake-utils-src" )
+
+	find_package( CMakeUtils QUIET )
+	if( CMakeUtils_FOUND )
+		message( STATUS "Found CMakeUtils: ${CMakeUtils_DIR}" )
+	else()
+		message( STATUS "Not found CMakeUtils: Only minimal build enabled" )
+	endif()
+endif()
+
+if( CMakeUtils_FOUND )
+	set( CMAKE_UTILS * )
+	set( COVERAGE_GLOBAL_ONLY ON )
+	include( CMakeUtils )
+endif()
 
 add_subdirectory( "${CMAKE_SOURCE_DIR}/src" )
 add_subdirectory( "${CMAKE_SOURCE_DIR}/test" )
 
-coverage_global()
+if( CMakeUtils_FOUND )
+	coverage_global()
+endif()

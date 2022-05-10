@@ -1,7 +1,7 @@
 
-if( Catch2_FOUND )
-	add_custom_target( unittest )
+add_custom_target( unittest )
 
+if( Catch2_FOUND )
 	add_executable( openemsh_unittest EXCLUDE_FROM_ALL )
 	add_dependencies( unittest openemsh_unittest )
 
@@ -53,18 +53,22 @@ if( Catch2_FOUND )
 		openemsh
 		)
 
-	enable_clang_build_analyzer(
-		TARGET openemsh_unittest
-		)
+	if( CMakeUtils_FOUND )
+		enable_clang_build_analyzer(
+			TARGET openemsh_unittest
+			)
 
-	enable_sanitizers(
-		TARGET openemsh_unittest
-		)
+		enable_sanitizers(
+			TARGET openemsh_unittest
+			)
 
-	coverage(
-		TARGET_TO_RUN openemsh_unittest
-		TARGETS_TO_COVER openemsh
-		ARGS_GCOVR
-			-f "${CMAKE_SOURCE_DIR}/src"
-		)
+		coverage(
+			TARGET_TO_RUN openemsh_unittest
+			TARGETS_TO_COVER openemsh
+#			ARGS_GCOVR
+#				-f "${CMAKE_SOURCE_DIR}/src"
+#				-e "${CMAKE_SOURCE_DIR}/src/domain/board.cpp"
+#				-f "${CMAKE_CURRENT_BINARY_DIR}"
+			)
+	endif()
 endif()

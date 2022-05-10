@@ -55,50 +55,60 @@ install(
 	)
 #]]
 
-file( GLOB_RECURSE OPENEMSH_HEADERS "*.hpp" )
+if( CMakeUtils_FOUND )
+	file( GLOB_RECURSE OPENEMSH_HEADERS "*.hpp" )
 
-lizard(
-	TARGET openemsh
-	ADDITIONAL_FILES ${OPENEMSH_HEADERS}
-	ARGS
-		--languages cpp
-		--sort cyclomatic_complexity
-	)
+	lizard(
+		TARGET openemsh
+		ADDITIONAL_FILES ${OPENEMSH_HEADERS}
+		ARGS
+			--languages cpp
+			--sort cyclomatic_complexity
+		)
 
-iwyu(
-	TARGET openemsh
-	ARGS
-		--std=c++17 # Useless with -p ?
-#		-p="${CMAKE_BINARY_DIR}" # Outdated iwyu version.
-		-Xiwyu
-		--no_comments
-	)
+	iwyu(
+		TARGET openemsh
+		ARGS
+			-p "${CMAKE_BINARY_DIR}"
+			--
+			-Xiwyu
+			--no_comments
+			--cxx17ns
+		)
 
-clang_tidy(
-	TARGET openemsh
-	ARGS
-		-p="${CMAKE_BINARY_DIR}"
-		-checks=*
-	)
+	clang_tidy(
+		TARGET openemsh
+		ARGS
+			-p="${CMAKE_BINARY_DIR}"
+			-checks=*
+		)
 
-clang_format(
-	TARGET openemsh
-	ADDITIONAL_FILES ${OPENEMSH_HEADERS}
-	ARGS
-	)
+	clang_format(
+		TARGET openemsh
+		ADDITIONAL_FILES ${OPENEMSH_HEADERS}
+		ARGS
+		)
 
-cppcheck(
-	TARGET openemsh
-	ADDITIONAL_FILES ${OPENEMSH_HEADERS}
-	ARGS
-#		--enable=all
-#		-v
-	)
+	cppcheck(
+		TARGET openemsh
+		ADDITIONAL_FILES ${OPENEMSH_HEADERS}
+		ARGS
+			--enable=all
+			-v
+		)
 
-enable_clang_build_analyzer(
-	TARGET openemsh
-	)
+	uncrustify(
+		TARGET openemsh
+		ADDITIONAL_FILES ${OPENEMSH_HEADERS}
+		ARGS
+			-c "${CMAKE_SOURCE_DIR}/.uncrustify_0.cfg"
+		)
 
-enable_sanitizers(
-	TARGET openemsh
-	)
+	enable_clang_build_analyzer(
+		TARGET openemsh
+		)
+
+	enable_sanitizers(
+		TARGET openemsh
+		)
+endif()

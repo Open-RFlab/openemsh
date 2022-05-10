@@ -19,6 +19,8 @@ add_custom_target( checkall
 	DEPENDS unittest
 	)
 
-add_test( NAME OpenemshUnittest
-	COMMAND $<TARGET_FILE:openemsh_unittest> --use-colour=yes
-	)
+if( Catch2_FOUND )
+	add_test( NAME OpenemshUnittest
+		COMMAND $<TARGET_FILE:openemsh_unittest> --use-colour=yes
+		)
+endif()
