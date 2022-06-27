@@ -18,9 +18,9 @@ This is an [OpenEMS](https://openems.de) mesher draft (with a H at the end, it l
 By creating myself one of those converter ([Qucs-RFlayout](https://github.com/thomaslepoix/Qucs-RFlayout)), discussing with other meshers authors, observing meshers behavior and looking into their code, I identified some pitfalls that end up to usability or mesh correctness issues :
 
 - All polygon edges should be detected and not just the edges of the polygon minimal bounding boxes.
-- The colinear edges detection is not related to the mesh and thus should be treated _independantly_, before any thirds rule application or smoothmesh generation.
+- The collinear edges' detection is not related to the mesh and thus should be treated _independently_, before any thirds rule application or smoothmesh generation.
 - The user should be able to give directives to customize the mesh / solve meshlines conflicts through a decent interface.
-- The [thirds rule](https://openems.de/index.php/FDTD_Mesh.html) should not be applied statically at the chosen mesh resolution before smoothmeshing, but should be applied _while_ smoothmeshing. The reason is fixed meshlines make the structure really difficult to smoothmesh correctly. Also this way is not possible to correctly handle structure parts that are equivalent or thinner than the mesh resolution.
+- The [thirds rule](https://openems.de/index.php/FDTD_Mesh.html) should not be applied statically at the chosen mesh resolution before smoothmeshing, but should be applied _while_ smoothmeshing. The reason is fixed meshlines make the structure really difficult to smoothmesh correctly. Also, this way is not possible to correctly handle structure parts that are equivalent or thinner than the mesh resolution.
 
 Those considerations led me to think the key to create a correct mesher is about conflict management system :
 - Identifying and classifying conflict kinds.
@@ -28,7 +28,7 @@ Those considerations led me to think the key to create a correct mesher is about
 - Providing automatic resolution.
 - Providing access to resolve manually.
 
-Also I'd like this mesher to be a standalone tool, independant from any converter or scripting API.
+Also, I'd like this mesher to be a standalone tool, independent of any converter or scripting API.
 
 The `doc/` directory contains some experimentations about meshing algorithms, such as [this Python script](doc/abstract/conflict_too_close_meshline_policies/autosolve.py).
 
@@ -37,9 +37,9 @@ The `doc/` directory contains some experimentations about meshing algorithms, su
 ### Dependencies
 -->
 
-## Developping
+## Developing
 
-The development environment is based on [Nix](https://nixos.org/) (which handles dependencies) and the tools provided by [cmake-utils](https://github.com/conformism/cmake-utils). Install Nix and take a look to cmake-utils for usage informations.
+The development environment is based on [Nix](https://nixos.org/) (which handles dependencies) and the tools provided by [cmake-utils](https://github.com/conformism/cmake-utils). Install Nix and take a look to cmake-utils for usage information.
 
 - `nix flake update` For updating the dev env
 - `nix develop` For entering the dev env
