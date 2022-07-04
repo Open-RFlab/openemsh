@@ -10,11 +10,11 @@
 
 #include "utils/signum.hpp"
 
-/// @test template <typename T> int8_t signum(T const& a)
+/// @test template<typename T> int8_t signum(T const& a)
 ///*****************************************************************************
 
 //******************************************************************************
-SCENARIO("template <typename T> int8_t signum(T const& a)", "[utils][signum]") {
+SCENARIO("template<typename T> int8_t signum(T const& a)", "[utils][signum]") {
 	GIVEN("A double number") {
 		WHEN("Positive") {
 			double a = 2;

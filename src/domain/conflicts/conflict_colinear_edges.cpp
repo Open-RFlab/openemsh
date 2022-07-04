@@ -58,11 +58,12 @@ void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manage
 			solution = meshline_policy;
 			is_solved = true;
 		} else if(normal_min && !normal_max) {
-			Normal normal;
-			switch(axis.value()) {
-			case MeshlinePolicy::Axis::H: normal = Normal::YMIN; break;
-			case MeshlinePolicy::Axis::V: normal = Normal::XMIN; break;
-			}
+			Normal normal = [&] {
+				switch(axis.value()) {
+				case MeshlinePolicy::Axis::H: return Normal::YMIN;
+				case MeshlinePolicy::Axis::V: return Normal::XMIN;
+				}
+			} ();
 			meshline_policy = line_policy_manager.add_meshline_policy(
 				this,
 				axis.value(),
@@ -72,11 +73,12 @@ void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manage
 			solution = meshline_policy;
 			is_solved = true;
 		} else if(!normal_min && normal_max) {
-			Normal normal;
-			switch(axis.value()) {
-			case MeshlinePolicy::Axis::H: normal = Normal::YMAX; break;
-			case MeshlinePolicy::Axis::V: normal = Normal::XMAX; break;
-			}
+			Normal normal = [&] {
+				switch(axis.value()) {
+				case MeshlinePolicy::Axis::H: return Normal::YMAX;
+				case MeshlinePolicy::Axis::V: return Normal::XMAX;
+				}
+			} ();
 			meshline_policy = line_policy_manager.add_meshline_policy(
 				this,
 				axis.value(),
