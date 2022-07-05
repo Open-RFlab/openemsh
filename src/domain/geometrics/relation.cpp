@@ -4,6 +4,8 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <cstdlib>
+
 #include "relation.hpp"
 
 namespace relation {
@@ -11,6 +13,7 @@ namespace relation {
 //******************************************************************************
 PolygonPoint cast(PolygonSegment const a) {
 	switch(a) {
+	default: [[fallthrough]];
 	case PolygonSegment::IN: return PolygonPoint::IN;
 	case PolygonSegment::ON: return PolygonPoint::ON;
 	case PolygonSegment::OUT: return PolygonPoint::OUT;
@@ -23,6 +26,7 @@ PolygonSegment cast(PolygonPoint const a) {
 	case PolygonPoint::IN: return PolygonSegment::IN;
 	case PolygonPoint::ON: return PolygonSegment::ON;
 	case PolygonPoint::OUT: return PolygonSegment::OUT;
+	default: abort();
 	}
 }
 
