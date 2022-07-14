@@ -6,8 +6,11 @@
 
 #include <catch2/catch_all.hpp>
 
+#include <vector>
+
 #include "domain/geometrics/edge.hpp"
 #include "domain/geometrics/point.hpp"
+#include "domain/conflict_manager.hpp"
 
 #include "domain/meshline_policy_manager.hpp"
 
@@ -19,6 +22,10 @@
 ///       	Normal const normal,
 ///       	Coord const coord,
 ///       	bool const is_enabled)
+/// @test optional<array<MeshlinePolicy*, 2>> detect_closest_meshline_policies(
+///       	vector<MeshlinePolicy*> dimension,
+///       	Coord proximity_limit)
+/// @test void MeshlinePolicyManager::detect_and_solve_too_close_meshline_policies()
 ///*****************************************************************************
 
 //******************************************************************************
@@ -49,7 +56,7 @@ Coord const coord, \
 bool const is_enabled)", "[meshline_policy_manager]") {
 	GIVEN("A meshline policy manager") {
 		Params params;
-		MeshlinePolicyManager mpm(params);
+		MeshlinePolicyManager mpm(params, nullptr);
 		Point e0(1, 1), e1(1, 3);
 		Edge e(&e0, &e1);
 		WHEN("We add a meshline policy with incoherent axis and normal parameters") {
@@ -130,6 +137,287 @@ bool const is_enabled)", "[meshline_policy_manager]") {
 					REQUIRE(m->is_enabled);
 				}
 			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("optional<array<MeshlinePolicy*, 2>> detect_closest_meshline_policies( \
+vector<MeshlinePolicy*> dimension, \
+Coord proximity_limit)", "[meshline_policy_manager]") {
+	GIVEN("A vector of pointers to meshline policies and a proximity limit") {
+		std::vector<MeshlinePolicy*> vec;
+		Params params;
+		params.proximity_limit = 1;
+		WHEN("Containing no meshline policy") {
+			THEN("Should return nullopt") {
+				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				REQUIRE_FALSE(ret.has_value());
+			}
+		}
+
+		WHEN("Containing one meshline policy") {
+			MeshlinePolicy a(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				params,
+				10);
+			vec.push_back(&a);
+			THEN("Should return nullopt") {
+				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				REQUIRE_FALSE(ret.has_value());
+			}
+		}
+
+		WHEN("Containing two meshline policies more distant than proximity limit") {
+			MeshlinePolicy a(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				params,
+				10);
+			MeshlinePolicy b(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				params,
+				20);
+			vec.push_back(&a);
+			vec.push_back(&b);
+			THEN("Should return nullopt") {
+				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				REQUIRE_FALSE(ret.has_value());
+			}
+		}
+
+		WHEN("Containing two meshline policies as distant as proximity limit") {
+			MeshlinePolicy a(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				params,
+				10);
+			MeshlinePolicy b(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				params,
+				11);
+			vec.push_back(&a);
+			vec.push_back(&b);
+			THEN("Should return both") {
+				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				REQUIRE(ret.has_value());
+				REQUIRE_THAT(*ret, Catch::Matchers::Contains(&a));
+				REQUIRE_THAT(*ret, Catch::Matchers::Contains(&b));
+			}
+		}
+
+		WHEN("Containing two meshline policies less distant than proximity limit") {
+			MeshlinePolicy a(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				params,
+				10);
+			MeshlinePolicy b(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				params,
+				10.5);
+			vec.push_back(&a);
+			vec.push_back(&b);
+			THEN("Should return both") {
+				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				REQUIRE(ret.has_value());
+				REQUIRE_THAT(*ret, Catch::Matchers::Contains(&a));
+				REQUIRE_THAT(*ret, Catch::Matchers::Contains(&b));
+			}
+		}
+
+		WHEN("Containing three meshline policies with two less distant than proximity limit") {
+			MeshlinePolicy a(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				params,
+				10);
+			MeshlinePolicy b(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				params,
+				10.5);
+			MeshlinePolicy c(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				params,
+				20);
+			vec.push_back(&a);
+			vec.push_back(&b);
+			vec.push_back(&c);
+			THEN("Should return the two closer than the limit") {
+				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				REQUIRE(ret.has_value());
+				REQUIRE_THAT(*ret, Catch::Matchers::Contains(&a));
+				REQUIRE_THAT(*ret, Catch::Matchers::Contains(&b));
+			}
+		}
+
+		WHEN("Containing three meshline policies with two pairs less distant than proximity limit") {
+			MeshlinePolicy a(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				params,
+				11.2);
+			MeshlinePolicy b(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				params,
+				10.8);
+			MeshlinePolicy c(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				params,
+				10);
+			vec.push_back(&a);
+			vec.push_back(&b);
+			vec.push_back(&c);
+			THEN("Should return the two closer") {
+				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				REQUIRE(ret.has_value());
+				REQUIRE_THAT(*ret, Catch::Matchers::Contains(&a));
+				REQUIRE_THAT(*ret, Catch::Matchers::Contains(&b));
+			}
+		}
+
+		WHEN("Containing two meshline policies less distant than proximity limit but one is disabled") {
+			MeshlinePolicy a(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				params,
+				10,
+				false);
+			MeshlinePolicy b(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				params,
+				10.5);
+			vec.push_back(&a);
+			vec.push_back(&b);
+			THEN("Should return nullopt") {
+				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				REQUIRE_FALSE(ret.has_value());
+			}
+		}
+
+		WHEN("Containing two meshline policies less distant than proximity limit but one is ONELINE policy") {
+			MeshlinePolicy a(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::ONELINE,
+				Normal::NONE,
+				params,
+				10);
+			MeshlinePolicy b(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				params,
+				10.5);
+			vec.push_back(&a);
+			vec.push_back(&b);
+			THEN("Should return nullopt") {
+				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				REQUIRE_FALSE(ret.has_value());
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("void MeshlinePolicyManager::detect_and_solve_too_close_meshline_policies()", "[meshline_policy_manager]") {
+	class Wrapper {
+	public:
+		Params params;
+		ConflictManager cm;
+		MeshlinePolicyManager mpm;
+
+		Wrapper()
+		: cm(&mpm)
+		, mpm(params, &cm)
+		{}
+	};
+
+	GIVEN("A meshline policy manager and some meshline policies") {
+		Wrapper w;
+		w.params.proximity_limit = 1;
+		Point e0(1, 1), e1(1, 3);
+		Edge e(&e0, &e1);
+
+		// 10  10,2  10,5   11,1  11,7
+		//   10,1    10,5   11,1  11,7
+		//       10,3       11,1  11,7
+		//       10,3          11,4
+
+		w.mpm.add_meshline_policy(
+			&e,
+			MeshlinePolicy::Axis::H,
+			MeshlinePolicy::Policy::HALFS,
+			Normal::NONE,
+			10);
+		w.mpm.add_meshline_policy(
+			&e,
+			MeshlinePolicy::Axis::H,
+			MeshlinePolicy::Policy::HALFS,
+			Normal::NONE,
+			10.2);
+		w.mpm.add_meshline_policy(
+			&e,
+			MeshlinePolicy::Axis::H,
+			MeshlinePolicy::Policy::HALFS,
+			Normal::NONE,
+			10.5);
+		w.mpm.add_meshline_policy(
+			&e,
+			MeshlinePolicy::Axis::H,
+			MeshlinePolicy::Policy::HALFS,
+			Normal::NONE,
+			11.1);
+		w.mpm.add_meshline_policy(
+			&e,
+			MeshlinePolicy::Axis::H,
+			MeshlinePolicy::Policy::HALFS,
+			Normal::NONE,
+			11.7);
+
+		THEN("Meshline policies should be recursively merged till any is closer than the proximity limit") {
+			w.mpm.detect_and_solve_too_close_meshline_policies();
+			REQUIRE(w.mpm.line_policies[V].size() == 0);
+			REQUIRE(w.mpm.line_policies[H].size() == 8);
+			REQUIRE(w.mpm.line_policies[H][0]->coord == 10);
+			REQUIRE_FALSE(w.mpm.line_policies[H][0]->is_enabled);
+			REQUIRE(w.mpm.line_policies[H][1]->coord == 10.2);
+			REQUIRE_FALSE(w.mpm.line_policies[H][1]->is_enabled);
+			REQUIRE(w.mpm.line_policies[H][2]->coord == 10.5);
+			REQUIRE_FALSE(w.mpm.line_policies[H][2]->is_enabled);
+			REQUIRE(w.mpm.line_policies[H][3]->coord == 11.1);
+			REQUIRE_FALSE(w.mpm.line_policies[H][3]->is_enabled);
+			REQUIRE(w.mpm.line_policies[H][4]->coord == 11.7);
+			REQUIRE_FALSE(w.mpm.line_policies[H][4]->is_enabled);
+			REQUIRE(w.mpm.line_policies[H][5]->coord == 10.1);
+			REQUIRE_FALSE(w.mpm.line_policies[H][5]->is_enabled);
+			REQUIRE(w.mpm.line_policies[H][6]->coord == 10.3);
+			REQUIRE(w.mpm.line_policies[H][6]->is_enabled);
+			REQUIRE(w.mpm.line_policies[H][7]->coord == 11.4);
+			REQUIRE(w.mpm.line_policies[H][7]->is_enabled);
 		}
 	}
 }

@@ -6,6 +6,7 @@
 
 #include "geometrics/edge.hpp"
 #include "geometrics/polygon.hpp"
+#include "mesh/meshline_policy.hpp"
 
 #include "conflict_manager.hpp"
 
@@ -113,6 +114,31 @@ void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const
 //		b->conflicts.push_back(conflict); // TODO needed?
 		polygon->conflicts.push_back(conflict);
 	}
+}
+
+//******************************************************************************
+ConflictTooCloseMeshlinePolicies* ConflictManager::add_too_close_meshline_policies(
+		MeshlinePolicy* a,
+		MeshlinePolicy* b) noexcept {
+
+	if(a->axis != b->axis)
+		return nullptr;
+
+	for(auto& conflict : all_too_close_meshline_policies)
+		if(conflict->meshline_policies[0] == a
+		|| conflict->meshline_policies[0] == b
+		|| conflict->meshline_policies[1] == a
+		|| conflict->meshline_policies[1] == b)
+			return nullptr;
+
+	auto conflict = all_too_close_meshline_policies.emplace_back(
+		make_unique<ConflictTooCloseMeshlinePolicies>(a, b)).get();
+	a->conflicts.push_back(conflict);
+	b->conflicts.push_back(conflict);
+	a->is_enabled = false;
+	b->is_enabled = false;
+
+	return conflict;
 }
 
 //******************************************************************************

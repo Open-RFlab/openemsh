@@ -4,13 +4,17 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#pragma once
+#include <memory>
+#include <vector>
 
 //******************************************************************************
-struct Params {
-	double metal_res;
-	double substrate_res;
-	double proximity_limit;
-};
+template<typename T>
+std::vector<T*> create_view(std::vector<std::unique_ptr<T>> const& original) noexcept {
+	std::vector<T*> view(original.size());
 
-inline double equality_tolerance = 1e-8;
+	for(size_t i = 0, size = original.size(); i < size; ++i) {
+		view[i] = original[i].get();
+	}
+
+	return view;
+}

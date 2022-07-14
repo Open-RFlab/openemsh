@@ -71,3 +71,8 @@ Coord operator*(Coord const& a, Coord const& b) noexcept {
 Coord operator/(Coord const& a, Coord const& b) noexcept {
 	return a.value() / b.value();
 }
+
+//******************************************************************************
+Coord mid(Coord const& a, Coord const& b) {
+	return (a.value() + b.value()) / 2;
+}

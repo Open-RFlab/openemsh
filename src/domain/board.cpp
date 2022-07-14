@@ -68,7 +68,7 @@ void sort_points_by_vector_orientation(vector<Point>& points, Point const& vecto
 //******************************************************************************
 Board::Board(vector<unique_ptr<Polygon>>& polygons)
 : conflict_manager(&line_policy_manager)
-, line_policy_manager(params)
+, line_policy_manager(params, &conflict_manager)
 , polygons(move(polygons)) {
 	for(unique_ptr<Polygon>& polygon : this->polygons)
 		for(unique_ptr<Edge>& edge : polygon->edges)

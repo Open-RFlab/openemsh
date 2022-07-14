@@ -43,7 +43,7 @@ bool operator!=(Point const& a, Point const& b) {
 
 //******************************************************************************
 Point mid(Point const& a, Point const& b) noexcept {
-	return Point((a.x + b.x) / 2, (a.y + b.y) / 2);
+	return Point(mid(a.x, b.x), mid(a.y, b.y));
 }
 
 #ifdef DEBUG

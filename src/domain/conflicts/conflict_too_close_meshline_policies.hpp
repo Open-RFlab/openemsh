@@ -6,11 +6,16 @@
 
 #pragma once
 
-//******************************************************************************
-struct Params {
-	double metal_res;
-	double substrate_res;
-	double proximity_limit;
-};
+#include <array>
 
-inline double equality_tolerance = 1e-8;
+#include "conflict.hpp"
+
+//******************************************************************************
+class ConflictTooCloseMeshlinePolicies : public Conflict {
+public:
+	std::array<MeshlinePolicy* const, 2> const meshline_policies;
+
+	ConflictTooCloseMeshlinePolicies(MeshlinePolicy* a, MeshlinePolicy* b);
+
+	void auto_solve(MeshlinePolicyManager& line_policy_manager) override;
+};

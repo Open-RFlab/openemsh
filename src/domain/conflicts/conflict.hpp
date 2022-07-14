@@ -22,7 +22,8 @@ public:
 		USER_WILL, // TODO multiple cases ?
 		EDGE_IN_POLYGON,
 //		OVERLAPPING_EDGES, // TODO this or EDGE_IN_POLYGON subcase? try EOP first
-		COLINEAR_EDGES
+		COLINEAR_EDGES,
+		TOO_CLOSE_MESHLINE_POLICIES
 	} kind;
 
 	bool is_solved;

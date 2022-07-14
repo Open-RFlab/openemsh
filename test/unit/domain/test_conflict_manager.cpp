@@ -11,16 +11,25 @@
 #include "domain/geometrics/edge.hpp"
 #include "domain/geometrics/point.hpp"
 #include "domain/geometrics/polygon.hpp"
+#include "domain/mesh/meshline_policy.hpp"
+#include "domain/global.hpp"
 
 #include "domain/conflict_manager.hpp"
 
 /// @test void ConflictManager::add_colinear_edges(Edge* a, Edge* b)
-/// @test void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const range, std::optional<Edge const*> b)
+/// @test void ConflictManager::add_edge_in_polygon(
+///       	Edge* a,
+///       	Polygon* polygon,
+///       	Range const range,
+///       	std::optional<Edge const*> b)
+/// @test ConflictTooCloseMeshlinePolicies& ConflictManager::add_too_close_meshline_policies(
+///       	MeshlinePolicy* a,
+///       	MeshlinePolicy* b)
 ///*****************************************************************************
 
 //******************************************************************************
 SCENARIO("void ConflictManager::add_colinear_edges(Edge* a, Edge* b)", "[conflict_manager]") {
-	GIVEN("A conflict vector, a conflict manager and some edges") {
+	GIVEN("A conflict manager and some edges") {
 		ConflictManager cm(nullptr);
 		WHEN("Two vertical edges that are colinear are reported as colinear") {
 			Point a0(1, 1), a1(1, 2);
@@ -232,7 +241,7 @@ SCENARIO("void ConflictManager::add_colinear_edges(Edge* a, Edge* b)", "[conflic
 
 //******************************************************************************
 SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const range, std::optional<Edge const*> b)", "[conflict_manager]") {
-	GIVEN("A conflict vector, a conflict manager, an edge and some polygons") {
+	GIVEN("A conflict manager, an edge and some polygons") {
 		ConflictManager cm(nullptr);
 		Polygon p({
 			{ 3, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }, { 1, 3 },
@@ -592,6 +601,105 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 				REQUIRE(a.conflicts[0] == conflict);
 				REQUIRE(p.conflicts.size() == 1);
 				REQUIRE(p.conflicts[0] == conflict);
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("ConflictTooCloseMeshlinePolicies& ConflictManager::add_too_close_meshline_policies( \
+MeshlinePolicy* a, \
+MeshlinePolicy* b)", "[conflict_manager]") {
+	GIVEN("A conflict manager and some meshline policies") {
+		ConflictManager cm(nullptr);
+		WHEN("Two meshline policies of different axis are reported") {
+			Params p;
+			MeshlinePolicy a(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				p,
+				5);
+			MeshlinePolicy b(
+				MeshlinePolicy::Axis::V,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				p,
+				5);
+			THEN("No conflict should be registered") {
+				auto* c = cm.add_too_close_meshline_policies(&a, &b);
+				REQUIRE(c == nullptr);
+			}
+		}
+
+		WHEN("Two meshline policies of same axis are reported") {
+			Params p;
+			MeshlinePolicy a(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				p,
+				5);
+			MeshlinePolicy b(
+				MeshlinePolicy::Axis::H,
+				MeshlinePolicy::Policy::HALFS,
+				Normal::NONE,
+				p,
+				5);
+			auto* c0 = cm.add_too_close_meshline_policies(&a, &b);
+			THEN("A TOO_CLOSE_MESHLINE_POLICIES conflict should be registered") {
+				REQUIRE_FALSE(c0 == nullptr);
+				REQUIRE(c0->kind == Conflict::Kind::TOO_CLOSE_MESHLINE_POLICIES);
+				REQUIRE(c0->meshline_policies[0] == &a);
+				REQUIRE(c0->meshline_policies[1] == &b);
+				REQUIRE_FALSE(a.is_enabled);
+				REQUIRE_FALSE(b.is_enabled);
+			}
+
+			AND_WHEN("Two other meshline policies of same axis are reported") {
+				MeshlinePolicy d(
+					MeshlinePolicy::Axis::H,
+					MeshlinePolicy::Policy::HALFS,
+					Normal::NONE,
+					p,
+					5);
+				MeshlinePolicy e(
+					MeshlinePolicy::Axis::H,
+					MeshlinePolicy::Policy::HALFS,
+					Normal::NONE,
+					p,
+					5);
+				auto* c1 = cm.add_too_close_meshline_policies(&d, &e);
+				THEN("A TOO_CLOSE_MESHLINE_POLICIES conflict should be registered") {
+					REQUIRE_FALSE(c1 == nullptr);
+					REQUIRE_FALSE(c1 == c0);
+					REQUIRE(c1->kind == Conflict::Kind::TOO_CLOSE_MESHLINE_POLICIES);
+					REQUIRE(c1->meshline_policies[0] == &d);
+					REQUIRE(c1->meshline_policies[1] == &e);
+					REQUIRE_FALSE(d.is_enabled);
+					REQUIRE_FALSE(e.is_enabled);
+				}
+			}
+
+			AND_WHEN("A third meshline policy of same axis is reported to conflict with an already conflicting one") {
+				MeshlinePolicy d(
+					MeshlinePolicy::Axis::H,
+					MeshlinePolicy::Policy::HALFS,
+					Normal::NONE,
+					p,
+					5);
+				auto* c1 = cm.add_too_close_meshline_policies(&a, &d);
+				auto* c2 = cm.add_too_close_meshline_policies(&d, &a);
+				auto* c3 = cm.add_too_close_meshline_policies(&b, &d);
+				auto* c4 = cm.add_too_close_meshline_policies(&d, &b);
+				auto* c5 = cm.add_too_close_meshline_policies(&a, &b);
+				THEN("No conflict should be registered") {
+					REQUIRE(c1 == nullptr);
+					REQUIRE(c2 == nullptr);
+					REQUIRE(c3 == nullptr);
+					REQUIRE(c4 == nullptr);
+					REQUIRE(c5 == nullptr);
+				}
 			}
 		}
 	}

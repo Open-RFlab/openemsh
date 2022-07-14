@@ -61,3 +61,6 @@ template<typename T>
 bool operator==(Coord const& a, T const& b) noexcept {
 	return a == Coord(b);
 }
+
+//******************************************************************************
+Coord mid(Coord const& a, Coord const& b);

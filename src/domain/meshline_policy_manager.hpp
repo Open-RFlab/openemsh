@@ -8,11 +8,13 @@
 
 #include <array>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "mesh/meshline.hpp"
 #include "mesh/meshline_policy.hpp"
 
+class ConflictManager;
 class Meshline;
 
 #ifdef UNITTEST
@@ -28,12 +30,14 @@ enum GridAxis { H, V };
 class MeshlinePolicyManager { // TODO MeshlineManager
 private:
 	Params& params;
+	ConflictManager* const conflict_manager;
 
 	Grid<std::vector<std::unique_ptr<MeshlinePolicy>>> line_policies;
 	Grid<std::vector<std::unique_ptr<Meshline>>> meshlines;
 
+
 public:
-	explicit MeshlinePolicyManager(Params& params);
+	MeshlinePolicyManager(Params& params, ConflictManager* conflict_manager);
 
 	MeshlinePolicy* add_meshline_policy(
 		IMeshLineOrigin* origin,
@@ -44,11 +48,20 @@ public:
 		bool const is_enabled = true);
 
 	void mesh(MeshlinePolicy& policy);
+
+	void detect_and_solve_too_close_meshline_policies();
+	void detect_intervals();
+	void mesh();
 };
 
 #ifdef UNITTEST
 #undef private
 #endif // UNITTEST
+
+//******************************************************************************
+std::optional<std::array<MeshlinePolicy*, 2>> detect_closest_meshline_policies(
+	std::vector<MeshlinePolicy*> dimension,
+	Coord proximity_limit);
 
 //******************************************************************************
 GridAxis cast(MeshlinePolicy::Axis const a) noexcept;

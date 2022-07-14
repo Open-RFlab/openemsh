@@ -19,7 +19,7 @@
 SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manager)", "[conflict_colinear_edges]") {
 	GIVEN("A conflict about four colinear vertical edges with mixed normals") {
 		Params params;
-		MeshlinePolicyManager mpm(params);
+		MeshlinePolicyManager mpm(params, nullptr);
 		Point a0(1, 1), a1(1, 2);
 		Point b0(1, 3), b1(1, 4);
 		Point c0(1, 5), c1(1, 6);
@@ -135,7 +135,7 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 
 	GIVEN("A conflict about four colinear horizontal edges with mixed normals") {
 		Params params;
-		MeshlinePolicyManager mpm(params);
+		MeshlinePolicyManager mpm(params, nullptr);
 		Point a0(1, 1), a1(2, 1);
 		Point b0(3, 1), b1(4, 1);
 		Point c0(5, 1), c1(6, 1);

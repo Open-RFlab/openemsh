@@ -13,9 +13,11 @@
 //#include "conflict.hpp"
 #include "conflicts/conflict_colinear_edges.hpp"
 #include "conflicts/conflict_edge_in_polygon.hpp"
+#include "conflicts/conflict_too_close_meshline_policies.hpp"
 
 class Edge;
 class MeshlinePolicyManager;
+class MeshlinePolicy;
 class Polygon;
 class Range;
 
@@ -31,6 +33,7 @@ private:
 
 	std::vector<std::unique_ptr<ConflictEdgeInPolygon>> all_edge_in_polygons;
 	std::vector<std::unique_ptr<ConflictColinearEdges>> all_colinear_edges;
+	std::vector<std::unique_ptr<ConflictTooCloseMeshlinePolicies>> all_too_close_meshline_policies;
 
 public:
 	explicit ConflictManager(MeshlinePolicyManager* const line_policy_manager);
@@ -39,6 +42,7 @@ public:
 
 	void add_edge_in_polygon(Edge* a, Polygon* polygon, std::optional<Edge const*> b = std::nullopt);
 	void add_edge_in_polygon(Edge* a, Polygon* polygon, Range const range, std::optional<Edge const*> b = std::nullopt);
+	ConflictTooCloseMeshlinePolicies* add_too_close_meshline_policies(MeshlinePolicy* a, MeshlinePolicy* b) noexcept;
 
 //	void add_user_will(Edge* a); // TODO
 
