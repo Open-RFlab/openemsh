@@ -58,7 +58,8 @@ jobs:
             -Bbuild \
             -DCMAKE_BUILD_TYPE=Coverage \
             -DCMAKE_CXX_COMPILER=g++ \
-            -DSONAR=ON
+            -DSONAR=ON \
+            -DCOVERAGE_ERROR=OFF
 
       - name: Build
         run: |
