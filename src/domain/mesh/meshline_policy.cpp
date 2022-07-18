@@ -48,5 +48,6 @@ Coord coord(Point const& point, MeshlinePolicy::Axis const axis) noexcept {
 	switch(axis) {
 	case MeshlinePolicy::Axis::H: return point.y;
 	case MeshlinePolicy::Axis::V: return point.x;
+	default: abort();
 	}
 }

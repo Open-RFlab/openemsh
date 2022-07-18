@@ -105,5 +105,6 @@ GridAxis cast(MeshlinePolicy::Axis const a) noexcept {
 	switch(a) {
 	case MeshlinePolicy::Axis::H: return H;
 	case MeshlinePolicy::Axis::V: return V;
+	default: abort();
 	}
 }

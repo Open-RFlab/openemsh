@@ -13,10 +13,10 @@ namespace relation {
 //******************************************************************************
 PolygonPoint cast(PolygonSegment const a) {
 	switch(a) {
-	default: [[fallthrough]];
 	case PolygonSegment::IN: return PolygonPoint::IN;
 	case PolygonSegment::ON: return PolygonPoint::ON;
 	case PolygonSegment::OUT: return PolygonPoint::OUT;
+	default: abort();
 	}
 }
 
