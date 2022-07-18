@@ -4,6 +4,7 @@
 [![Version](https://img.shields.io/github/v/release/Open-RFlab/openemsh)](https://github.com/Open-RFlab/openemsh/releases/latest)
 [![Nix](https://img.shields.io/static/v1?logo=nixos&logoColor=white&label=&message=Built%20with%20Nix&color=41439a)](https://builtwithnix.org/)
 
+[![LGTM grade](https://img.shields.io/lgtm/grade/cpp/g/Open-RFlab/openemsh.svg?logo=lgtm)](https://lgtm.com/projects/g/Open-RFlab/openemsh/context:cpp)
 [![SonarCloud quality gate](https://sonarcloud.io/api/project_badges/measure?project=Open-RFlab_openemsh&metric=alert_status)](https://sonarcloud.io/dashboard?id=Open-RFlab_openemsh)
 [![SonarCloud coverage](https://sonarcloud.io/api/project_badges/measure?project=Open-RFlab_openemsh&metric=coverage)](https://sonarcloud.io/dashboard?id=Open-RFlab_openemsh)
 
