@@ -10,7 +10,7 @@ on:
 #    cron: "0 13 * * 1" # Every monday at 13h
 
 env:
-  SONAR_SCANNER_VERSION: 4.6.2.2472
+  SONAR_SCANNER_VERSION: 4.7.0.2747
 
 jobs:
   run:
