@@ -21,7 +21,8 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y \
-            gcovr
+            gcovr \
+            libxml2-utils
 
       - name: "Dependencies: Sonar"
         run: |
@@ -38,6 +39,11 @@ jobs:
           unzip \
             -o /tmp/sonar/build-wrapper-linux-x86.zip \
             -d /tmp/sonar/
+
+      - name: "Dependencies: Report.CI"
+        run: |
+          curl https://report.ci/report.py \
+            > /tmp/report.py
 
       - name: "Dependencies: Catch2"
         run: |
@@ -78,3 +84,35 @@ jobs:
             -Dsonar.host.url="https://sonarcloud.io" \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.cfamily.cache.enabled=false
+
+      - name: Produce test report
+        run: |
+          build/test/unit/openemsh_unittest \
+            -r xml::out=build/test/unit/openemsh_unittest_result.catch.xml \
+            || true
+
+      - name: Downgrade Catch XML format
+        run: |
+          sed \
+            -i build/test/unit/openemsh_unittest_result.catch.xml \
+            -e 's/<Catch2TestRun/<Catch/g' \
+            -e '3i\<Group name="openemsh_unittest">' \
+            -e "s/^<\/Catch2TestRun>/<\/Group>/"
+          cat build/test/unit/openemsh_unittest_result.catch.xml \
+            | tail -3 \
+            | head -1 \
+            >> build/test/unit/openemsh_unittest_result.catch.xml
+          sed \
+            -i build/test/unit/openemsh_unittest_result.catch.xml \
+            -e '$a\</Catch>'
+          xmllint \
+            build/test/unit/openemsh_unittest_result.catch.xml \
+            -o build/test/unit/openemsh_unittest_result.catch.xml \
+            --format
+
+      - name: Export test report
+        run: |
+          python /tmp/report.py \
+            --name "Unittest"
+            --token ${{ secrets.REPORT_CI_TOKEN }} \
+            --include-as-catch build/test/unit/*.catch.xml
