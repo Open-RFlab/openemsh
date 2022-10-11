@@ -27,11 +27,15 @@ MeshlinePolicy::MeshlinePolicy(
 , coord(coord)
 , is_enabled(is_enabled)
 , res_factor(res_factor)
+, d(params.dmax / res_factor)
 {}
 
 //******************************************************************************
-Meshline MeshlinePolicy::mesh() {
-	return Meshline(coord, this);
+optional<Meshline> MeshlinePolicy::mesh() {
+	if(policy == Policy::ONELINE)
+		return Meshline(coord, this);
+	else
+		return nullopt;
 }
 
 //******************************************************************************

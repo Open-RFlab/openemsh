@@ -7,8 +7,23 @@
 #include "meshline.hpp"
 
 //******************************************************************************
-Meshline::Meshline(Coord coord, MeshlinePolicy* const policy)
+Meshline::Meshline(Coord coord, Interval* const interval, MeshlinePolicy* const policy) noexcept
 : coord(coord)
+, interval(interval)
+, policy(policy)
+{}
+
+//******************************************************************************
+Meshline::Meshline(Coord coord, Interval* const interval) noexcept
+: coord(coord)
+, interval(interval)
+, policy(nullptr)
+{}
+
+//******************************************************************************
+Meshline::Meshline(Coord coord, MeshlinePolicy* const policy) noexcept
+: coord(coord)
+, interval(nullptr)
 , policy(policy)
 {}
 

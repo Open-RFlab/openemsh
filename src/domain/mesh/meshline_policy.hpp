@@ -50,7 +50,9 @@ public:
 	Params& params;
 	Coord const coord;
 	bool is_enabled;
-	double res_factor;
+	double res_factor; // TODO useful? d directly? come from params
+
+	double d; ///< Distance betwen two lines (HALFS and THIRDS only).
 
 	std::vector<IMeshLineOrigin*> origins;
 	std::vector<Meshline*> meshlines; // TODO unique_ptr or ptr?
@@ -63,9 +65,9 @@ public:
 		Params& params,
 		Coord const coord,
 		bool const is_enabled = true,
-		double const res_factor = 1);
+		double const res_factor = 2);
 
-	Meshline mesh();
+	std::optional<Meshline> mesh();
 };
 
 //******************************************************************************

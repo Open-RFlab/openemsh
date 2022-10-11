@@ -11,6 +11,9 @@ struct Params {
 	double metal_res;
 	double substrate_res;
 	double proximity_limit;
+	double lambda = 2;
+	size_t lmin = 10;
+	double dmax = 2.5;
 };
 
 inline double equality_tolerance = 1e-8;

@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <limits>
 
+#include "mesh/meshline.hpp"
 #include "utils/vector_view.hpp"
 #include "conflict_manager.hpp"
 
@@ -42,13 +43,6 @@ MeshlinePolicy* MeshlinePolicyManager::add_meshline_policy(
 	line_policy->origins.emplace_back(origin);
 
 	return line_policy.get();
-}
-
-//******************************************************************************
-void MeshlinePolicyManager::mesh(MeshlinePolicy& policy) {
-	unique_ptr<Meshline>& line = meshlines[cast(policy.axis)].emplace_back(
-		make_unique<Meshline>(policy.mesh()));
-	policy.meshlines.push_back(line.get());
 }
 
 //******************************************************************************
@@ -101,10 +95,88 @@ void MeshlinePolicyManager::detect_and_solve_too_close_meshline_policies() {
 }
 
 //******************************************************************************
+void MeshlinePolicyManager::detect_intervals() {
+	for(size_t axis = H; axis <= V; ++axis) {
+		auto dimension = create_view(line_policies[axis]);
+
+		dimension.erase(remove_if(begin(dimension), end(dimension),
+			[](MeshlinePolicy const* a) {
+				return (!a->is_enabled);
+			}),
+			end(dimension));
+
+		sort(begin(dimension), end(dimension),
+			[](MeshlinePolicy const* a, MeshlinePolicy const* b) {
+				return a->coord < b->coord;
+			});
+
+		for(size_t i = 1; i < dimension.size(); ++i) {
+			unique_ptr<Interval>& interval = intervals[axis].emplace_back(make_unique<Interval>(
+				dimension[i-1], dimension[i], cast(GridAxis(axis)), params));
+			// TODO add links MLP -> I ?
+		}
+	}
+}
+
+//******************************************************************************
+void MeshlinePolicyManager::mesh() {
+	for(size_t axis = H; axis <= V; ++axis) {
+		auto dimension_view = create_view(intervals[axis]);
+
+		sort(begin(dimension_view), end(dimension_view),
+			[](Interval const* a, Interval const* b) {
+				return a->h < b->h;
+			});
+
+		for(auto interval : dimension_view)
+			interval->auto_solve_d();
+
+		size_t new_size = meshlines[axis].size();
+		vector<vector<unique_ptr<Meshline>>> interval_meshlines;
+
+		for(auto interval : dimension_view) {
+//			interval->auto_solve_d();
+			interval->auto_solve_lambda();
+			interval_meshlines.emplace_back(interval->mesh());
+
+			new_size += interval_meshlines.back().size();
+		}
+
+		for(auto const& line_policy : line_policies[axis]) {
+			if(auto meshline = line_policy->mesh(); meshline) {
+				vector<unique_ptr<Meshline>> v;
+				v.push_back(make_unique<Meshline>(meshline.value()));
+				interval_meshlines.emplace_back(move(v));
+				++new_size;
+			}
+		}
+
+		meshlines[axis].reserve(new_size);
+		for(auto& it : interval_meshlines) {
+			move(begin(it), end(it), back_inserter(meshlines[axis]));
+		}
+
+		sort(begin(meshlines[axis]), end(meshlines[axis]),
+			[](unique_ptr<Meshline> const& a, unique_ptr<Meshline> const& b) {
+				return *a < *b;
+			});
+	}
+}
+
+//******************************************************************************
 GridAxis cast(MeshlinePolicy::Axis const a) noexcept {
 	switch(a) {
 	case MeshlinePolicy::Axis::H: return H;
 	case MeshlinePolicy::Axis::V: return V;
+	default: abort();
+	}
+}
+
+//******************************************************************************
+Interval::Axis cast(GridAxis const a) noexcept {
+	switch(a) {
+	case H: return Interval::Axis::H;
+	case V: return Interval::Axis::V;
 	default: abort();
 	}
 }
