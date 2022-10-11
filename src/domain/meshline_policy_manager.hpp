@@ -11,6 +11,7 @@
 #include <optional>
 #include <vector>
 
+#include "mesh/interval.hpp"
 #include "mesh/meshline.hpp"
 #include "mesh/meshline_policy.hpp"
 
@@ -34,7 +35,7 @@ private:
 
 	Grid<std::vector<std::unique_ptr<MeshlinePolicy>>> line_policies;
 	Grid<std::vector<std::unique_ptr<Meshline>>> meshlines;
-
+	Grid<std::vector<std::unique_ptr<Interval>>> intervals;
 
 public:
 	MeshlinePolicyManager(Params& params, ConflictManager* conflict_manager);
@@ -46,8 +47,6 @@ public:
 		Normal const normal,
 		Coord const coord,
 		bool const is_enabled = true);
-
-	void mesh(MeshlinePolicy& policy);
 
 	void detect_and_solve_too_close_meshline_policies();
 	void detect_intervals();
@@ -65,3 +64,6 @@ std::optional<std::array<MeshlinePolicy*, 2>> detect_closest_meshline_policies(
 
 //******************************************************************************
 GridAxis cast(MeshlinePolicy::Axis const a) noexcept;
+
+//******************************************************************************
+Interval::Axis cast(GridAxis const a) noexcept;

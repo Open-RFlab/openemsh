@@ -48,7 +48,6 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.line_policies[V][0]->normal == Normal::NONE);
 				REQUIRE(mpm.line_policies[V][0]->coord == 1);
 				REQUIRE(mpm.line_policies[V][0]->is_enabled);
-				REQUIRE(mpm.line_policies[V][0]->res_factor == 1);
 			}
 		}
 
@@ -68,7 +67,6 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.line_policies[V][0]->normal == Normal::NONE);
 				REQUIRE(mpm.line_policies[V][0]->coord == 1);
 				REQUIRE(mpm.line_policies[V][0]->is_enabled);
-				REQUIRE(mpm.line_policies[V][0]->res_factor == 1);
 			}
 		}
 
@@ -88,7 +86,6 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.line_policies[V][0]->normal == Normal::XMIN);
 				REQUIRE(mpm.line_policies[V][0]->coord == 1);
 				REQUIRE(mpm.line_policies[V][0]->is_enabled);
-				REQUIRE(mpm.line_policies[V][0]->res_factor == 1);
 			}
 		}
 
@@ -108,7 +105,6 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.line_policies[V][0]->normal == Normal::NONE);
 				REQUIRE(mpm.line_policies[V][0]->coord == 1);
 				REQUIRE(mpm.line_policies[V][0]->is_enabled);
-				REQUIRE(mpm.line_policies[V][0]->res_factor == 1);
 			}
 		}
 
@@ -128,7 +124,6 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.line_policies[V][0]->normal == Normal::XMAX);
 				REQUIRE(mpm.line_policies[V][0]->coord == 1);
 				REQUIRE(mpm.line_policies[V][0]->is_enabled);
-				REQUIRE(mpm.line_policies[V][0]->res_factor == 1);
 			}
 		}
 	}
@@ -164,7 +159,6 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.line_policies[H][0]->normal == Normal::NONE);
 				REQUIRE(mpm.line_policies[H][0]->coord == 1);
 				REQUIRE(mpm.line_policies[H][0]->is_enabled);
-				REQUIRE(mpm.line_policies[H][0]->res_factor == 1);
 			}
 		}
 
@@ -184,7 +178,6 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.line_policies[H][0]->normal == Normal::NONE);
 				REQUIRE(mpm.line_policies[H][0]->coord == 1);
 				REQUIRE(mpm.line_policies[H][0]->is_enabled);
-				REQUIRE(mpm.line_policies[H][0]->res_factor == 1);
 			}
 		}
 
@@ -204,7 +197,6 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.line_policies[H][0]->normal == Normal::YMIN);
 				REQUIRE(mpm.line_policies[H][0]->coord == 1);
 				REQUIRE(mpm.line_policies[H][0]->is_enabled);
-				REQUIRE(mpm.line_policies[H][0]->res_factor == 1);
 			}
 		}
 
@@ -224,7 +216,6 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.line_policies[H][0]->normal == Normal::NONE);
 				REQUIRE(mpm.line_policies[H][0]->coord == 1);
 				REQUIRE(mpm.line_policies[H][0]->is_enabled);
-				REQUIRE(mpm.line_policies[H][0]->res_factor == 1);
 			}
 		}
 
@@ -244,7 +235,6 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.line_policies[H][0]->normal == Normal::YMAX);
 				REQUIRE(mpm.line_policies[H][0]->coord == 1);
 				REQUIRE(mpm.line_policies[H][0]->is_enabled);
-				REQUIRE(mpm.line_policies[H][0]->res_factor == 1);
 			}
 		}
 	}
