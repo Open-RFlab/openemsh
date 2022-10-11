@@ -18,6 +18,32 @@ public:
 
 	explicit operator double() const noexcept;
 	double value() const noexcept;
+
+	template<typename T>
+	Coord& operator=(T const& a) noexcept {
+		val = (double) a;
+		return *this;
+	}
+	template<typename T>
+	Coord& operator+=(T const& a) noexcept {
+		val += (double) a;
+		return *this;
+	}
+	template<typename T>
+	Coord& operator-=(T const& a) noexcept {
+		val -= (double) a;
+		return *this;
+	}
+	template<typename T>
+	Coord& operator*=(T const& a) noexcept {
+		val *= (double) a;
+		return *this;
+	}
+	template<typename T>
+	Coord& operator/=(T const& a) noexcept {
+		val /= a;
+		return *this;
+	}
 };
 
 //******************************************************************************
@@ -63,4 +89,7 @@ bool operator==(Coord const& a, T const& b) noexcept {
 }
 
 //******************************************************************************
-Coord mid(Coord const& a, Coord const& b);
+Coord mid(Coord const& a, Coord const& b) noexcept;
+
+//******************************************************************************
+Coord distance(Coord const& a, Coord const& b) noexcept;
