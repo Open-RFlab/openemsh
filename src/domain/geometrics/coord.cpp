@@ -73,6 +73,11 @@ Coord operator/(Coord const& a, Coord const& b) noexcept {
 }
 
 //******************************************************************************
-Coord mid(Coord const& a, Coord const& b) {
+Coord mid(Coord const& a, Coord const& b) noexcept {
 	return (a.value() + b.value()) / 2;
+}
+
+//******************************************************************************
+Coord distance(Coord const& a, Coord const& b) noexcept {
+	return abs(a.value() - b.value());
 }
