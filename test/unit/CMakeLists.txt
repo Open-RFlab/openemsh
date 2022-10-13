@@ -17,6 +17,7 @@ if( Catch2_FOUND )
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflicts/test_conflict_colinear_edges.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflicts/test_conflict_edge_in_polygon.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflicts/test_conflict_too_close_meshline_policies.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/domain/mesh/test_interval.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/mesh/test_meshline_policy.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_conflict_manager.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_meshline_policy_manager.cpp"
