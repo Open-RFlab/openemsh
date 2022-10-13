@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <limits>
 
-#include "mesh/meshline.hpp"
 #include "utils/vector_view.hpp"
 #include "conflict_manager.hpp"
 
