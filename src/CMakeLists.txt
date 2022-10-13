@@ -17,6 +17,7 @@ target_sources( openemsh
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflicts/conflict_too_close_meshline_policies.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflicts/i_conflict_origin.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/mesh/i_meshline_origin.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/domain/mesh/interval.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/mesh/meshline.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/mesh/meshline_policy.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/meshline_policy_manager.cpp"

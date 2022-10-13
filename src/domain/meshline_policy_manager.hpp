@@ -16,7 +16,6 @@
 #include "mesh/meshline_policy.hpp"
 
 class ConflictManager;
-class Meshline;
 
 #ifdef UNITTEST
 #define private public
