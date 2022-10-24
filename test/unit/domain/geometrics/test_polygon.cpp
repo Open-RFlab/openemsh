@@ -182,6 +182,27 @@ SCENARIO("relation::PolygonPoint Polygon::relation_to(Point const* point) const"
 			}
 		}
 
+		WHEN("A point is outside the polygon, but colinear to an edge") {
+			Point p(1, 0);
+			Point q(3, 0);
+			Point r(4, 1);
+			Point s(4, 3);
+			Point t(3, 4);
+			Point u(1, 4);
+			Point v(0, 3);
+			Point w(0, 1);
+			THEN("Should be detected as OUT") {
+				REQUIRE(poly.relation_to(p) == relation::PolygonPoint::OUT);
+				REQUIRE(poly.relation_to(q) == relation::PolygonPoint::OUT);
+				REQUIRE(poly.relation_to(r) == relation::PolygonPoint::OUT);
+				REQUIRE(poly.relation_to(s) == relation::PolygonPoint::OUT);
+				REQUIRE(poly.relation_to(t) == relation::PolygonPoint::OUT);
+				REQUIRE(poly.relation_to(u) == relation::PolygonPoint::OUT);
+				REQUIRE(poly.relation_to(v) == relation::PolygonPoint::OUT);
+				REQUIRE(poly.relation_to(w) == relation::PolygonPoint::OUT);
+			}
+		}
+
 		WHEN("A point is on an edge of the polygon") {
 			Point p(1, 2);
 			THEN("Should be detected as ON") {
@@ -213,6 +234,22 @@ SCENARIO("relation::PolygonPoint Polygon::relation_to(Point const* point) const"
 			Point p(2, 2);
 			THEN("Should be detected as IN") {
 				REQUIRE(poly.relation_to(p) == relation::PolygonPoint::IN);
+			}
+		}
+	}
+
+	GIVEN("A simple polygon that flirt with floating points calculus imprecision") {
+		WHEN("A point is outside the polygon, but colinear to an edge") {
+			Polygon poly({
+				{ 120.0290, -44.8024 },
+				{ 120.0290, -42.0164 },
+				{ 140.2830, -42.0164 },
+				{ 140.2830, -44.8024 }});
+			Point p(51.3539, -44.8024);
+			Point q(31.1000, -44.8024);
+			THEN("Should be detected as OUT") {
+				REQUIRE(poly.relation_to(p) == relation::PolygonPoint::OUT);
+				REQUIRE(poly.relation_to(q) == relation::PolygonPoint::OUT);
 			}
 		}
 	}

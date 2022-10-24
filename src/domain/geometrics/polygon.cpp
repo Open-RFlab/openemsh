@@ -71,7 +71,7 @@ template<class T>
 Polygon::Rotation detect_rotation(T const& points) {
 	double left_sum = 0.0;
 	double right_sum = 0.0;
- 
+
 	for(size_t i = 0; i < points.size(); ++i) {
 		size_t j = (i + 1) % points.size();
 		left_sum  += double (points[i]->x * points[j]->y);
@@ -80,12 +80,14 @@ Polygon::Rotation detect_rotation(T const& points) {
 
 	double area = 0.5 * (left_sum - right_sum);
 
-	if(area > 0)
+	if(Coord(area) == 0)
+		return Polygon::Rotation::COLINEAR;
+	else if(area > 0)
 		return Polygon::Rotation::CCW;
 	else if(area < 0)
 		return Polygon::Rotation::CW;
 	else
-		return Polygon::Rotation::COLINEAR;
+		abort();
 }
 
 //******************************************************************************
@@ -116,7 +118,7 @@ void Polygon::detect_bounding() {
 ///*****************************************************************************
 void Polygon::detect_edge_normal() {
 	switch(rotation) {
-	case Rotation::CW: 
+	case Rotation::CW:
 		for(std::unique_ptr<Edge>& edge : edges) {
 			switch(edge->direction) {
 			case Edge::Direction::XMIN: edge->normal = Normal::YMIN; break;
@@ -139,7 +141,7 @@ void Polygon::detect_edge_normal() {
 		}
 		break;
 	default: break;
-	}	
+	}
 }
 
 /// Based on the ray casting method.
