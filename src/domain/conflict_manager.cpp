@@ -152,3 +152,18 @@ void ConflictManager::auto_solve_all_colinear_edges() {
 	for(unique_ptr<ConflictColinearEdges>& conflict : all_colinear_edges)
 		conflict->auto_solve(*line_policy_manager);
 }
+
+//******************************************************************************
+vector<unique_ptr<ConflictColinearEdges>> const& ConflictManager::get_colinear_edges() const {
+	return all_colinear_edges;
+}
+
+//******************************************************************************
+vector<unique_ptr<ConflictEdgeInPolygon>> const& ConflictManager::get_edge_in_polygons() const {
+	return all_edge_in_polygons;
+}
+
+//******************************************************************************
+vector<unique_ptr<ConflictTooCloseMeshlinePolicies>> const& ConflictManager::get_too_close_meshline_policies() const {
+	return all_too_close_meshline_policies;
+}
