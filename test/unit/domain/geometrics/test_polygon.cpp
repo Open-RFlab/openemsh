@@ -53,10 +53,14 @@ SCENARIO("template<class T> Polygon::Rotation detect_rotation(T& points)", "[pol
 
 		WHEN("Points are all aligned in an axis") {
 			Polygon a({{ 1, 2 }, { 1, 4 }, { 1, 1 }});
-			std::vector<Point const*> b({a.points[0].get(), a.points[1].get(), a.points[2].get()});
+			Polygon b({{ 51.3539, -44.8024 }, { 120.0290, -44.8024 }, { 140.2830, -44.8024 }});
+			std::vector<Point const*> c({a.points[0].get(), a.points[1].get(), a.points[2].get()});
+			std::vector<Point const*> d({b.points[0].get(), b.points[1].get(), b.points[2].get()});
 			THEN("Should be detected as COLINEAR") {
 				REQUIRE(detect_rotation(a.points) == Polygon::Rotation::COLINEAR);
-				REQUIRE(detect_rotation(b) == Polygon::Rotation::COLINEAR);
+				REQUIRE(detect_rotation(b.points) == Polygon::Rotation::COLINEAR);
+				REQUIRE(detect_rotation(c) == Polygon::Rotation::COLINEAR);
+				REQUIRE(detect_rotation(d) == Polygon::Rotation::COLINEAR);
 			}
 		}
 
