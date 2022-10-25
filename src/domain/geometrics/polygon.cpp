@@ -36,6 +36,27 @@ Polygon::Polygon(initializer_list<Point> points)
 }
 
 //******************************************************************************
+Polygon::Polygon(std::string name, initializer_list<Point> points)
+: bounding({ begin(points)->x, begin(points)->x, begin(points)->y, begin(points)->y })
+, name(name) {
+	for(Point const& point : points)
+		this->points.push_back(make_unique<Point>(point)); // TODO do not use initializer_list because of copies
+	this->points.shrink_to_fit();
+
+	rotation = detect_rotation(this->points);
+
+	Point const* prev = this->points.back().get();
+	for(unique_ptr<Point const>& point : this->points) {
+		edges.push_back(make_unique<Edge>(prev, point.get()));
+		prev = point.get();
+	}
+	edges.shrink_to_fit();
+
+	detect_bounding();
+	detect_edge_normal();
+}
+
+//******************************************************************************
 /*
 Polygon::Polygon(vector<unique_ptr<Point const>> _points)
 : points(_points) {
