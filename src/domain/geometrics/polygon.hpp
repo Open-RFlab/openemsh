@@ -8,6 +8,7 @@
 
 #include <initializer_list>
 #include <memory>
+#include <string>
 #include <vector>
 
 //#include "conflict.hpp"
@@ -43,6 +44,7 @@ public:
 	} type; // TODO usefull?
 
 	Bounding2D bounding;
+	std::string name; // TODO
 
 	// TODO rm unique_ptr ?
 	std::vector<std::unique_ptr<Point const>> points;
@@ -53,6 +55,7 @@ public:
 	std::vector<std::unique_ptr<Edge>> edges;
 
 	explicit Polygon(std::initializer_list<Point> points);
+	Polygon(std::string name, std::initializer_list<Point> points);
 
 //	relation::PolygonEdge relation_to(Edge const* edge);
 	relation::PolygonPoint relation_to(Point const& point) const;
