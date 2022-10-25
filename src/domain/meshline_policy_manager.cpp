@@ -95,7 +95,7 @@ void MeshlinePolicyManager::detect_and_solve_too_close_meshline_policies() {
 
 //******************************************************************************
 void MeshlinePolicyManager::detect_intervals() {
-	for(size_t axis = H; axis <= V; ++axis) {
+	for(auto const axis : AllGridAxis) {
 		auto dimension = create_view(line_policies[axis]);
 
 		dimension.erase(remove_if(begin(dimension), end(dimension),
@@ -111,7 +111,7 @@ void MeshlinePolicyManager::detect_intervals() {
 
 		for(size_t i = 1; i < dimension.size(); ++i) {
 			unique_ptr<Interval>& interval = intervals[axis].emplace_back(make_unique<Interval>(
-				dimension[i-1], dimension[i], cast(GridAxis(axis)), params));
+				dimension[i-1], dimension[i], cast(axis), params));
 			// TODO add links MLP -> I ?
 		}
 	}
@@ -119,7 +119,7 @@ void MeshlinePolicyManager::detect_intervals() {
 
 //******************************************************************************
 void MeshlinePolicyManager::mesh() {
-	for(size_t axis = H; axis <= V; ++axis) {
+	for(auto const axis : AllGridAxis) {
 		auto dimension_view = create_view(intervals[axis]);
 
 		sort(begin(dimension_view), end(dimension_view),
