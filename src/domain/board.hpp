@@ -54,6 +54,15 @@ public:
 
 	void auto_mesh() {} // TODO
 
+	std::vector<std::unique_ptr<Meshline>> get_meshline_policies_meshlines(GridAxis axis) const;
+	std::vector<std::unique_ptr<Meshline>> const& get_meshlines(GridAxis axis) const;
+	std::vector<std::unique_ptr<MeshlinePolicy>> const& get_meshline_policies(GridAxis axis) const;
+	std::vector<std::unique_ptr<Interval>> const& get_intervals(GridAxis axis) const;
+	std::vector<std::unique_ptr<Polygon>> const& get_polygons() const;
+	std::vector<std::unique_ptr<ConflictEdgeInPolygon>> const& get_conflicts_edge_in_polygons() const;
+	std::vector<std::unique_ptr<ConflictColinearEdges>> const& get_conflicts_colinear_edges() const;
+	std::vector<std::unique_ptr<ConflictTooCloseMeshlinePolicies>> const& get_conflicts_too_close_meshline_policies() const;
+
 #ifdef DEBUG
 	void print() const;
 #endif // DEBUG

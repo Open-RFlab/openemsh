@@ -163,6 +163,30 @@ void MeshlinePolicyManager::mesh() {
 }
 
 //******************************************************************************
+vector<unique_ptr<Meshline>> const& MeshlinePolicyManager::get_meshlines(GridAxis axis) const {
+	return meshlines[axis];
+}
+
+//******************************************************************************
+vector<unique_ptr<Meshline>> MeshlinePolicyManager::get_meshline_policies_meshlines(GridAxis axis) const {
+	vector<unique_ptr<Meshline>> mesh;
+	for(auto const& line_policy : line_policies[axis])
+		if(line_policy->is_enabled)
+			mesh.emplace_back(make_unique<Meshline>(line_policy->coord, nullptr, nullptr));
+	return mesh;
+}
+
+//******************************************************************************
+vector<unique_ptr<MeshlinePolicy>> const& MeshlinePolicyManager::get_meshline_policies(GridAxis axis) const {
+	return line_policies[axis];
+}
+
+//******************************************************************************
+vector<unique_ptr<Interval>> const& MeshlinePolicyManager::get_intervals(GridAxis axis) const {
+	return intervals[axis];
+}
+
+//******************************************************************************
 GridAxis cast(MeshlinePolicy::Axis const a) noexcept {
 	switch(a) {
 	case MeshlinePolicy::Axis::H: return H;

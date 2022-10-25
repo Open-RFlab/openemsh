@@ -51,6 +51,11 @@ public:
 	void detect_and_solve_too_close_meshline_policies();
 	void detect_intervals();
 	void mesh();
+
+	std::vector<std::unique_ptr<Meshline>> get_meshline_policies_meshlines(GridAxis axis) const;
+	std::vector<std::unique_ptr<Meshline>> const& get_meshlines(GridAxis axis) const;
+	std::vector<std::unique_ptr<MeshlinePolicy>> const& get_meshline_policies(GridAxis axis) const;
+	std::vector<std::unique_ptr<Interval>> const& get_intervals(GridAxis axis) const;
 };
 
 #ifdef UNITTEST

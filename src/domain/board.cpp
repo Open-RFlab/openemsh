@@ -249,6 +249,46 @@ void Board::detect_non_conflicting_edges() {
 	}
 }
 
+//******************************************************************************
+vector<unique_ptr<Meshline>> Board::get_meshline_policies_meshlines(GridAxis axis) const {
+	return line_policy_manager.get_meshline_policies_meshlines(axis);
+}
+
+//******************************************************************************
+vector<unique_ptr<Meshline>> const& Board::get_meshlines(GridAxis axis) const {
+	return line_policy_manager.get_meshlines(axis);
+}
+
+//******************************************************************************
+vector<unique_ptr<MeshlinePolicy>> const& Board::get_meshline_policies(GridAxis axis) const {
+	return line_policy_manager.get_meshline_policies(axis);
+}
+
+//******************************************************************************
+vector<unique_ptr<Interval>> const& Board::get_intervals(GridAxis axis) const {
+	return line_policy_manager.get_intervals(axis);
+}
+
+//******************************************************************************
+vector<unique_ptr<Polygon>> const& Board::get_polygons() const {
+	return polygons;
+}
+
+//******************************************************************************
+vector<unique_ptr<ConflictEdgeInPolygon>> const& Board::get_conflicts_edge_in_polygons() const {
+	return conflict_manager.get_edge_in_polygons();
+}
+
+//******************************************************************************
+vector<unique_ptr<ConflictColinearEdges>> const& Board::get_conflicts_colinear_edges() const {
+	return conflict_manager.get_colinear_edges();
+}
+
+//******************************************************************************
+vector<unique_ptr<ConflictTooCloseMeshlinePolicies>> const& Board::get_conflicts_too_close_meshline_policies() const {
+	return conflict_manager.get_too_close_meshline_policies();
+}
+
 #ifdef DEBUG
 //******************************************************************************
 void Board::print() const {

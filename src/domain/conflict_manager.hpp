@@ -49,6 +49,10 @@ public:
 	void auto_solve_all_edge_in_polygon();
 	void auto_solve_all_colinear_edges();
 //	Conflict* find(std::vector<IConflictOrigin> const&);
+
+	std::vector<std::unique_ptr<ConflictColinearEdges>> const& get_colinear_edges() const;
+	std::vector<std::unique_ptr<ConflictEdgeInPolygon>> const& get_edge_in_polygons() const;
+	std::vector<std::unique_ptr<ConflictTooCloseMeshlinePolicies>> const& get_too_close_meshline_policies() const;
 };
 
 #ifdef UNITTEST
