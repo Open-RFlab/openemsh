@@ -13,7 +13,9 @@
 class Edge;
 
 //******************************************************************************
-class ConflictColinearEdges : public Conflict {
+class ConflictColinearEdges
+: public Conflict
+, public Visitable<ConflictColinearEdges, EntityVisitor> {
 public:
 	std::vector<Edge*> edges;
 

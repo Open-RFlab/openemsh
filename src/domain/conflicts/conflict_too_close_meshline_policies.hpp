@@ -11,7 +11,9 @@
 #include "conflict.hpp"
 
 //******************************************************************************
-class ConflictTooCloseMeshlinePolicies : public Conflict {
+class ConflictTooCloseMeshlinePolicies
+: public Conflict
+, public Visitable<ConflictTooCloseMeshlinePolicies, EntityVisitor> {
 public:
 	std::array<MeshlinePolicy* const, 2> const meshline_policies;
 

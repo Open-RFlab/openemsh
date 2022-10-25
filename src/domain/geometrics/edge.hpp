@@ -16,6 +16,7 @@
 #include "domain/conflicts/i_conflict_origin.hpp"
 #include "domain/conflicts/i_conflict_solution.hpp"
 #include "domain/mesh/i_meshline_origin.hpp"
+#include "utils/entity.hpp"
 #include "bounding.hpp"
 #include "range.hpp"
 #include "relation.hpp"
@@ -31,7 +32,13 @@ class Point;
 #endif // UNITTEST
 
 //******************************************************************************
-class Edge : public Segment, public IConflictOrigin, public IConflictSolution, public IMeshLineOrigin {
+class Edge
+: public Entity
+, public Visitable<Edge, EntityVisitor>
+, public Segment
+, public IConflictOrigin
+, public IConflictSolution
+, public IMeshLineOrigin {
 private:
 	Point const* const _p0;
 	Point const* const _p1;

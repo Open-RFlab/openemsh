@@ -14,6 +14,7 @@
 
 #include "domain/geometrics/coord.hpp"
 #include "domain/global.hpp"
+#include "utils/entity.hpp"
 
 class Meshline;
 class MeshlinePolicy;
@@ -23,7 +24,7 @@ class MeshlinePolicy;
 #endif // UNITTEST
 
 //******************************************************************************
-class Interval {
+class Interval : public Entity, public Visitable<Interval, EntityVisitor> {
 private:
 	Params& params;
 

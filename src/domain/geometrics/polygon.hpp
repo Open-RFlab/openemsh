@@ -16,6 +16,7 @@
 //#include "point.hpp"
 #include "domain/conflicts/i_conflict_origin.hpp"
 #include "domain/mesh/i_meshline_origin.hpp"
+#include "utils/entity.hpp"
 #include "domain/global.hpp"
 #include "bounding.hpp"
 #include "relation.hpp"
@@ -25,7 +26,11 @@ class Edge;
 class Point;
 
 //******************************************************************************
-class Polygon : public IConflictOrigin/*, public IMeshLineOrigin*/ {
+class Polygon
+: public Entity
+, public Visitable<Polygon, EntityVisitor>
+, public IConflictOrigin
+/*, public IMeshLineOrigin*/ {
 private:
 	void detect_bounding(); // TODO
 	void detect_edge_normal();

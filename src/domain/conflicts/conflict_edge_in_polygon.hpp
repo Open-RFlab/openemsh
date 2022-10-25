@@ -28,7 +28,9 @@ enum OverlapIndex {
 };
 
 //******************************************************************************
-class ConflictEdgeInPolygon : public Conflict {
+class ConflictEdgeInPolygon
+: public Conflict
+, public Visitable<ConflictEdgeInPolygon, EntityVisitor> {
 public:
 	Edge* const edge;
 

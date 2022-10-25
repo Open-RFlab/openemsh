@@ -4,6 +4,8 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <cstdlib>
+
 #include "domain/geometrics/point.hpp"
 #include "meshline.hpp"
 

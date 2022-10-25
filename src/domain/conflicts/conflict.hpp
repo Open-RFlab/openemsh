@@ -8,6 +8,7 @@
 
 //#include <vector>
 
+#include "utils/entity.hpp"
 #include "domain/mesh/i_meshline_origin.hpp"
 #include "i_conflict_origin.hpp"
 
@@ -16,7 +17,7 @@ class IConflictSolution;
 class MeshlinePolicyManager;
 
 //******************************************************************************
-class Conflict : public IMeshLineOrigin {
+class Conflict : public Entity, public IMeshLineOrigin {
 public:
 	enum class Kind {
 		USER_WILL, // TODO multiple cases ?
