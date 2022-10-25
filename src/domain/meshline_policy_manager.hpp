@@ -25,6 +25,7 @@ class ConflictManager;
 template<typename T>
 using Grid = typename std::array<T, 2>;
 enum GridAxis { H, V };
+constexpr Grid<GridAxis const> AllGridAxis { H, V };
 
 //******************************************************************************
 class MeshlinePolicyManager { // TODO MeshlineManager
