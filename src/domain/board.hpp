@@ -33,9 +33,10 @@ private:
 	MeshlinePolicyManager line_policy_manager;
 	std::vector<std::unique_ptr<Polygon>> polygons;
 	std::vector<Edge*> edges;
-	Params params;
 
 public:
+	Params params;
+
 //	Board(std::initializer_list<Polygon> _polygons);
 	explicit Board(std::vector<std::unique_ptr<Polygon>>& polygons);
 	Board(); // TODO
@@ -50,10 +51,10 @@ public:
 
 	/// Mesh resolution dependant detection tasks
 	///*************************************************************************
-	void detect_ranges_between_lines() {} // TODO
 	void detect_too_close_lines() {} // TODO
+	void detect_intervals_between_lines() {} // TODO
 
-	void auto_mesh() {} // TODO
+	void auto_mesh(); // TODO
 
 	std::vector<std::unique_ptr<Meshline>> get_meshline_policies_meshlines(GridAxis axis) const;
 	std::vector<std::unique_ptr<Meshline>> const& get_meshlines(GridAxis axis) const;
