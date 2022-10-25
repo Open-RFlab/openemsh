@@ -70,8 +70,8 @@ Board::Board(vector<unique_ptr<Polygon>>& polygons)
 : conflict_manager(&line_policy_manager)
 , line_policy_manager(params, &conflict_manager)
 , polygons(move(polygons)) {
-	for(unique_ptr<Polygon>& polygon : this->polygons)
-		for(unique_ptr<Edge>& edge : polygon->edges)
+	for(auto const& polygon : this->polygons)
+		for(auto const& edge : polygon->edges)
 			edges.push_back(edge.get());
 	this->polygons.shrink_to_fit();
 	edges.shrink_to_fit();
@@ -81,12 +81,12 @@ Board::Board(vector<unique_ptr<Polygon>>& polygons)
 /// Overlapping edges should be EDGE_IN_POLYGON and not COLINEAR_EDGES.
 ///*****************************************************************************
 void Board::detect_edges_in_polygons() {
-	for(unique_ptr<Polygon>& poly_a : polygons) {
-		for(unique_ptr<Polygon>& poly_b : polygons) {
+	for(auto const& poly_a : polygons) {
+		for(auto const& poly_b : polygons) {
 			if(poly_b == poly_a)
 				continue;
 
-			for(unique_ptr<Edge>& edge_a : poly_a->edges) {
+			for(auto const& edge_a : poly_a->edges) {
 
 				struct RangeBtwIntersections {
 					Range const range;
@@ -125,7 +125,7 @@ void Board::detect_edges_in_polygons() {
 				vector<Point> intersections;
 				vector<RangeBtwIntersections> ranges;
 
-				for(unique_ptr<Edge>& edge_b : poly_b->edges) {
+				for(auto const& edge_b : poly_b->edges) {
 					relation::SegmentSegment rel = edge_a->relation_to(*edge_b);
 					switch(rel) {
 					case relation::SegmentSegment::CROSSING:
@@ -188,7 +188,7 @@ void Board::detect_edges_in_polygons() {
 						ranges.emplace_back(move(current_range));
 					}
 
-					for(RangeBtwIntersections& range : ranges) {
+					for(RangeBtwIntersections const& range : ranges) {
 						if(range.mid.has_value()
 						&& poly_b->relation_to(range.mid.value()) == relation::PolygonPoint::IN) {
 /*						|| poly_b->relation_to(&range.mid.value()) == relation::PolygonPoint::ON))

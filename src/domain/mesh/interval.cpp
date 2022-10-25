@@ -156,7 +156,7 @@ vector<Coord> find_ls(double d, double lambda, double dmax, Coord s) {
 bool is_ls_valid_for_dmax_lmin_lambda(vector<Coord> ls, double d, double lambda, double dmax, size_t lmin) {
 	if(d > dmax
 	|| ls.size() < lmin
-	|| ls.size() == 0)
+	|| ls.empty())
 		return false;
 
 	if(ls[0] > lambda * d + equality_tolerance

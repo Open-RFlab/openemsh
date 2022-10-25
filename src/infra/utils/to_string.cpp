@@ -19,7 +19,7 @@ string to_string(Edge::Direction direction) {
 	case Edge::Direction::YMAX: return "YMAX";
 	case Edge::Direction::NONE: return "NONE";
 	default: abort();
-	};
+	}
 }
 
 //******************************************************************************
