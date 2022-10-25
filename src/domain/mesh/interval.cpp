@@ -19,7 +19,7 @@ Interval::Side::Side(MeshlinePolicy* meshline_policy, size_t lmin, double lambda
 : meshline_policy(meshline_policy)
 , lmin(lmin)
 , lambda(lambda)
-, d_init_(d_init)
+, d_init_(std::move(d_init))
 {
 	if(meshline_policy->d > h)
 		meshline_policy->d = (double) h;

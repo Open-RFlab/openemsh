@@ -114,14 +114,6 @@ bool const is_enabled)", "[meshline_policy_manager]") {
 				&e, MeshlinePolicy::Axis::V, MeshlinePolicy::Policy::HALFS, Normal::XMIN, 1);
 			MeshlinePolicy* u = mpm.add_meshline_policy(
 				&e, MeshlinePolicy::Axis::V, MeshlinePolicy::Policy::HALFS, Normal::XMAX, 1);
-			MeshlinePolicy* v = mpm.add_meshline_policy(
-				&e, MeshlinePolicy::Axis::H, MeshlinePolicy::Policy::INTERVAL, Normal::YMIN, 1);
-			MeshlinePolicy* w = mpm.add_meshline_policy(
-				&e, MeshlinePolicy::Axis::H, MeshlinePolicy::Policy::INTERVAL, Normal::YMAX, 1);
-			MeshlinePolicy* x = mpm.add_meshline_policy(
-				&e, MeshlinePolicy::Axis::V, MeshlinePolicy::Policy::INTERVAL, Normal::XMIN, 1);
-			MeshlinePolicy* y = mpm.add_meshline_policy(
-				&e, MeshlinePolicy::Axis::V, MeshlinePolicy::Policy::INTERVAL, Normal::XMAX, 1);
 			THEN("No meshline policy should be added nor returned") {
 				REQUIRE(mpm.line_policies[H].size() == 0);
 				REQUIRE(mpm.line_policies[V].size() == 0);
@@ -134,10 +126,6 @@ bool const is_enabled)", "[meshline_policy_manager]") {
 				REQUIRE(s == nullptr);
 				REQUIRE(t == nullptr);
 				REQUIRE(u == nullptr);
-				REQUIRE(v == nullptr);
-				REQUIRE(w == nullptr);
-				REQUIRE(x == nullptr);
-				REQUIRE(y == nullptr);
 			}
 		}
 

@@ -41,8 +41,7 @@ public:
 //		             /// or if the edge is inside a polygon.
 		ONELINE,     ///< Place one line on the coord. typically produced by ports.
 		HALFS,       ///< Apply halfs rule while meshing : when edges conflict on the direction.
-		THIRDS,       ///< Apply thirds rule while meshing : normal case for edges.
-		INTERVAL
+		THIRDS       ///< Apply thirds rule while meshing : normal case for edges.
 	} policy; // TODO rename meshing_rule
 
 	Normal normal;
