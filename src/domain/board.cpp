@@ -250,6 +250,21 @@ void Board::detect_non_conflicting_edges() {
 }
 
 //******************************************************************************
+void Board::auto_mesh() {
+	detect_edges_in_polygons();
+	conflict_manager.auto_solve_all_edge_in_polygon();
+
+	detect_colinear_edges();
+	conflict_manager.auto_solve_all_colinear_edges();
+
+	detect_non_conflicting_edges();
+	line_policy_manager.detect_and_solve_too_close_meshline_policies();
+
+	line_policy_manager.detect_intervals();
+	line_policy_manager.mesh();
+}
+
+//******************************************************************************
 vector<unique_ptr<Meshline>> Board::get_meshline_policies_meshlines(GridAxis axis) const {
 	return line_policy_manager.get_meshline_policies_meshlines(axis);
 }

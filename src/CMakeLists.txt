@@ -52,6 +52,36 @@ target_include_directories( openemsh
 	${CMAKE_CURRENT_SOURCE_DIR}
 	)
 
+add_executable( openemsh_bin )
+
+target_sources( openemsh_bin
+	PRIVATE
+	"${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
+	)
+
+target_compile_features( openemsh_bin
+	PRIVATE
+	cxx_std_17
+	)
+
+target_compile_options( openemsh_bin
+	PRIVATE
+	$<$<CONFIG:Coverage>:-O0>
+	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Wall>
+	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Wextra>
+#	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Weffc++>
+	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-fexceptions>
+	)
+
+target_include_directories( openemsh_bin
+	PRIVATE
+	${CMAKE_CURRENT_SOURCE_DIR}
+	)
+
+target_link_libraries( openemsh_bin
+	openemsh
+	)
+
 #[[
 install(
 	TARGETS openemsh
