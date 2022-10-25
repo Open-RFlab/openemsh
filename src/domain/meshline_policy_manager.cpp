@@ -80,7 +80,7 @@ optional<array<MeshlinePolicy*, 2>> detect_closest_meshline_policies(
 
 //******************************************************************************
 void MeshlinePolicyManager::detect_and_solve_too_close_meshline_policies() {
-	for(auto& dimension : line_policies) {
+	for(auto const& dimension : line_policies) {
 		while(true) {
 			auto closest = detect_closest_meshline_policies(create_view(dimension), params.proximity_limit);
 			if(!closest)
@@ -110,7 +110,7 @@ void MeshlinePolicyManager::detect_intervals() {
 			});
 
 		for(size_t i = 1; i < dimension.size(); ++i) {
-			unique_ptr<Interval>& interval = intervals[axis].emplace_back(make_unique<Interval>(
+			unique_ptr<Interval> const& interval = intervals[axis].emplace_back(make_unique<Interval>(
 				dimension[i-1], dimension[i], cast(axis), params));
 			// TODO add links MLP -> I ?
 		}
@@ -133,7 +133,7 @@ void MeshlinePolicyManager::mesh() {
 		size_t new_size = meshlines[axis].size();
 		vector<vector<unique_ptr<Meshline>>> interval_meshlines;
 
-		for(auto interval : dimension_view) {
+		for(auto* interval : dimension_view) {
 //			interval->auto_solve_d();
 			interval->auto_solve_lambda();
 			interval_meshlines.emplace_back(interval->mesh());

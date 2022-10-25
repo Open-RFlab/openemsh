@@ -23,11 +23,11 @@ void ConflictManager::add_colinear_edges(Edge* a, Edge* b) {
 	if((a->axis == Segment::Axis::H && b->axis == Segment::Axis::H)
 	|| (a->axis == Segment::Axis::V && b->axis == Segment::Axis::V)) {
 		bool does_conflict_exist = false;
-		for(unique_ptr<ConflictColinearEdges>& conflict : all_colinear_edges) {
+		for(auto const& conflict : all_colinear_edges) {
 			bool is_a_registered = false;
 			bool is_b_registered = false;
 
-			for(Edge* edge : conflict->edges) {
+			for(auto const* edge : conflict->edges) {
 				if(edge == a) {
 					is_a_registered = true;
 					if(is_b_registered)
@@ -74,7 +74,7 @@ void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, optional<Ed
 ///*****************************************************************************
 void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const range, optional<Edge const*> b) {
 	bool does_conflict_exist = false;
-	for(unique_ptr<ConflictEdgeInPolygon>& conflict : all_edge_in_polygons) {
+	for(auto const& conflict : all_edge_in_polygons) {
 		bool is_a_registered = false;
 		bool is_polygon_registered = false;
 		bool is_overlap_registered = false;
@@ -124,7 +124,7 @@ ConflictTooCloseMeshlinePolicies* ConflictManager::add_too_close_meshline_polici
 	if(a->axis != b->axis)
 		return nullptr;
 
-	for(auto& conflict : all_too_close_meshline_policies)
+	for(auto const& conflict : all_too_close_meshline_policies)
 		if(conflict->meshline_policies[0] == a
 		|| conflict->meshline_policies[0] == b
 		|| conflict->meshline_policies[1] == a
@@ -143,13 +143,13 @@ ConflictTooCloseMeshlinePolicies* ConflictManager::add_too_close_meshline_polici
 
 //******************************************************************************
 void ConflictManager::auto_solve_all_edge_in_polygon() {
-	for(unique_ptr<ConflictEdgeInPolygon>& conflict : all_edge_in_polygons)
+	for(auto const& conflict : all_edge_in_polygons)
 		conflict->auto_solve(*line_policy_manager);
 }
 
 //******************************************************************************
 void ConflictManager::auto_solve_all_colinear_edges() {
-	for(unique_ptr<ConflictColinearEdges>& conflict : all_colinear_edges)
+	for(auto const& conflict : all_colinear_edges)
 		conflict->auto_solve(*line_policy_manager);
 }
 

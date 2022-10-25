@@ -115,14 +115,14 @@ optional<Point> intersection(Segment const& a, Segment const& b) {
 		// Diagonal
 		Point a_vec(a.p1() - a.p0());
 		Point b_vec(b.p1() - b.p0());
-		double div = double (a_vec.x * b_vec.y - a_vec.y * b_vec.x);
+		auto div = double (a_vec.x * b_vec.y - a_vec.y * b_vec.x);
 
 		if(div != 0) {
-			double m = double (a_vec.x * a.p0().y
-			         - a_vec.x * b.p0().y
-			         - a_vec.y * a.p0().x
-			         + a_vec.y * b.p0().x)
-			         / div;
+			auto m = double (a_vec.x * a.p0().y
+			       - a_vec.x * b.p0().y
+			       - a_vec.y * a.p0().x
+			       + a_vec.y * b.p0().x)
+			       / div;
 			if(m >= 0 && m <= 1) // When we are not sure edges are crossing.
 				return Point(b.p0() + m * b_vec);
 		}
