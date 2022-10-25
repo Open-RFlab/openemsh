@@ -18,14 +18,14 @@ using namespace std;
 //******************************************************************************
 Polygon::Polygon(initializer_list<Point> points)
 : bounding({ begin(points)->x, begin(points)->x, begin(points)->y, begin(points)->y }) {
-	for(Point const& point : points)
+	for(auto const& point : points)
 		this->points.push_back(make_unique<Point>(point)); // TODO do not use initializer_list because of copies
 	this->points.shrink_to_fit();
 
 	rotation = detect_rotation(this->points);
 
 	Point const* prev = this->points.back().get();
-	for(unique_ptr<Point const>& point : this->points) {
+	for(auto const& point : this->points) {
 		edges.push_back(make_unique<Edge>(prev, point.get()));
 		prev = point.get();
 	}
@@ -36,17 +36,17 @@ Polygon::Polygon(initializer_list<Point> points)
 }
 
 //******************************************************************************
-Polygon::Polygon(std::string name, initializer_list<Point> points)
+Polygon::Polygon(string name, initializer_list<Point> points)
 : bounding({ begin(points)->x, begin(points)->x, begin(points)->y, begin(points)->y })
-, name(name) {
-	for(Point const& point : points)
+, name(move(name)) {
+	for(auto const& point : points)
 		this->points.push_back(make_unique<Point>(point)); // TODO do not use initializer_list because of copies
 	this->points.shrink_to_fit();
 
 	rotation = detect_rotation(this->points);
 
 	Point const* prev = this->points.back().get();
-	for(unique_ptr<Point const>& point : this->points) {
+	for(auto const& point : this->points) {
 		edges.push_back(make_unique<Edge>(prev, point.get()));
 		prev = point.get();
 	}
@@ -117,7 +117,7 @@ template Polygon::Rotation detect_rotation(std::vector<Point const*> const&);
 
 //******************************************************************************
 void Polygon::detect_bounding() {
-	for(std::unique_ptr<Point const>& point : points) {
+	for(auto const& point : points) {
 		if(point->x < bounding[XMIN]) bounding[XMIN] = point->x;
 		if(point->x > bounding[XMAX]) bounding[XMAX] = point->x;
 		if(point->y < bounding[YMIN]) bounding[YMIN] = point->y;
@@ -140,7 +140,7 @@ void Polygon::detect_bounding() {
 void Polygon::detect_edge_normal() {
 	switch(rotation) {
 	case Rotation::CW:
-		for(std::unique_ptr<Edge>& edge : edges) {
+		for(auto const& edge : edges) {
 			switch(edge->direction) {
 			case Edge::Direction::XMIN: edge->normal = Normal::YMIN; break;
 			case Edge::Direction::XMAX: edge->normal = Normal::YMAX; break;
@@ -151,7 +151,7 @@ void Polygon::detect_edge_normal() {
 		}
 		break;
 	case Rotation::CCW:
-		for(std::unique_ptr<Edge>& edge : edges) {
+		for(auto const& edge : edges) {
 			switch(edge->direction) {
 			case Edge::Direction::XMIN: edge->normal = Normal::YMAX; break;
 			case Edge::Direction::XMAX: edge->normal = Normal::YMIN; break;
@@ -192,7 +192,7 @@ relation::PolygonPoint Polygon::relation_to(Point const& point) const {
 		Edge ray(&point, &to_try[n++]);
 
 		// Detect vertices on the ray.
-		for(unique_ptr<Point const> const& p : points) {
+		for(auto const& p : points) {
 			if(*p == point) {
 				return relation::PolygonPoint::ON;
 			} else if(ray.relation_to(*p) == relation::SegmentPoint::ON) {
@@ -203,7 +203,7 @@ relation::PolygonPoint Polygon::relation_to(Point const& point) const {
 		if(need_retry)
 			continue;
 
-		for(unique_ptr<Edge> const& edge : edges) {
+		for(auto const& edge : edges) {
 			if(edge->relation_to(point) == relation::SegmentPoint::ON)
 				return relation::PolygonPoint::ON;
 

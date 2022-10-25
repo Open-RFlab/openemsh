@@ -46,6 +46,7 @@ public:
 	virtual void visit(ConflictTooCloseMeshlinePolicies& conflict) = 0;
 	virtual void visit(MeshlinePolicy& policy) = 0;
 	virtual void visit(Interval& interval) = 0;
+	virtual ~EntityVisitor() = default;
 };
 
 //******************************************************************************
@@ -56,4 +57,6 @@ public:
 	virtual void accept(Visitor& visitor) final {
 		visitor.visit(dynamic_cast<T&>(*this));
 	}
+
+	virtual ~Visitable() = default;
 };
