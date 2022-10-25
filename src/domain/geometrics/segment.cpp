@@ -39,15 +39,15 @@ relation::SegmentSegment Segment::relation_to(Segment const& segment) const {
 	vector<Point const*> v2({ &p0(), &p1(), &segment.p1() });
 	vector<Point const*> v3({ &segment.p0(), &segment.p1(), &p0() });
 	vector<Point const*> v4({ &segment.p0(), &segment.p1(), &p1() });
-	Polygon::Rotation r1(detect_rotation(v1));
-	Polygon::Rotation r2(detect_rotation(v2));
-	Polygon::Rotation r3(detect_rotation(v3));
-	Polygon::Rotation r4(detect_rotation(v4));
+	Polygon::Rotation const r1(detect_rotation(v1));
+	Polygon::Rotation const r2(detect_rotation(v2));
+	Polygon::Rotation const r3(detect_rotation(v3));
+	Polygon::Rotation const r4(detect_rotation(v4));
 
 	if(r1 == Polygon::Rotation::COLINEAR && r2 == Polygon::Rotation::COLINEAR
 	&& r3 == Polygon::Rotation::COLINEAR && r4 == Polygon::Rotation::COLINEAR) {
-		Bounding2D a_bnd(bounding(segment));
-		Bounding2D b_bnd(bounding(*this));
+		Bounding2D const a_bnd(bounding(segment));
+		Bounding2D const b_bnd(bounding(*this));
 
 		if(((a_bnd[XMIN] >= b_bnd[XMIN] && a_bnd[XMIN] <= b_bnd[XMAX]) || (a_bnd[XMAX] >= b_bnd[XMIN] && a_bnd[XMAX] <= b_bnd[XMAX])
 		||  (b_bnd[XMIN] >= a_bnd[XMIN] && b_bnd[XMIN] <= a_bnd[XMAX]) || (b_bnd[XMAX] >= a_bnd[XMIN] && b_bnd[XMAX] <= a_bnd[XMAX]))
