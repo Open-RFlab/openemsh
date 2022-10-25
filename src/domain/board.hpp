@@ -15,6 +15,7 @@
 #include "geometrics/edge.hpp"
 #include "geometrics/point.hpp"
 #include "geometrics/polygon.hpp"
+#include "utils/entity.hpp"
 #include "conflict_manager.hpp"
 #include "global.hpp"
 #include "meshline_policy_manager.hpp"
@@ -26,7 +27,7 @@
 #endif // UNITTEST
 
 //******************************************************************************
-class Board {
+class Board : public Entity, public Visitable<Board, EntityVisitor> {
 private:
 	ConflictManager conflict_manager;
 	MeshlinePolicyManager line_policy_manager;

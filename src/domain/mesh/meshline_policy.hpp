@@ -17,6 +17,7 @@
 #include "domain/geometrics/segment.hpp"
 #include "domain/geometrics/types.hpp"
 #include "domain/global.hpp"
+#include "utils/entity.hpp"
 #include "i_meshline_origin.hpp"
 
 class Conflict;
@@ -27,7 +28,11 @@ class Meshline;
 /// be produced by other entities than edges, like a whole polygon (port) or
 /// a conflict between lines that can require a modification of other lines.
 ///*****************************************************************************
-class MeshlinePolicy : public IConflictOrigin, public IConflictSolution {
+class MeshlinePolicy
+: public Entity
+, public Visitable<MeshlinePolicy, EntityVisitor>
+, public IConflictOrigin
+, public IConflictSolution {
 public:
 	enum class Axis {
 		H,
