@@ -13,9 +13,9 @@
 #include "domain/meshline_policy_manager.hpp"
 
 //******************************************************************************
-std::string to_string(Edge::Direction const direction);
-std::string to_string(GridAxis const axis);
-std::string to_string(Normal const normal);
-std::string to_string(MeshlinePolicy::Policy const policy);
-std::string to_string(Polygon::Rotation const rotation);
-std::string to_string(Segment::Axis const axis);
+std::string to_string(Edge::Direction const direction) noexcept;
+std::string to_string(GridAxis const axis) noexcept;
+std::string to_string(Normal const normal) noexcept;
+std::string to_string(MeshlinePolicy::Policy const policy) noexcept;
+std::string to_string(Polygon::Rotation const rotation) noexcept;
+std::string to_string(Segment::Axis const axis) noexcept;

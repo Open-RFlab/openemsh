@@ -11,7 +11,7 @@
 using namespace std;
 
 //******************************************************************************
-string to_string(Edge::Direction direction) {
+string to_string(Edge::Direction direction) noexcept {
 	switch(direction) {
 	case Edge::Direction::XMIN: return "XMIN";
 	case Edge::Direction::XMAX: return "XMAX";
@@ -23,7 +23,7 @@ string to_string(Edge::Direction direction) {
 }
 
 //******************************************************************************
-string to_string(GridAxis const axis) {
+string to_string(GridAxis const axis) noexcept {
 	switch(axis) {
 	case H: return "H";
 	case V: return "V";
@@ -32,7 +32,7 @@ string to_string(GridAxis const axis) {
 }
 
 //******************************************************************************
-string to_string(Normal const normal) {
+string to_string(Normal const normal) noexcept {
 	switch(normal) {
 	case Normal::XMIN: return "XMIN";
 	case Normal::XMAX: return "XMAX";
@@ -44,7 +44,7 @@ string to_string(Normal const normal) {
 }
 
 //******************************************************************************
-string to_string(MeshlinePolicy::Policy const policy) {
+string to_string(MeshlinePolicy::Policy const policy) noexcept {
 	switch(policy) {
 	case MeshlinePolicy::Policy::ONELINE: return "ONELINE";
 	case MeshlinePolicy::Policy::HALFS: return "HALFS";
@@ -54,7 +54,7 @@ string to_string(MeshlinePolicy::Policy const policy) {
 }
 
 //******************************************************************************
-string to_string(Polygon::Rotation const rotation) {
+string to_string(Polygon::Rotation const rotation) noexcept {
 	switch(rotation) {
 	case Polygon::Rotation::CW: return "CW";
 	case Polygon::Rotation::CCW: return "CCW";
@@ -64,7 +64,7 @@ string to_string(Polygon::Rotation const rotation) {
 }
 
 //******************************************************************************
-string to_string(Segment::Axis const axis) {
+string to_string(Segment::Axis const axis) noexcept {
 	switch(axis) {
 	case Segment::Axis::H: return "H";
 	case Segment::Axis::V: return "V";
