@@ -35,13 +35,23 @@ private:
 	std::vector<Edge*> edges;
 
 public:
+	//**************************************************************************
+	class Builder {
+	public:
+
+		void add_polygon(std::string const& name, std::initializer_list<Point> points);
+		void add_polygon(std::string const& name, std::vector<std::unique_ptr<Point const>>&& points);
+		void add_polygon_from_box(std::string const& name, Point const p1, Point const p3);
+
+		[[nodiscard]] std::unique_ptr<Board> build();
+
+	private:
+		std::vector<std::unique_ptr<Polygon>> polygons;
+	};
+
 	Params params;
 
-//	Board(std::initializer_list<Polygon> _polygons);
-	explicit Board(std::vector<std::unique_ptr<Polygon>>& polygons);
-	Board(); // TODO
-
-	void add_polygon(Polygon const polygon); // TODO
+	explicit Board(std::vector<std::unique_ptr<Polygon>>&& polygons);
 
 	/// Mesh resolution independant detection tasks
 	///*************************************************************************

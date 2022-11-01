@@ -6,35 +6,59 @@
 
 #include <catch2/catch_all.hpp>
 
+#include "utils/vector_utils.hpp"
 #include "domain/geometrics/edge.hpp"
 #include "domain/geometrics/point.hpp"
 
 #include "domain/geometrics/polygon.hpp"
 
-/// @test void Polygon::detect_bounding()
-/// @test template<class T> Polygon::Rotation detect_rotation(T& points)
-/// @test void Polygon::detect_edge_normal()
+/// @test Bounding2D detect_bounding(std::vector<std::unique_ptr<Point const>> const& points) noexcept
+/// @test std::vector<std::unique_ptr<Edge>> detect_edges(std::vector<std::unique_ptr<Point const>> const& points)
+/// @test template<class T> Polygon::Rotation detect_rotation(T& points) noexcept
+/// @test void Polygon::detect_edge_normal() noexcept
 /// @test relation::PolygonPoint Polygon::relation_to(Point const* point) const
 ///*****************************************************************************
 
 //******************************************************************************
-SCENARIO("void Polygon::detect_bounding()", "[polygon]") {
+SCENARIO("Bounding2D detect_bounding(std::vector<std::unique_ptr<Point const>> const& points) noexcept", "[polygon]") {
 	GIVEN("A random polygon") {
-		Polygon a({{ 1, 2 }, { 1, 4 }, { 4, 4 }});
+		Bounding2D bounding(detect_bounding(from_init_list<Point>({{ 1, 2 }, { 1, 4 }, { 4, 4 }})));
 		THEN("Should calcul bounding box") {
-			REQUIRE(a.bounding[XMIN] == 1);
-			REQUIRE(a.bounding[XMAX] == 4);
-			REQUIRE(a.bounding[YMIN] == 2);
-			REQUIRE(a.bounding[YMAX] == 4);
+			REQUIRE(bounding[XMIN] == 1);
+			REQUIRE(bounding[XMAX] == 4);
+			REQUIRE(bounding[YMIN] == 2);
+			REQUIRE(bounding[YMAX] == 4);
 		}
 	}
 }
 
 //******************************************************************************
-SCENARIO("template<class T> Polygon::Rotation detect_rotation(T& points)", "[polygon]") {
+SCENARIO("std::vector<std::unique_ptr<Edge>> detect_edges(std::vector<std::unique_ptr<Point const>> const& points)", "[polygon]") {
+	GIVEN("A vector of points") {
+		std::vector<std::unique_ptr<Point const>> points(from_init_list<Point>({{ 1, 2 }, { 1, 4 }, { 4, 4 }}));
+		std::vector<std::unique_ptr<Edge>> edges(detect_edges(points));
+		THEN("Should return a vector of edges") {
+			REQUIRE(edges.size() == points.size());
+			AND_THEN("First edge should be between last point and first point") {
+				REQUIRE(edges[0]->_p0 == points[2].get());
+				REQUIRE(edges[0]->_p1 == points[0].get());
+			}
+
+			AND_THEN("For any other edge, edge[n] should be between point[n-1] and point[n]"){
+				REQUIRE(edges[1]->_p0 == points[0].get());
+				REQUIRE(edges[1]->_p1 == points[1].get());
+				REQUIRE(edges[2]->_p0 == points[1].get());
+				REQUIRE(edges[2]->_p1 == points[2].get());
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("template<class T> Polygon::Rotation detect_rotation(T& points) noexcept", "[polygon]") {
 	GIVEN("A polygon or a bunch of points") {
 		WHEN("Points order is oriented clockwise") {
-			Polygon a({{ 1, 2 }, { 1, 4 }, { 4, 4 }});
+			Polygon a("", from_init_list<Point>({{ 1, 2 }, { 1, 4 }, { 4, 4 }}));
 			std::vector<Point const*> b({a.points[0].get(), a.points[1].get(), a.points[2].get()});
 			THEN("Should be detected as CW") {
 				REQUIRE(detect_rotation(a.points) == Polygon::Rotation::CW);
@@ -43,7 +67,7 @@ SCENARIO("template<class T> Polygon::Rotation detect_rotation(T& points)", "[pol
 		}
 
 		WHEN("Points order is oriented counter clockwise") {
-			Polygon a({{ 1, 2 }, { 4, 4 }, { 1, 4 }});
+			Polygon a("", from_init_list<Point>({{ 1, 2 }, { 4, 4 }, { 1, 4 }}));
 			std::vector<Point const*> b({a.points[0].get(), a.points[1].get(), a.points[2].get()});
 			THEN("Should be detected as CCW") {
 				REQUIRE(detect_rotation(a.points) == Polygon::Rotation::CCW);
@@ -52,8 +76,8 @@ SCENARIO("template<class T> Polygon::Rotation detect_rotation(T& points)", "[pol
 		}
 
 		WHEN("Points are all aligned in an axis") {
-			Polygon a({{ 1, 2 }, { 1, 4 }, { 1, 1 }});
-			Polygon b({{ 51.3539, -44.8024 }, { 120.0290, -44.8024 }, { 140.2830, -44.8024 }});
+			Polygon a("", from_init_list<Point>({{ 1, 2 }, { 1, 4 }, { 1, 1 }}));
+			Polygon b("", from_init_list<Point>({{ 51.3539, -44.8024 }, { 120.0290, -44.8024 }, { 140.2830, -44.8024 }}));
 			std::vector<Point const*> c({a.points[0].get(), a.points[1].get(), a.points[2].get()});
 			std::vector<Point const*> d({b.points[0].get(), b.points[1].get(), b.points[2].get()});
 			THEN("Should be detected as COLINEAR") {
@@ -65,7 +89,7 @@ SCENARIO("template<class T> Polygon::Rotation detect_rotation(T& points)", "[pol
 		}
 
 		WHEN("Points are all aligned in diagonal") {
-			Polygon a({{ 1, 2 }, { 4, 4 }, { 2.5, 3 }});
+			Polygon a("", from_init_list<Point>({{ 1, 2 }, { 4, 4 }, { 2.5, 3 }}));
 			std::vector<Point const*> b({a.points[0].get(), a.points[1].get(), a.points[2].get()});
 			THEN("Should be detected as COLINEAR") {
 				REQUIRE(detect_rotation(a.points) == Polygon::Rotation::COLINEAR);
@@ -74,7 +98,7 @@ SCENARIO("template<class T> Polygon::Rotation detect_rotation(T& points)", "[pol
 		}
 
 		WHEN("Two points of a triangle are at the same place") {
-			Polygon a({{ 1, 2 }, { 4, 4 }, { 1, 2 }});
+			Polygon a("", from_init_list<Point>({{ 1, 2 }, { 4, 4 }, { 1, 2 }}));
 			std::vector<Point const*> b({a.points[0].get(), a.points[1].get(), a.points[2].get()});
 			THEN("Should be detected as COLINEAR") {
 				REQUIRE(detect_rotation(a.points) == Polygon::Rotation::COLINEAR);
@@ -85,12 +109,12 @@ SCENARIO("template<class T> Polygon::Rotation detect_rotation(T& points)", "[pol
 }
 
 //******************************************************************************
-SCENARIO("void Polygon::detect_edge_normal()", "[polygon]") {
+SCENARIO("void Polygon::detect_edge_normal() noexcept", "[polygon]") {
 	GIVEN("An octogon : 2 horizontal edges, 2 verticals, 4 diagonals") {
 		WHEN("Points order is oriented clockwise") {
-			Polygon a({
+			Polygon a("", from_init_list<Point>({
 				{ 2, 1 }, { 1, 2 }, { 1, 3 }, { 2, 4 },
-				{ 3, 4 }, { 4, 3 }, { 4, 2 }, { 3, 1 }});
+				{ 3, 4 }, { 4, 3 }, { 4, 2 }, { 3, 1 }}));
 			THEN("For edges going down to the X axis, the normal should go down to the Y") {
 				REQUIRE(a.edges[0]->direction == Edge::Direction::XMIN);
 				REQUIRE(a.edges[0]->normal == Normal::YMIN);
@@ -120,9 +144,9 @@ SCENARIO("void Polygon::detect_edge_normal()", "[polygon]") {
 		}
 
 		WHEN("Points order is oriented counter clockwise") {
-			Polygon a({
+			Polygon a("", from_init_list<Point>({
 				{ 2, 1 }, { 3, 1 }, { 4, 2 }, { 4, 3 },
-				{ 3, 4 }, { 2, 4 }, { 1, 3 }, { 1, 2 }});
+				{ 3, 4 }, { 2, 4 }, { 1, 3 }, { 1, 2 }}));
 			THEN("For edges going down to the X axis, the normal should go up to the Y") {
 				REQUIRE(a.edges[5]->direction == Edge::Direction::XMIN);
 				REQUIRE(a.edges[5]->normal == Normal::YMAX);
@@ -152,7 +176,7 @@ SCENARIO("void Polygon::detect_edge_normal()", "[polygon]") {
 		}
 
 		WHEN("Points are all aligned or at the same position") {
-			Polygon a({{ 1, 2 }, { 1, 4 }, { 1, 1 }, { 1, 1 }});
+			Polygon a("", from_init_list<Point>({{ 1, 2 }, { 1, 4 }, { 1, 1 }, { 1, 1 }}));
 			THEN("There should not be any normal") {
 				REQUIRE(a.rotation == Polygon::Rotation::COLINEAR);
 				REQUIRE(a.edges[0]->normal == Normal::NONE);
@@ -167,7 +191,7 @@ SCENARIO("void Polygon::detect_edge_normal()", "[polygon]") {
 //******************************************************************************
 SCENARIO("relation::PolygonPoint Polygon::relation_to(Point const* point) const", "[polygon]") {
 	GIVEN("A simple polygon") {
-		Polygon poly({{ 1, 1 }, { 1, 3 }, { 3, 3 }, { 3, 1 }});
+		Polygon poly("", from_init_list<Point>({{ 1, 1 }, { 1, 3 }, { 3, 3 }, { 3, 1 }}));
 		WHEN("A point is inside the polygon") {
 			Point p(2, 2);
 			THEN("Should be detected as IN") {
@@ -224,9 +248,9 @@ SCENARIO("relation::PolygonPoint Polygon::relation_to(Point const* point) const"
 
 	GIVEN("A polygon with vertices on the firsts rays") {
 		WHEN("The polygon have 4 edge colinear to the 4 first rays") {
-			Polygon poly({
+			Polygon poly("", from_init_list<Point>({
 				{ 3, 1 }, { 3, 2 }, { 4, 3 }, { 5, 3 },
-				{ 3, 5 }, { 3, 4 }, { 2, 3 }, { 1, 3 }});
+				{ 3, 5 }, { 3, 4 }, { 2, 3 }, { 1, 3 }}));
 			Point p(3, 3);
 			THEN("Should be detected as IN") {
 				REQUIRE(poly.relation_to(p) == relation::PolygonPoint::IN);
@@ -234,7 +258,7 @@ SCENARIO("relation::PolygonPoint Polygon::relation_to(Point const* point) const"
 		}
 
 		WHEN("The polygon have 4 angles on the 4 first rays") {
-			Polygon poly({{ 2, 1 }, { 3, 2 }, { 2, 3 }, { 1, 2 }});
+			Polygon poly("", from_init_list<Point>({{ 2, 1 }, { 3, 2 }, { 2, 3 }, { 1, 2 }}));
 			Point p(2, 2);
 			THEN("Should be detected as IN") {
 				REQUIRE(poly.relation_to(p) == relation::PolygonPoint::IN);
@@ -244,11 +268,11 @@ SCENARIO("relation::PolygonPoint Polygon::relation_to(Point const* point) const"
 
 	GIVEN("A simple polygon that flirt with floating points calculus imprecision") {
 		WHEN("A point is outside the polygon, but colinear to an edge") {
-			Polygon poly({
+			Polygon poly("", from_init_list<Point>({
 				{ 120.0290, -44.8024 },
 				{ 120.0290, -42.0164 },
 				{ 140.2830, -42.0164 },
-				{ 140.2830, -44.8024 }});
+				{ 140.2830, -44.8024 }}));
 			Point p(51.3539, -44.8024);
 			Point q(31.1000, -44.8024);
 			THEN("Should be detected as OUT") {

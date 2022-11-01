@@ -24,7 +24,7 @@ if( Catch2_FOUND )
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_board.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/infra/utils/test_to_string.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/utils/test_signum.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/utils/test_vector_view.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/utils/test_vector_utils.cpp"
 		)
 
 	target_compile_definitions( openemsh_unittest
