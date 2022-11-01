@@ -32,8 +32,7 @@ class Polygon
 , public IConflictOrigin
 /*, public IMeshLineOrigin*/ {
 private:
-	void detect_bounding(); // TODO
-	void detect_edge_normal();
+	void detect_edge_normal() noexcept;
 
 public:
 	enum class Rotation {
@@ -41,26 +40,24 @@ public:
 		CW,
 		CCW,
 		COLINEAR
-	} rotation;
+	} const rotation;
 
 	enum class Type {
 		SHAPE,
 		PORT
 	} type; // TODO usefull?
 
-	Bounding2D bounding;
-	std::string name; // TODO
+	Bounding2D const bounding;
+	std::string const name;
 
-	// TODO rm unique_ptr ?
-	std::vector<std::unique_ptr<Point const>> points;
+	std::vector<std::unique_ptr<Point const>> const points;
 
 	/// edge[0] is between points[n] & points[0]
 	/// edge[x] is between points[x-1] & points[x]
 	///*************************************************************************
-	std::vector<std::unique_ptr<Edge>> edges;
+	std::vector<std::unique_ptr<Edge>> const edges;
 
-	explicit Polygon(std::initializer_list<Point> points);
-	Polygon(std::string name, std::initializer_list<Point> points);
+	Polygon(std::string const& name, std::vector<std::unique_ptr<Point const>>&& points);
 
 //	relation::PolygonEdge relation_to(Edge const* edge);
 	relation::PolygonPoint relation_to(Point const& point) const;
@@ -72,6 +69,12 @@ public:
 
 /// These are the two declaration authorized.
 ///*****************************************************************************
-template<class T> Polygon::Rotation detect_rotation(T const& points);
-extern template Polygon::Rotation detect_rotation(std::vector<std::unique_ptr<Point const>> const&);
-extern template Polygon::Rotation detect_rotation(std::vector<Point const*> const&);
+template<class T> Polygon::Rotation detect_rotation(T const& points) noexcept;
+extern template Polygon::Rotation detect_rotation(std::vector<std::unique_ptr<Point const>> const&) noexcept;
+extern template Polygon::Rotation detect_rotation(std::vector<Point const*> const&) noexcept;
+
+//******************************************************************************
+Bounding2D detect_bounding(std::vector<std::unique_ptr<Point const>> const& points) noexcept;
+
+//******************************************************************************
+std::vector<std::unique_ptr<Edge>> detect_edges(std::vector<std::unique_ptr<Point const>> const& points);
