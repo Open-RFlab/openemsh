@@ -13,6 +13,7 @@
 #include "domain/geometrics/polygon.hpp"
 #include "domain/mesh/meshline_policy.hpp"
 #include "domain/global.hpp"
+#include "utils/vector_utils.hpp"
 
 #include "domain/conflict_manager.hpp"
 
@@ -243,10 +244,10 @@ SCENARIO("void ConflictManager::add_colinear_edges(Edge* a, Edge* b)", "[conflic
 SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const range, std::optional<Edge const*> b)", "[conflict_manager]") {
 	GIVEN("A conflict manager, an edge and some polygons") {
 		ConflictManager cm(nullptr);
-		Polygon p({
+		Polygon p("", from_init_list<Point>({
 			{ 3, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }, { 1, 3 },
-			{ 2, 3 }, { 2, 5 }, { 5, 5 }, { 5, 2 }, { 3, 2 }});
-		Polygon q({{ 0, 0 }, { 0, 8 }, { 8, 8 }, { 8, 0 }});
+			{ 2, 3 }, { 2, 5 }, { 5, 5 }, { 5, 2 }, { 3, 2 }}));
+		Polygon q("", from_init_list<Point>({{ 0, 0 }, { 0, 8 }, { 8, 8 }, { 8, 0 }}));
 		WHEN("A vertical edge that is in a polygon is reported as partially in this polygon") {
 			Point a0(4, 1), a1(4, 7);
 			Edge a(&a0, &a1);

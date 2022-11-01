@@ -15,7 +15,7 @@
 #include "domain/mesh/interval.hpp"
 #include "domain/board.hpp"
 #include "infra/utils/to_string.hpp"
-#include "utils/vector_view.hpp"
+#include "utils/vector_utils.hpp"
 #include "utils/color.hpp"
 
 #include "serializer_to_prettyprint.hpp"

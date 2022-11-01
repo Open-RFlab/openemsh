@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <initializer_list>
 #include <memory>
 #include <vector>
 
@@ -19,4 +20,16 @@ std::vector<T*> create_view(std::vector<std::unique_ptr<T>> const& original) noe
 	}
 
 	return view;
+}
+
+//******************************************************************************
+template<typename T>
+std::vector<std::unique_ptr<T const>> from_init_list(std::initializer_list<T> const& original) noexcept {
+	std::vector<std::unique_ptr<T const>> out;
+
+	for(auto const& it : original)
+		out.push_back(std::make_unique<T>(it));
+
+	out.shrink_to_fit();
+	return out;
 }

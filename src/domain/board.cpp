@@ -12,6 +12,7 @@
 #include <utility>
 
 #include "utils/signum.hpp"
+#include "utils/vector_utils.hpp"
 #include "conflicts/conflict_edge_in_polygon.hpp"
 
 #include "board.hpp"
@@ -66,7 +67,33 @@ void sort_points_by_vector_orientation(vector<Point>& points, Point const& vecto
 }
 
 //******************************************************************************
-Board::Board(vector<unique_ptr<Polygon>>& polygons)
+unique_ptr<Board> Board::Builder::build() {
+	return make_unique<Board>(move(polygons));
+}
+
+//******************************************************************************
+void Board::Builder::add_polygon(string const& name, initializer_list<Point> points) {
+	polygons.push_back(make_unique<Polygon>(name, from_init_list(points)));
+}
+
+//******************************************************************************
+void Board::Builder::add_polygon(string const& name, vector<unique_ptr<Point const>>&& points) {
+	polygons.push_back(make_unique<Polygon>(name, move(points)));
+}
+
+//******************************************************************************
+void Board::Builder::add_polygon_from_box(string const& name, Point const p1, Point const p3) {
+	vector<unique_ptr<Point const>> points(4);
+	points[0] = make_unique<Point const>(p1.x, p1.y);
+	points[1] = make_unique<Point const>(p1.x, p3.y);
+	points[2] = make_unique<Point const>(p3.x, p3.y);
+	points[3] = make_unique<Point const>(p3.x, p1.y);
+
+	polygons.push_back(make_unique<Polygon>(name, move(points)));
+}
+
+//******************************************************************************
+Board::Board(vector<unique_ptr<Polygon>>&& polygons)
 : conflict_manager(&line_policy_manager)
 , line_policy_manager(params, &conflict_manager)
 , polygons(move(polygons)) {

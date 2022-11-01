@@ -7,13 +7,19 @@
 #include <catch2/catch_all.hpp>
 
 #include <array>
+#include <utility>
 
 #include "domain/conflicts/conflict_colinear_edges.hpp"
 #include "domain/conflicts/conflict_edge_in_polygon.hpp"
+#include "utils/vector_utils.hpp"
 
 #include "domain/board.hpp"
 
 /// @test void sort_points_by_vector_orientation(std::vector<Point>& points, Point const& vector)
+/// @test void Board::Builder::add_polygon(std::string const& name, std::initializer_list<Point> points)
+/// @test void Board::Builder::add_polygon(std::string const& name, std::vector<std::unique_ptr<Point const>>&& points)
+/// @test void Board::Builder::add_polygon_from_box(std::string const& name, Point const p1, Point const p3)
+/// @test std::unique_ptr<Board> Board::Builder::build()
 /// @test void Board::detect_edges_in_polygons()
 /// @test void Board::detect_colinear_edges()
 /// @test void Board::detect_non_conflicting_edges()
@@ -126,6 +132,148 @@ SCENARIO("void sort_points_by_vector_orientation(std::vector<Point>& points, Poi
 	}
 }
 
+
+//******************************************************************************
+SCENARIO("void Board::Builder::add_polygon(std::string const& name, std::initializer_list<Point> points)", "[board]") {
+	GIVEN("A Board Builder") {
+		Board::Builder b;
+		REQUIRE(b.polygons.empty());
+		WHEN("Adding a polygon as an initializer_list of Points") {
+			b.add_polygon("MS13", {
+				{ 70.3673, -42.8674 },
+				{ 62.1753, -42.8674 },
+				{ 62.1753, -43.9276 },
+				{ 66.2713, -43.9276 },
+				{ 66.2713, -43.9514 },
+				{ 70.3673, -43.9514 }});
+			THEN("Should add a Polygon in the inner vector") {
+				REQUIRE(b.polygons.size() == 1);
+				REQUIRE(b.polygons[0]->name == "MS13");
+				REQUIRE(*(b.polygons[0]->points[0]) == Point(70.3673, -42.8674));
+				REQUIRE(*(b.polygons[0]->points[1]) == Point(62.1753, -42.8674));
+				REQUIRE(*(b.polygons[0]->points[2]) == Point(62.1753, -43.9276));
+				REQUIRE(*(b.polygons[0]->points[3]) == Point(66.2713, -43.9276));
+				REQUIRE(*(b.polygons[0]->points[4]) == Point(66.2713, -43.9514));
+				REQUIRE(*(b.polygons[0]->points[5]) == Point(70.3673, -43.9514));
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("void Board::Builder::add_polygon(std::string const& name, std::vector<std::unique_ptr<Point const>>&& points)", "[board]") {
+	GIVEN("A Board Builder") {
+		Board::Builder b;
+		REQUIRE(b.polygons.empty());
+		WHEN("Adding a polygon as a vector of Points") {
+			std::vector<std::unique_ptr<Point const>> points(from_init_list<Point>({
+				{ 70.3673, -42.8674 },
+				{ 62.1753, -42.8674 },
+				{ 62.1753, -43.9276 },
+				{ 66.2713, -43.9276 },
+				{ 66.2713, -43.9514 },
+				{ 70.3673, -43.9514 }}));
+			b.add_polygon("MS13", std::move(points));
+			b.add_polygon("MS15", from_init_list<Point>({
+				{ 70.3673, -42.8674 },
+				{ 62.1753, -42.8674 },
+				{ 62.1753, -43.9276 },
+				{ 66.2713, -43.9276 },
+				{ 66.2713, -43.9514 },
+				{ 70.3673, -43.9514 }}));
+			THEN("Should add a Polygon in the inner vector") {
+				REQUIRE(b.polygons.size() == 2);
+				REQUIRE(b.polygons[0]->name == "MS13");
+				REQUIRE(*(b.polygons[0]->points[0]) == Point(70.3673, -42.8674));
+				REQUIRE(*(b.polygons[0]->points[1]) == Point(62.1753, -42.8674));
+				REQUIRE(*(b.polygons[0]->points[2]) == Point(62.1753, -43.9276));
+				REQUIRE(*(b.polygons[0]->points[3]) == Point(66.2713, -43.9276));
+				REQUIRE(*(b.polygons[0]->points[4]) == Point(66.2713, -43.9514));
+				REQUIRE(*(b.polygons[0]->points[5]) == Point(70.3673, -43.9514));
+				REQUIRE(b.polygons[1]->name == "MS15");
+				REQUIRE(*(b.polygons[1]->points[0]) == Point(70.3673, -42.8674));
+				REQUIRE(*(b.polygons[1]->points[1]) == Point(62.1753, -42.8674));
+				REQUIRE(*(b.polygons[1]->points[2]) == Point(62.1753, -43.9276));
+				REQUIRE(*(b.polygons[1]->points[3]) == Point(66.2713, -43.9276));
+				REQUIRE(*(b.polygons[1]->points[4]) == Point(66.2713, -43.9514));
+				REQUIRE(*(b.polygons[1]->points[5]) == Point(70.3673, -43.9514));
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("void Board::Builder::add_polygon_from_box(std::string const& name, Point const p1, Point const p3)", "[board]") {
+	GIVEN("A Board Builder") {
+		Board::Builder b;
+		REQUIRE(b.polygons.empty());
+		WHEN("Adding a rectangle polygon as a box of opposite Points") {
+			b.add_polygon_from_box("MS1", { 16.1, -26.5 }, { 20.6, -26 });
+			THEN("Should add a Polygon in the inner vector") {
+				REQUIRE(b.polygons.size() == 1);
+				REQUIRE(b.polygons[0]->name == "MS1");
+				REQUIRE(*(b.polygons[0]->points[0]) == Point(16.1, -26.5));
+				REQUIRE(*(b.polygons[0]->points[1]) == Point(16.1, -26));
+				REQUIRE(*(b.polygons[0]->points[2]) == Point(20.6, -26));
+				REQUIRE(*(b.polygons[0]->points[3]) == Point(20.6, -26.5));
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("std::unique_ptr<Board> Board::Builder::build()", "[board]") {
+	GIVEN("A Board Builder previously fed of polygons") {
+		Board::Builder b;
+		REQUIRE(b.polygons.empty());
+		b.add_polygon_from_box("MS1", { 16.1, -26.5 }, { 20.6, -26 });
+		b.add_polygon("MS15", from_init_list<Point>({
+			{ 70.3673, -42.8674 },
+			{ 62.1753, -42.8674 },
+			{ 62.1753, -43.9276 },
+			{ 66.2713, -43.9276 },
+			{ 66.2713, -43.9514 },
+			{ 70.3673, -43.9514 }}));
+		b.add_polygon("MS13", {
+			{ 70.3673, -42.8674 },
+			{ 62.1753, -42.8674 },
+			{ 62.1753, -43.9276 },
+			{ 66.2713, -43.9276 },
+			{ 66.2713, -43.9514 },
+			{ 70.3673, -43.9514 }});
+		REQUIRE(b.polygons.size() == 3);
+		WHEN("Calling build()") {
+			std::unique_ptr<Board> a = b.build();
+			THEN("Should output a Board containing the polygons") {
+				REQUIRE(a->polygons.size() == 3);
+				REQUIRE(a->polygons[0]->name == "MS1");
+				REQUIRE(*(a->polygons[0]->points[0]) == Point(16.1, -26.5));
+				REQUIRE(*(a->polygons[0]->points[1]) == Point(16.1, -26));
+				REQUIRE(*(a->polygons[0]->points[2]) == Point(20.6, -26));
+				REQUIRE(*(a->polygons[0]->points[3]) == Point(20.6, -26.5));
+				REQUIRE(a->polygons[1]->name == "MS15");
+				REQUIRE(*(a->polygons[1]->points[0]) == Point(70.3673, -42.8674));
+				REQUIRE(*(a->polygons[1]->points[1]) == Point(62.1753, -42.8674));
+				REQUIRE(*(a->polygons[1]->points[2]) == Point(62.1753, -43.9276));
+				REQUIRE(*(a->polygons[1]->points[3]) == Point(66.2713, -43.9276));
+				REQUIRE(*(a->polygons[1]->points[4]) == Point(66.2713, -43.9514));
+				REQUIRE(*(a->polygons[1]->points[5]) == Point(70.3673, -43.9514));
+				REQUIRE(a->polygons[2]->name == "MS13");
+				REQUIRE(*(a->polygons[2]->points[0]) == Point(70.3673, -42.8674));
+				REQUIRE(*(a->polygons[2]->points[1]) == Point(62.1753, -42.8674));
+				REQUIRE(*(a->polygons[2]->points[2]) == Point(62.1753, -43.9276));
+				REQUIRE(*(a->polygons[2]->points[3]) == Point(66.2713, -43.9276));
+				REQUIRE(*(a->polygons[2]->points[4]) == Point(66.2713, -43.9514));
+				REQUIRE(*(a->polygons[2]->points[5]) == Point(70.3673, -43.9514));
+			}
+
+			THEN("The Builder should be empty") {
+				REQUIRE(b.polygons.empty());
+			}
+		}
+	}
+}
+
 //******************************************************************************
 SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 	GIVEN("A board holding two simple polygons (orthogonal squares)") {
@@ -133,9 +281,9 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				std::vector<std::unique_ptr<Polygon>> tmp;
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }})));
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 2, 2 }, { 2, 3 }, { 3, 3 }, { 3, 2 }})));
-				b = std::make_unique<Board>(tmp);
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }})));
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 2, 2 }, { 2, 3 }, { 3, 3 }, { 3, 2 }})));
+				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_edges_in_polygons();
 			THEN("4 EDGE_IN_POLYGON conflicts should be registered") {
@@ -210,9 +358,9 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				std::vector<std::unique_ptr<Polygon>> tmp;
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 1, 2 }, { 3, 2 }, { 3, 4 }, { 1, 4 }})));
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 2, 1 }, { 4, 1 }, { 4, 3 }, { 2, 3 }})));
-				b = std::make_unique<Board>(tmp);
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 1, 2 }, { 3, 2 }, { 3, 4 }, { 1, 4 }})));
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 2, 1 }, { 4, 1 }, { 4, 3 }, { 2, 3 }})));
+				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_edges_in_polygons();
 			THEN("4 EDGE_IN_POLYGON conflicts should be registered") {
@@ -288,9 +436,9 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				std::vector<std::unique_ptr<Polygon>> tmp;
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }})));
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 2, 1 }, { 3, 1 }, { 3, 3 }, { 2, 3 }})));
-				b = std::make_unique<Board>(tmp);
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }})));
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 3 }, { 2, 3 }})));
+				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_edges_in_polygons();
 			THEN("4 EDGE_IN_POLYGON conflicts should be registered") {
@@ -366,9 +514,9 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				std::vector<std::unique_ptr<Polygon>> tmp;
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }})));
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 2, 3 }, { 3, 2 }, { 5, 4 }, { 4, 5 }})));
-				b = std::make_unique<Board>(tmp);
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }})));
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 2, 3 }, { 3, 2 }, { 5, 4 }, { 4, 5 }})));
+				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_edges_in_polygons();
 			THEN("5 EDGE_IN_POLYGON conflicts should be registered") {
@@ -457,9 +605,9 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				std::vector<std::unique_ptr<Polygon>> tmp;
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }})));
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }})));
-				b = std::make_unique<Board>(tmp);
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }})));
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }})));
+				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_edges_in_polygons();
 			THEN("2 EDGE_IN_POLYGON conflicts should be registered") {
@@ -510,9 +658,9 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				std::vector<std::unique_ptr<Polygon>> tmp;
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 1, 2 }, { 2, 2 }, { 2, 3 }, { 1, 3 }})));
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }})));
-				b = std::make_unique<Board>(tmp);
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 1, 2 }, { 2, 2 }, { 2, 3 }, { 1, 3 }})));
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }})));
+				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_edges_in_polygons();
 			THEN("There should not be any conflict registered") {
@@ -524,9 +672,9 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				std::vector<std::unique_ptr<Polygon>> tmp;
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 2, 1 }})));
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 3, 3 }, { 3, 4 }, { 4, 4 }, { 4, 3 }})));
-				b = std::make_unique<Board>(tmp);
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 2, 1 }})));
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }, { 4, 3 }})));
+				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_edges_in_polygons();
 			THEN("There should not be any conflict registered") {
@@ -540,14 +688,14 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				std::vector<std::unique_ptr<Polygon>> tmp;
-				tmp.push_back(std::make_unique<Polygon>(Polygon({
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({
 					{ 1, 1 }, { 10, 1 }, { 10, 10 }, { 1, 10 }})));
-				tmp.push_back(std::make_unique<Polygon>(Polygon({
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({
 					{ 11, 4 }, { 9, 3 }, { 13, 2 }, { 5, 2 },
 					{ 5, 11 }, { 4, 11.3 }, { 3, 10 }, { 2, 10 },
 					{ 2.3, 12 }, { 6, 11.3 }, { 6, 9 }, { 10, 10 },
 					{ 11, 9 }, { 9, 7 }, { 10, 6.3 }, { 10, 5 }})));
-				b = std::make_unique<Board>(tmp);
+				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_edges_in_polygons();
 			THEN("12 EDGE_IN_POLYGON conflicts should be registered") {
@@ -677,10 +825,10 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				std::vector<std::unique_ptr<Polygon>> tmp;
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }})));
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 0.5, 3 }, { 2, 3 }, { 2, 4 }, { 0.5, 4 }})));
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 3, 5 }, { 2, 5 }, { 2, 6 }, { 3, 6 }})));
-				b = std::make_unique<Board>(tmp);
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }})));
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 0.5, 3 }, { 2, 3 }, { 2, 4 }, { 0.5, 4 }})));
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 3, 5 }, { 2, 5 }, { 2, 6 }, { 3, 6 }})));
+				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_colinear_edges();
 			THEN("A COLINEAR_EDGES conflict should be registered") {
@@ -720,10 +868,10 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				std::vector<std::unique_ptr<Polygon>> tmp;
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }})));
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 3, 0.5 }, { 3, 2 }, { 4, 2 }, { 4, 0.5 }})));
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 5, 3 }, { 5, 2 }, { 6, 2 }, { 6, 3 }})));
-				b = std::make_unique<Board>(tmp);
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }})));
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 3, 0.5 }, { 3, 2 }, { 4, 2 }, { 4, 0.5 }})));
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 5, 3 }, { 5, 2 }, { 6, 2 }, { 6, 3 }})));
+				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_colinear_edges();
 			THEN("A COLINEAR_EDGES conflict should be registered") {
@@ -763,10 +911,10 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				std::vector<std::unique_ptr<Polygon>> tmp;
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 1, 1 }, { 1, 2 }, { 2, 2 }})));
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 3, 3 }, { 3, 4 }, { 4, 4 }})));
-				tmp.push_back(std::make_unique<Polygon>(Polygon({{ 5, 5 }, { 5, 6 }, { 6, 6 }})));
-				b = std::make_unique<Board>(tmp);
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 1, 1 }, { 1, 2 }, { 2, 2 }})));
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }})));
+				tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 5, 5 }, { 5, 6 }, { 6, 6 }})));
+				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_colinear_edges();
 			THEN("There should not be any conflict registered") {
@@ -782,9 +930,9 @@ SCENARIO("void Board::detect_non_conflicting_edges()", "[board]") {
 		std::unique_ptr<Board> b;
 		{
 			std::vector<std::unique_ptr<Polygon>> tmp;
-			tmp.push_back(std::make_unique<Polygon>(Polygon({{ 1, 1 }, { 1, 2 }, { 2, 2 }})));
-			tmp.push_back(std::make_unique<Polygon>(Polygon({{ 3, 3 }, { 3, 4 }, { 4, 4 }})));
-			b = std::make_unique<Board>(tmp);
+			tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 1, 1 }, { 1, 2 }, { 2, 2 }})));
+			tmp.push_back(std::make_unique<Polygon>("", from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }})));
+			b = std::make_unique<Board>(std::move(tmp));
 		}
 		REQUIRE(b->edges.size() == 6);
 		b->edges[0]->conflicts.push_back(nullptr);

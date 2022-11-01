@@ -16,70 +16,29 @@
 using namespace std;
 
 //******************************************************************************
-Polygon::Polygon(initializer_list<Point> points)
-: bounding({ begin(points)->x, begin(points)->x, begin(points)->y, begin(points)->y }) {
-	for(auto const& point : points)
-		this->points.push_back(make_unique<Point>(point)); // TODO do not use initializer_list because of copies
-	this->points.shrink_to_fit();
-
-	rotation = detect_rotation(this->points);
-
-	Point const* prev = this->points.back().get();
-	for(auto const& point : this->points) {
-		edges.push_back(make_unique<Edge>(prev, point.get()));
-		prev = point.get();
-	}
-	edges.shrink_to_fit();
-
-	detect_bounding();
+Polygon::Polygon(string const& name, vector<unique_ptr<Point const>>&& points)
+: rotation(detect_rotation(points))
+, bounding(detect_bounding(points))
+, name(name)
+, points(move(points))
+, edges(detect_edges(this->points))
+{
 	detect_edge_normal();
 }
 
 //******************************************************************************
-Polygon::Polygon(string name, initializer_list<Point> points)
-: bounding({ begin(points)->x, begin(points)->x, begin(points)->y, begin(points)->y })
-, name(move(name)) {
-	for(auto const& point : points)
-		this->points.push_back(make_unique<Point>(point)); // TODO do not use initializer_list because of copies
-	this->points.shrink_to_fit();
-
-	rotation = detect_rotation(this->points);
-
-	Point const* prev = this->points.back().get();
-	for(auto const& point : this->points) {
-		edges.push_back(make_unique<Edge>(prev, point.get()));
-		prev = point.get();
-	}
-	edges.shrink_to_fit();
-
-	detect_bounding();
-	detect_edge_normal();
-}
-
-//******************************************************************************
-/*
-Polygon::Polygon(vector<unique_ptr<Point const>> _points)
-: points(_points) {
-	for(unique_ptr<Point const>& point : points) {
-		if(point->x < bounding[XMIN]) bounding[XMIN] = point->x;
-		if(point->x > bounding[XMAX]) bounding[XMAX] = point->x;
-		if(point->y < bounding[YMIN]) bounding[YMIN] = point->y;
-		if(point->y > bounding[YMAX]) bounding[YMAX] = point->y;
-	}
-	points.shrink_to_fit();
-
-	rotation = detect_rotation(points);
+vector<unique_ptr<Edge>> detect_edges(vector<unique_ptr<Point const>> const& points) {
+	vector<unique_ptr<Edge>> edges;
 
 	Point const* prev = points.back().get();
-	for(unique_ptr<Point const>& point : points) {
+	for(auto const & point : points) {
 		edges.push_back(make_unique<Edge>(prev, point.get()));
 		prev = point.get();
 	}
 	edges.shrink_to_fit();
 
-	detect_edge_normal();
+	return edges;
 }
-*/
 
 /// Cf. https://rosettacode.org/wiki/Shoelace_formula_for_polygonal_area#C.2B.2B
 /// Cf. https://www.baeldung.com/cs/list-polygon-points-clockwise
@@ -89,7 +48,7 @@ Polygon::Polygon(vector<unique_ptr<Point const>> _points)
 /// FDTD mesh is orthogonal.
 ///*****************************************************************************
 template<class T>
-Polygon::Rotation detect_rotation(T const& points) {
+Polygon::Rotation detect_rotation(T const& points) noexcept {
 	double left_sum = 0.0;
 	double right_sum = 0.0;
 
@@ -112,17 +71,25 @@ Polygon::Rotation detect_rotation(T const& points) {
 }
 
 //******************************************************************************
-template Polygon::Rotation detect_rotation(std::vector<std::unique_ptr<Point const>> const&);
-template Polygon::Rotation detect_rotation(std::vector<Point const*> const&);
+template Polygon::Rotation detect_rotation(std::vector<std::unique_ptr<Point const>> const&) noexcept;
+template Polygon::Rotation detect_rotation(std::vector<Point const*> const&) noexcept;
 
 //******************************************************************************
-void Polygon::detect_bounding() {
+Bounding2D detect_bounding(vector<unique_ptr<Point const>> const& points) noexcept {
+	Bounding2D bounding({
+		(*begin(points))->x,
+		(*begin(points))->x,
+		(*begin(points))->y,
+		(*begin(points))->y });
+
 	for(auto const& point : points) {
 		if(point->x < bounding[XMIN]) bounding[XMIN] = point->x;
 		if(point->x > bounding[XMAX]) bounding[XMAX] = point->x;
 		if(point->y < bounding[YMIN]) bounding[YMIN] = point->y;
 		if(point->y > bounding[YMAX]) bounding[YMAX] = point->y;
 	}
+
+	return bounding;
 }
 
 ///           YMAX          |           YMAX
@@ -137,7 +104,7 @@ void Polygon::detect_bounding() {
 ///          YMIN           |          YMIN
 ///           CW            |           CCW
 ///*****************************************************************************
-void Polygon::detect_edge_normal() {
+void Polygon::detect_edge_normal() noexcept {
 	switch(rotation) {
 	case Rotation::CW:
 		for(auto const& edge : edges) {
