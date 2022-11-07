@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <limits>
 
+#include "utils/unreachable.hpp"
 #include "utils/vector_utils.hpp"
 #include "conflict_manager.hpp"
 
@@ -191,7 +192,7 @@ GridAxis cast(MeshlinePolicy::Axis const a) noexcept {
 	switch(a) {
 	case MeshlinePolicy::Axis::H: return H;
 	case MeshlinePolicy::Axis::V: return V;
-	default: abort();
+	default: unreachable();
 	}
 }
 
@@ -200,6 +201,6 @@ Interval::Axis cast(GridAxis const a) noexcept {
 	switch(a) {
 	case H: return Interval::Axis::H;
 	case V: return Interval::Axis::V;
-	default: abort();
+	default: unreachable();
 	}
 }
