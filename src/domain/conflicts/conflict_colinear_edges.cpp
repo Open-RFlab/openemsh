@@ -6,6 +6,7 @@
 
 #include "domain/geometrics/edge.hpp"
 #include "domain/meshline_policy_manager.hpp"
+#include "utils/unreachable.hpp"
 
 #include "conflict_colinear_edges.hpp"
 
@@ -62,7 +63,7 @@ void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manage
 				switch(axis.value()) {
 				case MeshlinePolicy::Axis::H: return Normal::YMIN;
 				case MeshlinePolicy::Axis::V: return Normal::XMIN;
-				default: abort();
+				default: unreachable();
 				}
 			} ();
 			meshline_policy = line_policy_manager.add_meshline_policy(
@@ -78,7 +79,7 @@ void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manage
 				switch(axis.value()) {
 				case MeshlinePolicy::Axis::H: return Normal::YMAX;
 				case MeshlinePolicy::Axis::V: return Normal::XMAX;
-				default: abort();
+				default: unreachable();
 				}
 			} ();
 			meshline_policy = line_policy_manager.add_meshline_policy(

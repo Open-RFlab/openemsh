@@ -8,6 +8,7 @@
 #include <iostream>
 #endif // DEBUG
 
+#include "utils/unreachable.hpp"
 #include "edge.hpp"
 #include "point.hpp"
 
@@ -67,7 +68,7 @@ Polygon::Rotation detect_rotation(T const& points) noexcept {
 	else if(area < 0)
 		return Polygon::Rotation::CW;
 	else
-		abort();
+		unreachable();
 }
 
 //******************************************************************************

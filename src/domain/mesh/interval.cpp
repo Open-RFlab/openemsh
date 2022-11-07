@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include "utils/signum.hpp"
+#include "utils/unreachable.hpp"
 #include "meshline.hpp"
 #include "meshline_policy.hpp"
 
@@ -53,7 +54,7 @@ Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Par
 			return d;
 		}
 	} ();
-	default: abort();
+	default: unreachable();
 	}
 })
 , after(after, params.lmin, params.lambda, h, [after](double d) noexcept {
@@ -72,7 +73,7 @@ Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Par
 			return d;
 		}
 	} ();
-	default: abort();
+	default: unreachable();
 	}
 })
 {}

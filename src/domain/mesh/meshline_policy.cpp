@@ -4,9 +4,8 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#include <cstdlib>
-
 #include "domain/geometrics/point.hpp"
+#include "utils/unreachable.hpp"
 #include "meshline.hpp"
 
 #include "meshline_policy.hpp"
@@ -54,6 +53,6 @@ Coord coord(Point const& point, MeshlinePolicy::Axis const axis) noexcept {
 	switch(axis) {
 	case MeshlinePolicy::Axis::H: return point.y;
 	case MeshlinePolicy::Axis::V: return point.x;
-	default: abort();
+	default: unreachable();
 	}
 }
