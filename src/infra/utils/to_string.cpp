@@ -4,7 +4,7 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#include <cstdlib>
+#include "utils/unreachable.hpp"
 
 #include "to_string.hpp"
 
@@ -18,7 +18,7 @@ string to_string(Edge::Direction direction) noexcept {
 	case Edge::Direction::YMIN: return "YMIN";
 	case Edge::Direction::YMAX: return "YMAX";
 	case Edge::Direction::NONE: return "NONE";
-	default: abort();
+	default: unreachable();
 	}
 }
 
@@ -27,7 +27,7 @@ string to_string(GridAxis const axis) noexcept {
 	switch(axis) {
 	case H: return "H";
 	case V: return "V";
-	default: abort();
+	default: unreachable();
 	}
 }
 
@@ -39,7 +39,7 @@ string to_string(Normal const normal) noexcept {
 	case Normal::YMIN: return "YMIN";
 	case Normal::YMAX: return "YMAX";
 	case Normal::NONE: return "NONE";
-	default: abort();
+	default: unreachable();
 	}
 }
 
@@ -49,7 +49,7 @@ string to_string(MeshlinePolicy::Policy const policy) noexcept {
 	case MeshlinePolicy::Policy::ONELINE: return "ONELINE";
 	case MeshlinePolicy::Policy::HALFS: return "HALFS";
 	case MeshlinePolicy::Policy::THIRDS: return "THIRDS";
-	default: abort();
+	default: unreachable();
 	}
 }
 
@@ -59,7 +59,7 @@ string to_string(Polygon::Rotation const rotation) noexcept {
 	case Polygon::Rotation::CW: return "CW";
 	case Polygon::Rotation::CCW: return "CCW";
 	case Polygon::Rotation::COLINEAR: return "COLINEAR";
-	default: abort();
+	default: unreachable();
 	}
 }
 
@@ -70,6 +70,6 @@ string to_string(Segment::Axis const axis) noexcept {
 	case Segment::Axis::V: return "V";
 	case Segment::Axis::DIAGONAL: return "DIAGONAL";
 	case Segment::Axis::POINT: return "POINT";
-	default: abort();
+	default: unreachable();
 	}
 }
