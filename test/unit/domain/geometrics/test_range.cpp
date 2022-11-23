@@ -14,6 +14,7 @@
 /// @test std::optional<Range> merge(Segment const* a, Segment const* b)
 ///*****************************************************************************
 
+//******************************************************************************
 SCENARIO("Bounding2D bounding(Segment const& a)", "[range][segment]") {
 	GIVEN("An horizontal range") {
 		Point a0(1, 1), a1(2, 1);

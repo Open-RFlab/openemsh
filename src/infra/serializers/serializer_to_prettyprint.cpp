@@ -57,10 +57,11 @@ string SerializerToPrettyprint::run(Board& board) {
 void SerializerToPrettyprint::visit(Board& board) {
 
 	out += F_ORANGE + S_BOLD + "\nCONFLICT: EDGE IN POLYGONS\n\n" + S_RESET;
-	for(auto const& conflict : board.get_conflicts_edge_in_polygons())
-		conflict->accept(*this);
+	for(auto const plane : AllPlane)
+		for(auto const& conflict : board.get_conflicts_edge_in_polygons(plane))
+			conflict->accept(*this);
 
-	for(auto const axis : AllGridAxis) {
+	for(auto const axis : AllAxis) {
 		auto policies = create_view(board.get_meshline_policies(axis));
 
 		sort(begin(policies), end(policies),
@@ -76,12 +77,14 @@ void SerializerToPrettyprint::visit(Board& board) {
 	}
 
 	out += F_ORANGE + S_BOLD + "\nCONFLICT: COLINEAR EDGES\n\n" + S_RESET;
-	for(auto const& conflict : board.get_conflicts_colinear_edges())
-		conflict->accept(*this);
+	for(auto const axis : AllAxis)
+		for(auto const& conflict : board.get_conflicts_colinear_edges(axis))
+			conflict->accept(*this);
 
 	out += F_ORANGE + S_BOLD + "\nCONFLICT: TOO CLOSE MESHLINE POLICIES\n\n" + S_RESET;
-	for(auto const& conflict : board.get_conflicts_too_close_meshline_policies())
-		conflict->accept(*this);
+	for(auto const axis : AllAxis)
+		for(auto const& conflict : board.get_conflicts_too_close_meshline_policies(axis))
+			conflict->accept(*this);
 }
 
 //******************************************************************************
@@ -91,7 +94,7 @@ void SerializerToPrettyprint::visit(Edge& edge) {
 
 //******************************************************************************
 void SerializerToPrettyprint::visit(Polygon& polygon) {
-	out += F_CYAN + polygon.name + S_RESET + " " + to_string(polygon.rotation) + " {\n";
+	out += F_CYAN + polygon.name + S_RESET + " " + to_string(polygon.rotation) + /*" " + to_string(polygon.plane) +*/ " {\n";
 
 	for(auto const& edge : polygon.edges) {
 		out += ::indent(indent);
@@ -105,7 +108,9 @@ void SerializerToPrettyprint::visit(Polygon& polygon) {
 void SerializerToPrettyprint::visit(ConflictColinearEdges& conflict) {
 	auto solution = dynamic_cast<MeshlinePolicy*>(conflict.solution);
 
-	out += F_ORANGE + "Conflict ColinearEdges between:\n" + S_RESET;
+	out +=
+		F_ORANGE + "Conflict ColinearEdges between:\n" + S_RESET +
+		"\tAxis: " + to_string(conflict.axis) + "\n";
 
 	for(auto const& edge : conflict.edges) {
 		out += "\tEdge: ";
@@ -122,7 +127,9 @@ void SerializerToPrettyprint::visit(ConflictColinearEdges& conflict) {
 void SerializerToPrettyprint::visit(ConflictEdgeInPolygon& conflict) {
 	out +=
 		F_ORANGE + "Conflict EdgeInPolygon between:\n" + S_RESET +
+		"\tPlane: " + to_string(conflict.plane) + "\n"
 		"\tEdge: ";
+
 	conflict.edge->accept(*this);
 
 	indent += 2;

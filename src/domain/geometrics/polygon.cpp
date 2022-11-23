@@ -17,23 +17,24 @@
 using namespace std;
 
 //******************************************************************************
-Polygon::Polygon(string const& name, vector<unique_ptr<Point const>>&& points)
+Polygon::Polygon(Plane const plane, string const& name, vector<unique_ptr<Point const>>&& points)
 : rotation(detect_rotation(points))
+, plane(plane)
 , bounding(detect_bounding(points))
 , name(name)
 , points(move(points))
-, edges(detect_edges(this->points))
+, edges(detect_edges(this->points, plane))
 {
 	detect_edge_normal();
 }
 
 //******************************************************************************
-vector<unique_ptr<Edge>> detect_edges(vector<unique_ptr<Point const>> const& points) {
+vector<unique_ptr<Edge>> detect_edges(vector<unique_ptr<Point const>> const& points, Plane const plane) {
 	vector<unique_ptr<Edge>> edges;
 
 	Point const* prev = points.back().get();
 	for(auto const & point : points) {
-		edges.push_back(make_unique<Edge>(prev, point.get()));
+		edges.push_back(make_unique<Edge>(plane, prev, point.get()));
 		prev = point.get();
 	}
 	edges.shrink_to_fit();
@@ -157,7 +158,7 @@ relation::PolygonPoint Polygon::relation_to(Point const& point) const {
 		count = 0;
 		if(to_try.size() <= n)
 			to_try.emplace_back(bounding[XMAX] + 1, point.y + n);
-		Edge ray(&point, &to_try[n++]);
+		Edge ray(plane, &point, &to_try[n++]);
 
 		// Detect vertices on the ray.
 		for(auto const& p : points) {

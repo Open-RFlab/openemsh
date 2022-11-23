@@ -4,8 +4,7 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-//#include <vector>
-
+#include "utils/unreachable.hpp"
 #include "point.hpp"
 #include "polygon.hpp"
 #include "range.hpp"
@@ -33,6 +32,7 @@ Segment::Segment(Axis const axis) noexcept
 {}
 
 /// Cf. https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect
+/// @warning Assumes both segments are on the same Plane.
 ///*****************************************************************************
 relation::SegmentSegment Segment::relation_to(Segment const& segment) const {
 	vector<Point const*> v1({ &p0(), &p1(), &segment.p0() });
@@ -215,4 +215,26 @@ optional<Range> overlap(Segment const& a, Segment const& b) {
 		return Range(Point(xmin, ymin), Point(xmax, ymax));
 	}
 	return nullopt;
+}
+
+//******************************************************************************
+optional<Axis> transpose(Plane const plane, Segment::Axis const axis) noexcept {
+	switch(axis) {
+	case Segment::Axis::H:
+		switch(plane) {
+		case YZ: return Z;
+		case ZX: return X;
+		case XY: return Y;
+		default: unreachable();
+		}
+	case Segment::Axis::V:
+		switch(plane) {
+		case YZ: return Y;
+		case ZX: return Z;
+		case XY: return X;
+		default: unreachable();
+		}
+	default:
+		return nullopt;
+	}
 }

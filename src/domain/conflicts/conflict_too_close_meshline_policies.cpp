@@ -7,6 +7,7 @@
 #include <optional>
 #include <tuple>
 
+#include "domain/geometrics/space.hpp"
 #include "domain/mesh/meshline_policy.hpp"
 #include "domain/meshline_policy_manager.hpp"
 
@@ -16,9 +17,11 @@ using namespace std;
 
 //******************************************************************************
 ConflictTooCloseMeshlinePolicies::ConflictTooCloseMeshlinePolicies(
+		Axis axis,
 		MeshlinePolicy* a,
 		MeshlinePolicy* b)
 : Conflict(Kind::TOO_CLOSE_MESHLINE_POLICIES)
+, axis(axis)
 , meshline_policies({ a, b })
 {}
 
@@ -26,31 +29,24 @@ ConflictTooCloseMeshlinePolicies::ConflictTooCloseMeshlinePolicies(
 void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManager& line_policy_manager) {
 	auto& a = meshline_policies.front();
 	auto& b = meshline_policies.back();
-	auto axis = a->axis;
-	if(axis != b->axis)
+	if(a->axis != b->axis)
 		return;
 
-	auto [policy, normal] = [&]() -> tuple<optional<MeshlinePolicy::Policy>, optional<Normal>> {
+	auto [policy, normal] = [&]() -> tuple<optional<MeshlinePolicy::Policy>, optional<MeshlinePolicy::Normal>> {
 		if(a->policy == MeshlinePolicy::Policy::THIRDS && b->policy == MeshlinePolicy::Policy::THIRDS) {
 			if(a->normal != b->normal) {
-				return { MeshlinePolicy::Policy::HALFS, Normal::NONE };
-			} else if(a->normal == Normal::YMIN
-			       && b->normal == Normal::YMIN) {
-				return { MeshlinePolicy::Policy::THIRDS, Normal::YMIN };
-			} else if(a->normal == Normal::YMAX
-			       && b->normal == Normal::YMAX) {
-				return { MeshlinePolicy::Policy::THIRDS, Normal::YMAX };
-			} else if(a->normal == Normal::XMIN
-			       && b->normal == Normal::XMIN) {
-				return { MeshlinePolicy::Policy::THIRDS, Normal::XMIN };
-			} else if(a->normal == Normal::XMAX
-			       && b->normal == Normal::XMAX) {
-				return { MeshlinePolicy::Policy::THIRDS, Normal::XMAX };
+				return { MeshlinePolicy::Policy::HALFS, MeshlinePolicy::Normal::NONE };
+			} else if(a->normal == MeshlinePolicy::Normal::MIN
+			       && b->normal == MeshlinePolicy::Normal::MIN) {
+				return { MeshlinePolicy::Policy::THIRDS, MeshlinePolicy::Normal::MIN };
+			} else if(a->normal == MeshlinePolicy::Normal::MAX
+			       && b->normal == MeshlinePolicy::Normal::MAX) {
+				return { MeshlinePolicy::Policy::THIRDS, MeshlinePolicy::Normal::MAX };
 			}
 		} else if((a->policy == MeshlinePolicy::Policy::HALFS && b->policy == MeshlinePolicy::Policy::HALFS)
 		       || (a->policy == MeshlinePolicy::Policy::HALFS && b->policy == MeshlinePolicy::Policy::THIRDS)
 		       || (a->policy == MeshlinePolicy::Policy::THIRDS && b->policy == MeshlinePolicy::Policy::HALFS)) {
-			return { MeshlinePolicy::Policy::HALFS, Normal::NONE };
+			return { MeshlinePolicy::Policy::HALFS, MeshlinePolicy::Normal::NONE };
 		} //else if(ONE and *) { // TODO }
 		// TODO should not have been created ?
 		// TODO only one, remove other?
@@ -76,6 +72,5 @@ void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManager& line_po
 	// TODO create MLP
 
 }
-
 
 // TODO Interval class : just mesh() from adjacent / neibourgh

@@ -24,12 +24,12 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 		Point b0(1, 3), b1(1, 4);
 		Point c0(1, 5), c1(1, 6);
 		Point d0(1, 7), d1(1, 8);
-		Edge a(&a0, &a1), b(&b0, &b1), c(&c0, &c1), d(&d0, &d1);
+		Edge a(XY, &a0, &a1), b(XY, &b0, &b1), c(XY, &c0, &c1), d(XY, &d0, &d1);
 		a.normal = Normal::XMIN;
 		b.normal = Normal::XMIN;
 		c.normal = Normal::XMAX;
 		d.normal = Normal::XMAX;
-		ConflictColinearEdges cce(&a, &b);
+		ConflictColinearEdges cce(X, &a, &b);
 		cce.append(&c);
 		cce.append(&d);
 		WHEN("Two edges normals are Normal::XMIN and two are Normal::XMAX") {
@@ -39,15 +39,15 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 			d.to_mesh = true;
 			cce.auto_solve(mpm);
 			THEN("Should add a halfs meshline policy in the meshline policy manager") {
-				REQUIRE(mpm.line_policies[H].size() == 0);
-				REQUIRE(mpm.line_policies[V].size() == 1);
-				REQUIRE(mpm.line_policies[V][0].get() == cce.solution);
-				REQUIRE(mpm.line_policies[V][0]->origins.size() == 1);
-				REQUIRE(mpm.line_policies[V][0]->origins[0] == &cce);
-				REQUIRE(mpm.line_policies[V][0]->policy == MeshlinePolicy::Policy::HALFS);
-				REQUIRE(mpm.line_policies[V][0]->normal == Normal::NONE);
-				REQUIRE(mpm.line_policies[V][0]->coord == 1);
-				REQUIRE(mpm.line_policies[V][0]->is_enabled);
+				REQUIRE(mpm.line_policies[Y].size() == 0);
+				REQUIRE(mpm.line_policies[X].size() == 1);
+				REQUIRE(mpm.line_policies[X][0].get() == cce.solution);
+				REQUIRE(mpm.line_policies[X][0]->origins.size() == 1);
+				REQUIRE(mpm.line_policies[X][0]->origins[0] == &cce);
+				REQUIRE(mpm.line_policies[X][0]->policy == MeshlinePolicy::Policy::HALFS);
+				REQUIRE(mpm.line_policies[X][0]->normal == MeshlinePolicy::Normal::NONE);
+				REQUIRE(mpm.line_policies[X][0]->coord == 1);
+				REQUIRE(mpm.line_policies[X][0]->is_enabled);
 			}
 		}
 
@@ -58,15 +58,15 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 			d.to_mesh = true;
 			cce.auto_solve(mpm);
 			THEN("Should add a halfs meshline policy in the meshline policy manager") {
-				REQUIRE(mpm.line_policies[H].size() == 0);
-				REQUIRE(mpm.line_policies[V].size() == 1);
-				REQUIRE(mpm.line_policies[V][0].get() == cce.solution);
-				REQUIRE(mpm.line_policies[V][0]->origins.size() == 1);
-				REQUIRE(mpm.line_policies[V][0]->origins[0] == &cce);
-				REQUIRE(mpm.line_policies[V][0]->policy == MeshlinePolicy::Policy::HALFS);
-				REQUIRE(mpm.line_policies[V][0]->normal == Normal::NONE);
-				REQUIRE(mpm.line_policies[V][0]->coord == 1);
-				REQUIRE(mpm.line_policies[V][0]->is_enabled);
+				REQUIRE(mpm.line_policies[Y].size() == 0);
+				REQUIRE(mpm.line_policies[X].size() == 1);
+				REQUIRE(mpm.line_policies[X][0].get() == cce.solution);
+				REQUIRE(mpm.line_policies[X][0]->origins.size() == 1);
+				REQUIRE(mpm.line_policies[X][0]->origins[0] == &cce);
+				REQUIRE(mpm.line_policies[X][0]->policy == MeshlinePolicy::Policy::HALFS);
+				REQUIRE(mpm.line_policies[X][0]->normal == MeshlinePolicy::Normal::NONE);
+				REQUIRE(mpm.line_policies[X][0]->coord == 1);
+				REQUIRE(mpm.line_policies[X][0]->is_enabled);
 			}
 		}
 
@@ -77,15 +77,15 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 			d.to_mesh = false;
 			cce.auto_solve(mpm);
 			THEN("Should add a thirds meshline policy in the meshline policy manager") {
-				REQUIRE(mpm.line_policies[H].size() == 0);
-				REQUIRE(mpm.line_policies[V].size() == 1);
-				REQUIRE(mpm.line_policies[V][0].get() == cce.solution);
-				REQUIRE(mpm.line_policies[V][0]->origins.size() == 1);
-				REQUIRE(mpm.line_policies[V][0]->origins[0] == &cce);
-				REQUIRE(mpm.line_policies[V][0]->policy == MeshlinePolicy::Policy::THIRDS);
-				REQUIRE(mpm.line_policies[V][0]->normal == Normal::XMIN);
-				REQUIRE(mpm.line_policies[V][0]->coord == 1);
-				REQUIRE(mpm.line_policies[V][0]->is_enabled);
+				REQUIRE(mpm.line_policies[Y].size() == 0);
+				REQUIRE(mpm.line_policies[X].size() == 1);
+				REQUIRE(mpm.line_policies[X][0].get() == cce.solution);
+				REQUIRE(mpm.line_policies[X][0]->origins.size() == 1);
+				REQUIRE(mpm.line_policies[X][0]->origins[0] == &cce);
+				REQUIRE(mpm.line_policies[X][0]->policy == MeshlinePolicy::Policy::THIRDS);
+				REQUIRE(mpm.line_policies[X][0]->normal == MeshlinePolicy::Normal::MIN);
+				REQUIRE(mpm.line_policies[X][0]->coord == 1);
+				REQUIRE(mpm.line_policies[X][0]->is_enabled);
 			}
 		}
 
@@ -96,15 +96,15 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 			d.to_mesh = true;
 			cce.auto_solve(mpm);
 			THEN("Should add a halfs meshline policy in the meshline policy manager") {
-				REQUIRE(mpm.line_policies[H].size() == 0);
-				REQUIRE(mpm.line_policies[V].size() == 1);
-				REQUIRE(mpm.line_policies[V][0].get() == cce.solution);
-				REQUIRE(mpm.line_policies[V][0]->origins.size() == 1);
-				REQUIRE(mpm.line_policies[V][0]->origins[0] == &cce);
-				REQUIRE(mpm.line_policies[V][0]->policy == MeshlinePolicy::Policy::HALFS);
-				REQUIRE(mpm.line_policies[V][0]->normal == Normal::NONE);
-				REQUIRE(mpm.line_policies[V][0]->coord == 1);
-				REQUIRE(mpm.line_policies[V][0]->is_enabled);
+				REQUIRE(mpm.line_policies[Y].size() == 0);
+				REQUIRE(mpm.line_policies[X].size() == 1);
+				REQUIRE(mpm.line_policies[X][0].get() == cce.solution);
+				REQUIRE(mpm.line_policies[X][0]->origins.size() == 1);
+				REQUIRE(mpm.line_policies[X][0]->origins[0] == &cce);
+				REQUIRE(mpm.line_policies[X][0]->policy == MeshlinePolicy::Policy::HALFS);
+				REQUIRE(mpm.line_policies[X][0]->normal == MeshlinePolicy::Normal::NONE);
+				REQUIRE(mpm.line_policies[X][0]->coord == 1);
+				REQUIRE(mpm.line_policies[X][0]->is_enabled);
 			}
 		}
 
@@ -115,15 +115,15 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 			d.to_mesh = true;
 			cce.auto_solve(mpm);
 			THEN("Should add a halfs meshline policy in the meshline policy manager") {
-				REQUIRE(mpm.line_policies[H].size() == 0);
-				REQUIRE(mpm.line_policies[V].size() == 1);
-				REQUIRE(mpm.line_policies[V][0].get() == cce.solution);
-				REQUIRE(mpm.line_policies[V][0]->origins.size() == 1);
-				REQUIRE(mpm.line_policies[V][0]->origins[0] == &cce);
-				REQUIRE(mpm.line_policies[V][0]->policy == MeshlinePolicy::Policy::THIRDS);
-				REQUIRE(mpm.line_policies[V][0]->normal == Normal::XMAX);
-				REQUIRE(mpm.line_policies[V][0]->coord == 1);
-				REQUIRE(mpm.line_policies[V][0]->is_enabled);
+				REQUIRE(mpm.line_policies[Y].size() == 0);
+				REQUIRE(mpm.line_policies[X].size() == 1);
+				REQUIRE(mpm.line_policies[X][0].get() == cce.solution);
+				REQUIRE(mpm.line_policies[X][0]->origins.size() == 1);
+				REQUIRE(mpm.line_policies[X][0]->origins[0] == &cce);
+				REQUIRE(mpm.line_policies[X][0]->policy == MeshlinePolicy::Policy::THIRDS);
+				REQUIRE(mpm.line_policies[X][0]->normal == MeshlinePolicy::Normal::MAX);
+				REQUIRE(mpm.line_policies[X][0]->coord == 1);
+				REQUIRE(mpm.line_policies[X][0]->is_enabled);
 			}
 		}
 	}
@@ -135,12 +135,12 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 		Point b0(3, 1), b1(4, 1);
 		Point c0(5, 1), c1(6, 1);
 		Point d0(7, 1), d1(8, 1);
-		Edge a(&a0, &a1), b(&b0, &b1), c(&c0, &c1), d(&d0, &d1);
+		Edge a(XY, &a0, &a1), b(XY, &b0, &b1), c(XY, &c0, &c1), d(XY, &d0, &d1);
 		a.normal = Normal::YMIN;
 		b.normal = Normal::YMIN;
 		c.normal = Normal::YMAX;
 		d.normal = Normal::YMAX;
-		ConflictColinearEdges cce(&a, &b);
+		ConflictColinearEdges cce(Y, &a, &b);
 		cce.append(&c);
 		cce.append(&d);
 		WHEN("Two edges normals are Normal::YMIN and two are Normal::YMAX") {
@@ -150,15 +150,15 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 			d.to_mesh = true;
 			cce.auto_solve(mpm);
 			THEN("Should add a halfs meshline policy in the meshline policy manager") {
-				REQUIRE(mpm.line_policies[H].size() == 1);
-				REQUIRE(mpm.line_policies[V].size() == 0);
-				REQUIRE(mpm.line_policies[H][0].get() == cce.solution);
-				REQUIRE(mpm.line_policies[H][0]->origins.size() == 1);
-				REQUIRE(mpm.line_policies[H][0]->origins[0] == &cce);
-				REQUIRE(mpm.line_policies[H][0]->policy == MeshlinePolicy::Policy::HALFS);
-				REQUIRE(mpm.line_policies[H][0]->normal == Normal::NONE);
-				REQUIRE(mpm.line_policies[H][0]->coord == 1);
-				REQUIRE(mpm.line_policies[H][0]->is_enabled);
+				REQUIRE(mpm.line_policies[Y].size() == 1);
+				REQUIRE(mpm.line_policies[X].size() == 0);
+				REQUIRE(mpm.line_policies[Y][0].get() == cce.solution);
+				REQUIRE(mpm.line_policies[Y][0]->origins.size() == 1);
+				REQUIRE(mpm.line_policies[Y][0]->origins[0] == &cce);
+				REQUIRE(mpm.line_policies[Y][0]->policy == MeshlinePolicy::Policy::HALFS);
+				REQUIRE(mpm.line_policies[Y][0]->normal == MeshlinePolicy::Normal::NONE);
+				REQUIRE(mpm.line_policies[Y][0]->coord == 1);
+				REQUIRE(mpm.line_policies[Y][0]->is_enabled);
 			}
 		}
 
@@ -169,15 +169,15 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 			d.to_mesh = true;
 			cce.auto_solve(mpm);
 			THEN("Should add a halfs meshline policy in the meshline policy manager") {
-				REQUIRE(mpm.line_policies[H].size() == 1);
-				REQUIRE(mpm.line_policies[V].size() == 0);
-				REQUIRE(mpm.line_policies[H][0].get() == cce.solution);
-				REQUIRE(mpm.line_policies[H][0]->origins.size() == 1);
-				REQUIRE(mpm.line_policies[H][0]->origins[0] == &cce);
-				REQUIRE(mpm.line_policies[H][0]->policy == MeshlinePolicy::Policy::HALFS);
-				REQUIRE(mpm.line_policies[H][0]->normal == Normal::NONE);
-				REQUIRE(mpm.line_policies[H][0]->coord == 1);
-				REQUIRE(mpm.line_policies[H][0]->is_enabled);
+				REQUIRE(mpm.line_policies[Y].size() == 1);
+				REQUIRE(mpm.line_policies[X].size() == 0);
+				REQUIRE(mpm.line_policies[Y][0].get() == cce.solution);
+				REQUIRE(mpm.line_policies[Y][0]->origins.size() == 1);
+				REQUIRE(mpm.line_policies[Y][0]->origins[0] == &cce);
+				REQUIRE(mpm.line_policies[Y][0]->policy == MeshlinePolicy::Policy::HALFS);
+				REQUIRE(mpm.line_policies[Y][0]->normal == MeshlinePolicy::Normal::NONE);
+				REQUIRE(mpm.line_policies[Y][0]->coord == 1);
+				REQUIRE(mpm.line_policies[Y][0]->is_enabled);
 			}
 		}
 
@@ -188,15 +188,15 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 			d.to_mesh = false;
 			cce.auto_solve(mpm);
 			THEN("Should add a thirds meshline policy in the meshline policy manager") {
-				REQUIRE(mpm.line_policies[H].size() == 1);
-				REQUIRE(mpm.line_policies[V].size() == 0);
-				REQUIRE(mpm.line_policies[H][0].get() == cce.solution);
-				REQUIRE(mpm.line_policies[H][0]->origins.size() == 1);
-				REQUIRE(mpm.line_policies[H][0]->origins[0] == &cce);
-				REQUIRE(mpm.line_policies[H][0]->policy == MeshlinePolicy::Policy::THIRDS);
-				REQUIRE(mpm.line_policies[H][0]->normal == Normal::YMIN);
-				REQUIRE(mpm.line_policies[H][0]->coord == 1);
-				REQUIRE(mpm.line_policies[H][0]->is_enabled);
+				REQUIRE(mpm.line_policies[Y].size() == 1);
+				REQUIRE(mpm.line_policies[X].size() == 0);
+				REQUIRE(mpm.line_policies[Y][0].get() == cce.solution);
+				REQUIRE(mpm.line_policies[Y][0]->origins.size() == 1);
+				REQUIRE(mpm.line_policies[Y][0]->origins[0] == &cce);
+				REQUIRE(mpm.line_policies[Y][0]->policy == MeshlinePolicy::Policy::THIRDS);
+				REQUIRE(mpm.line_policies[Y][0]->normal == MeshlinePolicy::Normal::MIN);
+				REQUIRE(mpm.line_policies[Y][0]->coord == 1);
+				REQUIRE(mpm.line_policies[Y][0]->is_enabled);
 			}
 		}
 
@@ -207,15 +207,15 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 			d.to_mesh = true;
 			cce.auto_solve(mpm);
 			THEN("Should add a halfs meshline policy in the meshline policy manager") {
-				REQUIRE(mpm.line_policies[H].size() == 1);
-				REQUIRE(mpm.line_policies[V].size() == 0);
-				REQUIRE(mpm.line_policies[H][0].get() == cce.solution);
-				REQUIRE(mpm.line_policies[H][0]->origins.size() == 1);
-				REQUIRE(mpm.line_policies[H][0]->origins[0] == &cce);
-				REQUIRE(mpm.line_policies[H][0]->policy == MeshlinePolicy::Policy::HALFS);
-				REQUIRE(mpm.line_policies[H][0]->normal == Normal::NONE);
-				REQUIRE(mpm.line_policies[H][0]->coord == 1);
-				REQUIRE(mpm.line_policies[H][0]->is_enabled);
+				REQUIRE(mpm.line_policies[Y].size() == 1);
+				REQUIRE(mpm.line_policies[X].size() == 0);
+				REQUIRE(mpm.line_policies[Y][0].get() == cce.solution);
+				REQUIRE(mpm.line_policies[Y][0]->origins.size() == 1);
+				REQUIRE(mpm.line_policies[Y][0]->origins[0] == &cce);
+				REQUIRE(mpm.line_policies[Y][0]->policy == MeshlinePolicy::Policy::HALFS);
+				REQUIRE(mpm.line_policies[Y][0]->normal == MeshlinePolicy::Normal::NONE);
+				REQUIRE(mpm.line_policies[Y][0]->coord == 1);
+				REQUIRE(mpm.line_policies[Y][0]->is_enabled);
 			}
 		}
 
@@ -226,15 +226,15 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 			d.to_mesh = true;
 			cce.auto_solve(mpm);
 			THEN("Should add a halfs meshline policy in the meshline policy manager") {
-				REQUIRE(mpm.line_policies[H].size() == 1);
-				REQUIRE(mpm.line_policies[V].size() == 0);
-				REQUIRE(mpm.line_policies[H][0].get() == cce.solution);
-				REQUIRE(mpm.line_policies[H][0]->origins.size() == 1);
-				REQUIRE(mpm.line_policies[H][0]->origins[0] == &cce);
-				REQUIRE(mpm.line_policies[H][0]->policy == MeshlinePolicy::Policy::THIRDS);
-				REQUIRE(mpm.line_policies[H][0]->normal == Normal::YMAX);
-				REQUIRE(mpm.line_policies[H][0]->coord == 1);
-				REQUIRE(mpm.line_policies[H][0]->is_enabled);
+				REQUIRE(mpm.line_policies[Y].size() == 1);
+				REQUIRE(mpm.line_policies[X].size() == 0);
+				REQUIRE(mpm.line_policies[Y][0].get() == cce.solution);
+				REQUIRE(mpm.line_policies[Y][0]->origins.size() == 1);
+				REQUIRE(mpm.line_policies[Y][0]->origins[0] == &cce);
+				REQUIRE(mpm.line_policies[Y][0]->policy == MeshlinePolicy::Policy::THIRDS);
+				REQUIRE(mpm.line_policies[Y][0]->normal == MeshlinePolicy::Normal::MAX);
+				REQUIRE(mpm.line_policies[Y][0]->coord == 1);
+				REQUIRE(mpm.line_policies[Y][0]->is_enabled);
 			}
 		}
 	}

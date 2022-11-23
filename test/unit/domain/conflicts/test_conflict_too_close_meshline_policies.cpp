@@ -21,245 +21,245 @@ SCENARIO("void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManage
 
 	GIVEN("A conflict between HALFS and HALFS meshline policies") {
 		MeshlinePolicy a(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::HALFS,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			params,
 			10);
 		MeshlinePolicy b(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::HALFS,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			params,
 			11);
-		ConflictTooCloseMeshlinePolicies x(&a, &b);
+		ConflictTooCloseMeshlinePolicies x(Y, &a, &b);
 		THEN("Should add a HALFS meshline policy in the meshline policy manager") {
 			x.auto_solve(mpm);
-			REQUIRE(mpm.line_policies[V].size() == 0);
-			REQUIRE(mpm.line_policies[H].size() == 1);
-			REQUIRE(mpm.line_policies[H][0].get() == x.solution);
-			REQUIRE(mpm.line_policies[H][0]->origins.size() == 1);
-			REQUIRE(mpm.line_policies[H][0]->origins[0] == &x);
-			REQUIRE(mpm.line_policies[H][0]->policy == MeshlinePolicy::Policy::HALFS);
-			REQUIRE(mpm.line_policies[H][0]->normal == Normal::NONE);
-			REQUIRE(mpm.line_policies[H][0]->coord == 10.5);
-			REQUIRE(mpm.line_policies[H][0]->is_enabled);
+			REQUIRE(mpm.line_policies[X].size() == 0);
+			REQUIRE(mpm.line_policies[Y].size() == 1);
+			REQUIRE(mpm.line_policies[Y][0].get() == x.solution);
+			REQUIRE(mpm.line_policies[Y][0]->origins.size() == 1);
+			REQUIRE(mpm.line_policies[Y][0]->origins[0] == &x);
+			REQUIRE(mpm.line_policies[Y][0]->policy == MeshlinePolicy::Policy::HALFS);
+			REQUIRE(mpm.line_policies[Y][0]->normal == MeshlinePolicy::Normal::NONE);
+			REQUIRE(mpm.line_policies[Y][0]->coord == 10.5);
+			REQUIRE(mpm.line_policies[Y][0]->is_enabled);
 			REQUIRE(x.is_solved);
-			REQUIRE(x.solution == mpm.line_policies[H][0].get());
+			REQUIRE(x.solution == mpm.line_policies[Y][0].get());
 		}
 	}
 
 	GIVEN("A conflict between HALFS and THIRDS meshline policies") {
 		MeshlinePolicy a(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::HALFS,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			params,
 			10);
 		MeshlinePolicy b(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::YMIN,
+			MeshlinePolicy::Normal::MIN,
 			params,
 			11);
-		ConflictTooCloseMeshlinePolicies x(&a, &b);
-		ConflictTooCloseMeshlinePolicies y(&b, &a);
+		ConflictTooCloseMeshlinePolicies x(Y, &a, &b);
+		ConflictTooCloseMeshlinePolicies y(Y, &b, &a);
 		THEN("Should add a HALFS meshline policy in the meshline policy manager") {
 			x.auto_solve(mpm);
 			y.auto_solve(mpm);
-			REQUIRE(mpm.line_policies[V].size() == 0);
-			REQUIRE(mpm.line_policies[H].size() == 2);
-			REQUIRE(mpm.line_policies[H][0].get() == x.solution);
-			REQUIRE(mpm.line_policies[H][0]->origins.size() == 1);
-			REQUIRE(mpm.line_policies[H][0]->origins[0] == &x);
-			REQUIRE(mpm.line_policies[H][0]->policy == MeshlinePolicy::Policy::HALFS);
-			REQUIRE(mpm.line_policies[H][0]->normal == Normal::NONE);
-			REQUIRE(mpm.line_policies[H][0]->coord == 10.5);
-			REQUIRE(mpm.line_policies[H][0]->is_enabled);
-			REQUIRE(mpm.line_policies[H][1].get() == y.solution);
-			REQUIRE(mpm.line_policies[H][1]->origins.size() == 1);
-			REQUIRE(mpm.line_policies[H][1]->origins[0] == &y);
-			REQUIRE(mpm.line_policies[H][1]->policy == MeshlinePolicy::Policy::HALFS);
-			REQUIRE(mpm.line_policies[H][1]->normal == Normal::NONE);
-			REQUIRE(mpm.line_policies[H][1]->coord == 10.5);
-			REQUIRE(mpm.line_policies[H][1]->is_enabled);
+			REQUIRE(mpm.line_policies[X].size() == 0);
+			REQUIRE(mpm.line_policies[Y].size() == 2);
+			REQUIRE(mpm.line_policies[Y][0].get() == x.solution);
+			REQUIRE(mpm.line_policies[Y][0]->origins.size() == 1);
+			REQUIRE(mpm.line_policies[Y][0]->origins[0] == &x);
+			REQUIRE(mpm.line_policies[Y][0]->policy == MeshlinePolicy::Policy::HALFS);
+			REQUIRE(mpm.line_policies[Y][0]->normal == MeshlinePolicy::Normal::NONE);
+			REQUIRE(mpm.line_policies[Y][0]->coord == 10.5);
+			REQUIRE(mpm.line_policies[Y][0]->is_enabled);
+			REQUIRE(mpm.line_policies[Y][1].get() == y.solution);
+			REQUIRE(mpm.line_policies[Y][1]->origins.size() == 1);
+			REQUIRE(mpm.line_policies[Y][1]->origins[0] == &y);
+			REQUIRE(mpm.line_policies[Y][1]->policy == MeshlinePolicy::Policy::HALFS);
+			REQUIRE(mpm.line_policies[Y][1]->normal == MeshlinePolicy::Normal::NONE);
+			REQUIRE(mpm.line_policies[Y][1]->coord == 10.5);
+			REQUIRE(mpm.line_policies[Y][1]->is_enabled);
 			REQUIRE(x.is_solved);
 			REQUIRE(y.is_solved);
-			REQUIRE(x.solution == mpm.line_policies[H][0].get());
-			REQUIRE(y.solution == mpm.line_policies[H][1].get());
+			REQUIRE(x.solution == mpm.line_policies[Y][0].get());
+			REQUIRE(y.solution == mpm.line_policies[Y][1].get());
 		}
 	}
 
 	GIVEN("A conflict between THIRDS and THIRDS meshline policies with different normal") {
 		MeshlinePolicy a(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::YMIN,
+			MeshlinePolicy::Normal::MIN,
 			params,
 			10);
 		MeshlinePolicy b(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::YMAX,
+			MeshlinePolicy::Normal::MAX,
 			params,
 			11);
 		MeshlinePolicy c(
-			MeshlinePolicy::Axis::V,
+			X,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::XMIN,
+			MeshlinePolicy::Normal::MIN,
 			params,
 			10);
 		MeshlinePolicy d(
-			MeshlinePolicy::Axis::V,
+			X,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::XMAX,
+			MeshlinePolicy::Normal::MAX,
 			params,
 			11);
-		ConflictTooCloseMeshlinePolicies x(&a, &b);
-		ConflictTooCloseMeshlinePolicies y(&c, &d);
+		ConflictTooCloseMeshlinePolicies x(Y, &a, &b);
+		ConflictTooCloseMeshlinePolicies y(X, &c, &d);
 		THEN("Should add a HALFS meshline policy in the meshline policy manager") {
 			x.auto_solve(mpm);
 			y.auto_solve(mpm);
-			REQUIRE(mpm.line_policies[V].size() == 1);
-			REQUIRE(mpm.line_policies[H].size() == 1);
-			REQUIRE(mpm.line_policies[H][0].get() == x.solution);
-			REQUIRE(mpm.line_policies[H][0]->origins.size() == 1);
-			REQUIRE(mpm.line_policies[H][0]->origins[0] == &x);
-			REQUIRE(mpm.line_policies[H][0]->policy == MeshlinePolicy::Policy::HALFS);
-			REQUIRE(mpm.line_policies[H][0]->normal == Normal::NONE);
-			REQUIRE(mpm.line_policies[H][0]->coord == 10.5);
-			REQUIRE(mpm.line_policies[H][0]->is_enabled);
-			REQUIRE(mpm.line_policies[V][0].get() == y.solution);
-			REQUIRE(mpm.line_policies[V][0]->origins.size() == 1);
-			REQUIRE(mpm.line_policies[V][0]->origins[0] == &y);
-			REQUIRE(mpm.line_policies[V][0]->policy == MeshlinePolicy::Policy::HALFS);
-			REQUIRE(mpm.line_policies[V][0]->normal == Normal::NONE);
-			REQUIRE(mpm.line_policies[V][0]->coord == 10.5);
-			REQUIRE(mpm.line_policies[V][0]->is_enabled);
+			REQUIRE(mpm.line_policies[X].size() == 1);
+			REQUIRE(mpm.line_policies[Y].size() == 1);
+			REQUIRE(mpm.line_policies[Y][0].get() == x.solution);
+			REQUIRE(mpm.line_policies[Y][0]->origins.size() == 1);
+			REQUIRE(mpm.line_policies[Y][0]->origins[0] == &x);
+			REQUIRE(mpm.line_policies[Y][0]->policy == MeshlinePolicy::Policy::HALFS);
+			REQUIRE(mpm.line_policies[Y][0]->normal == MeshlinePolicy::Normal::NONE);
+			REQUIRE(mpm.line_policies[Y][0]->coord == 10.5);
+			REQUIRE(mpm.line_policies[Y][0]->is_enabled);
+			REQUIRE(mpm.line_policies[X][0].get() == y.solution);
+			REQUIRE(mpm.line_policies[X][0]->origins.size() == 1);
+			REQUIRE(mpm.line_policies[X][0]->origins[0] == &y);
+			REQUIRE(mpm.line_policies[X][0]->policy == MeshlinePolicy::Policy::HALFS);
+			REQUIRE(mpm.line_policies[X][0]->normal == MeshlinePolicy::Normal::NONE);
+			REQUIRE(mpm.line_policies[X][0]->coord == 10.5);
+			REQUIRE(mpm.line_policies[X][0]->is_enabled);
 			REQUIRE(x.is_solved);
 			REQUIRE(y.is_solved);
-			REQUIRE(x.solution == mpm.line_policies[H][0].get());
-			REQUIRE(y.solution == mpm.line_policies[V][0].get());
+			REQUIRE(x.solution == mpm.line_policies[Y][0].get());
+			REQUIRE(y.solution == mpm.line_policies[X][0].get());
 		}
 	}
 
 	GIVEN("A conflict between THIRDS and THIRDS meshline policies with same normal") {
 		MeshlinePolicy a(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::YMIN,
+			MeshlinePolicy::Normal::MIN,
 			params,
 			10);
 		MeshlinePolicy b(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::YMIN,
+			MeshlinePolicy::Normal::MIN,
 			params,
 			11);
 		MeshlinePolicy c(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::YMAX,
+			MeshlinePolicy::Normal::MAX,
 			params,
 			10);
 		MeshlinePolicy d(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::YMAX,
+			MeshlinePolicy::Normal::MAX,
 			params,
 			11);
 		MeshlinePolicy e(
-			MeshlinePolicy::Axis::V,
+			X,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::XMIN,
+			MeshlinePolicy::Normal::MIN,
 			params,
 			10);
 		MeshlinePolicy f(
-			MeshlinePolicy::Axis::V,
+			X,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::XMIN,
+			MeshlinePolicy::Normal::MIN,
 			params,
 			11);
 		MeshlinePolicy g(
-			MeshlinePolicy::Axis::V,
+			X,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::XMAX,
+			MeshlinePolicy::Normal::MAX,
 			params,
 			10);
 		MeshlinePolicy h(
-			MeshlinePolicy::Axis::V,
+			X,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::XMAX,
+			MeshlinePolicy::Normal::MAX,
 			params,
 			11);
-		ConflictTooCloseMeshlinePolicies w(&a, &b);
-		ConflictTooCloseMeshlinePolicies x(&c, &d);
-		ConflictTooCloseMeshlinePolicies y(&e, &f);
-		ConflictTooCloseMeshlinePolicies z(&g, &h);
+		ConflictTooCloseMeshlinePolicies w(Y, &a, &b);
+		ConflictTooCloseMeshlinePolicies x(Y, &c, &d);
+		ConflictTooCloseMeshlinePolicies y(X, &e, &f);
+		ConflictTooCloseMeshlinePolicies z(X, &g, &h);
 		THEN("Should add a THIRDS meshline policy with the same normal in the meshline policy manager") {
 			w.auto_solve(mpm);
 			x.auto_solve(mpm);
 			y.auto_solve(mpm);
 			z.auto_solve(mpm);
-			REQUIRE(mpm.line_policies[V].size() == 2);
-			REQUIRE(mpm.line_policies[H].size() == 2);
-			REQUIRE(mpm.line_policies[H][0].get() == w.solution);
-			REQUIRE(mpm.line_policies[H][0]->origins.size() == 1);
-			REQUIRE(mpm.line_policies[H][0]->origins[0] == &w);
-			REQUIRE(mpm.line_policies[H][0]->policy == MeshlinePolicy::Policy::THIRDS);
-			REQUIRE(mpm.line_policies[H][0]->normal == Normal::YMIN);
-			REQUIRE(mpm.line_policies[H][0]->coord == 10.5);
-			REQUIRE(mpm.line_policies[H][0]->is_enabled);
-			REQUIRE(mpm.line_policies[H][1].get() == x.solution);
-			REQUIRE(mpm.line_policies[H][1]->origins.size() == 1);
-			REQUIRE(mpm.line_policies[H][1]->origins[0] == &x);
-			REQUIRE(mpm.line_policies[H][1]->policy == MeshlinePolicy::Policy::THIRDS);
-			REQUIRE(mpm.line_policies[H][1]->normal == Normal::YMAX);
-			REQUIRE(mpm.line_policies[H][1]->coord == 10.5);
-			REQUIRE(mpm.line_policies[H][1]->is_enabled);
-			REQUIRE(mpm.line_policies[V][0].get() == y.solution);
-			REQUIRE(mpm.line_policies[V][0]->origins.size() == 1);
-			REQUIRE(mpm.line_policies[V][0]->origins[0] == &y);
-			REQUIRE(mpm.line_policies[V][0]->policy == MeshlinePolicy::Policy::THIRDS);
-			REQUIRE(mpm.line_policies[V][0]->normal == Normal::XMIN);
-			REQUIRE(mpm.line_policies[V][0]->coord == 10.5);
-			REQUIRE(mpm.line_policies[V][0]->is_enabled);
-			REQUIRE(mpm.line_policies[V][1].get() == z.solution);
-			REQUIRE(mpm.line_policies[V][1]->origins.size() == 1);
-			REQUIRE(mpm.line_policies[V][1]->origins[0] == &z);
-			REQUIRE(mpm.line_policies[V][1]->policy == MeshlinePolicy::Policy::THIRDS);
-			REQUIRE(mpm.line_policies[V][1]->normal == Normal::XMAX);
-			REQUIRE(mpm.line_policies[V][1]->coord == 10.5);
-			REQUIRE(mpm.line_policies[V][1]->is_enabled);
+			REQUIRE(mpm.line_policies[X].size() == 2);
+			REQUIRE(mpm.line_policies[Y].size() == 2);
+			REQUIRE(mpm.line_policies[Y][0].get() == w.solution);
+			REQUIRE(mpm.line_policies[Y][0]->origins.size() == 1);
+			REQUIRE(mpm.line_policies[Y][0]->origins[0] == &w);
+			REQUIRE(mpm.line_policies[Y][0]->policy == MeshlinePolicy::Policy::THIRDS);
+			REQUIRE(mpm.line_policies[Y][0]->normal == MeshlinePolicy::Normal::MIN);
+			REQUIRE(mpm.line_policies[Y][0]->coord == 10.5);
+			REQUIRE(mpm.line_policies[Y][0]->is_enabled);
+			REQUIRE(mpm.line_policies[Y][1].get() == x.solution);
+			REQUIRE(mpm.line_policies[Y][1]->origins.size() == 1);
+			REQUIRE(mpm.line_policies[Y][1]->origins[0] == &x);
+			REQUIRE(mpm.line_policies[Y][1]->policy == MeshlinePolicy::Policy::THIRDS);
+			REQUIRE(mpm.line_policies[Y][1]->normal == MeshlinePolicy::Normal::MAX);
+			REQUIRE(mpm.line_policies[Y][1]->coord == 10.5);
+			REQUIRE(mpm.line_policies[Y][1]->is_enabled);
+			REQUIRE(mpm.line_policies[X][0].get() == y.solution);
+			REQUIRE(mpm.line_policies[X][0]->origins.size() == 1);
+			REQUIRE(mpm.line_policies[X][0]->origins[0] == &y);
+			REQUIRE(mpm.line_policies[X][0]->policy == MeshlinePolicy::Policy::THIRDS);
+			REQUIRE(mpm.line_policies[X][0]->normal == MeshlinePolicy::Normal::MIN);
+			REQUIRE(mpm.line_policies[X][0]->coord == 10.5);
+			REQUIRE(mpm.line_policies[X][0]->is_enabled);
+			REQUIRE(mpm.line_policies[X][1].get() == z.solution);
+			REQUIRE(mpm.line_policies[X][1]->origins.size() == 1);
+			REQUIRE(mpm.line_policies[X][1]->origins[0] == &z);
+			REQUIRE(mpm.line_policies[X][1]->policy == MeshlinePolicy::Policy::THIRDS);
+			REQUIRE(mpm.line_policies[X][1]->normal == MeshlinePolicy::Normal::MAX);
+			REQUIRE(mpm.line_policies[X][1]->coord == 10.5);
+			REQUIRE(mpm.line_policies[X][1]->is_enabled);
 			REQUIRE(w.is_solved);
 			REQUIRE(x.is_solved);
 			REQUIRE(y.is_solved);
 			REQUIRE(z.is_solved);
-			REQUIRE(w.solution == mpm.line_policies[H][0].get());
-			REQUIRE(x.solution == mpm.line_policies[H][1].get());
-			REQUIRE(y.solution == mpm.line_policies[V][0].get());
-			REQUIRE(z.solution == mpm.line_policies[V][1].get());
+			REQUIRE(w.solution == mpm.line_policies[Y][0].get());
+			REQUIRE(x.solution == mpm.line_policies[Y][1].get());
+			REQUIRE(y.solution == mpm.line_policies[X][0].get());
+			REQUIRE(z.solution == mpm.line_policies[X][1].get());
 		}
 	}
 
 	GIVEN("A conflict between meshline policies of different axes") {
 		MeshlinePolicy a(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::HALFS,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			params,
 			10);
 		MeshlinePolicy b(
-			MeshlinePolicy::Axis::V,
+			X,
 			MeshlinePolicy::Policy::HALFS,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			params,
 			11);
-		ConflictTooCloseMeshlinePolicies x(&a, &b);
+		ConflictTooCloseMeshlinePolicies x(X, &a, &b);
 		THEN("Should add nothing to the meshline policy manager") {
 			x.auto_solve(mpm);
-			REQUIRE(mpm.line_policies[V].size() == 0);
-			REQUIRE(mpm.line_policies[H].size() == 0);
+			REQUIRE(mpm.line_policies[X].size() == 0);
+			REQUIRE(mpm.line_policies[Y].size() == 0);
 			REQUIRE_FALSE(x.is_solved);
 			REQUIRE(x.solution == nullptr);
 		}
@@ -267,30 +267,30 @@ SCENARIO("void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManage
 
 	GIVEN("A conflict with ONELINE meshline policies") {
 		MeshlinePolicy a(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::HALFS,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			params,
 			10);
 		MeshlinePolicy b(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			params,
 			10);
 		MeshlinePolicy c(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::ONELINE,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			params,
 			11);
-		ConflictTooCloseMeshlinePolicies x(&a, &c);
-		ConflictTooCloseMeshlinePolicies y(&b, &c);
+		ConflictTooCloseMeshlinePolicies x(X, &a, &c);
+		ConflictTooCloseMeshlinePolicies y(X, &b, &c);
 		THEN("Should add nothing to the meshline policy manager") {
 			x.auto_solve(mpm);
 			y.auto_solve(mpm);
-			REQUIRE(mpm.line_policies[V].size() == 0);
-			REQUIRE(mpm.line_policies[H].size() == 0);
+			REQUIRE(mpm.line_policies[X].size() == 0);
+			REQUIRE(mpm.line_policies[Y].size() == 0);
 			REQUIRE_FALSE(x.is_solved);
 			REQUIRE_FALSE(y.is_solved);
 			REQUIRE(x.solution == nullptr);

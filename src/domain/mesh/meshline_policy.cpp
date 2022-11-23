@@ -40,19 +40,28 @@ optional<Meshline> MeshlinePolicy::mesh() {
 }
 
 //******************************************************************************
-optional<MeshlinePolicy::Axis> cast(Segment::Axis const a) noexcept {
-	switch(a) {
-	case Segment::Axis::H: return MeshlinePolicy::Axis::H;
-	case Segment::Axis::V: return MeshlinePolicy::Axis::V;
+optional<Coord> coord(Point const& point, Segment::Axis const axis) noexcept {
+	switch(axis) {
+	case Segment::Axis::H: return point.y;
+	case Segment::Axis::V: return point.x;
 	default: return nullopt;
 	}
 }
 
 //******************************************************************************
-Coord coord(Point const& point, MeshlinePolicy::Axis const axis) noexcept {
-	switch(axis) {
-	case MeshlinePolicy::Axis::H: return point.y;
-	case MeshlinePolicy::Axis::V: return point.x;
-	default: unreachable();
+MeshlinePolicy::Normal cast(Normal const normal) noexcept {
+	switch(normal) {
+	case Normal::XMIN:
+	case Normal::YMIN:
+	case Normal::ZMIN:
+		return MeshlinePolicy::Normal::MIN;
+	case Normal::XMAX:
+	case Normal::YMAX:
+	case Normal::ZMAX:
+		return MeshlinePolicy::Normal::MAX;
+	case Normal::NONE:
+		return MeshlinePolicy::Normal::NONE;
+	default:
+		unreachable();
 	}
 }

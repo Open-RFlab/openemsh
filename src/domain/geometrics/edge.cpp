@@ -20,12 +20,13 @@
 using namespace std;
 
 //******************************************************************************
-Edge::Edge(Point const* p0, Point const* p1)
+Edge::Edge(Plane const plane, Point const* p0, Point const* p1)
 : Segment(::axis(*p0, *p1))
 , IMeshLineOrigin()
 , _p0(p0)
 , _p1(p1)
 , vec(*p1 - *p0)
+, plane(plane)
 , normal(Normal::NONE)
 , to_mesh(true)
 //, bounding(bounding(*this))

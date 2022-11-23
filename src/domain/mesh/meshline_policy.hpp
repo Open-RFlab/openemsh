@@ -16,6 +16,7 @@
 #include "domain/geometrics/coord.hpp"
 #include "domain/geometrics/segment.hpp"
 #include "domain/geometrics/types.hpp"
+#include "domain/geometrics/space.hpp"
 #include "domain/global.hpp"
 #include "utils/entity.hpp"
 #include "i_meshline_origin.hpp"
@@ -34,10 +35,7 @@ class MeshlinePolicy
 , public IConflictOrigin
 , public IConflictSolution {
 public:
-	enum class Axis {
-		H,
-		V
-	} const axis;
+	Axis const axis;
 
 	/// Describe meshing policy to apply to the edge.
 	///*************************************************************************
@@ -47,9 +45,13 @@ public:
 		ONELINE,     ///< Place one line on the coord. typically produced by ports.
 		HALFS,       ///< Apply halfs rule while meshing : when edges conflict on the direction.
 		THIRDS       ///< Apply thirds rule while meshing : normal case for edges.
-	} policy; // TODO rename meshing_rule
+	} const policy; // TODO rename meshing_rule
 
-	Normal normal;
+	enum class Normal {
+		NONE,
+		MIN,
+		MAX
+	} const normal;
 
 	Params& params;
 	Coord const coord;
@@ -75,7 +77,7 @@ public:
 };
 
 //******************************************************************************
-std::optional<MeshlinePolicy::Axis> cast(Segment::Axis const a) noexcept;
+std::optional<Coord> coord(Point const& point, Segment::Axis const axis) noexcept;
 
 //******************************************************************************
-Coord coord(Point const& point, MeshlinePolicy::Axis const axis) noexcept;
+MeshlinePolicy::Normal cast(Normal const normal) noexcept;

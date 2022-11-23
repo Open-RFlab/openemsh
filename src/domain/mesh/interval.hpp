@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "domain/geometrics/coord.hpp"
+#include "domain/geometrics/space.hpp"
 #include "domain/global.hpp"
 #include "utils/entity.hpp"
 
@@ -29,10 +30,7 @@ private:
 	Params& params;
 
 public:
-	enum class Axis {
-		H,
-		V
-	} const axis;
+	Axis const axis;
 
 	struct Side {
 		MeshlinePolicy* const meshline_policy;

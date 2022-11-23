@@ -17,6 +17,7 @@ class ConflictEdgeInPolygon;
 class ConflictTooCloseMeshlinePolicies;
 class MeshlinePolicy;
 class Interval;
+class Meshline;
 
 //******************************************************************************
 inline size_t generate_id() {
@@ -45,6 +46,7 @@ public:
 	virtual void visit(ConflictEdgeInPolygon& conflict) = 0;
 	virtual void visit(ConflictTooCloseMeshlinePolicies& conflict) = 0;
 	virtual void visit(MeshlinePolicy& policy) = 0;
+	virtual void visit(Meshline& meshline) = 0;
 	virtual void visit(Interval& interval) = 0;
 	virtual ~EntityVisitor() = default;
 };
