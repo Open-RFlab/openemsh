@@ -14,5 +14,7 @@ enum class Normal {
 	XMAX,
 	YMIN,
 	YMAX,
+	ZMIN,
+	ZMAX,
 	NONE
 };

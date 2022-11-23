@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "domain/geometrics/range.hpp"
+#include "domain/geometrics/space.hpp"
 #include "conflict.hpp"
 
 class Edge;
@@ -32,11 +33,12 @@ class ConflictEdgeInPolygon
 : public Conflict
 , public Visitable<ConflictEdgeInPolygon, EntityVisitor> {
 public:
+	Plane const plane;
 	Edge* const edge;
 
 	std::vector<Overlap> overlaps;
 
-	ConflictEdgeInPolygon(Edge* a, Polygon const* polygon, Range const range, std::optional<Edge const*> b);
+	ConflictEdgeInPolygon(Plane plane, Edge* a, Polygon const* polygon, Range const range, std::optional<Edge const*> b);
 
 	void append(Polygon const* polygon, Range const range, std::optional<Edge const*> edge);
 

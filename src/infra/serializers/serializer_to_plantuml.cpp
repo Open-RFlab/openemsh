@@ -9,6 +9,8 @@
 #include "domain/conflicts/conflict_too_close_meshline_policies.hpp"
 #include "domain/geometrics/edge.hpp"
 #include "domain/geometrics/polygon.hpp"
+#include "domain/geometrics/space.hpp"
+#include "domain/mesh/meshline.hpp"
 #include "domain/mesh/meshline_policy.hpp"
 #include "domain/mesh/interval.hpp"
 #include "domain/board.hpp"
@@ -21,10 +23,20 @@ using namespace std;
 
 //******************************************************************************
 string SerializerToPlantuml::run(Board& board) {
-	SerializerToPlantuml serializer;
+	return SerializerToPlantuml::run(board, {});
+}
+
+//******************************************************************************
+string SerializerToPlantuml::run(Board& board, Params params) {
+	SerializerToPlantuml serializer(move(params));
 	board.accept(serializer);
 	return serializer.dump();
 }
+
+//******************************************************************************
+SerializerToPlantuml::SerializerToPlantuml(Params params)
+: params(move(params))
+{}
 
 //******************************************************************************
 void SerializerToPlantuml::visit(Board& board) {
@@ -34,39 +46,51 @@ void SerializerToPlantuml::visit(Board& board) {
 //		"hide empty description\n"
 		;
 
-	for(auto const& polygon : board.get_polygons())
-		polygon->accept(*this);
+	for(auto const plane : AllPlane) {
+		out += "state \"Plane " + to_string(plane) + "\" as " + to_string(plane) + " {\n";
 
-/*
-	for(auto const& conflict : board.get_conflicts_edge_in_polygons())
-		conflict->accept(*this);
-*/
+		if(params.with_geometric_part)
+			for(auto const& polygon : board.get_polygons(plane))
+				polygon->accept(*this);
 
-	for(auto const axis : AllGridAxis) {
-		out += "state \"Axis " + to_string(axis) + "\" as " + to_string(axis) + " {\n";
-
-		auto policies = create_view(board.get_meshline_policies(axis));
-
-		sort(begin(policies), end(policies),
-			[](MeshlinePolicy const* a, MeshlinePolicy const* b) {
-				return a->coord < b->coord;
-			});
-
-//		for(auto const& policy : board.get_meshline_policies(axis))
-		for(auto const& policy : policies)
-			policy->accept(*this);
-
-		for(auto const& interval : board.get_intervals(axis))
-			interval->accept(*this);
+		if(params.with_conflict_edge_in_polygon)
+			for(auto const& conflict : board.get_conflicts_edge_in_polygons(plane))
+				conflict->accept(*this);
 
 		out += "}\n";
-	}
+		}
 
-	for(auto const& conflict : board.get_conflicts_colinear_edges())
-		conflict->accept(*this);
+	if(params.with_axis_part)
+		for(auto const axis : AllAxis) {
+			out += "state \"Axis " + to_string(axis) + "\" as " + to_string(axis) + " {\n";
 
-	for(auto const& conflict : board.get_conflicts_too_close_meshline_policies())
-		conflict->accept(*this);
+			auto policies = create_view(board.get_meshline_policies(axis));
+
+			sort(begin(policies), end(policies),
+				[](MeshlinePolicy const* a, MeshlinePolicy const* b) {
+					return a->coord < b->coord;
+				});
+
+//			for(auto const& policy : board.get_meshline_policies(axis))
+			for(auto const& policy : policies)
+				policy->accept(*this);
+
+			for(auto const& interval : board.get_intervals(axis))
+				interval->accept(*this);
+
+			for(auto const& meshline : board.get_meshlines(axis))
+				meshline->accept(*this);
+
+			if(params.with_conflict_colinear_edges)
+				for(auto const& conflict : board.get_conflicts_colinear_edges(axis))
+					conflict->accept(*this);
+
+			if(params.with_conflict_too_close_meshline_policies)
+				for(auto const& conflict : board.get_conflicts_too_close_meshline_policies(axis))
+					conflict->accept(*this);
+
+			out += "}\n";
+		}
 
 	out += "@enduml\n";
 }
@@ -203,6 +227,22 @@ void SerializerToPlantuml::visit(Interval& interval) {
 		to_string(interval.before.meshline_policy->id) + "_out ------> " + id + "_in1 \n" +
 		to_string(interval.after.meshline_policy->id) + "_out ------> " + id + "_in2 \n"
 		"}\n";
+}
+
+//******************************************************************************
+void SerializerToPlantuml::visit(Meshline& meshline) {
+	auto id = to_string(meshline.id);
+
+	out +=
+		"state \"Meshline\" as " + id + " {\n" +
+		id + " : Coord = " + to_string(meshline.coord.value()) + "\n";
+
+	if(meshline.interval)
+		out += to_string(meshline.interval->id) + "_out ------> " + id + "\n";
+	if(meshline.policy)
+		out += to_string(meshline.policy->id) + "_out ------> " + id + "\n";
+
+	out += "}\n";
 }
 
 //******************************************************************************

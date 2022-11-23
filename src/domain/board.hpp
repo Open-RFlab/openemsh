@@ -15,6 +15,7 @@
 #include "geometrics/edge.hpp"
 #include "geometrics/point.hpp"
 #include "geometrics/polygon.hpp"
+#include "geometrics/space.hpp"
 #include "utils/entity.hpp"
 #include "conflict_manager.hpp"
 #include "global.hpp"
@@ -31,33 +32,38 @@ class Board : public Entity, public Visitable<Board, EntityVisitor> {
 private:
 	ConflictManager conflict_manager;
 	MeshlinePolicyManager line_policy_manager;
-	std::vector<std::unique_ptr<Polygon>> polygons;
-	std::vector<Edge*> edges;
+
+	PlaneSpace<std::vector<std::unique_ptr<Polygon>>> polygons;
+	PlaneSpace<std::vector<Edge*>> edges;
 
 public:
 	//**************************************************************************
 	class Builder {
 	public:
 
-		void add_polygon(std::string const& name, std::initializer_list<Point> points);
-		void add_polygon(std::string const& name, std::vector<std::unique_ptr<Point const>>&& points);
-		void add_polygon_from_box(std::string const& name, Point const p1, Point const p3);
+		void add_polygon(Plane plane, std::string const& name, std::initializer_list<Point> points);
+		void add_polygon(Plane plane, std::string const& name, std::vector<std::unique_ptr<Point const>>&& points);
+		void add_polygon_from_box(Plane plane, std::string const& name, Point const p1, Point const p3);
 
 		[[nodiscard]] std::unique_ptr<Board> build();
 
 	private:
-		std::vector<std::unique_ptr<Polygon>> polygons;
+		PlaneSpace<std::vector<std::unique_ptr<Polygon>>> polygons;
 	};
 
 	Params params;
 
-	explicit Board(std::vector<std::unique_ptr<Polygon>>&& polygons);
+	explicit Board(PlaneSpace<std::vector<std::unique_ptr<Polygon>>>&& polygons);
 
 	/// Mesh resolution independant detection tasks
 	///*************************************************************************
-	void detect_edges_in_polygons();
-	void detect_colinear_edges();
-	void detect_non_conflicting_edges();
+	void detect_edges_in_polygons(Plane const plane);
+	void detect_colinear_edges(Plane plane);
+	void detect_non_conflicting_edges(Plane const plane);
+
+	void detect_edges_in_polygons() { for(auto const& plane : AllPlane) detect_edges_in_polygons(plane); };
+	void detect_colinear_edges() { for(auto const& plane : AllPlane) detect_colinear_edges(plane); };
+	void detect_non_conflicting_edges() { for(auto const& plane : AllPlane) detect_non_conflicting_edges(plane); };
 
 	/// Mesh resolution dependant detection tasks
 	///*************************************************************************
@@ -66,14 +72,14 @@ public:
 
 	void auto_mesh(); // TODO
 
-	std::vector<std::unique_ptr<Meshline>> get_meshline_policies_meshlines(GridAxis axis) const;
-	std::vector<std::unique_ptr<Meshline>> const& get_meshlines(GridAxis axis) const;
-	std::vector<std::unique_ptr<MeshlinePolicy>> const& get_meshline_policies(GridAxis axis) const;
-	std::vector<std::unique_ptr<Interval>> const& get_intervals(GridAxis axis) const;
-	std::vector<std::unique_ptr<Polygon>> const& get_polygons() const;
-	std::vector<std::unique_ptr<ConflictEdgeInPolygon>> const& get_conflicts_edge_in_polygons() const;
-	std::vector<std::unique_ptr<ConflictColinearEdges>> const& get_conflicts_colinear_edges() const;
-	std::vector<std::unique_ptr<ConflictTooCloseMeshlinePolicies>> const& get_conflicts_too_close_meshline_policies() const;
+	std::vector<std::unique_ptr<Meshline>> get_meshline_policies_meshlines(Axis axis) const;
+	std::vector<std::unique_ptr<Meshline>> const& get_meshlines(Axis axis) const;
+	std::vector<std::unique_ptr<MeshlinePolicy>> const& get_meshline_policies(Axis axis) const;
+	std::vector<std::unique_ptr<Interval>> const& get_intervals(Axis axis) const;
+	std::vector<std::unique_ptr<Polygon>> const& get_polygons(Plane plane) const;
+	std::vector<std::unique_ptr<ConflictEdgeInPolygon>> const& get_conflicts_edge_in_polygons(Plane const plane) const;
+	std::vector<std::unique_ptr<ConflictColinearEdges>> const& get_conflicts_colinear_edges(Axis const axis) const;
+	std::vector<std::unique_ptr<ConflictTooCloseMeshlinePolicies>> const& get_conflicts_too_close_meshline_policies(Axis const axis) const;
 
 #ifdef DEBUG
 	void print() const;
@@ -82,6 +88,5 @@ public:
 
 #ifdef UNITTEST
 #undef private
-
 void sort_points_by_vector_orientation(std::vector<Point>& points, Point const& vector);
 #endif // UNITTEST

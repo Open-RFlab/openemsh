@@ -24,6 +24,7 @@ private:
 	friend class ConflictTooCloseMeshlinePolicies;
 	friend class MeshlinePolicy;
 	friend class Interval;
+	friend class Meshline;
 
 	void visit(Board& board) override;
 	void visit(Edge& edge) override;
@@ -33,6 +34,7 @@ private:
 	void visit(ConflictTooCloseMeshlinePolicies& conflict) override;
 	void visit(MeshlinePolicy& policy) override;
 	void visit(Interval& interval) override;
+	void visit(Meshline& meshline) override {}
 	std::string dump();
 
 	std::string out;

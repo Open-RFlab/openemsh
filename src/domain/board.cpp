@@ -4,6 +4,10 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include "domain/geometrics/space.hpp"
+#include "domain/meshline_policy_manager.hpp"
+#include "utils/entity.hpp"
+#include "utils/unreachable.hpp"
 #ifdef DEBUG
 #include <iostream>
 #endif // DEBUG
@@ -22,8 +26,8 @@ using namespace std;
 /// @warning Undefined behavior if points are not all colinear.
 ///*****************************************************************************
 void sort_points_by_vector_orientation(vector<Point>& points, Point const& vector) {
-	int8_t x_sign = signum(vector.x);
-	int8_t y_sign = signum(vector.y);
+	int8_t const x_sign = signum(vector.x);
+	int8_t const y_sign = signum(vector.y);
 	if(x_sign > 0 && y_sign == 0)
 		sort(begin(points), end(points),
 			[](Point const& a, Point const& b) {
@@ -72,44 +76,47 @@ unique_ptr<Board> Board::Builder::build() {
 }
 
 //******************************************************************************
-void Board::Builder::add_polygon(string const& name, initializer_list<Point> points) {
-	polygons.push_back(make_unique<Polygon>(name, from_init_list(points)));
+void Board::Builder::add_polygon(Plane plane, string const& name, initializer_list<Point> points) {
+	polygons[plane].push_back(make_unique<Polygon>(plane, name, from_init_list(points)));
 }
 
 //******************************************************************************
-void Board::Builder::add_polygon(string const& name, vector<unique_ptr<Point const>>&& points) {
-	polygons.push_back(make_unique<Polygon>(name, move(points)));
+void Board::Builder::add_polygon(Plane plane, string const& name, vector<unique_ptr<Point const>>&& points) {
+	polygons[plane].push_back(make_unique<Polygon>(plane, name, move(points)));
 }
 
 //******************************************************************************
-void Board::Builder::add_polygon_from_box(string const& name, Point const p1, Point const p3) {
+void Board::Builder::add_polygon_from_box(Plane plane, string const& name, Point const p1, Point const p3) {
 	vector<unique_ptr<Point const>> points(4);
 	points[0] = make_unique<Point const>(p1.x, p1.y);
 	points[1] = make_unique<Point const>(p1.x, p3.y);
 	points[2] = make_unique<Point const>(p3.x, p3.y);
 	points[3] = make_unique<Point const>(p3.x, p1.y);
 
-	polygons.push_back(make_unique<Polygon>(name, move(points)));
+	polygons[plane].push_back(make_unique<Polygon>(plane, name, move(points)));
 }
 
 //******************************************************************************
-Board::Board(vector<unique_ptr<Polygon>>&& polygons)
+Board::Board(PlaneSpace<vector<unique_ptr<Polygon>>>&& polygons)
 : conflict_manager(&line_policy_manager)
 , line_policy_manager(params, &conflict_manager)
 , polygons(move(polygons)) {
-	for(auto const& polygon : this->polygons)
-		for(auto const& edge : polygon->edges)
-			edges.push_back(edge.get());
-	this->polygons.shrink_to_fit();
-	edges.shrink_to_fit();
+	for(auto const& plane : AllPlane) {
+		for(auto const& polygon : this->polygons[plane])
+			for(auto const& edge : polygon->edges)
+				edges[plane].push_back(edge.get());
+
+		this->polygons[plane].shrink_to_fit();
+		edges[plane].shrink_to_fit();
+	}
 }
 
 /// Detect all EDGE_IN_POLYGON. Will also detect some COLINEAR_EDGES.
 /// Overlapping edges should be EDGE_IN_POLYGON and not COLINEAR_EDGES.
 ///*****************************************************************************
-void Board::detect_edges_in_polygons() {
-	for(auto const& poly_a : polygons) {
-		for(auto const& poly_b : polygons) {
+void Board::detect_edges_in_polygons(Plane const plane) {
+	for(auto const& poly_a : polygons[plane]) {
+		for(auto const& poly_b : polygons[plane]) {
 			if(poly_b == poly_a)
 				continue;
 
@@ -244,91 +251,111 @@ void Board::detect_edges_in_polygons() {
 }
 
 //******************************************************************************
-void Board::detect_colinear_edges() {
-	for(size_t i = 0; i < edges.size(); ++i) {
-		if(edges[i]->axis == Segment::Axis::DIAGONAL)
+void Board::detect_colinear_edges(Plane const plane) {
+	for(size_t i = 0; i < edges[plane].size(); ++i) {
+		if(edges[plane][i]->axis == Segment::Axis::DIAGONAL)
+//		|| !edges[i]->to_mesh)
 			continue;
 
-		for(size_t j = i + 1; j < edges.size(); ++j) {
-			if(edges[j]->axis != edges[i]->axis)
+		for(size_t j = i + 1; j < edges[plane].size(); ++j) {
+			if(edges[plane][j]->axis != edges[plane][i]->axis)
 				continue;
 
-			if(edges[i]->axis == Segment::Axis::H && edges[i]->p0().y == edges[j]->p0().y)
-				conflict_manager.add_colinear_edges(edges[i], edges[j]);
-			else if(edges[i]->axis == Segment::Axis::V && edges[i]->p0().x == edges[j]->p0().x)
-				conflict_manager.add_colinear_edges(edges[i], edges[j]);
+			optional<Axis> const axis = transpose(plane, edges[plane][i]->axis);
+
+			if(axis) {
+				if(edges[plane][i]->axis == Segment::Axis::H && edges[plane][i]->p0().y == edges[plane][j]->p0().y)
+					conflict_manager.add_colinear_edges(edges[plane][i], edges[plane][j]);
+				else if(edges[plane][i]->axis == Segment::Axis::V && edges[plane][i]->p0().x == edges[plane][j]->p0().x)
+					conflict_manager.add_colinear_edges(edges[plane][i], edges[plane][j]);
+			}
 		}
 	}
 }
 
 //******************************************************************************
-void Board::detect_non_conflicting_edges() {
-	for(Edge* edge : edges) {
-		optional<MeshlinePolicy::Axis> axis = cast(edge->axis);
-		if(axis && !edge->conflicts.size()) {
+void Board::detect_non_conflicting_edges(Plane const plane) {
+	for(Edge* edge : edges[plane]) {
+		optional<Coord> const coord = ::coord(edge->p0(), edge->axis);
+		optional<Axis> const axis = transpose(plane, edge->axis);
+		optional<MeshlinePolicy::Normal> const normal = cast(edge->normal);
+		if(coord && axis && normal && !edge->conflicts.size()) {
 			edge->meshline_policy = line_policy_manager.add_meshline_policy(
 				edge,
 				axis.value(),
 				MeshlinePolicy::Policy::THIRDS,
-				edge->normal,
-				coord(edge->p0(), axis.value()));
+				normal.value(),
+				coord.value());
 		}
 	}
 }
 
 //******************************************************************************
 void Board::auto_mesh() {
-	detect_edges_in_polygons();
-	conflict_manager.auto_solve_all_edge_in_polygon();
+	for(auto const& plane : AllPlane)
+		detect_edges_in_polygons(plane);
 
-	detect_colinear_edges();
-	conflict_manager.auto_solve_all_colinear_edges();
+	for(auto const& plane : AllPlane)
+		detect_colinear_edges(plane);
 
-	detect_non_conflicting_edges();
-	line_policy_manager.detect_and_solve_too_close_meshline_policies();
+	for(auto const& plane : AllPlane)
+		detect_non_conflicting_edges(plane);
 
-	line_policy_manager.detect_intervals();
-	line_policy_manager.mesh();
+	for(auto const& plane : AllPlane)
+		conflict_manager.auto_solve_all_edge_in_polygon(plane);
+
+	for(auto const& axis : AllAxis)
+		conflict_manager.auto_solve_all_colinear_edges(axis);
+
+	for(auto const& axis : AllAxis)
+		line_policy_manager.detect_and_solve_too_close_meshline_policies(axis);
+
+	for(auto const& axis : AllAxis)
+		line_policy_manager.detect_intervals(axis);
+
+	for(auto const& axis : AllAxis)
+		line_policy_manager.mesh(axis);
 }
 
+
 //******************************************************************************
-vector<unique_ptr<Meshline>> Board::get_meshline_policies_meshlines(GridAxis axis) const {
+vector<unique_ptr<Meshline>> Board::get_meshline_policies_meshlines(Axis axis) const {
 	return line_policy_manager.get_meshline_policies_meshlines(axis);
 }
 
 //******************************************************************************
-vector<unique_ptr<Meshline>> const& Board::get_meshlines(GridAxis axis) const {
+vector<unique_ptr<Meshline>> const& Board::get_meshlines(Axis axis) const {
 	return line_policy_manager.get_meshlines(axis);
 }
 
 //******************************************************************************
-vector<unique_ptr<MeshlinePolicy>> const& Board::get_meshline_policies(GridAxis axis) const {
+vector<unique_ptr<MeshlinePolicy>> const& Board::get_meshline_policies(Axis axis) const {
 	return line_policy_manager.get_meshline_policies(axis);
 }
 
 //******************************************************************************
-vector<unique_ptr<Interval>> const& Board::get_intervals(GridAxis axis) const {
+vector<unique_ptr<Interval>> const& Board::get_intervals(Axis axis) const {
 	return line_policy_manager.get_intervals(axis);
 }
 
 //******************************************************************************
-vector<unique_ptr<Polygon>> const& Board::get_polygons() const {
-	return polygons;
+vector<unique_ptr<Polygon>> const& Board::get_polygons(Plane plane) const {
+	return polygons[plane];
 }
 
 //******************************************************************************
-vector<unique_ptr<ConflictEdgeInPolygon>> const& Board::get_conflicts_edge_in_polygons() const {
-	return conflict_manager.get_edge_in_polygons();
+vector<unique_ptr<ConflictEdgeInPolygon>> const& Board::get_conflicts_edge_in_polygons(Plane const plane) const {
+	return conflict_manager.get_edge_in_polygons(plane);
 }
 
 //******************************************************************************
-vector<unique_ptr<ConflictColinearEdges>> const& Board::get_conflicts_colinear_edges() const {
-	return conflict_manager.get_colinear_edges();
+vector<unique_ptr<ConflictColinearEdges>> const& Board::get_conflicts_colinear_edges(Axis const axis) const {
+	return conflict_manager.get_colinear_edges(axis);
 }
 
 //******************************************************************************
-vector<unique_ptr<ConflictTooCloseMeshlinePolicies>> const& Board::get_conflicts_too_close_meshline_policies() const {
-	return conflict_manager.get_too_close_meshline_policies();
+vector<unique_ptr<ConflictTooCloseMeshlinePolicies>> const& Board::get_conflicts_too_close_meshline_policies(Axis const axis) const {
+	return conflict_manager.get_too_close_meshline_policies(axis);
 }
 
 #ifdef DEBUG

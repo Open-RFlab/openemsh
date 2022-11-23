@@ -14,6 +14,7 @@
 #include "conflicts/conflict_colinear_edges.hpp"
 #include "conflicts/conflict_edge_in_polygon.hpp"
 #include "conflicts/conflict_too_close_meshline_policies.hpp"
+#include "geometrics/space.hpp"
 
 class Edge;
 class MeshlinePolicyManager;
@@ -31,9 +32,9 @@ class ConflictManager {
 private:
 	MeshlinePolicyManager* const line_policy_manager;
 
-	std::vector<std::unique_ptr<ConflictEdgeInPolygon>> all_edge_in_polygons;
-	std::vector<std::unique_ptr<ConflictColinearEdges>> all_colinear_edges;
-	std::vector<std::unique_ptr<ConflictTooCloseMeshlinePolicies>> all_too_close_meshline_policies;
+	PlaneSpace<std::vector<std::unique_ptr<ConflictEdgeInPolygon>>> all_edge_in_polygons;
+	AxisSpace<std::vector<std::unique_ptr<ConflictColinearEdges>>> all_colinear_edges;
+	AxisSpace<std::vector<std::unique_ptr<ConflictTooCloseMeshlinePolicies>>> all_too_close_meshline_policies;
 
 public:
 	explicit ConflictManager(MeshlinePolicyManager* const line_policy_manager);
@@ -46,13 +47,13 @@ public:
 
 //	void add_user_will(Edge* a); // TODO
 
-	void auto_solve_all_edge_in_polygon();
-	void auto_solve_all_colinear_edges();
+	void auto_solve_all_edge_in_polygon(Plane const plane);
+	void auto_solve_all_colinear_edges(Axis const axis);
 //	Conflict* find(std::vector<IConflictOrigin> const&);
 
-	std::vector<std::unique_ptr<ConflictColinearEdges>> const& get_colinear_edges() const;
-	std::vector<std::unique_ptr<ConflictEdgeInPolygon>> const& get_edge_in_polygons() const;
-	std::vector<std::unique_ptr<ConflictTooCloseMeshlinePolicies>> const& get_too_close_meshline_policies() const;
+	std::vector<std::unique_ptr<ConflictColinearEdges>> const& get_colinear_edges(Axis const axis) const;
+	std::vector<std::unique_ptr<ConflictEdgeInPolygon>> const& get_edge_in_polygons(Plane const plane) const;
+	std::vector<std::unique_ptr<ConflictTooCloseMeshlinePolicies>> const& get_too_close_meshline_policies(Axis const axis) const;
 };
 
 #ifdef UNITTEST

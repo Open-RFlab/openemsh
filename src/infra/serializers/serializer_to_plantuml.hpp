@@ -13,7 +13,16 @@
 //******************************************************************************
 class SerializerToPlantuml : public EntityVisitor {
 public:
+	struct Params {
+		bool with_conflict_edge_in_polygon = true;
+		bool with_conflict_colinear_edges = true;
+		bool with_conflict_too_close_meshline_policies = true;
+		bool with_axis_part = true;
+		bool with_geometric_part = true;
+	};
+
 	static std::string run(Board& board);
+	static std::string run(Board& board, Params params);
 
 private:
 	friend class Board;
@@ -24,6 +33,7 @@ private:
 	friend class ConflictTooCloseMeshlinePolicies;
 	friend class MeshlinePolicy;
 	friend class Interval;
+	friend class Meshline;
 
 	void visit(Board& board) override;
 	void visit(Edge& edge) override;
@@ -33,7 +43,11 @@ private:
 	void visit(ConflictTooCloseMeshlinePolicies& conflict) override;
 	void visit(MeshlinePolicy& policy) override;
 	void visit(Interval& interval) override;
+	void visit(Meshline& meshline) override;
+
+	SerializerToPlantuml(Params params);
 	std::string dump();
 
 	std::string out;
+	Params const params;
 };

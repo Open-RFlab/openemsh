@@ -35,21 +35,21 @@ SCENARIO("Interval::Side::Side(MeshlinePolicy* meshline_policy, size_t lmin, dou
 	GIVEN("Two meshline policies") {
 		Params p;
 		MeshlinePolicy a(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::ONELINE,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			p,
 			10);
 		MeshlinePolicy b(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::ONELINE,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			p,
 			20);
 		a.d = 2;
 		b.d = 15;
 		WHEN("Creating an Interval's sides") {
-			Interval i(&a, &b, Interval::Axis::H, p);
+			Interval i(&a, &b, Y, p);
 			THEN("d should be limited to the half of the distance between both policies") {
 				REQUIRE(a.d == 2);
 				REQUIRE(b.d == 5);
@@ -66,18 +66,18 @@ SCENARIO("double Interval::Side::d_init_(double d)", "[interval]") {
 	GIVEN("An Interval between two MeshlinePolicy") {
 		WHEN("Meshline policies are ONELINE") {
 			MeshlinePolicy a(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::ONELINE,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				10);
 			MeshlinePolicy b(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::ONELINE,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				20);
-			Interval i(&a, &b, Interval::Axis::H, p);
+			Interval i(&a, &b, Y, p);
 			THEN("d_init should be 0") {
 				REQUIRE(i.before.d_init_(d) == 0);
 				REQUIRE(i.after.d_init_(d) == 0);
@@ -86,18 +86,18 @@ SCENARIO("double Interval::Side::d_init_(double d)", "[interval]") {
 
 		WHEN("Meshline policies are HALFS") {
 			MeshlinePolicy a(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::HALFS,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				10);
 			MeshlinePolicy b(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::HALFS,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				20);
-			Interval i(&a, &b, Interval::Axis::H, p);
+			Interval i(&a, &b, Y, p);
 			THEN("d_init should be d/2") {
 				REQUIRE(i.before.d_init_(d) == d/2);
 				REQUIRE(i.after.d_init_(d) == d/2);
@@ -105,90 +105,60 @@ SCENARIO("double Interval::Side::d_init_(double d)", "[interval]") {
 		}
 
 		WHEN("Meshline policies are THIRDS") {
-			AND_WHEN("Meshline Normal are XMIN or YMIN") {
+			AND_WHEN("Meshline Normal are MIN") {
 				MeshlinePolicy a(
-					MeshlinePolicy::Axis::H,
+					Y,
 					MeshlinePolicy::Policy::THIRDS,
-					Normal::YMIN,
+					MeshlinePolicy::Normal::MIN,
 					p,
 					10);
 				MeshlinePolicy b(
-					MeshlinePolicy::Axis::H,
+					Y,
 					MeshlinePolicy::Policy::THIRDS,
-					Normal::YMIN,
+					MeshlinePolicy::Normal::MIN,
 					p,
 					20);
-				MeshlinePolicy c(
-					MeshlinePolicy::Axis::V,
-					MeshlinePolicy::Policy::THIRDS,
-					Normal::XMIN,
-					p,
-					10);
-				MeshlinePolicy e(
-					MeshlinePolicy::Axis::V,
-					MeshlinePolicy::Policy::THIRDS,
-					Normal::XMIN,
-					p,
-					20);
-				Interval i(&a, &b, Interval::Axis::H, p);
-				Interval j(&c, &e, Interval::Axis::V, p);
+				Interval i(&a, &b, Y, p);
 				THEN("d_init should be d/3 inside and 2d/3 outside") {
 					REQUIRE(i.before.d_init_(d) == 1.0/3.0 * d);
 					REQUIRE(i.after.d_init_(d) == 2.0/3.0 * d);
-					REQUIRE(j.before.d_init_(d) == 1.0/3.0 * d);
-					REQUIRE(j.after.d_init_(d) == 2.0/3.0 * d);
 				}
 			}
 
-			AND_WHEN("Meshline Normal are XMAX or YMAX") {
+			AND_WHEN("Meshline Normal are MAX") {
 				MeshlinePolicy a(
-					MeshlinePolicy::Axis::H,
+					Y,
 					MeshlinePolicy::Policy::THIRDS,
-					Normal::YMAX,
+					MeshlinePolicy::Normal::MAX,
 					p,
 					10);
 				MeshlinePolicy b(
-					MeshlinePolicy::Axis::H,
+					Y,
 					MeshlinePolicy::Policy::THIRDS,
-					Normal::YMAX,
+					MeshlinePolicy::Normal::MAX,
 					p,
 					20);
-				MeshlinePolicy c(
-					MeshlinePolicy::Axis::V,
-					MeshlinePolicy::Policy::THIRDS,
-					Normal::XMAX,
-					p,
-					10);
-				MeshlinePolicy e(
-					MeshlinePolicy::Axis::V,
-					MeshlinePolicy::Policy::THIRDS,
-					Normal::XMAX,
-					p,
-					20);
-				Interval i(&a, &b, Interval::Axis::H, p);
-				Interval j(&c, &e, Interval::Axis::V, p);
+				Interval i(&a, &b, Y, p);
 				THEN("d_init should be d/3 inside and 2d/3 outside") {
 					REQUIRE(i.before.d_init_(d) == 2.0/3.0 * d);
 					REQUIRE(i.after.d_init_(d) == 1.0/3.0 * d);
-					REQUIRE(j.before.d_init_(d) == 2.0/3.0 * d);
-					REQUIRE(j.after.d_init_(d) == 1.0/3.0 * d);
 				}
 			}
 
 			AND_WHEN("Meshline Normal are NONE") {
 				MeshlinePolicy a(
-					MeshlinePolicy::Axis::H,
+					Y,
 					MeshlinePolicy::Policy::THIRDS,
-					Normal::NONE,
+					MeshlinePolicy::Normal::NONE,
 					p,
 					10);
 				MeshlinePolicy b(
-					MeshlinePolicy::Axis::H,
+					Y,
 					MeshlinePolicy::Policy::THIRDS,
-					Normal::NONE,
+					MeshlinePolicy::Normal::NONE,
 					p,
 					20);
-				Interval i(&a, &b, Interval::Axis::H, p);
+				Interval i(&a, &b, Y, p);
 				THEN("d_init should be d") {
 					REQUIRE(i.before.d_init_(d) == d);
 					REQUIRE(i.after.d_init_(d) == d);
@@ -264,7 +234,7 @@ SCENARIO("bool is_ls_valid_for_dmax_lmin_lambda(std::vector<Coord> ls, double d,
 		}
 	}
 
-	GIVEN("A vector wontaining one line") {
+	GIVEN("An ls vector containing one line") {
 		std::vector<Coord> ls { 0.2 };
 		WHEN("There is less than lmin lines") {
 			THEN("Should not be valid") {
@@ -342,20 +312,20 @@ SCENARIO("double find_dmax(Interval::Side const& side, double dmax)", "[interval
 	GIVEN("A Side of an Interval with previously computed ls") {
 		Params p;
 		MeshlinePolicy a(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			p,
 			10);
 		MeshlinePolicy b(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			p,
 			20);
 		a.d = 1;
 		p.lambda = 2;
-		Interval i(&a, &b, Interval::Axis::H, p);
+		Interval i(&a, &b, Y, p);
 		WHEN("ls contains no lines") {
 			THEN("Should return dmax") {
 				REQUIRE_FALSE(i.before.ls.size());
@@ -404,20 +374,20 @@ SCENARIO("double find_dmax(Interval::Side const& side, Interval::Side const& b, 
 	GIVEN("Two Sides of an Interval with previously computed ls") {
 		Params p;
 		MeshlinePolicy a(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			p,
 			10);
 		MeshlinePolicy b(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::THIRDS,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			p,
 			20);
 		a.d = 1;
 		p.lambda = 2;
-		Interval i(&a, &b, Interval::Axis::H, p);
+		Interval i(&a, &b, Y, p);
 		i.before.ls = { 2.0 };
 		i.after.ls = { 1.0, 3.0, 6.0 };
 		THEN("Should return the minimal dmax of both Sides'") {
@@ -435,21 +405,21 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 		WHEN("dmax and lmin end criteras are already respected") {
 			Params p;
 			MeshlinePolicy a(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::HALFS,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				10);
 			MeshlinePolicy b(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::HALFS,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				20);
 			p.dmax = 1.2;
 			p.lmin = 2;
 			a.d = 1.0;
-			Interval i(&a, &b, Interval::Axis::H, p);
+			Interval i(&a, &b, Y, p);
 			i.update_ls();
 			THEN("Initial ls should be conform") {
 				REQUIRE(is_ls_valid_for_dmax_lmin_lambda(i.before.ls, a.d, i.before.lambda, p.dmax, p.lmin));
@@ -464,21 +434,21 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 		WHEN("dmax end critera is already respected but not lmin one") {
 			Params p;
 			MeshlinePolicy a(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::HALFS,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				10);
 			MeshlinePolicy b(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::HALFS,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				20);
 			p.dmax = 2.0;
 			p.lmin = 10;
 			a.d = 1.0;
-			Interval i(&a, &b, Interval::Axis::H, p);
+			Interval i(&a, &b, Y, p);
 			i.update_ls();
 			THEN("Initial ls should not be conform") {
 				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(i.before.ls, a.d, i.before.lambda, p.dmax, p.lmin));
@@ -497,21 +467,21 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 		WHEN("lmin end critera is already respected but not dmax one") {
 			Params p;
 			MeshlinePolicy a(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::HALFS,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				10);
 			MeshlinePolicy b(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::HALFS,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				20);
 			p.dmax = 0.8;
 			p.lmin = 2;
 			a.d = 1.0;
-			Interval i(&a, &b, Interval::Axis::H, p);
+			Interval i(&a, &b, Y, p);
 			i.update_ls();
 			THEN("Initial ls should not be conform") {
 				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(i.before.ls, a.d, i.before.lambda, p.dmax, p.lmin));
@@ -530,21 +500,21 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 		WHEN("dmax and lmin end criteras are not respected") {
 			Params p;
 			MeshlinePolicy a(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::HALFS,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				10);
 			MeshlinePolicy b(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::HALFS,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				20);
 			p.dmax = 0.8;
 			p.lmin = 10;
 			a.d = 1.0;
-			Interval i(&a, &b, Interval::Axis::H, p);
+			Interval i(&a, &b, Y, p);
 			i.update_ls();
 			THEN("Initial ls should not be conform") {
 				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(i.before.ls, a.d, i.before.lambda, p.dmax, p.lmin));
@@ -584,23 +554,23 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side 
 	GIVEN("A Side of an Interval with previously computed valid ls with lambda superior to 2") {
 		Params p;
 		MeshlinePolicy a(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::HALFS,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			p,
 			0);
 		MeshlinePolicy b(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::HALFS,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			p,
 			20);
 		p.dmax = 30.0;
 		p.lmin = 5;
 		p.lambda = 2;
 		a.d = 0.1;
-		Interval i(&a, &b, Interval::Axis::H, p);
-		Interval j(&a, &b, Interval::Axis::H, p);
+		Interval i(&a, &b, Y, p);
+		Interval j(&a, &b, Y, p);
 		i.update_ls();
 		j.update_ls();
 		Coord old_last_space = i.before.ls.back() - i.s(i.before);
@@ -645,22 +615,22 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side 
 	GIVEN("A Side of an Interval with previously computed valid ls with lambda being 1") {
 		Params p;
 		MeshlinePolicy a(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::HALFS,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			p,
 			0);
 		MeshlinePolicy b(
-			MeshlinePolicy::Axis::H,
+			Y,
 			MeshlinePolicy::Policy::HALFS,
-			Normal::NONE,
+			MeshlinePolicy::Normal::NONE,
 			p,
 			20);
 		p.dmax = 30.0;
 		p.lmin = 5;
 		p.lambda = 1;
 		a.d = 0.1;
-		Interval i(&a, &b, Interval::Axis::H, p);
+		Interval i(&a, &b, Y, p);
 		i.update_ls();
 		Coord old_last_space = i.before.ls.back() - i.s(i.before);
 		REQUIRE(is_ls_valid_for_dmax_lmin_lambda(i.before.ls, a.d, i.before.lambda, p.dmax, p.lmin));
@@ -693,27 +663,27 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 		WHEN("Sides' policies are HALFS or THIRDS") {
 			Params p;
 			MeshlinePolicy a(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::HALFS,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				10);
 			MeshlinePolicy b(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::THIRDS,
-				Normal::YMAX,
+				MeshlinePolicy::Normal::MAX,
 				p,
 				30);
 			MeshlinePolicy c(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::THIRDS,
-				Normal::YMAX,
+				MeshlinePolicy::Normal::MAX,
 				p,
 				10);
 			MeshlinePolicy d(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::HALFS,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				30);
 			p.dmax = 2;
@@ -723,8 +693,8 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 			b.d = 0.1;
 			c.d = 0.1;
 			d.d = 0.1;
-			Interval i(&a, &b, Interval::Axis::H, p);
-			Interval j(&c, &d, Interval::Axis::H, p);
+			Interval i(&a, &b, Y, p);
+			Interval j(&c, &d, Y, p);
 			i.update_ls();
 			j.update_ls();
 			auto mesh_i = i.mesh();
@@ -791,15 +761,15 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 		WHEN("Sides' policies are ONELINE") {
 			Params p;
 			MeshlinePolicy a(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::ONELINE,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				10);
 			MeshlinePolicy b(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::ONELINE,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				30);
 			p.dmax = 1.5;
@@ -807,7 +777,7 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 			p.lambda = 2;
 			a.d = 0.1;
 			b.d = 0.1;
-			Interval i(&a, &b, Interval::Axis::H, p);
+			Interval i(&a, &b, Y, p);
 			i.update_ls();
 			auto mesh = i.mesh();
 			THEN("Policy lines should not be placed") {
@@ -850,27 +820,27 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 		WHEN("Sides' policies are HALFS or THIRDS") {
 			Params p;
 			MeshlinePolicy a(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::HALFS,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				10);
 			MeshlinePolicy b(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::THIRDS,
-				Normal::YMAX,
+				MeshlinePolicy::Normal::MAX,
 				p,
 				30);
 			MeshlinePolicy c(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::THIRDS,
-				Normal::YMAX,
+				MeshlinePolicy::Normal::MAX,
 				p,
 				10);
 			MeshlinePolicy d(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::HALFS,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				30);
 			p.dmax = 2;
@@ -880,8 +850,8 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 			b.d = 0.1;
 			c.d = 0.1;
 			d.d = 0.1;
-			Interval i(&a, &b, Interval::Axis::H, p);
-			Interval j(&c, &d, Interval::Axis::H, p);
+			Interval i(&a, &b, Y, p);
+			Interval j(&c, &d, Y, p);
 			auto mesh_i = i.mesh();
 			auto mesh_j = j.mesh();
 			THEN("The only lines should be policy lines and middle line") {
@@ -899,15 +869,15 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 		WHEN("Sides' policies are ONELINE") {
 			Params p;
 			MeshlinePolicy a(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::ONELINE,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				10);
 			MeshlinePolicy b(
-				MeshlinePolicy::Axis::H,
+				Y,
 				MeshlinePolicy::Policy::ONELINE,
-				Normal::NONE,
+				MeshlinePolicy::Normal::NONE,
 				p,
 				30);
 			p.dmax = 1.5;
@@ -915,7 +885,7 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 			p.lambda = 2;
 			a.d = 0.1;
 			b.d = 0.1;
-			Interval i(&a, &b, Interval::Axis::H, p);
+			Interval i(&a, &b, Y, p);
 			auto mesh = i.mesh();
 			THEN("The only line should be the middle line") {
 				REQUIRE(mesh.size() == 1);

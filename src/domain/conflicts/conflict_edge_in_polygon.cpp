@@ -4,6 +4,8 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include "domain/geometrics/segment.hpp"
+#include "domain/geometrics/space.hpp"
 #ifdef DEBUG
 #include <iostream>
 #endif // DEBUG
@@ -69,8 +71,9 @@ void sort_overlaps_by_p0_by_vector_orientation(vector<Overlap>& overlaps, Point 
 }
 
 //******************************************************************************
-ConflictEdgeInPolygon::ConflictEdgeInPolygon(Edge* a, Polygon const* polygon, Range const range, optional<Edge const*> b)
+ConflictEdgeInPolygon::ConflictEdgeInPolygon(Plane plane, Edge* a, Polygon const* polygon, Range const range, optional<Edge const*> b)
 : Conflict(Kind::EDGE_IN_POLYGON)
+, plane(plane)
 , edge(a) {
 	overlaps.emplace_back(polygon, range, b);
 }

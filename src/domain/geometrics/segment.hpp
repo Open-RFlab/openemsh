@@ -11,6 +11,7 @@
 
 #include "bounding.hpp"
 #include "relation.hpp"
+#include "space.hpp"
 
 class Point;
 class Range;
@@ -53,3 +54,6 @@ Point mid(Segment const& s) noexcept;
 
 //******************************************************************************
 std::optional<Range> overlap(Segment const& a, Segment const& b); // TODO -> Bounding2D?
+
+//******************************************************************************
+std::optional<Axis> transpose(Plane const plane, Segment::Axis const axis) noexcept;
