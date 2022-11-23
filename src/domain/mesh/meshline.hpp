@@ -6,13 +6,15 @@
 
 #pragma once
 
+#include "utils/entity.hpp"
+
 #include "domain/geometrics/coord.hpp"
 
 class Interval;
 class MeshlinePolicy;
 
 //******************************************************************************
-class Meshline {
+class Meshline : public Entity, public Visitable<Meshline, EntityVisitor> {
 public:
 	Coord const coord;
 	Interval const* const interval;

@@ -21,6 +21,7 @@
 #include "range.hpp"
 #include "relation.hpp"
 #include "segment.hpp"
+#include "space.hpp"
 #include "types.hpp"
 
 class Conflict;
@@ -52,6 +53,8 @@ public:
 	// TODO vec & normal -> std::complex
 	// enums -> funcs? vars? enums?
 
+	Plane const plane;
+
 	/// Direction from p0 to p1.
 	///*************************************************************************
 	enum class Direction {
@@ -67,7 +70,7 @@ public:
 
 //	Bounding2D bounding;
 
-	Edge(Point const* p0, Point const* p1);
+	Edge(Plane plane, Point const* p0, Point const* p1);
 
 	Point const& p0() const noexcept override;
 	Point const& p1() const noexcept override;

@@ -20,10 +20,13 @@ ConflictManager::ConflictManager(MeshlinePolicyManager* const line_policy_manage
 /// @warning Allows geometrically inconsistent datas.
 ///*****************************************************************************
 void ConflictManager::add_colinear_edges(Edge* a, Edge* b) {
-	if((a->axis == Segment::Axis::H && b->axis == Segment::Axis::H)
-	|| (a->axis == Segment::Axis::V && b->axis == Segment::Axis::V)) {
+	if(a->plane == b->plane && a->axis == b->axis) {
+		auto const axis = transpose(a->plane, a->axis);
+		if(!axis.has_value())
+			return;
+
 		bool does_conflict_exist = false;
-		for(auto const& conflict : all_colinear_edges) {
+		for(auto const& conflict : all_colinear_edges[axis.value()]) {
 			bool is_a_registered = false;
 			bool is_b_registered = false;
 
@@ -56,8 +59,8 @@ void ConflictManager::add_colinear_edges(Edge* a, Edge* b) {
 		}
 
 		if(!does_conflict_exist) {
-			Conflict* conflict = all_colinear_edges.emplace_back(
-				make_unique<ConflictColinearEdges>(a, b)).get();
+			Conflict* conflict = all_colinear_edges[axis.value()].emplace_back(
+				make_unique<ConflictColinearEdges>(axis.value(), a, b)).get();
 			a->conflicts.push_back(conflict);
 			b->conflicts.push_back(conflict);
 		}
@@ -73,8 +76,14 @@ void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, optional<Ed
 /// @warning Allows geometrically inconsistent datas.
 ///*****************************************************************************
 void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const range, optional<Edge const*> b) {
+	if(a->plane != polygon->plane
+	&& (!b.has_value() || (*b)->plane != a->plane))
+		return;
+
+	Plane const plane = a->plane;
+
 	bool does_conflict_exist = false;
-	for(auto const& conflict : all_edge_in_polygons) {
+	for(auto const& conflict : all_edge_in_polygons[plane]) {
 		bool is_a_registered = false;
 		bool is_polygon_registered = false;
 		bool is_overlap_registered = false;
@@ -108,8 +117,8 @@ void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const
 	}
 
 	if(!does_conflict_exist) {
-		Conflict* conflict = all_edge_in_polygons.emplace_back(
-			make_unique<ConflictEdgeInPolygon>(a, polygon, range, b)).get();
+		Conflict* conflict = all_edge_in_polygons[plane].emplace_back(
+			make_unique<ConflictEdgeInPolygon>(plane, a, polygon, range, b)).get();
 		a->conflicts.push_back(conflict);
 //		b->conflicts.push_back(conflict); // TODO needed?
 		polygon->conflicts.push_back(conflict);
@@ -124,15 +133,17 @@ ConflictTooCloseMeshlinePolicies* ConflictManager::add_too_close_meshline_polici
 	if(a->axis != b->axis)
 		return nullptr;
 
-	for(auto const& conflict : all_too_close_meshline_policies)
+	Axis const axis = a->axis;
+
+	for(auto const& conflict : all_too_close_meshline_policies[axis])
 		if(conflict->meshline_policies[0] == a
 		|| conflict->meshline_policies[0] == b
 		|| conflict->meshline_policies[1] == a
 		|| conflict->meshline_policies[1] == b)
 			return nullptr;
 
-	auto conflict = all_too_close_meshline_policies.emplace_back(
-		make_unique<ConflictTooCloseMeshlinePolicies>(a, b)).get();
+	auto conflict = all_too_close_meshline_policies[axis].emplace_back(
+		make_unique<ConflictTooCloseMeshlinePolicies>(axis, a, b)).get();
 	a->conflicts.push_back(conflict);
 	b->conflicts.push_back(conflict);
 	a->is_enabled = false;
@@ -142,28 +153,28 @@ ConflictTooCloseMeshlinePolicies* ConflictManager::add_too_close_meshline_polici
 }
 
 //******************************************************************************
-void ConflictManager::auto_solve_all_edge_in_polygon() {
-	for(auto const& conflict : all_edge_in_polygons)
+void ConflictManager::auto_solve_all_edge_in_polygon(Plane const plane) {
+	for(auto const& conflict : all_edge_in_polygons[plane])
 		conflict->auto_solve(*line_policy_manager);
 }
 
 //******************************************************************************
-void ConflictManager::auto_solve_all_colinear_edges() {
-	for(auto const& conflict : all_colinear_edges)
+void ConflictManager::auto_solve_all_colinear_edges(Axis const axis) {
+	for(auto const& conflict : all_colinear_edges[axis])
 		conflict->auto_solve(*line_policy_manager);
 }
 
 //******************************************************************************
-vector<unique_ptr<ConflictColinearEdges>> const& ConflictManager::get_colinear_edges() const {
-	return all_colinear_edges;
+vector<unique_ptr<ConflictColinearEdges>> const& ConflictManager::get_colinear_edges(Axis const axis) const {
+	return all_colinear_edges[axis];
 }
 
 //******************************************************************************
-vector<unique_ptr<ConflictEdgeInPolygon>> const& ConflictManager::get_edge_in_polygons() const {
-	return all_edge_in_polygons;
+vector<unique_ptr<ConflictEdgeInPolygon>> const& ConflictManager::get_edge_in_polygons(Plane const plane) const {
+	return all_edge_in_polygons[plane];
 }
 
 //******************************************************************************
-vector<unique_ptr<ConflictTooCloseMeshlinePolicies>> const& ConflictManager::get_too_close_meshline_policies() const {
-	return all_too_close_meshline_policies;
+vector<unique_ptr<ConflictTooCloseMeshlinePolicies>> const& ConflictManager::get_too_close_meshline_policies(Axis const axis) const {
+	return all_too_close_meshline_policies[axis];
 }

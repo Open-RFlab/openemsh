@@ -44,11 +44,9 @@ Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Par
 	case MeshlinePolicy::Policy::HALFS: return d / 2.0;
 	case MeshlinePolicy::Policy::THIRDS: return [&] {
 		switch(before->normal) {
-		case Normal::XMAX:
-		case Normal::YMAX:
+		case MeshlinePolicy::Normal::MAX:
 			return 2.0/3.0 * d;
-		case Normal::XMIN:
-		case Normal::YMIN:
+		case MeshlinePolicy::Normal::MIN:
 			return 1.0/3.0 * d;
 		default:
 			return d;
@@ -63,11 +61,9 @@ Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Par
 	case MeshlinePolicy::Policy::HALFS: return d / 2.0;
 	case MeshlinePolicy::Policy::THIRDS: return [&] {
 		switch(after->normal) {
-		case Normal::XMAX:
-		case Normal::YMAX:
+		case MeshlinePolicy::Normal::MAX:
 			return 1.0/3.0 * d;
-		case Normal::XMIN:
-		case Normal::YMIN:
+		case MeshlinePolicy::Normal::MIN:
 			return 2.0/3.0 * d;
 		default:
 			return d;

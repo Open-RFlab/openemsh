@@ -9,11 +9,13 @@
 #include "infra/utils/to_string.hpp"
 
 /// @test std::string to_string(Edge::Direction const direction) noexcept
-/// @test std::string to_string(GridAxis const axis) noexcept
 /// @test std::string to_string(Normal const normal) noexcept
+/// @test std::string to_string(MeshlinePolicy::Normal const normal) noexcept
 /// @test std::string to_string(MeshlinePolicy::Policy const policy) noexcept
 /// @test std::string to_string(Polygon::Rotation const rotation) noexcept
 /// @test std::string to_string(Segment::Axis const axis) noexcept
+/// @test std::string to_string(Axis const axis) noexcept
+/// @test std::string to_string(Plane const plane) noexcept
 ///*****************************************************************************
 
 //******************************************************************************
@@ -26,18 +28,21 @@ SCENARIO("std::string to_string(Edge::Direction const direction) noexcept", "[to
 }
 
 //******************************************************************************
-SCENARIO("std::string to_string(GridAxis const axis) noexcept", "[to_string]") {
-	REQUIRE(to_string(H) == "H");
-	REQUIRE(to_string(V) == "V");
-}
-
-//******************************************************************************
 SCENARIO("std::string to_string(Normal const normal) noexcept", "[to_string]") {
 	REQUIRE(to_string(Normal::XMIN) == "XMIN");
 	REQUIRE(to_string(Normal::XMAX) == "XMAX");
 	REQUIRE(to_string(Normal::YMIN) == "YMIN");
 	REQUIRE(to_string(Normal::YMAX) == "YMAX");
+	REQUIRE(to_string(Normal::ZMIN) == "ZMIN");
+	REQUIRE(to_string(Normal::ZMAX) == "ZMAX");
 	REQUIRE(to_string(Normal::NONE) == "NONE");
+}
+
+//******************************************************************************
+SCENARIO("std::string to_string(MeshlinePolicy::Normal const normal) noexcept", "[to_string]") {
+	REQUIRE(to_string(MeshlinePolicy::Normal::MIN) == "MIN");
+	REQUIRE(to_string(MeshlinePolicy::Normal::MAX) == "MAX");
+	REQUIRE(to_string(MeshlinePolicy::Normal::NONE) == "NONE");
 }
 
 //******************************************************************************
@@ -60,4 +65,18 @@ SCENARIO("std::string to_string(Segment::Axis const axis) noexcept", "[to_string
 	REQUIRE(to_string(Segment::Axis::V) == "V");
 	REQUIRE(to_string(Segment::Axis::DIAGONAL) == "DIAGONAL");
 	REQUIRE(to_string(Segment::Axis::POINT) == "POINT");
+}
+
+//******************************************************************************
+SCENARIO("std::string to_string(Axis const axis) noexcept", "[to_string]") {
+	REQUIRE(to_string(X) == "X");
+	REQUIRE(to_string(Y) == "Y");
+	REQUIRE(to_string(Z) == "Z");
+}
+
+//******************************************************************************
+SCENARIO("std::string to_string(Plane const plane) noexcept", "[to_string]") {
+	REQUIRE(to_string(YZ) == "YZ");
+	REQUIRE(to_string(ZX) == "ZX");
+	REQUIRE(to_string(XY) == "XY");
 }

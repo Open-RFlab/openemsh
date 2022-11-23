@@ -20,6 +20,7 @@
 #include "domain/global.hpp"
 #include "bounding.hpp"
 #include "relation.hpp"
+#include "space.hpp"
 
 class Conflict;
 class Edge;
@@ -47,6 +48,7 @@ public:
 		PORT
 	} type; // TODO usefull?
 
+	Plane const plane;
 	Bounding2D const bounding;
 	std::string const name;
 
@@ -57,7 +59,7 @@ public:
 	///*************************************************************************
 	std::vector<std::unique_ptr<Edge>> const edges;
 
-	Polygon(std::string const& name, std::vector<std::unique_ptr<Point const>>&& points);
+	Polygon(Plane plane, std::string const& name, std::vector<std::unique_ptr<Point const>>&& points);
 
 //	relation::PolygonEdge relation_to(Edge const* edge);
 	relation::PolygonPoint relation_to(Point const& point) const;
@@ -77,4 +79,4 @@ extern template Polygon::Rotation detect_rotation(std::vector<Point const*> cons
 Bounding2D detect_bounding(std::vector<std::unique_ptr<Point const>> const& points) noexcept;
 
 //******************************************************************************
-std::vector<std::unique_ptr<Edge>> detect_edges(std::vector<std::unique_ptr<Point const>> const& points);
+std::vector<std::unique_ptr<Edge>> detect_edges(std::vector<std::unique_ptr<Point const>> const& points, Plane plane);
