@@ -5,9 +5,15 @@
 
 #pragma once
 
+#ifdef DEBUG
+#include <cstdlib>
+#endif
+
 /// @brief Backport of C++23 std::unreachable.
 ///*****************************************************************************
 [[noreturn]] inline void unreachable() {
+#ifndef DEBUG
+
 #ifdef __GNUC__ // GCC, Clang, ICC
 	__builtin_unreachable();
 #else
@@ -15,4 +21,10 @@
 	__assume(false);
 #endif
 #endif
+
+#else // DEBUG
+
+	std::abort();
+
+#endif // DEBUG
 }
