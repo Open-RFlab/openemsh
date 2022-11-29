@@ -39,17 +39,20 @@ protected:
 //******************************************************************************
 class EntityVisitor {
 public:
-	virtual void visit(Board& board) = 0;
-	virtual void visit(Edge& edge) = 0;
-	virtual void visit(Polygon& polygon) = 0;
-	virtual void visit(ConflictColinearEdges& conflict) = 0;
-	virtual void visit(ConflictEdgeInPolygon& conflict) = 0;
-	virtual void visit(ConflictTooCloseMeshlinePolicies& conflict) = 0;
-	virtual void visit(MeshlinePolicy& policy) = 0;
-	virtual void visit(Meshline& meshline) = 0;
-	virtual void visit(Interval& interval) = 0;
-	virtual ~EntityVisitor() = default;
+	virtual void visit([[maybe_unused]] Board& board) {};
+	virtual void visit([[maybe_unused]] Edge& edge) {};
+	virtual void visit([[maybe_unused]] Polygon& polygon) {};
+	virtual void visit([[maybe_unused]] ConflictColinearEdges& conflict) {};
+	virtual void visit([[maybe_unused]] ConflictEdgeInPolygon& conflict) {};
+	virtual void visit([[maybe_unused]] ConflictTooCloseMeshlinePolicies& conflict) {};
+	virtual void visit([[maybe_unused]] MeshlinePolicy& policy) {};
+	virtual void visit([[maybe_unused]] Meshline& meshline) {};
+	virtual void visit([[maybe_unused]] Interval& interval) {};
+	virtual ~EntityVisitor() = 0;
 };
+
+//******************************************************************************
+inline EntityVisitor::~EntityVisitor() = default;
 
 //******************************************************************************
 template<typename T, typename Visitor>
