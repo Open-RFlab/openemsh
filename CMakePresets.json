@@ -1,0 +1,71 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "common",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build",
+      "generator": "Unix Makefiles",
+      "cacheVariables": {
+        "CPM_DISABLE": "$penv{CPM_DISABLE}"
+      }
+    },
+    {
+      "name": "release",
+      "inherits": "common",
+      "environment": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "debug",
+      "inherits": "common",
+      "environment": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "coverage",
+      "inherits": "debug",
+      "cacheVariables": {
+        "COVERAGE": true,
+        "COVERAGE_ERROR": false
+      }
+    },
+    {
+      "name": "coverage-sonar",
+      "inherits": "coverage",
+      "environment": {
+        "C": "gcc",
+        "CXX": "g++"
+      },
+      "cacheVariables": {
+        "SONAR": true
+      }
+    },
+    {
+      "name": "static",
+      "inherits": "debug",
+      "cacheVariables": {
+        "CODECHECKER_REPORT": true
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "coverage",
+      "configurePreset": "coverage",
+      "targets": "coverage"
+    },
+    {
+      "name": "codechecker",
+      "configurePreset": "static",
+      "targets": "codechecker"
+    }
+  ]
+}
