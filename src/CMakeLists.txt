@@ -53,6 +53,10 @@ target_include_directories( openemsh
 	${CMAKE_CURRENT_SOURCE_DIR}
 	)
 
+target_link_libraries( openemsh
+	pugixml::shared
+	)
+
 add_executable( openemsh_bin )
 
 target_sources( openemsh_bin

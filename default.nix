@@ -5,6 +5,7 @@
 , cmake-utils
 , git
 , texlive
+, pugixml
 }:
 
 with pkgs;
@@ -23,6 +24,18 @@ stdenv.mkDerivation {
       inherit (texlive) scheme-small standalone pgfplots;
     })
   ];
+
+  buildInputs = [
+    (pugixml.override { shared = true; })
+  ];
+
+  cmakeFlags = [
+    "-DCPM_DISABLE=ON"
+  ];
+
+  shellHook = ''
+    export CPM_DISABLE=ON
+  '';
 
   meta = {
     homepage = "https://github.com/Open-RFlab/openemsh";
