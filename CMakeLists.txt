@@ -42,7 +42,7 @@ if( NOT CPM_DISABLE )
 		DOWNLOAD_ONLY
 		)
 
-	set( CMakeUtils_DIR "${FETCHCONTENT_BASE_DIR}/cmake-utils-src" )
+	set( CMakeUtils_DIR "${cmake-utils_SOURCE_DIR}" )
 
 	CPMAddPackage(
 		NAME pugixml
@@ -52,7 +52,7 @@ if( NOT CPM_DISABLE )
 			"BUILD_SHARED_LIBS ON"
 		)
 
-	set( pugixml_DIR "${FETCHCONTENT_BASE_DIR}/pugixml-build" )
+	set( pugixml_DIR "${pugixml_BINARY_DIR}" )
 endif()
 
 find_package( CMakeUtils QUIET )
