@@ -6,6 +6,8 @@
 
 #include "meshline.hpp"
 
+namespace domain {
+
 //******************************************************************************
 Meshline::Meshline(Coord coord, Interval const* interval, MeshlinePolicy const* policy) noexcept
 : coord(coord)
@@ -31,3 +33,5 @@ Meshline::Meshline(Coord coord, MeshlinePolicy const* policy) noexcept
 bool operator<(Meshline const& a, Meshline const& b) noexcept {
 	return (a.coord < b.coord);
 }
+
+} // namespace domain

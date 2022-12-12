@@ -19,6 +19,8 @@
 /// @test Edge::Edge(Plane plane, Point const* p0, Point const* p1)
 ///*****************************************************************************
 
+using namespace domain;
+
 //******************************************************************************
 SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) const", "[edge][segment]") {
 	GIVEN("Two edges") {

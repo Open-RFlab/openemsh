@@ -10,6 +10,8 @@
 
 #include "conflict_manager.hpp"
 
+namespace domain {
+
 using namespace std;
 
 //******************************************************************************
@@ -178,3 +180,5 @@ vector<unique_ptr<ConflictEdgeInPolygon>> const& ConflictManager::get_edge_in_po
 vector<unique_ptr<ConflictTooCloseMeshlinePolicies>> const& ConflictManager::get_too_close_meshline_policies(Axis const axis) const {
 	return all_too_close_meshline_policies[axis];
 }
+
+} // namespace domain

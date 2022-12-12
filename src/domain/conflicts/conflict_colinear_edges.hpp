@@ -11,6 +11,8 @@
 #include "domain/geometrics/space.hpp"
 #include "conflict.hpp"
 
+namespace domain {
+
 class Edge;
 
 //******************************************************************************
@@ -31,3 +33,5 @@ public:
 	void print() const override {} // TODO
 #endif // DEBUG
 };
+
+} // namespace domain

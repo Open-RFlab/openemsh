@@ -13,6 +13,8 @@
 
 #include "interval.hpp"
 
+namespace domain {
+
 using namespace std;
 
 //******************************************************************************
@@ -353,7 +355,7 @@ tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side const& side, si
 void Interval::auto_solve_d() {
 	update_ls();
 
-	dmax = ::find_dmax(before, after, dmax);
+	dmax = domain::find_dmax(before, after, dmax);
 	update_ls();
 
 	before.meshline_policy->d = get<0>(adjust_d_for_dmax_lmin(before/*, 10000*/));
@@ -408,3 +410,5 @@ vector<unique_ptr<Meshline>> Interval::mesh() const {
 	meshlines.shrink_to_fit();
 	return meshlines;
 }
+
+} // namespace domain

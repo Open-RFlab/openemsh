@@ -8,10 +8,10 @@
 
 #include <string>
 
-#include "utils/entity.hpp"
+#include "domain/utils/entity_visitor.hpp"
 
 //******************************************************************************
-class SerializerToPlantuml : public EntityVisitor {
+class SerializerToPlantuml final : public domain::EntityVisitor {
 public:
 	struct Params {
 		bool with_conflict_edge_in_polygon = true;
@@ -21,29 +21,29 @@ public:
 		bool with_geometric_part = true;
 	};
 
-	static std::string run(Board& board);
-	static std::string run(Board& board, Params params);
+	static std::string run(domain::Board& board);
+	static std::string run(domain::Board& board, Params params);
 
 private:
-	friend class Board;
-	friend class Edge;
-	friend class Polygon;
-	friend class ConflictColinearEdges;
-	friend class ConflictEdgeInPolygon;
-	friend class ConflictTooCloseMeshlinePolicies;
-	friend class MeshlinePolicy;
-	friend class Interval;
-	friend class Meshline;
+	friend class domain::Board;
+	friend class domain::Edge;
+	friend class domain::Polygon;
+	friend class domain::ConflictColinearEdges;
+	friend class domain::ConflictEdgeInPolygon;
+	friend class domain::ConflictTooCloseMeshlinePolicies;
+	friend class domain::MeshlinePolicy;
+	friend class domain::Interval;
+	friend class domain::Meshline;
 
-	void visit(Board& board) override;
-	void visit(Edge& edge) override;
-	void visit(Polygon& polygon) override;
-	void visit(ConflictColinearEdges& conflict) override;
-	void visit(ConflictEdgeInPolygon& conflict) override;
-	void visit(ConflictTooCloseMeshlinePolicies& conflict) override;
-	void visit(MeshlinePolicy& policy) override;
-	void visit(Interval& interval) override;
-	void visit(Meshline& meshline) override;
+	void visit(domain::Board& board) override;
+	void visit(domain::Edge& edge) override;
+	void visit(domain::Polygon& polygon) override;
+	void visit(domain::ConflictColinearEdges& conflict) override;
+	void visit(domain::ConflictEdgeInPolygon& conflict) override;
+	void visit(domain::ConflictTooCloseMeshlinePolicies& conflict) override;
+	void visit(domain::MeshlinePolicy& policy) override;
+	void visit(domain::Interval& interval) override;
+	void visit(domain::Meshline& meshline) override;
 
 	SerializerToPlantuml(Params params);
 	std::string dump();

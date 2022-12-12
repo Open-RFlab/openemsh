@@ -4,10 +4,6 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#include "domain/geometrics/space.hpp"
-#include "domain/meshline_policy_manager.hpp"
-#include "utils/entity.hpp"
-#include "utils/unreachable.hpp"
 #ifdef DEBUG
 #include <iostream>
 #endif // DEBUG
@@ -15,11 +11,13 @@
 #include <algorithm>
 #include <utility>
 
+#include "utils/unreachable.hpp"
 #include "utils/signum.hpp"
 #include "utils/vector_utils.hpp"
-#include "conflicts/conflict_edge_in_polygon.hpp"
 
 #include "board.hpp"
+
+namespace domain {
 
 using namespace std;
 
@@ -129,7 +127,7 @@ void Board::detect_edges_in_polygons(Plane const plane) {
 					explicit RangeBtwIntersections(Range const& _range)
 					: range(_range)
 					, rel_to_poly_b(nullopt)
-					, mid(::mid(_range))
+					, mid(domain::mid(_range))
 					{}
 					RangeBtwIntersections(Range const& _range, relation::PolygonPoint _rel_to_poly_b)
 					: range(_range)
@@ -276,7 +274,7 @@ void Board::detect_colinear_edges(Plane const plane) {
 //******************************************************************************
 void Board::detect_non_conflicting_edges(Plane const plane) {
 	for(Edge* edge : edges[plane]) {
-		optional<Coord> const coord = ::coord(edge->p0(), edge->axis);
+		optional<Coord> const coord = domain::coord(edge->p0(), edge->axis);
 		optional<Axis> const axis = transpose(plane, edge->axis);
 		optional<MeshlinePolicy::Normal> const normal = cast(edge->normal);
 		if(coord && axis && normal && !edge->conflicts.size()) {
@@ -365,3 +363,5 @@ void Board::print() const {
 		polygon->print();
 }
 #endif // DEBUG
+
+} // namespace domain

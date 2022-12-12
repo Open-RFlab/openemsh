@@ -15,6 +15,8 @@
 /// @test void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manager)
 ///*****************************************************************************
 
+using namespace domain;
+
 //******************************************************************************
 SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manager)", "[conflict_colinear_edges]") {
 	GIVEN("A conflict about four colinear vertical edges with mixed normals") {

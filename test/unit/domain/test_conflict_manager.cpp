@@ -29,6 +29,8 @@
 ///       	MeshlinePolicy* b)
 ///*****************************************************************************
 
+using namespace domain;
+
 //******************************************************************************
 SCENARIO("void ConflictManager::add_colinear_edges(Edge* a, Edge* b)", "[conflict_manager]") {
 	GIVEN("A conflict manager and some edges") {

@@ -10,6 +10,8 @@
 
 #include "point.hpp"
 
+namespace domain {
+
 using namespace std;
 
 //******************************************************************************
@@ -52,3 +54,5 @@ void Point::print() const {
 	cout << "x: " << x << "\ty: " << y << endl;
 }
 #endif // DEBUG
+
+} // namespace domain

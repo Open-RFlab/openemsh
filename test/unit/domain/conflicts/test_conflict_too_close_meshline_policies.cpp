@@ -14,6 +14,8 @@
 /// @test void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManager& line_policy_manager)
 ///*****************************************************************************
 
+using namespace domain;
+
 //******************************************************************************
 SCENARIO("void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManager& line_policy_manager)", "[conflict_too_close_meshline_policies]") {
 	Params params;

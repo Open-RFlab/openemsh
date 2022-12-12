@@ -20,6 +20,7 @@
 
 #include "serializer_to_prettyprint.hpp"
 
+using namespace domain;
 using namespace std;
 
 //******************************************************************************
@@ -150,18 +151,6 @@ void SerializerToPrettyprint::visit(ConflictEdgeInPolygon& conflict) {
 		out += "\tSolution: " + (conflict.edge->to_mesh ? F_D_GREEN + "to mesh" : F_D_RED + "don't mesh") + S_RESET;
 
 	out += "\n";
-}
-
-//******************************************************************************
-void SerializerToPrettyprint::visit(ConflictTooCloseMeshlinePolicies& conflict) {
-}
-
-//******************************************************************************
-void SerializerToPrettyprint::visit(MeshlinePolicy& policy) {
-}
-
-//******************************************************************************
-void SerializerToPrettyprint::visit(Interval& interval) {
 }
 
 //******************************************************************************

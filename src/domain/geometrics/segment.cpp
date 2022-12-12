@@ -11,20 +11,18 @@
 
 #include "segment.hpp"
 
+namespace domain {
+
 using namespace std;
 
-namespace {
-
 //******************************************************************************
-bool are_parallel(Segment const& a, Segment const& b) noexcept {
+static bool are_parallel(Segment const& a, Segment const& b) noexcept {
 	Point a_vec(a.p1() - a.p0());
 	Point b_vec(b.p1() - b.p0());
 	return (a.axis == Segment::Axis::H && b.axis == Segment::Axis::H)
 		|| (a.axis == Segment::Axis::V && b.axis == Segment::Axis::V)
 		|| (a_vec.y / a_vec.x == b_vec.y / b_vec.x);
 }
-
-} // namespace
 
 //******************************************************************************
 Segment::Segment(Axis const axis) noexcept
@@ -238,3 +236,5 @@ optional<Axis> transpose(Plane const plane, Segment::Axis const axis) noexcept {
 		return nullopt;
 	}
 }
+
+} // namespace domain

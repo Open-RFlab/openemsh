@@ -11,6 +11,8 @@
 #include "point.hpp"
 #include "segment.hpp"
 
+namespace domain {
+
 //******************************************************************************
 class Range : public Segment/*, public IConflictOrigin*//*, public IMeshLineOrigin*/ {
 private:
@@ -30,3 +32,5 @@ public:
 
 //******************************************************************************
 bool operator==(Range const& a, Range const& b) noexcept;
+
+} // namespace domain

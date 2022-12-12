@@ -10,11 +10,13 @@
 
 #include "range.hpp"
 
+namespace domain {
+
 using namespace std;
 
 //******************************************************************************
 Range::Range(Point const p0, Point const p1) noexcept
-: Segment(::axis(p0, p1))
+: Segment(domain::axis(p0, p1))
 , _p0(p0)
 , _p1(p1)
 {}
@@ -42,3 +44,5 @@ void Range::print() const {
 	p1().print();
 }
 #endif // DEBUG
+
+} // namespace domain

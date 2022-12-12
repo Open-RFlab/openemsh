@@ -30,6 +30,8 @@
 /// @test std::vector<std::unique_ptr<Meshline>> Interval::mesh() const
 ///*****************************************************************************
 
+using namespace domain;
+
 //******************************************************************************
 SCENARIO("Interval::Side::Side(MeshlinePolicy* meshline_policy, size_t lmin, double lambda, Coord h, function<double (double)> d_init)", "[interval]") {
 	GIVEN("Two meshline policies") {

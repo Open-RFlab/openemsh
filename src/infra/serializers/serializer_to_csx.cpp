@@ -14,6 +14,7 @@
 
 #include "serializer_to_csx.hpp"
 
+using namespace domain;
 using namespace std;
 
 //******************************************************************************

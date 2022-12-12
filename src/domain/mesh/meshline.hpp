@@ -6,9 +6,11 @@
 
 #pragma once
 
+#include "domain/geometrics/coord.hpp"
+#include "domain/utils/entity_visitor.hpp"
 #include "utils/entity.hpp"
 
-#include "domain/geometrics/coord.hpp"
+namespace domain {
 
 class Interval;
 class MeshlinePolicy;
@@ -27,3 +29,5 @@ public:
 
 //******************************************************************************
 bool operator<(Meshline const& a, Meshline const& b) noexcept;
+
+} // namespace domain

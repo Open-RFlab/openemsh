@@ -10,6 +10,8 @@
 
 #include "coord.hpp"
 
+namespace domain {
+
 using namespace std;
 
 //******************************************************************************
@@ -81,3 +83,5 @@ Coord mid(Coord const& a, Coord const& b) noexcept {
 Coord distance(Coord const& a, Coord const& b) noexcept {
 	return abs(a.value() - b.value());
 }
+
+} // namespace domain

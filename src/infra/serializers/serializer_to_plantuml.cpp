@@ -19,6 +19,7 @@
 
 #include "serializer_to_plantuml.hpp"
 
+using namespace domain;
 using namespace std;
 
 //******************************************************************************

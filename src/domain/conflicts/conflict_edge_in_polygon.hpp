@@ -15,6 +15,8 @@
 #include "domain/geometrics/space.hpp"
 #include "conflict.hpp"
 
+namespace domain {
+
 class Edge;
 class Polygon;
 
@@ -52,3 +54,5 @@ public:
 #ifdef UNITTEST
 void sort_overlaps_by_p0_by_vector_orientation(std::vector<Overlap>& overlaps, Point const& vector);
 #endif // UNITTEST
+
+} // namespace domain
