@@ -11,6 +11,8 @@
 /// @test bool does_overlap(Bounding2D const& a, Bounding2D const& b)
 ///*****************************************************************************
 
+using namespace domain;
+
 //******************************************************************************
 SCENARIO("bool does_overlap(Bounding2D const& a, Bounding2D const& b)", "[bounding]") {
 	GIVEN("Two bounding boxes that do not overlap") {

@@ -13,6 +13,8 @@
 #include "relation.hpp"
 #include "space.hpp"
 
+namespace domain {
+
 class Point;
 class Range;
 
@@ -57,3 +59,5 @@ std::optional<Range> overlap(Segment const& a, Segment const& b); // TODO -> Bou
 
 //******************************************************************************
 std::optional<Axis> transpose(Plane const plane, Segment::Axis const axis) noexcept;
+
+} // namespace domain

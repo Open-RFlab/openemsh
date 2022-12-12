@@ -18,6 +18,8 @@
 /// @test Point mid(Point const& a, Point const& b)
 ///*****************************************************************************
 
+using namespace domain;
+
 //******************************************************************************
 SCENARIO("Point operator-(Point const& a, Point const& b)", "[point]") {
 	GIVEN("Two points") {

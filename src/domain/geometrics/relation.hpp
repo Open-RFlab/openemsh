@@ -6,6 +6,7 @@
 
 #pragma once
 
+namespace domain {
 namespace relation {
 
 /// Relation between edges.
@@ -52,4 +53,5 @@ enum class PolygonPoint {
 //******************************************************************************
 //void toggle(PolygonPoint& a);
 
-}; // namespace relation
+} // namespace relation
+} // namespace domain

@@ -14,12 +14,11 @@
 #include "domain/meshline_policy_manager.hpp"
 
 //******************************************************************************
-std::string to_string(Edge::Direction direction) noexcept;
-std::string to_string(MeshlinePolicy::Normal normal) noexcept;
-std::string to_string(MeshlinePolicy::Policy policy) noexcept;
-std::string to_string(Polygon::Rotation rotation) noexcept;
-std::string to_string(Segment::Axis axis) noexcept;
-std::string to_string(Axis axis) noexcept;
-std::string to_string(Normal normal) noexcept;
-std::string to_string(Plane plane) noexcept;
-//std::string to_string(GridAxis axis) noexcept;
+std::string to_string(domain::Edge::Direction direction) noexcept;
+std::string to_string(domain::MeshlinePolicy::Normal normal) noexcept;
+std::string to_string(domain::MeshlinePolicy::Policy policy) noexcept;
+std::string to_string(domain::Polygon::Rotation rotation) noexcept;
+std::string to_string(domain::Segment::Axis axis) noexcept;
+std::string to_string(domain::Axis axis) noexcept;
+std::string to_string(domain::Normal normal) noexcept;
+std::string to_string(domain::Plane plane) noexcept;

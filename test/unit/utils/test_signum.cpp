@@ -13,6 +13,8 @@
 /// @test template<typename T> int8_t signum(T const& a)
 ///*****************************************************************************
 
+using namespace domain;
+
 //******************************************************************************
 SCENARIO("template<typename T> int8_t signum(T const& a)", "[utils][signum]") {
 	GIVEN("A double number") {

@@ -6,6 +6,8 @@
 
 #pragma once
 
+namespace domain {
+
 class MeshlinePolicy;
 
 //******************************************************************************
@@ -16,3 +18,5 @@ public:
 	IMeshLineOrigin();
 	virtual ~IMeshLineOrigin() = default;
 };
+
+} // namespace domain

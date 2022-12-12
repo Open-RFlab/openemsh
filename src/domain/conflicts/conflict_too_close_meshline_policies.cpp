@@ -13,6 +13,8 @@
 
 #include "conflict_too_close_meshline_policies.hpp"
 
+namespace domain {
+
 using namespace std;
 
 //******************************************************************************
@@ -74,3 +76,5 @@ void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManager& line_po
 }
 
 // TODO Interval class : just mesh() from adjacent / neibourgh
+
+} // namespace domain

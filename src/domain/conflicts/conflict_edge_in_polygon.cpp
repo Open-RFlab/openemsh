@@ -18,6 +18,8 @@
 
 #include "conflict_edge_in_polygon.hpp"
 
+namespace domain {
+
 using namespace std;
 
 //******************************************************************************
@@ -131,3 +133,5 @@ void ConflictEdgeInPolygon::print() const {
 	}
 }
 #endif // DEBUG
+
+} // namespace domain

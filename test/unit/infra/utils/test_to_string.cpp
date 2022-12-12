@@ -18,6 +18,8 @@
 /// @test std::string to_string(Plane const plane) noexcept
 ///*****************************************************************************
 
+using namespace domain;
+
 //******************************************************************************
 SCENARIO("std::string to_string(Edge::Direction const direction) noexcept", "[to_string]") {
 	REQUIRE(to_string(Edge::Direction::XMIN) == "XMIN");

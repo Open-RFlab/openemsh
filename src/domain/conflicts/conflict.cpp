@@ -6,8 +6,12 @@
 
 #include "conflict.hpp"
 
+namespace domain {
+
 //******************************************************************************
 Conflict::Conflict(Kind const kind)
 : IMeshLineOrigin()
 , kind(kind)
 {}
+
+} // namespace domain

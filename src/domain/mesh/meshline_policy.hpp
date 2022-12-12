@@ -17,9 +17,12 @@
 #include "domain/geometrics/segment.hpp"
 #include "domain/geometrics/types.hpp"
 #include "domain/geometrics/space.hpp"
+#include "domain/utils/entity_visitor.hpp"
 #include "domain/global.hpp"
 #include "utils/entity.hpp"
 #include "i_meshline_origin.hpp"
+
+namespace domain {
 
 class Conflict;
 class Meshline;
@@ -81,3 +84,5 @@ std::optional<Coord> coord(Point const& point, Segment::Axis const axis) noexcep
 
 //******************************************************************************
 MeshlinePolicy::Normal cast(Normal const normal) noexcept;
+
+} // namespace domain

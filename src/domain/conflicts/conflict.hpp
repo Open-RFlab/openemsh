@@ -8,9 +8,12 @@
 
 //#include <vector>
 
-#include "utils/entity.hpp"
 #include "domain/mesh/i_meshline_origin.hpp"
+#include "domain/utils/entity_visitor.hpp"
+#include "utils/entity.hpp"
 #include "i_conflict_origin.hpp"
+
+namespace domain {
 
 class IConflictSolution;
 //class MeshlinePolicy;
@@ -40,3 +43,5 @@ public:
 	virtual void print() const = 0;
 #endif // DEBUG
 };
+
+} // namespace domain

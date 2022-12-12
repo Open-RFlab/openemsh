@@ -16,11 +16,14 @@
 //#include "point.hpp"
 #include "domain/conflicts/i_conflict_origin.hpp"
 #include "domain/mesh/i_meshline_origin.hpp"
-#include "utils/entity.hpp"
+#include "domain/utils/entity_visitor.hpp"
 #include "domain/global.hpp"
+#include "utils/entity.hpp"
 #include "bounding.hpp"
 #include "relation.hpp"
 #include "space.hpp"
+
+namespace domain {
 
 class Conflict;
 class Edge;
@@ -80,3 +83,5 @@ Bounding2D detect_bounding(std::vector<std::unique_ptr<Point const>> const& poin
 
 //******************************************************************************
 std::vector<std::unique_ptr<Edge>> detect_edges(std::vector<std::unique_ptr<Point const>> const& points, Plane plane);
+
+} // namespace domain

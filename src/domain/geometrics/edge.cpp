@@ -17,11 +17,13 @@
 
 #include "edge.hpp"
 
+namespace domain {
+
 using namespace std;
 
 //******************************************************************************
 Edge::Edge(Plane const plane, Point const* p0, Point const* p1)
-: Segment(::axis(*p0, *p1))
+: Segment(domain::axis(*p0, *p1))
 , IMeshLineOrigin()
 , _p0(p0)
 , _p1(p1)
@@ -86,3 +88,5 @@ void Edge::print() const {
 	}
 }
 #endif // DEBUG
+
+} // namespace domain

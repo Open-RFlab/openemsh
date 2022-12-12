@@ -16,6 +16,8 @@
 /// @test std::optional<Axis> transpose(Plane const plane, Segment::Axis const axis) noexcept
 ///*****************************************************************************
 
+using namespace domain;
+
 //******************************************************************************
 SCENARIO("Segment::Axis axis(Point const& vector)", "[segment]") {
 	GIVEN("A point describing a vertical vector") {

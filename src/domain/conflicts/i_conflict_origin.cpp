@@ -10,6 +10,8 @@
 
 #include "i_conflict_origin.hpp"
 
+namespace domain {
+
 using namespace std;
 
 //******************************************************************************
@@ -29,7 +31,9 @@ ConflictEdgeInPolygon* IConflictOrigin::look_for_conflict_edge_in_polygon() {
 //		if(conflict->kind == Conflict::Kind::EDGE_IN_POLYGON)
 //		if(typeid(conflict) == typeid(ConflictEdgeInPolygon))
 //			return dynamic_cast<ConflictEdgeInPolygon*>(conflict);
-		if(auto c = dynamic_cast<ConflictEdgeInPolygon*>(conflict)) 
+		if(auto c = dynamic_cast<ConflictEdgeInPolygon*>(conflict))
 			return c;
 	return nullptr;
 }
+
+} // namespace domain

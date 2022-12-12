@@ -13,6 +13,7 @@
 #include "infra/serializers/serializer_to_plantuml.hpp"
 #include "infra/serializers/serializer_to_prettyprint.hpp"
 
+using namespace domain;
 using namespace std;
 
 //******************************************************************************

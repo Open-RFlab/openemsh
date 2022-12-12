@@ -6,6 +6,8 @@
 
 #pragma once
 
+namespace domain {
+
 /// Normal vector to the edge "from the inner side to the outer side"
 /// of the polygon.
 ///*****************************************************************************
@@ -18,3 +20,5 @@ enum class Normal {
 	ZMAX,
 	NONE
 };
+
+} // namespace domain

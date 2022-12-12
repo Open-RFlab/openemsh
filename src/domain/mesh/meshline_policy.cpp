@@ -10,6 +10,8 @@
 
 #include "meshline_policy.hpp"
 
+namespace domain {
+
 using namespace std;
 
 //******************************************************************************
@@ -65,3 +67,5 @@ MeshlinePolicy::Normal cast(Normal const normal) noexcept {
 		unreachable();
 	}
 }
+
+} // namespace domain

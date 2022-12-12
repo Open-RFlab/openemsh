@@ -17,11 +17,14 @@
 #include "geometrics/polygon.hpp"
 #include "geometrics/space.hpp"
 #include "utils/entity.hpp"
+#include "utils/entity_visitor.hpp"
 #include "conflict_manager.hpp"
 #include "global.hpp"
 #include "meshline_policy_manager.hpp"
 //#include "meshline_policy.hpp"
 //#include "range.hpp"
+
+namespace domain {
 
 #ifdef UNITTEST
 #define private public
@@ -90,3 +93,5 @@ public:
 #undef private
 void sort_points_by_vector_orientation(std::vector<Point>& points, Point const& vector);
 #endif // UNITTEST
+
+} // namespace domain

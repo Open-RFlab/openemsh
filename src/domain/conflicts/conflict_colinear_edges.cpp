@@ -7,10 +7,11 @@
 #include "domain/geometrics/edge.hpp"
 #include "domain/mesh/meshline_policy.hpp"
 #include "domain/meshline_policy_manager.hpp"
-#include "utils/entity.hpp"
 #include "utils/unreachable.hpp"
 
 #include "conflict_colinear_edges.hpp"
+
+namespace domain {
 
 using namespace std;
 
@@ -51,7 +52,7 @@ void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manage
 		}
 	}
 
-	optional<Coord> const coord = ::coord(edges.front()->p0(), edges.front()->axis);
+	optional<Coord> const coord = domain::coord(edges.front()->p0(), edges.front()->axis);
 
 	if(coord) {
 		if(normal_min && normal_max) {
@@ -84,3 +85,5 @@ void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manage
 		}
 	}
 }
+
+} // namespace domain

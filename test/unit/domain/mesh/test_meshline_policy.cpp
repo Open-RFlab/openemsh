@@ -15,6 +15,8 @@
 /// @test MeshlinePolicy::Normal cast(Normal const normal) noexcept
 ///*****************************************************************************
 
+using namespace domain;
+
 //******************************************************************************
 SCENARIO("std::optional<Coord> coord(Point const& point, Segment::Axis const axis) noexcept", "[meshline_policy]") {
 	GIVEN("A Point and a Segment::Axis enum class") {

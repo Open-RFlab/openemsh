@@ -16,6 +16,8 @@
 #include "conflicts/conflict_too_close_meshline_policies.hpp"
 #include "geometrics/space.hpp"
 
+namespace domain {
+
 class Edge;
 class MeshlinePolicyManager;
 class MeshlinePolicy;
@@ -59,3 +61,5 @@ public:
 #ifdef UNITTEST
 #undef private
 #endif // UNITTEST
+
+} // namespace domain
