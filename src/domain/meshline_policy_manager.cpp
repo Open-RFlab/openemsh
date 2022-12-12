@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <limits>
 
-#include "domain/geometrics/types.hpp"
+#include "domain/geometrics/normal.hpp"
 #include "utils/unreachable.hpp"
 #include "utils/vector_utils.hpp"
 #include "conflict_manager.hpp"

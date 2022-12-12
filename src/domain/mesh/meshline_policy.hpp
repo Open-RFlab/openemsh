@@ -15,7 +15,7 @@
 #include "domain/conflicts/i_conflict_solution.hpp"
 #include "domain/geometrics/coord.hpp"
 #include "domain/geometrics/segment.hpp"
-#include "domain/geometrics/types.hpp"
+#include "domain/geometrics/normal.hpp"
 #include "domain/geometrics/space.hpp"
 #include "domain/utils/entity_visitor.hpp"
 #include "domain/global.hpp"
