@@ -8,6 +8,8 @@
 
 #include <vector>
 
+namespace domain {
+
 class Conflict;
 class ConflictColinearEdges;
 class ConflictEdgeInPolygon;
@@ -22,3 +24,5 @@ public:
 	std::vector<ConflictColinearEdges*> look_for_conflict_colinear_edges();
 	ConflictEdgeInPolygon* look_for_conflict_edge_in_polygon();
 };
+
+} // namespace domain

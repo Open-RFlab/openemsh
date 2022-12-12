@@ -9,10 +9,10 @@
 #include <filesystem>
 #include <string>
 
-#include "utils/entity.hpp"
+#include "domain/utils/entity_visitor.hpp"
 
 //******************************************************************************
-class SerializerToCsx final : public EntityVisitor {
+class SerializerToCsx final : public domain::EntityVisitor {
 public:
 	struct Params {
 //		bool does_overwrite = false;
@@ -25,19 +25,19 @@ public:
 	};
 
 	static void run(
-		Board& board,
+		domain::Board& board,
 		std::filesystem::path const& input,
 		std::filesystem::path const& output);
 	static void run(
-		Board& board,
+		domain::Board& board,
 		std::filesystem::path const& input,
 		std::filesystem::path const& output,
 		Params params);
 
 private:
-	friend class Board;
+	friend class domain::Board;
 
-	void visit(Board& board) override;
+	void visit(domain::Board& board) override;
 
 	SerializerToCsx(
 		std::filesystem::path const& input,

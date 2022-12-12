@@ -11,6 +11,8 @@
 #include "domain/geometrics/space.hpp"
 #include "conflict.hpp"
 
+namespace domain {
+
 //******************************************************************************
 class ConflictTooCloseMeshlinePolicies
 : public Conflict
@@ -23,3 +25,5 @@ public:
 
 	void auto_solve(MeshlinePolicyManager& line_policy_manager) override;
 };
+
+} // namespace domain

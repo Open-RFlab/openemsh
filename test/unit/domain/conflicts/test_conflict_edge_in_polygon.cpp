@@ -17,6 +17,8 @@
 /// @test void ConflictEdgeInPolygon::auto_solve(MeshlinePolicyManager&)
 ///*****************************************************************************
 
+using namespace domain;
+
 //******************************************************************************
 SCENARIO("void sort_overlaps_by_p0_by_vector_orientation(vector<Overlap>& overlaps, Point const& vector)", "[conflict_edge_in_polygon]") {
 	GIVEN("Unordered colinear overlaps in (+, 0) direction") {

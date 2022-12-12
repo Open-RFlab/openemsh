@@ -25,6 +25,8 @@
 /// @test void Board::detect_non_conflicting_edges()
 ///*****************************************************************************
 
+using namespace domain;
+
 //******************************************************************************
 SCENARIO("void sort_points_by_vector_orientation(std::vector<Point>& points, Point const& vector)", "[board]") {
 	GIVEN("Unordered colinear points in (+, 0) direction") {

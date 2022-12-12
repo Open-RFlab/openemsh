@@ -8,6 +8,7 @@
 
 #include "to_string.hpp"
 
+using namespace domain;
 using namespace std;
 
 //******************************************************************************

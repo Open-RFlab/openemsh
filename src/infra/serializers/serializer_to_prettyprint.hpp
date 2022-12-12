@@ -8,33 +8,25 @@
 
 #include <string>
 
-#include "utils/entity.hpp"
+#include "domain/utils/entity_visitor.hpp"
 
 //******************************************************************************
-class SerializerToPrettyprint : public EntityVisitor {
+class SerializerToPrettyprint final : public domain::EntityVisitor {
 public:
-	static std::string run(Board& board);
+	static std::string run(domain::Board& board);
 
 private:
-	friend class Board;
-	friend class Edge;
-	friend class Polygon;
-	friend class ConflictColinearEdges;
-	friend class ConflictEdgeInPolygon;
-	friend class ConflictTooCloseMeshlinePolicies;
-	friend class MeshlinePolicy;
-	friend class Interval;
-	friend class Meshline;
+	friend class domain::Board;
+	friend class domain::Edge;
+	friend class domain::Polygon;
+	friend class domain::ConflictColinearEdges;
+	friend class domain::ConflictEdgeInPolygon;
 
-	void visit(Board& board) override;
-	void visit(Edge& edge) override;
-	void visit(Polygon& polygon) override;
-	void visit(ConflictColinearEdges& conflict) override;
-	void visit(ConflictEdgeInPolygon& conflict) override;
-	void visit(ConflictTooCloseMeshlinePolicies& conflict) override;
-	void visit(MeshlinePolicy& policy) override;
-	void visit(Interval& interval) override;
-	void visit(Meshline& meshline) override {}
+	void visit(domain::Board& board) override;
+	void visit(domain::Edge& edge) override;
+	void visit(domain::Polygon& polygon) override;
+	void visit(domain::ConflictColinearEdges& conflict) override;
+	void visit(domain::ConflictEdgeInPolygon& conflict) override;
 	std::string dump();
 
 	std::string out;

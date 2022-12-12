@@ -29,6 +29,8 @@
 /// @test void MeshlinePolicyManager::mesh()
 ///*****************************************************************************
 
+using namespace domain;
+
 //******************************************************************************
 SCENARIO("MeshlinePolicy* MeshlinePolicyManager::add_meshline_policy( \
 IMeshLineOrigin* origin, \

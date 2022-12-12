@@ -14,6 +14,8 @@
 
 #include "polygon.hpp"
 
+namespace domain {
+
 using namespace std;
 
 //******************************************************************************
@@ -204,3 +206,5 @@ void Polygon::print() const {
 	}
 }
 #endif // DEBUG
+
+} // namespace domain

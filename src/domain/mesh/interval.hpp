@@ -14,8 +14,11 @@
 
 #include "domain/geometrics/coord.hpp"
 #include "domain/geometrics/space.hpp"
+#include "domain/utils/entity_visitor.hpp"
 #include "domain/global.hpp"
 #include "utils/entity.hpp"
+
+namespace domain {
 
 class Meshline;
 class MeshlinePolicy;
@@ -85,3 +88,5 @@ std::vector<Coord> find_ls(double d, double lambda, double dmax, Coord s);
 
 //******************************************************************************
 bool is_ls_valid_for_dmax_lmin_lambda(std::vector<Coord> ls, double d, double lambda, double dmax, size_t lmin);
+
+} // namespace domain

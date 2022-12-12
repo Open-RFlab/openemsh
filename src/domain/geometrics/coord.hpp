@@ -6,6 +6,8 @@
 
 #pragma once
 
+namespace domain {
+
 //******************************************************************************
 class Coord {
 private:
@@ -93,3 +95,5 @@ Coord mid(Coord const& a, Coord const& b) noexcept;
 
 //******************************************************************************
 Coord distance(Coord const& a, Coord const& b) noexcept;
+
+} // namespace domain

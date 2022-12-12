@@ -14,6 +14,8 @@
 
 #include "meshline_policy_manager.hpp"
 
+namespace domain {
+
 using namespace std;
 
 //******************************************************************************
@@ -178,3 +180,5 @@ vector<unique_ptr<MeshlinePolicy>> const& MeshlinePolicyManager::get_meshline_po
 vector<unique_ptr<Interval>> const& MeshlinePolicyManager::get_intervals(Axis axis) const {
 	return intervals[axis];
 }
+
+} // namespace domain

@@ -16,6 +16,8 @@
 #include "mesh/meshline.hpp"
 #include "mesh/meshline_policy.hpp"
 
+namespace domain {
+
 class ConflictManager;
 
 #ifdef UNITTEST
@@ -65,3 +67,5 @@ public:
 std::optional<std::array<MeshlinePolicy*, 2>> detect_closest_meshline_policies(
 	std::vector<MeshlinePolicy*> dimension,
 	Coord proximity_limit);
+
+} // namespace domain

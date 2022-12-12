@@ -6,6 +6,8 @@
 
 #pragma once
 
+namespace domain {
+
 //******************************************************************************
 struct Params {
 	double metal_res;
@@ -17,3 +19,5 @@ struct Params {
 };
 
 inline double equality_tolerance = 1e-8;
+
+} // namespace domain

@@ -14,6 +14,8 @@
 /// @test std::optional<Range> merge(Segment const* a, Segment const* b)
 ///*****************************************************************************
 
+using namespace domain;
+
 //******************************************************************************
 SCENARIO("Bounding2D bounding(Segment const& a)", "[range][segment]") {
 	GIVEN("An horizontal range") {

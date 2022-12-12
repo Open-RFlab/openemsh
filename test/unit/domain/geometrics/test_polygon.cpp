@@ -20,6 +20,8 @@
 /// @test relation::PolygonPoint Polygon::relation_to(Point const* point) const
 ///*****************************************************************************
 
+using namespace domain;
+
 //******************************************************************************
 SCENARIO("Bounding2D detect_bounding(std::vector<std::unique_ptr<Point const>> const& points) noexcept", "[polygon]") {
 	GIVEN("A random polygon") {

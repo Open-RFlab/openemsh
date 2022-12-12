@@ -16,6 +16,7 @@
 #include "domain/conflicts/i_conflict_origin.hpp"
 #include "domain/conflicts/i_conflict_solution.hpp"
 #include "domain/mesh/i_meshline_origin.hpp"
+#include "domain/utils/entity_visitor.hpp"
 #include "utils/entity.hpp"
 #include "bounding.hpp"
 #include "range.hpp"
@@ -23,6 +24,8 @@
 #include "segment.hpp"
 #include "space.hpp"
 #include "types.hpp"
+
+namespace domain {
 
 class Conflict;
 class Point;
@@ -90,3 +93,5 @@ std::optional<Range> merge(Edge const& a, Edge const& b) = delete;
 //******************************************************************************
 bool operator==(Range const& a, Edge const& b) noexcept;
 bool operator==(Edge const& a, Range const& b) noexcept;
+
+} // namespace domain

@@ -8,6 +8,7 @@
 
 #include "relation.hpp"
 
+namespace domain {
 namespace relation {
 
 //******************************************************************************
@@ -48,4 +49,5 @@ void toggle(PolygonPoint& a) {
 	}
 }
 
-}; // namespace relation
+} // namespace relation
+} // namespace domain

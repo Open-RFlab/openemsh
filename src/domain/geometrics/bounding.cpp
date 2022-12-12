@@ -6,6 +6,8 @@
 
 #include "bounding.hpp"
 
+namespace domain {
+
 /// Check if two bounding boxes overlap or just touch each other.
 ///*****************************************************************************
 bool does_overlap(Bounding2D const& a, Bounding2D const& b) noexcept {
@@ -18,3 +20,5 @@ bool does_overlap(Bounding2D const& a, Bounding2D const& b) noexcept {
 	    || (a[YMIN] >= b[YMIN] && a[YMIN] <= b[YMAX])
 	    || (a[YMAX] >= b[YMIN] && a[YMAX] <= b[YMAX]));
 }
+
+} // namespace domain
