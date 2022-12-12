@@ -23,7 +23,7 @@
 #include "relation.hpp"
 #include "segment.hpp"
 #include "space.hpp"
-#include "types.hpp"
+#include "normal.hpp"
 
 namespace domain {
 
