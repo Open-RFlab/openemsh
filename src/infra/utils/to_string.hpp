@@ -9,7 +9,7 @@
 #include "domain/geometrics/edge.hpp"
 #include "domain/geometrics/polygon.hpp"
 #include "domain/geometrics/space.hpp"
-#include "domain/geometrics/types.hpp"
+#include "domain/geometrics/normal.hpp"
 #include "domain/mesh/meshline_policy.hpp"
 #include "domain/meshline_policy_manager.hpp"
 
