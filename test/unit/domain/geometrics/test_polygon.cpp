@@ -17,7 +17,7 @@
 /// @test std::vector<std::unique_ptr<Edge>> detect_edges(std::vector<std::unique_ptr<Point const>> const& points, Plane plane)
 /// @test template<class T> Polygon::Rotation detect_rotation(T& points) noexcept
 /// @test void Polygon::detect_edge_normal() noexcept
-/// @test relation::PolygonPoint Polygon::relation_to(Point const* point) const
+/// @test relation::PolygonPoint Polygon::relation_to(Point const* point) const noexcept
 ///*****************************************************************************
 
 using namespace domain;
@@ -192,7 +192,7 @@ SCENARIO("void Polygon::detect_edge_normal() noexcept", "[polygon]") {
 }
 
 //******************************************************************************
-SCENARIO("relation::PolygonPoint Polygon::relation_to(Point const* point) const", "[polygon]") {
+SCENARIO("relation::PolygonPoint Polygon::relation_to(Point const* point) const noexcept", "[polygon]") {
 	GIVEN("A simple polygon") {
 		Polygon poly(XY, "", from_init_list<Point>({{ 1, 1 }, { 1, 3 }, { 3, 3 }, { 3, 1 }}));
 		WHEN("A point is inside the polygon") {

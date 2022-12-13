@@ -65,7 +65,7 @@ public:
 	Polygon(Plane plane, std::string const& name, std::vector<std::unique_ptr<Point const>>&& points);
 
 //	relation::PolygonEdge relation_to(Edge const* edge);
-	relation::PolygonPoint relation_to(Point const& point) const;
+	relation::PolygonPoint relation_to(Point const& point) const noexcept;
 
 #ifdef DEBUG
 	void print() const;

@@ -142,7 +142,7 @@ void Polygon::detect_edge_normal() noexcept {
 /// crossing relation with an edge will be faster with these ones. Then
 /// diagonals will be tried.
 ///*****************************************************************************
-relation::PolygonPoint Polygon::relation_to(Point const& point) const {
+relation::PolygonPoint Polygon::relation_to(Point const& point) const noexcept {
 	vector<Point> to_try({
 		{ bounding[XMIN] - 1, point.y },
 		{ bounding[XMAX] + 1, point.y },
