@@ -70,7 +70,7 @@ void sort_points_by_vector_orientation(vector<Point>& points, Point const& vecto
 
 //******************************************************************************
 unique_ptr<Board> Board::Builder::build() {
-	return make_unique<Board>(move(polygons));
+	return make_unique<Board>(std::move(polygons));
 }
 
 //******************************************************************************
@@ -80,7 +80,7 @@ void Board::Builder::add_polygon(Plane plane, string const& name, initializer_li
 
 //******************************************************************************
 void Board::Builder::add_polygon(Plane plane, string const& name, vector<unique_ptr<Point const>>&& points) {
-	polygons[plane].push_back(make_unique<Polygon>(plane, name, move(points)));
+	polygons[plane].push_back(make_unique<Polygon>(plane, name, std::move(points)));
 }
 
 //******************************************************************************
@@ -91,14 +91,14 @@ void Board::Builder::add_polygon_from_box(Plane plane, string const& name, Point
 	points[2] = make_unique<Point const>(p3.x, p3.y);
 	points[3] = make_unique<Point const>(p3.x, p1.y);
 
-	polygons[plane].push_back(make_unique<Polygon>(plane, name, move(points)));
+	polygons[plane].push_back(make_unique<Polygon>(plane, name, std::move(points)));
 }
 
 //******************************************************************************
 Board::Board(PlaneSpace<vector<unique_ptr<Polygon>>>&& polygons)
 : conflict_manager(&line_policy_manager)
 , line_policy_manager(params, &conflict_manager)
-, polygons(move(polygons)) {
+, polygons(std::move(polygons)) {
 	for(auto const& plane : AllPlane) {
 		for(auto const& polygon : this->polygons[plane])
 			for(auto const& edge : polygon->edges)
@@ -217,7 +217,7 @@ void Board::detect_edges_in_polygons(Plane const plane) {
 						if(is_already_there)
 							continue;
 
-						ranges.emplace_back(move(current_range));
+						ranges.emplace_back(std::move(current_range));
 					}
 
 					for(RangeBtwIntersections const& range : ranges) {
