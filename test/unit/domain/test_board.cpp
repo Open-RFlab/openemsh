@@ -141,7 +141,7 @@ SCENARIO("void Board::Builder::add_polygon(std::string const& name, std::initial
 		Board::Builder b;
 		REQUIRE(b.polygons[XY].empty());
 		WHEN("Adding a polygon as an initializer_list of Points") {
-			b.add_polygon(XY, "MS13", {
+			b.add_polygon(XY, Polygon::Type::SHAPE, "MS13", {
 				{ 70.3673, -42.8674 },
 				{ 62.1753, -42.8674 },
 				{ 62.1753, -43.9276 },
@@ -175,8 +175,8 @@ SCENARIO("void Board::Builder::add_polygon(std::string const& name, std::vector<
 				{ 66.2713, -43.9276 },
 				{ 66.2713, -43.9514 },
 				{ 70.3673, -43.9514 }}));
-			b.add_polygon(XY, "MS13", std::move(points));
-			b.add_polygon(XY, "MS15", from_init_list<Point>({
+			b.add_polygon(XY, Polygon::Type::SHAPE, "MS13", std::move(points));
+			b.add_polygon(XY, Polygon::Type::SHAPE, "MS15", from_init_list<Point>({
 				{ 70.3673, -42.8674 },
 				{ 62.1753, -42.8674 },
 				{ 62.1753, -43.9276 },
@@ -210,7 +210,7 @@ SCENARIO("void Board::Builder::add_polygon_from_box(std::string const& name, Poi
 		Board::Builder b;
 		REQUIRE(b.polygons[XY].empty());
 		WHEN("Adding a rectangle polygon as a box of opposite Points") {
-			b.add_polygon_from_box(XY, "MS1", { 16.1, -26.5 }, { 20.6, -26 });
+			b.add_polygon_from_box(XY, Polygon::Type::SHAPE, "MS1", { 16.1, -26.5 }, { 20.6, -26 });
 			THEN("Should add a Polygon in the inner vector") {
 				REQUIRE(b.polygons[XY].size() == 1);
 				REQUIRE(b.polygons[XY][0]->name == "MS1");
@@ -228,15 +228,15 @@ SCENARIO("std::unique_ptr<Board> Board::Builder::build()", "[board]") {
 	GIVEN("A Board Builder previously fed of polygons") {
 		Board::Builder b;
 		REQUIRE(b.polygons[XY].empty());
-		b.add_polygon_from_box(XY, "MS1", { 16.1, -26.5 }, { 20.6, -26 });
-		b.add_polygon(XY, "MS15", from_init_list<Point>({
+		b.add_polygon_from_box(XY, Polygon::Type::SHAPE, "MS1", { 16.1, -26.5 }, { 20.6, -26 });
+		b.add_polygon(XY, Polygon::Type::SHAPE, "MS15", from_init_list<Point>({
 			{ 70.3673, -42.8674 },
 			{ 62.1753, -42.8674 },
 			{ 62.1753, -43.9276 },
 			{ 66.2713, -43.9276 },
 			{ 66.2713, -43.9514 },
 			{ 70.3673, -43.9514 }}));
-		b.add_polygon(XY, "MS13", {
+		b.add_polygon(XY, Polygon::Type::SHAPE, "MS13", {
 			{ 70.3673, -42.8674 },
 			{ 62.1753, -42.8674 },
 			{ 62.1753, -43.9276 },
@@ -283,8 +283,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::unique_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }})));
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 2, 2 }, { 2, 3 }, { 3, 3 }, { 3, 2 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 2 }, { 2, 3 }, { 3, 3 }, { 3, 2 }})));
 				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_edges_in_polygons();
@@ -360,8 +360,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::unique_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 1, 2 }, { 3, 2 }, { 3, 4 }, { 1, 4 }})));
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 2, 1 }, { 4, 1 }, { 4, 3 }, { 2, 3 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 2 }, { 3, 2 }, { 3, 4 }, { 1, 4 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 1 }, { 4, 1 }, { 4, 3 }, { 2, 3 }})));
 				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_edges_in_polygons();
@@ -438,8 +438,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::unique_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }})));
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 3 }, { 2, 3 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 3 }, { 2, 3 }})));
 				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_edges_in_polygons();
@@ -516,8 +516,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::unique_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }})));
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 2, 3 }, { 3, 2 }, { 5, 4 }, { 4, 5 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 3 }, { 3, 2 }, { 5, 4 }, { 4, 5 }})));
 				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_edges_in_polygons();
@@ -607,8 +607,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::unique_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }})));
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }})));
 				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_edges_in_polygons();
@@ -660,8 +660,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::unique_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 1, 2 }, { 2, 2 }, { 2, 3 }, { 1, 3 }})));
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 2 }, { 2, 2 }, { 2, 3 }, { 1, 3 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }})));
 				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_edges_in_polygons();
@@ -674,8 +674,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::unique_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 2, 1 }})));
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }, { 4, 3 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 2, 1 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }, { 4, 3 }})));
 				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_edges_in_polygons();
@@ -690,9 +690,9 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::unique_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({
 					{ 1, 1 }, { 10, 1 }, { 10, 10 }, { 1, 10 }})));
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({
 					{ 11, 4 }, { 9, 3 }, { 13, 2 }, { 5, 2 },
 					{ 5, 11 }, { 4, 11.3 }, { 3, 10 }, { 2, 10 },
 					{ 2.3, 12 }, { 6, 11.3 }, { 6, 9 }, { 10, 10 },
@@ -827,9 +827,9 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::unique_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }})));
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 0.5, 3 }, { 2, 3 }, { 2, 4 }, { 0.5, 4 }})));
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 3, 5 }, { 2, 5 }, { 2, 6 }, { 3, 6 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 0.5, 3 }, { 2, 3 }, { 2, 4 }, { 0.5, 4 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 3, 5 }, { 2, 5 }, { 2, 6 }, { 3, 6 }})));
 				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_colinear_edges();
@@ -870,9 +870,9 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::unique_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }})));
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 3, 0.5 }, { 3, 2 }, { 4, 2 }, { 4, 0.5 }})));
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 5, 3 }, { 5, 2 }, { 6, 2 }, { 6, 3 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 3, 0.5 }, { 3, 2 }, { 4, 2 }, { 4, 0.5 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 5, 3 }, { 5, 2 }, { 6, 2 }, { 6, 3 }})));
 				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_colinear_edges();
@@ -913,9 +913,9 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::unique_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 1, 1 }, { 1, 2 }, { 2, 2 }})));
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }})));
-				tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 5, 5 }, { 5, 6 }, { 6, 6 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 1, 2 }, { 2, 2 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }})));
+				tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 5, 5 }, { 5, 6 }, { 6, 6 }})));
 				b = std::make_unique<Board>(std::move(tmp));
 			}
 			b->detect_colinear_edges();
@@ -934,8 +934,8 @@ SCENARIO("void Board::detect_non_conflicting_edges()", "[board]") {
 		std::unique_ptr<Board> b;
 		{
 			PlaneSpace<std::vector<std::unique_ptr<Polygon>>> tmp;
-			tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 1, 1 }, { 1, 2 }, { 2, 2 }})));
-			tmp[XY].push_back(std::make_unique<Polygon>(XY, "", from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }})));
+			tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 1, 2 }, { 2, 2 }})));
+			tmp[XY].push_back(std::make_unique<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }})));
 			b = std::make_unique<Board>(std::move(tmp));
 		}
 		REQUIRE(b->edges[XY].size() == 6);

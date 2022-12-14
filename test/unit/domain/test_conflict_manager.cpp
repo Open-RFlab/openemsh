@@ -255,10 +255,10 @@ SCENARIO("void ConflictManager::add_colinear_edges(Edge* a, Edge* b)", "[conflic
 SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const range, std::optional<Edge const*> b)", "[conflict_manager]") {
 	GIVEN("A conflict manager, an edge and some polygons") {
 		ConflictManager cm(nullptr);
-		Polygon p(XY, "", from_init_list<Point>({
+		Polygon p(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({
 			{ 3, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }, { 1, 3 },
 			{ 2, 3 }, { 2, 5 }, { 5, 5 }, { 5, 2 }, { 3, 2 }}));
-		Polygon q(XY, "", from_init_list<Point>({{ 0, 0 }, { 0, 8 }, { 8, 8 }, { 8, 0 }}));
+		Polygon q(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 0, 0 }, { 0, 8 }, { 8, 8 }, { 8, 0 }}));
 		WHEN("A vertical edge that is in a polygon is reported as partially in this polygon") {
 			Point a0(4, 1), a1(4, 7);
 			Edge a(XY, &a0, &a1);

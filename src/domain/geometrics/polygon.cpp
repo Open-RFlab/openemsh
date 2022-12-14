@@ -19,8 +19,9 @@ namespace domain {
 using namespace std;
 
 //******************************************************************************
-Polygon::Polygon(Plane const plane, string const& name, vector<unique_ptr<Point const>>&& points)
+Polygon::Polygon(Plane const plane, Type const type, string const& name, vector<unique_ptr<Point const>>&& points)
 : rotation(detect_rotation(points))
+, type(type)
 , plane(plane)
 , bounding(detect_bounding(points))
 , name(name)
