@@ -23,6 +23,8 @@ target_sources( openemsh
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/meshline_policy_manager.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflict_manager.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/board.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/infra/parsers/csxcad_layer/point_3d.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/infra/parsers/parser_from_csx.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/infra/serializers/serializer_to_csx.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/infra/serializers/serializer_to_plantuml.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/infra/serializers/serializer_to_prettyprint.cpp"
