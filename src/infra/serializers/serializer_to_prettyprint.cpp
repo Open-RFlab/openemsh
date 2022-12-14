@@ -155,5 +155,5 @@ void SerializerToPrettyprint::visit(ConflictEdgeInPolygon& conflict) {
 
 //******************************************************************************
 string SerializerToPrettyprint::dump() {
-	return move(out);
+	return std::move(out);
 }

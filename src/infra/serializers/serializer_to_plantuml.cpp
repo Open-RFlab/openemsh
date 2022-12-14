@@ -29,14 +29,14 @@ string SerializerToPlantuml::run(Board& board) {
 
 //******************************************************************************
 string SerializerToPlantuml::run(Board& board, Params params) {
-	SerializerToPlantuml serializer(move(params));
+	SerializerToPlantuml serializer(std::move(params));
 	board.accept(serializer);
 	return serializer.dump();
 }
 
 //******************************************************************************
 SerializerToPlantuml::SerializerToPlantuml(Params params)
-: params(move(params))
+: params(std::move(params))
 {}
 
 //******************************************************************************
@@ -248,5 +248,5 @@ void SerializerToPlantuml::visit(Meshline& meshline) {
 
 //******************************************************************************
 string SerializerToPlantuml::dump() {
-	return move(out);
+	return std::move(out);
 }

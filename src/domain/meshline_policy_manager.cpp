@@ -141,14 +141,14 @@ void MeshlinePolicyManager::mesh(Axis const axis) {
 		if(auto meshline = line_policy->mesh(); meshline) {
 			vector<unique_ptr<Meshline>> v;
 			v.push_back(make_unique<Meshline>(meshline.value()));
-			interval_meshlines.emplace_back(move(v));
+			interval_meshlines.emplace_back(std::move(v));
 			++new_size;
 		}
 	}
 
 	meshlines[axis].reserve(new_size);
 	for(auto& it : interval_meshlines) {
-		move(begin(it), end(it), back_inserter(meshlines[axis]));
+		std::move(begin(it), end(it), back_inserter(meshlines[axis]));
 	}
 
 	sort(begin(meshlines[axis]), end(meshlines[axis]),

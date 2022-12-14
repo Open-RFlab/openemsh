@@ -24,7 +24,7 @@ Polygon::Polygon(Plane const plane, string const& name, vector<unique_ptr<Point 
 , plane(plane)
 , bounding(detect_bounding(points))
 , name(name)
-, points(move(points))
+, points(std::move(points))
 , edges(detect_edges(this->points, plane))
 {
 	detect_edge_normal();
