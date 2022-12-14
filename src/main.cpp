@@ -10,11 +10,15 @@
 #include <fstream>
 
 #include "domain/board.hpp"
+#include "infra/parsers/parser_from_csx.hpp"
+#include "infra/serializers/serializer_to_csx.hpp"
 #include "infra/serializers/serializer_to_plantuml.hpp"
 #include "infra/serializers/serializer_to_prettyprint.hpp"
+#include "ui/cli.hpp"
 
 using namespace domain;
 using namespace std;
+using namespace ui;
 
 //******************************************************************************
 void print(vector<unique_ptr<Meshline>> const& mesh_x, vector<unique_ptr<Meshline>> const& mesh_y) {
@@ -38,6 +42,10 @@ void print(vector<unique_ptr<Meshline>> const& mesh_x, vector<unique_ptr<Meshlin
 
 //******************************************************************************
 int main(int argc, char* argv[]) {
+	optional<CliParams> const params = cli(argc, argv);
+	if(!params)
+		return 1;
+
 	if(argc != 3)
 		return 1;
 

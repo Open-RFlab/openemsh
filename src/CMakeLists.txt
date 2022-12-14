@@ -29,6 +29,7 @@ target_sources( openemsh
 	"${CMAKE_CURRENT_SOURCE_DIR}/infra/serializers/serializer_to_plantuml.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/infra/serializers/serializer_to_prettyprint.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/infra/utils/to_string.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/cli.cpp"
 	)
 
 target_compile_definitions( openemsh
@@ -56,6 +57,7 @@ target_include_directories( openemsh
 	)
 
 target_link_libraries( openemsh
+	CLI11::CLI11
 	pugixml::shared
 	)
 
