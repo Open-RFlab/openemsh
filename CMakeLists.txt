@@ -24,7 +24,7 @@ set( CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
 	)
 #]]
 
-option( CPM_DISABLE "Don't use CPM to retrieve dependencies" OFF )
+option( CPM_DISABLE "Don't use CPM to retrieve dependencies" "$ENV{CPM_DISABLE}" )
 
 if( NOT CPM_DISABLE )
 	message( STATUS "Downloading dependencies with CPM" )
