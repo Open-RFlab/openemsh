@@ -53,11 +53,15 @@ public:
 
 	private:
 		PlaneSpace<std::vector<std::unique_ptr<Polygon>>> polygons;
+		AxisSpace<std::vector<std::unique_ptr<MeshlinePolicy>>> line_policies;
 	};
 
 	Params params;
 
 	explicit Board(PlaneSpace<std::vector<std::unique_ptr<Polygon>>>&& polygons);
+	Board(
+		PlaneSpace<std::vector<std::unique_ptr<Polygon>>>&& polygons,
+		AxisSpace<std::vector<std::unique_ptr<MeshlinePolicy>>>&& line_policies);
 
 	/// Mesh resolution independant detection tasks
 	///*************************************************************************

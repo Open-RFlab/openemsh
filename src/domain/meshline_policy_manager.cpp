@@ -25,6 +25,16 @@ MeshlinePolicyManager::MeshlinePolicyManager(Params& params, ConflictManager* co
 {}
 
 //******************************************************************************
+MeshlinePolicyManager::MeshlinePolicyManager(
+	Params& params,
+	ConflictManager* conflict_manager,
+	AxisSpace<std::vector<std::unique_ptr<MeshlinePolicy>>>&& line_policies)
+: params(params)
+, conflict_manager(conflict_manager)
+, line_policies(std::move(line_policies))
+{}
+
+//******************************************************************************
 MeshlinePolicy* MeshlinePolicyManager::add_meshline_policy(
 		IMeshLineOrigin* origin,
 		Axis const axis,

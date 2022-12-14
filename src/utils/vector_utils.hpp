@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <initializer_list>
 #include <memory>
 #include <vector>
@@ -32,4 +33,17 @@ std::vector<std::unique_ptr<T const>> from_init_list(std::initializer_list<T> co
 
 	out.shrink_to_fit();
 	return out;
+}
+
+//******************************************************************************
+template<typename T>
+bool contains(std::vector<T> const& vector, T const& value) noexcept {
+	return std::find(std::begin(vector), std::end(vector), value) != std::end(vector);
+}
+
+//******************************************************************************
+template<typename T, typename P>
+bool contains_that(std::vector<T> const& vector, P&& predicate) noexcept {
+	return std::find_if(std::begin(vector), std::end(vector), std::forward<decltype(predicate)>(predicate))
+	    != std::end(vector);
 }

@@ -36,6 +36,10 @@ private:
 
 public:
 	MeshlinePolicyManager(Params& params, ConflictManager* conflict_manager);
+	MeshlinePolicyManager(
+		Params& params,
+		ConflictManager* conflict_manager,
+		AxisSpace<std::vector<std::unique_ptr<MeshlinePolicy>>>&& line_policies);
 
 	MeshlinePolicy* add_meshline_policy(
 		IMeshLineOrigin* origin,
