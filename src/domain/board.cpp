@@ -70,7 +70,26 @@ void sort_points_by_vector_orientation(vector<Point>& points, Point const& vecto
 
 //******************************************************************************
 unique_ptr<Board> Board::Builder::build() {
-	return make_unique<Board>(std::move(polygons));
+	return make_unique<Board>(std::move(polygons), std::move(line_policies));
+}
+
+// TODO should be in meshline manager?
+//******************************************************************************
+void Board::Builder::add_fixed_meshline_policy(Axis const axis, Coord const coord) {
+	if(!contains_that(line_policies[axis],
+		[&coord](unique_ptr<MeshlinePolicy> const& policy) {
+			if(policy->policy == MeshlinePolicy::Policy::ONELINE
+			&& policy->normal == MeshlinePolicy::Normal::NONE
+			&& policy->coord == coord)
+				return true;
+			return false;
+		}))
+			line_policies[axis].emplace_back(make_unique<MeshlinePolicy>(
+				axis,
+				MeshlinePolicy::Policy::ONELINE,
+				MeshlinePolicy::Normal::NONE,
+				params,
+				coord));
 }
 
 //******************************************************************************
@@ -98,6 +117,23 @@ void Board::Builder::add_polygon_from_box(Plane const plane, Polygon::Type const
 Board::Board(PlaneSpace<vector<unique_ptr<Polygon>>>&& polygons)
 : conflict_manager(&line_policy_manager)
 , line_policy_manager(params, &conflict_manager)
+, polygons(std::move(polygons)) {
+	for(auto const& plane : AllPlane) {
+		for(auto const& polygon : this->polygons[plane])
+			for(auto const& edge : polygon->edges)
+				edges[plane].push_back(edge.get());
+
+		this->polygons[plane].shrink_to_fit();
+		edges[plane].shrink_to_fit();
+	}
+}
+
+//******************************************************************************
+Board::Board(
+	PlaneSpace<std::vector<std::unique_ptr<Polygon>>>&& polygons,
+	AxisSpace<std::vector<std::unique_ptr<MeshlinePolicy>>>&& line_policies)
+: conflict_manager(&line_policy_manager)
+, line_policy_manager(params, &conflict_manager, std::move(line_policies))
 , polygons(std::move(polygons)) {
 	for(auto const& plane : AllPlane) {
 		for(auto const& polygon : this->polygons[plane])
