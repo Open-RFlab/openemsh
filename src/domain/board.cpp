@@ -110,7 +110,7 @@ void Board::Builder::add_polygon_from_box(Plane const plane, Polygon::Type const
 	points[2] = make_unique<Point const>(p3.x, p3.y);
 	points[3] = make_unique<Point const>(p3.x, p1.y);
 
-	polygons[plane].push_back(make_unique<Polygon>(plane, name, std::move(points)));
+	polygons[plane].push_back(make_unique<Polygon>(plane, type, name, std::move(points)));
 }
 
 //******************************************************************************
