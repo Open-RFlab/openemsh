@@ -26,6 +26,7 @@ stdenv.mkDerivation {
   ];
 
   buildInputs = [
+    cli11
     (pugixml.override { shared = true; })
   ];
 
