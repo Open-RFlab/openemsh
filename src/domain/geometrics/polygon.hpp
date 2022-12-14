@@ -48,8 +48,10 @@ public:
 
 	enum class Type {
 		SHAPE,
-		PORT
-	} type; // TODO usefull?
+		PORT,
+		GROUND,
+		SUBSTRATE
+	} const type;
 
 	Plane const plane;
 	Bounding2D const bounding;
@@ -62,7 +64,7 @@ public:
 	///*************************************************************************
 	std::vector<std::unique_ptr<Edge>> const edges;
 
-	Polygon(Plane plane, std::string const& name, std::vector<std::unique_ptr<Point const>>&& points);
+	Polygon(Plane plane, Type type, std::string const& name, std::vector<std::unique_ptr<Point const>>&& points);
 
 //	relation::PolygonEdge relation_to(Edge const* edge);
 	relation::PolygonPoint relation_to(Point const& point) const noexcept;
