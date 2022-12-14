@@ -51,11 +51,11 @@ const& original)", "[utils][vector_utils]") {
 SCENARIO("template<typename T> std::vector<std::unique_ptr<T const>> from_init_list( \
 std::initializer_list<T> const& original)", "[vector_utils]") {
 	GIVEN("An initializer list of strings") {
-		std::initializer_list<std::string> a({
+		std::initializer_list<std::string> a {
 				std::string("aa"),
 				std::string("b"),
 				std::string("333"),
-				std::string("dd") });
+				std::string("dd") };
 
 		THEN("Should return an equivalent vector of unique_ptr to const strings") {
 		std::vector<std::unique_ptr<std::string const>> b = from_init_list(a);

@@ -43,13 +43,13 @@ void SerializerToCsx::run(
 		filesystem::path const& output,
 		Params params) {
 
-	SerializerToCsx serializer(input, output, move(params));
+	SerializerToCsx serializer(input, output, std::move(params));
 	board.accept(serializer);
 }
 
 //******************************************************************************
 SerializerToCsx::SerializerToCsx(filesystem::path const& input, filesystem::path const& output, Params params)
-: params(move(params))
+: params(std::move(params))
 , input(input)
 , output(output)
 {}
