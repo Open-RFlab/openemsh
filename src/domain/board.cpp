@@ -74,17 +74,17 @@ unique_ptr<Board> Board::Builder::build() {
 }
 
 //******************************************************************************
-void Board::Builder::add_polygon(Plane plane, string const& name, initializer_list<Point> points) {
-	polygons[plane].push_back(make_unique<Polygon>(plane, name, from_init_list(points)));
+void Board::Builder::add_polygon(Plane const plane, Polygon::Type const type, string const& name, initializer_list<Point> points) {
+	polygons[plane].push_back(make_unique<Polygon>(plane, type, name, from_init_list(points)));
 }
 
 //******************************************************************************
-void Board::Builder::add_polygon(Plane plane, string const& name, vector<unique_ptr<Point const>>&& points) {
-	polygons[plane].push_back(make_unique<Polygon>(plane, name, std::move(points)));
+void Board::Builder::add_polygon(Plane const plane, Polygon::Type const type, string const& name, vector<unique_ptr<Point const>>&& points) {
+	polygons[plane].push_back(make_unique<Polygon>(plane, type, name, std::move(points)));
 }
 
 //******************************************************************************
-void Board::Builder::add_polygon_from_box(Plane plane, string const& name, Point const p1, Point const p3) {
+void Board::Builder::add_polygon_from_box(Plane const plane, Polygon::Type const type, string const& name, Point const p1, Point const p3) {
 	vector<unique_ptr<Point const>> points(4);
 	points[0] = make_unique<Point const>(p1.x, p1.y);
 	points[1] = make_unique<Point const>(p1.x, p3.y);
