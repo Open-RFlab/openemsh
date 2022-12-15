@@ -45,10 +45,6 @@ public:
 	void append(Polygon const* polygon, Range const range, std::optional<Edge const*> edge);
 
 	void auto_solve(MeshlinePolicyManager& line_policy_manager) override;
-
-#ifdef DEBUG
-	void print() const override;
-#endif // DEBUG
 };
 
 #ifdef UNITTEST

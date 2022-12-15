@@ -6,9 +6,6 @@
 
 #include "domain/geometrics/segment.hpp"
 #include "domain/geometrics/space.hpp"
-#ifdef DEBUG
-#include <iostream>
-#endif // DEBUG
 
 #include <algorithm>
 
@@ -106,32 +103,5 @@ void ConflictEdgeInPolygon::auto_solve(MeshlinePolicyManager& /*line_policy_mana
 	solution = edge;
 	is_solved = true;
 }
-
-#ifdef DEBUG
-//******************************************************************************
-void ConflictEdgeInPolygon::print() const {
-	cout << "ConflictEdgeInPolygon :" << endl;
-	if(edge) {
-		cout << "edge : " << edge << endl;
-		edge->print();
-	} else {
-		cout << "edge : nullptr" << endl;
-	}
-	cout << "overlaps : " << overlaps.size() << endl;
-	for(auto const& overlap : overlaps) {
-		cout << "overlap :" << endl;
-		cout << "polygon : " << get<POLYGON>(overlap) << endl;
-//		get<POLYGON>(overlap)->print();
-//		cout << "range :" << endl;
-		get<RANGE>(overlap).print();
-		if(get<EDGE>(overlap).has_value()) {
-			cout << "optedge : " << get<EDGE>(overlap).value() << endl;
-			get<EDGE>(overlap).value()->print();
-		} else {
-			cout << "optedge : nullopt" << endl;
-		}
-	}
-}
-#endif // DEBUG
 
 } // namespace domain
