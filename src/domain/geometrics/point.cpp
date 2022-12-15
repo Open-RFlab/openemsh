@@ -8,8 +8,6 @@
 
 namespace domain {
 
-using namespace std;
-
 //******************************************************************************
 Point::Point(Coord x, Coord y) noexcept
 : x(x)

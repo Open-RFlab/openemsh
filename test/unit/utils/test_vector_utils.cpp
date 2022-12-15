@@ -12,9 +12,15 @@
 #include "utils/vector_utils.hpp"
 
 /// @test template<typename T> std::vector<T*> create_view(
-///       	std::vector<std::unique_ptr<T>> const& original)
+///       	std::vector<std::unique_ptr<T>> const& original) noexcept
 /// @test template<typename T> std::vector<std::unique_ptr<T const>> from_init_list(
-///       	std::initializer_list<T> const& original)
+///       	std::initializer_list<T> const& original) noexcept
+/// @test template<typename T> bool contains(
+///       	std::vector<T> const& vector,
+//        	T const& value) noexcept
+/// @test template<typename T, typename P> bool contains_that(
+///       	std::vector<T> const& vector,
+///       	P&& predicate) noexcept
 ///*****************************************************************************
 
 //******************************************************************************
@@ -64,6 +70,58 @@ std::initializer_list<T> const& original)", "[vector_utils]") {
 			; it.first != end(a)
 			; ++it.first, ++it.second) {
 				REQUIRE(*(it.second->get()) == *it.first);
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("template<typename T> bool contains(std::vector<T> const& vector, T const& value) noexcept", "[vector_utils]") {
+	GIVEN("A vector of strings") {
+		std::vector<std::string> a;
+		a.emplace_back("aa");
+		a.emplace_back("b");
+		a.emplace_back("333");
+		a.emplace_back("dd");
+		WHEN("Looking for a string that is in the vector") {
+			THEN("Should return true") {
+				REQUIRE(contains(a, std::string("b")));
+			}
+		}
+
+		WHEN("Looking for a string that is not in the vector") {
+			THEN("Should return false") {
+				REQUIRE_FALSE(contains(a, std::string("ccc")));
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("template<typename T, typename P> bool contains_that(std::vector<T> const& vector, P&& predicate) noexcept", "[vector_utils]") {
+	GIVEN("A vector of unique_ptr to strings") {
+		std::vector<std::unique_ptr<std::string>> a;
+		a.emplace_back(std::make_unique<std::string>("aa"));
+		a.emplace_back(std::make_unique<std::string>("b"));
+		a.emplace_back(std::make_unique<std::string>("333"));
+		a.emplace_back(std::make_unique<std::string>("dd"));
+		WHEN("Looking for a predicate that matches a string in the vector") {
+			THEN("Should return true") {
+				std::string b("b");
+				REQUIRE(contains_that(a,
+					[&b](std::unique_ptr<std::string> const& str) {
+						return str->c_str() == b.c_str();
+					}));
+			}
+		}
+
+		WHEN("Looking for a predicate that does not match any string in the vector") {
+			THEN("Should return false") {
+				std::string b("ccc");
+				REQUIRE_FALSE(contains_that(a,
+					[&b](std::unique_ptr<std::string> const& str) {
+						return str->c_str() == b.c_str();
+					}));
 			}
 		}
 	}

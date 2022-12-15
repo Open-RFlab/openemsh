@@ -52,6 +52,7 @@ public:
 		[[nodiscard]] std::unique_ptr<Board> build();
 
 	private:
+		Params params;
 		PlaneSpace<std::vector<std::unique_ptr<Polygon>>> polygons;
 		AxisSpace<std::vector<std::unique_ptr<MeshlinePolicy>>> line_policies;
 	};
