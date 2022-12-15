@@ -38,10 +38,6 @@ public:
 	explicit Conflict(Kind const kind);
 
 	virtual void auto_solve(MeshlinePolicyManager& line_policy_manager) = 0;
-
-#ifdef DEBUG
-	virtual void print() const = 0;
-#endif // DEBUG
 };
 
 } // namespace domain

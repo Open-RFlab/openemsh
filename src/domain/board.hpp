@@ -88,10 +88,6 @@ public:
 	std::vector<std::unique_ptr<ConflictEdgeInPolygon>> const& get_conflicts_edge_in_polygons(Plane const plane) const;
 	std::vector<std::unique_ptr<ConflictColinearEdges>> const& get_conflicts_colinear_edges(Axis const axis) const;
 	std::vector<std::unique_ptr<ConflictTooCloseMeshlinePolicies>> const& get_conflicts_too_close_meshline_policies(Axis const axis) const;
-
-#ifdef DEBUG
-	void print() const;
-#endif // DEBUG
 };
 
 #ifdef UNITTEST

@@ -4,10 +4,6 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#ifdef DEBUG
-#include <iostream>
-#endif // DEBUG
-
 #include "point.hpp"
 
 namespace domain {
@@ -47,12 +43,5 @@ bool operator!=(Point const& a, Point const& b) {
 Point mid(Point const& a, Point const& b) noexcept {
 	return Point(mid(a.x, b.x), mid(a.y, b.y));
 }
-
-#ifdef DEBUG
-//******************************************************************************
-void Point::print() const {
-	cout << "x: " << x << "\ty: " << y << endl;
-}
-#endif // DEBUG
 
 } // namespace domain

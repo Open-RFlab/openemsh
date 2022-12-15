@@ -19,10 +19,6 @@ public:
 	Coord y;
 
 	Point(Coord x, Coord y) noexcept;
-
-#ifdef DEBUG
-	void print() const;
-#endif // DEBUG
 };
 
 //******************************************************************************

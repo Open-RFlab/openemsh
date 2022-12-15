@@ -4,10 +4,6 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#ifdef DEBUG
-#include <iostream>
-#endif // DEBUG
-
 #include <algorithm>
 #include <utility>
 
@@ -170,24 +166,6 @@ void Board::detect_edges_in_polygons(Plane const plane) {
 					, rel_to_poly_b(_rel_to_poly_b)
 					, mid(nullopt)
 					{}
-#ifdef DEBUG
-					void print() {
-						cout << "range : " << endl;
-						range.p0().print();
-						range.p1().print();
-						cout << "mid : " << endl;
-						if(mid) mid->print();
-						if(rel_to_poly_b) {
-							cout << "rel : ";
-							switch(rel_to_poly_b.value()) {
-							case relation::PolygonPoint::IN: cout << "IN"; break;
-							case relation::PolygonPoint::ON: cout << "ON"; break;
-							case relation::PolygonPoint::OUT: cout << "OUT"; break;
-							}
-							cout << endl;
-						}
-					}
-#endif // DEBUG
 				};
 
 				vector<Point> intersections;
@@ -391,13 +369,5 @@ vector<unique_ptr<ConflictColinearEdges>> const& Board::get_conflicts_colinear_e
 vector<unique_ptr<ConflictTooCloseMeshlinePolicies>> const& Board::get_conflicts_too_close_meshline_policies(Axis const axis) const {
 	return conflict_manager.get_too_close_meshline_policies(axis);
 }
-
-#ifdef DEBUG
-//******************************************************************************
-void Board::print() const {
-	for(unique_ptr<Polygon> const& polygon : polygons)
-		polygon->print();
-}
-#endif // DEBUG
 
 } // namespace domain

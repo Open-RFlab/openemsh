@@ -77,10 +77,6 @@ public:
 
 	Point const& p0() const noexcept override;
 	Point const& p1() const noexcept override;
-
-#ifdef DEBUG
-	void print() const;
-#endif // DEBUG
 };
 
 #ifdef UNITTEST
