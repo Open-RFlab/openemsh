@@ -4,10 +4,6 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#ifdef DEBUG
-#include <iostream>
-#endif // DEBUG
-
 #include "range.hpp"
 
 namespace domain {
@@ -35,14 +31,5 @@ Point const& Range::p1() const noexcept {
 bool operator==(Range const& a, Range const& b) noexcept {
 	return (a.p0() == b.p0() && a.p1() == b.p1()) || (a.p0() == b.p1() && a.p1() == b.p0());
 }
-
-#ifdef DEBUG
-//******************************************************************************
-void Range::print() const {
-	cout << "range:" << endl;
-	p0().print();
-	p1().print();
-}
-#endif // DEBUG
 
 } // namespace domain

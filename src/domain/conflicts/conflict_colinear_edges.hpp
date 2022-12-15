@@ -28,10 +28,6 @@ public:
 	void append(Edge* edge);
 
 	void auto_solve(MeshlinePolicyManager& line_policy_manager) override;
-
-#ifdef DEBUG
-	void print() const override {} // TODO
-#endif // DEBUG
 };
 
 } // namespace domain

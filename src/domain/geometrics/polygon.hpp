@@ -68,10 +68,6 @@ public:
 
 //	relation::PolygonEdge relation_to(Edge const* edge);
 	relation::PolygonPoint relation_to(Point const& point) const noexcept;
-
-#ifdef DEBUG
-	void print() const;
-#endif // DEBUG
 };
 
 /// These are the two declaration authorized.

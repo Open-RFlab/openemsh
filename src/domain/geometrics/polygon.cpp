@@ -4,10 +4,6 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#ifdef DEBUG
-#include <iostream>
-#endif // DEBUG
-
 #include "utils/unreachable.hpp"
 #include "edge.hpp"
 #include "point.hpp"
@@ -190,22 +186,5 @@ relation::PolygonPoint Polygon::relation_to(Point const& point) const noexcept {
 	else
 		return relation::PolygonPoint::OUT;
 }
-
-#ifdef DEBUG
-//******************************************************************************
-void Polygon::print() const {
-	for(unique_ptr<Point const> const& point : points)
-		point->print();
-	for(unique_ptr<Edge> const& edge : edges)
-		edge->print();
-	cout << "x: " << bounding[XMIN] << " <-> " << bounding[XMAX] << endl;
-	cout << "y: " << bounding[YMIN] << " <-> " << bounding[YMAX] << endl;
-	switch(rotation) {
-	case Rotation::CW: cout << "CW" << endl; break;
-	case Rotation::CCW: cout << "CCW" << endl; break;
-	case Rotation::COLINEAR: cout << "COLINEAR" << endl; break;
-	}
-}
-#endif // DEBUG
 
 } // namespace domain
