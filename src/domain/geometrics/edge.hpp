@@ -16,11 +16,16 @@
 #include "domain/conflicts/i_conflict_origin.hpp"
 #include "domain/conflicts/i_conflict_solution.hpp"
 #include "domain/mesh/i_meshline_origin.hpp"
+#include "domain/utils/entity_visitor.hpp"
+#include "utils/entity.hpp"
 #include "bounding.hpp"
 #include "range.hpp"
 #include "relation.hpp"
 #include "segment.hpp"
-#include "types.hpp"
+#include "space.hpp"
+#include "normal.hpp"
+
+namespace domain {
 
 class Conflict;
 class Point;
@@ -31,7 +36,13 @@ class Point;
 #endif // UNITTEST
 
 //******************************************************************************
-class Edge : public Segment, public IConflictOrigin, public IConflictSolution, public IMeshLineOrigin {
+class Edge
+: public Entity
+, public Visitable<Edge, EntityVisitor>
+, public Segment
+, public IConflictOrigin
+, public IConflictSolution
+, public IMeshLineOrigin {
 private:
 	Point const* const _p0;
 	Point const* const _p1;
@@ -44,6 +55,8 @@ public:
 	Point const vec;
 	// TODO vec & normal -> std::complex
 	// enums -> funcs? vars? enums?
+
+	Plane const plane;
 
 	/// Direction from p0 to p1.
 	///*************************************************************************
@@ -60,14 +73,10 @@ public:
 
 //	Bounding2D bounding;
 
-	Edge(Point const* p0, Point const* p1);
+	Edge(Plane plane, Point const* p0, Point const* p1);
 
 	Point const& p0() const noexcept override;
 	Point const& p1() const noexcept override;
-
-#ifdef DEBUG
-	void print() const;
-#endif // DEBUG
 };
 
 #ifdef UNITTEST
@@ -80,3 +89,5 @@ std::optional<Range> merge(Edge const& a, Edge const& b) = delete;
 //******************************************************************************
 bool operator==(Range const& a, Edge const& b) noexcept;
 bool operator==(Edge const& a, Range const& b) noexcept;
+
+} // namespace domain

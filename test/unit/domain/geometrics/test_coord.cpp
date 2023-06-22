@@ -15,6 +15,8 @@
 /// @test bool Coord::operator==(Coord const& a) const
 ///*****************************************************************************
 
+using namespace domain;
+
 //******************************************************************************
 SCENARIO("Coord::operator double() const", "[coord]") {
 	GIVEN("A coord") {

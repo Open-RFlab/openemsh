@@ -15,9 +15,14 @@
 #include "domain/conflicts/i_conflict_solution.hpp"
 #include "domain/geometrics/coord.hpp"
 #include "domain/geometrics/segment.hpp"
-#include "domain/geometrics/types.hpp"
+#include "domain/geometrics/normal.hpp"
+#include "domain/geometrics/space.hpp"
+#include "domain/utils/entity_visitor.hpp"
 #include "domain/global.hpp"
+#include "utils/entity.hpp"
 #include "i_meshline_origin.hpp"
+
+namespace domain {
 
 class Conflict;
 class Meshline;
@@ -27,12 +32,13 @@ class Meshline;
 /// be produced by other entities than edges, like a whole polygon (port) or
 /// a conflict between lines that can require a modification of other lines.
 ///*****************************************************************************
-class MeshlinePolicy : public IConflictOrigin, public IConflictSolution {
+class MeshlinePolicy
+: public Entity
+, public Visitable<MeshlinePolicy, EntityVisitor>
+, public IConflictOrigin
+, public IConflictSolution {
 public:
-	enum class Axis {
-		H,
-		V
-	} const axis;
+	Axis const axis;
 
 	/// Describe meshing policy to apply to the edge.
 	///*************************************************************************
@@ -41,16 +47,21 @@ public:
 //		             /// or if the edge is inside a polygon.
 		ONELINE,     ///< Place one line on the coord. typically produced by ports.
 		HALFS,       ///< Apply halfs rule while meshing : when edges conflict on the direction.
-		THIRDS,       ///< Apply thirds rule while meshing : normal case for edges.
-		INTERVAL
-	} policy; // TODO rename meshing_rule
+		THIRDS       ///< Apply thirds rule while meshing : normal case for edges.
+	} const policy; // TODO rename meshing_rule
 
-	Normal normal;
+	enum class Normal {
+		NONE,
+		MIN,
+		MAX
+	} const normal;
 
 	Params& params;
 	Coord const coord;
 	bool is_enabled;
-	double res_factor;
+	double res_factor; // TODO useful? d directly? come from params
+
+	double d; ///< Distance betwen two lines (HALFS and THIRDS only).
 
 	std::vector<IMeshLineOrigin*> origins;
 	std::vector<Meshline*> meshlines; // TODO unique_ptr or ptr?
@@ -63,13 +74,15 @@ public:
 		Params& params,
 		Coord const coord,
 		bool const is_enabled = true,
-		double const res_factor = 1);
+		double const res_factor = 2);
 
-	Meshline mesh();
+	std::optional<Meshline> mesh();
 };
 
 //******************************************************************************
-std::optional<MeshlinePolicy::Axis> cast(Segment::Axis const a) noexcept;
+std::optional<Coord> coord(Point const& point, Segment::Axis const axis) noexcept;
 
 //******************************************************************************
-Coord coord(Point const& point, MeshlinePolicy::Axis const axis) noexcept;
+MeshlinePolicy::Normal cast(Normal const normal) noexcept;
+
+} // namespace domain

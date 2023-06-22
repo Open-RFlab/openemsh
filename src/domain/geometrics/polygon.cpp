@@ -4,61 +4,42 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#ifdef DEBUG
-#include <iostream>
-#endif // DEBUG
-
+#include "utils/unreachable.hpp"
 #include "edge.hpp"
 #include "point.hpp"
 
 #include "polygon.hpp"
 
+namespace domain {
+
 using namespace std;
 
 //******************************************************************************
-Polygon::Polygon(initializer_list<Point> points)
-: bounding({ begin(points)->x, begin(points)->x, begin(points)->y, begin(points)->y }) {
-	for(Point const& point : points)
-		this->points.push_back(make_unique<Point>(point)); // TODO do not use initializer_list because of copies
-	this->points.shrink_to_fit();
-
-	rotation = detect_rotation(this->points);
-
-	Point const* prev = this->points.back().get();
-	for(unique_ptr<Point const>& point : this->points) {
-		edges.push_back(make_unique<Edge>(prev, point.get()));
-		prev = point.get();
-	}
-	edges.shrink_to_fit();
-
-	detect_bounding();
+Polygon::Polygon(Plane const plane, Type const type, string const& name, vector<unique_ptr<Point const>>&& points)
+: rotation(detect_rotation(points))
+, type(type)
+, plane(plane)
+, bounding(detect_bounding(points))
+, name(name)
+, points(std::move(points))
+, edges(detect_edges(this->points, plane))
+{
 	detect_edge_normal();
 }
 
 //******************************************************************************
-/*
-Polygon::Polygon(vector<unique_ptr<Point const>> _points)
-: points(_points) {
-	for(unique_ptr<Point const>& point : points) {
-		if(point->x < bounding[XMIN]) bounding[XMIN] = point->x;
-		if(point->x > bounding[XMAX]) bounding[XMAX] = point->x;
-		if(point->y < bounding[YMIN]) bounding[YMIN] = point->y;
-		if(point->y > bounding[YMAX]) bounding[YMAX] = point->y;
-	}
-	points.shrink_to_fit();
-
-	rotation = detect_rotation(points);
+vector<unique_ptr<Edge>> detect_edges(vector<unique_ptr<Point const>> const& points, Plane const plane) {
+	vector<unique_ptr<Edge>> edges;
 
 	Point const* prev = points.back().get();
-	for(unique_ptr<Point const>& point : points) {
-		edges.push_back(make_unique<Edge>(prev, point.get()));
+	for(auto const & point : points) {
+		edges.push_back(make_unique<Edge>(plane, prev, point.get()));
 		prev = point.get();
 	}
 	edges.shrink_to_fit();
 
-	detect_edge_normal();
+	return edges;
 }
-*/
 
 /// Cf. https://rosettacode.org/wiki/Shoelace_formula_for_polygonal_area#C.2B.2B
 /// Cf. https://www.baeldung.com/cs/list-polygon-points-clockwise
@@ -68,10 +49,10 @@ Polygon::Polygon(vector<unique_ptr<Point const>> _points)
 /// FDTD mesh is orthogonal.
 ///*****************************************************************************
 template<class T>
-Polygon::Rotation detect_rotation(T const& points) {
+Polygon::Rotation detect_rotation(T const& points) noexcept {
 	double left_sum = 0.0;
 	double right_sum = 0.0;
- 
+
 	for(size_t i = 0; i < points.size(); ++i) {
 		size_t j = (i + 1) % points.size();
 		left_sum  += double (points[i]->x * points[j]->y);
@@ -80,26 +61,36 @@ Polygon::Rotation detect_rotation(T const& points) {
 
 	double area = 0.5 * (left_sum - right_sum);
 
-	if(area > 0)
+	if(Coord(area) == 0)
+		return Polygon::Rotation::COLINEAR;
+	else if(area > 0)
 		return Polygon::Rotation::CCW;
 	else if(area < 0)
 		return Polygon::Rotation::CW;
 	else
-		return Polygon::Rotation::COLINEAR;
+		unreachable();
 }
 
 //******************************************************************************
-template Polygon::Rotation detect_rotation(std::vector<std::unique_ptr<Point const>> const&);
-template Polygon::Rotation detect_rotation(std::vector<Point const*> const&);
+template Polygon::Rotation detect_rotation(std::vector<std::unique_ptr<Point const>> const&) noexcept;
+template Polygon::Rotation detect_rotation(std::vector<Point const*> const&) noexcept;
 
 //******************************************************************************
-void Polygon::detect_bounding() {
-	for(std::unique_ptr<Point const>& point : points) {
+Bounding2D detect_bounding(vector<unique_ptr<Point const>> const& points) noexcept {
+	Bounding2D bounding({
+		(*begin(points))->x,
+		(*begin(points))->x,
+		(*begin(points))->y,
+		(*begin(points))->y });
+
+	for(auto const& point : points) {
 		if(point->x < bounding[XMIN]) bounding[XMIN] = point->x;
 		if(point->x > bounding[XMAX]) bounding[XMAX] = point->x;
 		if(point->y < bounding[YMIN]) bounding[YMIN] = point->y;
 		if(point->y > bounding[YMAX]) bounding[YMAX] = point->y;
 	}
+
+	return bounding;
 }
 
 ///           YMAX          |           YMAX
@@ -114,10 +105,10 @@ void Polygon::detect_bounding() {
 ///          YMIN           |          YMIN
 ///           CW            |           CCW
 ///*****************************************************************************
-void Polygon::detect_edge_normal() {
+void Polygon::detect_edge_normal() noexcept {
 	switch(rotation) {
-	case Rotation::CW: 
-		for(std::unique_ptr<Edge>& edge : edges) {
+	case Rotation::CW:
+		for(auto const& edge : edges) {
 			switch(edge->direction) {
 			case Edge::Direction::XMIN: edge->normal = Normal::YMIN; break;
 			case Edge::Direction::XMAX: edge->normal = Normal::YMAX; break;
@@ -128,7 +119,7 @@ void Polygon::detect_edge_normal() {
 		}
 		break;
 	case Rotation::CCW:
-		for(std::unique_ptr<Edge>& edge : edges) {
+		for(auto const& edge : edges) {
 			switch(edge->direction) {
 			case Edge::Direction::XMIN: edge->normal = Normal::YMAX; break;
 			case Edge::Direction::XMAX: edge->normal = Normal::YMIN; break;
@@ -139,7 +130,7 @@ void Polygon::detect_edge_normal() {
 		}
 		break;
 	default: break;
-	}	
+	}
 }
 
 /// Based on the ray casting method.
@@ -148,7 +139,7 @@ void Polygon::detect_edge_normal() {
 /// crossing relation with an edge will be faster with these ones. Then
 /// diagonals will be tried.
 ///*****************************************************************************
-relation::PolygonPoint Polygon::relation_to(Point const& point) const {
+relation::PolygonPoint Polygon::relation_to(Point const& point) const noexcept {
 	vector<Point> to_try({
 		{ bounding[XMIN] - 1, point.y },
 		{ bounding[XMAX] + 1, point.y },
@@ -166,10 +157,10 @@ relation::PolygonPoint Polygon::relation_to(Point const& point) const {
 		count = 0;
 		if(to_try.size() <= n)
 			to_try.emplace_back(bounding[XMAX] + 1, point.y + n);
-		Edge ray(&point, &to_try[n++]);
+		Edge ray(plane, &point, &to_try[n++]);
 
 		// Detect vertices on the ray.
-		for(unique_ptr<Point const> const& p : points) {
+		for(auto const& p : points) {
 			if(*p == point) {
 				return relation::PolygonPoint::ON;
 			} else if(ray.relation_to(*p) == relation::SegmentPoint::ON) {
@@ -180,7 +171,7 @@ relation::PolygonPoint Polygon::relation_to(Point const& point) const {
 		if(need_retry)
 			continue;
 
-		for(unique_ptr<Edge> const& edge : edges) {
+		for(auto const& edge : edges) {
 			if(edge->relation_to(point) == relation::SegmentPoint::ON)
 				return relation::PolygonPoint::ON;
 
@@ -196,19 +187,4 @@ relation::PolygonPoint Polygon::relation_to(Point const& point) const {
 		return relation::PolygonPoint::OUT;
 }
 
-#ifdef DEBUG
-//******************************************************************************
-void Polygon::print() const {
-	for(unique_ptr<Point const> const& point : points)
-		point->print();
-	for(unique_ptr<Edge> const& edge : edges)
-		edge->print();
-	cout << "x: " << bounding[XMIN] << " <-> " << bounding[XMAX] << endl;
-	cout << "y: " << bounding[YMIN] << " <-> " << bounding[YMAX] << endl;
-	switch(rotation) {
-	case Rotation::CW: cout << "CW" << endl; break;
-	case Rotation::CCW: cout << "CCW" << endl; break;
-	case Rotation::COLINEAR: cout << "COLINEAR" << endl; break;
-	}
-}
-#endif // DEBUG
+} // namespace domain

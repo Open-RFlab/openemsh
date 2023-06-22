@@ -4,17 +4,15 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#ifdef DEBUG
-#include <iostream>
-#endif // DEBUG
-
 #include "range.hpp"
+
+namespace domain {
 
 using namespace std;
 
 //******************************************************************************
 Range::Range(Point const p0, Point const p1) noexcept
-: Segment(::axis(p0, p1))
+: Segment(domain::axis(p0, p1))
 , _p0(p0)
 , _p1(p1)
 {}
@@ -34,11 +32,4 @@ bool operator==(Range const& a, Range const& b) noexcept {
 	return (a.p0() == b.p0() && a.p1() == b.p1()) || (a.p0() == b.p1() && a.p1() == b.p0());
 }
 
-#ifdef DEBUG
-//******************************************************************************
-void Range::print() const {
-	cout << "range:" << endl;
-	p0().print();
-	p1().print();
-}
-#endif // DEBUG
+} // namespace domain

@@ -17,11 +17,19 @@ target_sources( openemsh
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflicts/conflict_too_close_meshline_policies.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflicts/i_conflict_origin.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/mesh/i_meshline_origin.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/domain/mesh/interval.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/mesh/meshline.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/mesh/meshline_policy.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/meshline_policy_manager.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflict_manager.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/board.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/infra/parsers/csxcad_layer/point_3d.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/infra/parsers/parser_from_csx.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/infra/serializers/serializer_to_csx.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/infra/serializers/serializer_to_plantuml.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/infra/serializers/serializer_to_prettyprint.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/infra/utils/to_string.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/cli.cpp"
 	)
 
 target_compile_definitions( openemsh
@@ -46,6 +54,41 @@ target_compile_options( openemsh
 target_include_directories( openemsh
 	PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}
+	)
+
+target_link_libraries( openemsh
+	CLI11::CLI11
+	pugixml::shared
+	)
+
+add_executable( openemsh_bin )
+
+target_sources( openemsh_bin
+	PRIVATE
+	"${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
+	)
+
+target_compile_features( openemsh_bin
+	PRIVATE
+	cxx_std_17
+	)
+
+target_compile_options( openemsh_bin
+	PRIVATE
+	$<$<CONFIG:Coverage>:-O0>
+	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Wall>
+	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Wextra>
+#	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Weffc++>
+	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-fexceptions>
+	)
+
+target_include_directories( openemsh_bin
+	PRIVATE
+	${CMAKE_CURRENT_SOURCE_DIR}
+	)
+
+target_link_libraries( openemsh_bin
+	openemsh
 	)
 
 #[[

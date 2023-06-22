@@ -6,7 +6,11 @@
 
 #include "i_meshline_origin.hpp"
 
+namespace domain {
+
 //******************************************************************************
 IMeshLineOrigin::IMeshLineOrigin()
 : meshline_policy(nullptr)
 {}
+
+} // namespace domain

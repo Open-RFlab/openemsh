@@ -4,6 +4,7 @@
 , cmake
 , cmake-utils
 , git
+, pugixml
 }:
 
 with pkgs;
@@ -19,6 +20,19 @@ stdenv.mkDerivation {
     cmake-utils
     git
   ];
+
+  buildInputs = [
+    cli11
+    (pugixml.override { shared = true; })
+  ];
+
+  cmakeFlags = [
+    "-DCPM_DISABLE=ON"
+  ];
+
+  shellHook = ''
+    export CPM_DISABLE=ON
+  '';
 
   meta = {
     homepage = "https://github.com/Open-RFlab/openemsh";

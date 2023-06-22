@@ -24,11 +24,10 @@ set( CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
 	)
 #]]
 
-find_package( CMakeUtils QUIET )
-if( CMakeUtils_FOUND )
-	message( STATUS "Found CMakeUtils: ${CMakeUtils_DIR}" )
-else()
-	message( STATUS "Not found CMakeUtils: Trying to download it with CPM" )
+option( CPM_DISABLE "Don't use CPM to retrieve dependencies" "$ENV{CPM_DISABLE}" )
+
+if( NOT CPM_DISABLE )
+	message( STATUS "Downloading dependencies with CPM" )
 
 	list( APPEND CMAKE_MODULE_PATH
 		"${CMAKE_SOURCE_DIR}/cmake"
@@ -43,14 +42,42 @@ else()
 		DOWNLOAD_ONLY
 		)
 
-	set( CMakeUtils_DIR "${FETCHCONTENT_BASE_DIR}/cmake-utils-src" )
+	set( CMakeUtils_DIR "${cmake-utils_SOURCE_DIR}" )
 
-	find_package( CMakeUtils QUIET )
-	if( CMakeUtils_FOUND )
-		message( STATUS "Found CMakeUtils: ${CMakeUtils_DIR}" )
-	else()
-		message( STATUS "Not found CMakeUtils: Only minimal build enabled" )
-	endif()
+	CPMAddPackage(
+		NAME pugixml
+		GITHUB_REPOSITORY zeux/pugixml
+		VERSION 1.12.1
+		OPTIONS
+			"BUILD_SHARED_LIBS ON"
+		)
+
+	set( pugixml_DIR "${pugixml_BINARY_DIR}" )
+
+	CPMAddPackage(
+		NAME CLI11
+		GITHUB_REPOSITORY CLIUtils/CLI11
+		VERSION 2.3.1
+		)
+
+	set( CLI11_DIR "${CLI11_BINARY_DIR}" )
+endif()
+
+find_package( CMakeUtils QUIET )
+if( CMakeUtils_FOUND )
+	message( STATUS "Found CMakeUtils: ${CMakeUtils_DIR}" )
+else()
+	message( STATUS "Not found CMakeUtils: Only minimal build enabled" )
+endif()
+
+find_package( pugixml REQUIRED )
+if( pugixml_FOUND )
+	message( STATUS "Found pugixml: ${pugixml_DIR} ${PUGIXML_VERSION}" )
+endif()
+
+find_package( CLI11 REQUIRED )
+if( CLI11_FOUND )
+	message( STATUS "Found CLI11: ${CLI11_DIR} ${CLI11_VERSION}" )
 endif()
 
 if( CMakeUtils_FOUND )

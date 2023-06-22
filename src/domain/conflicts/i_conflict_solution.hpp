@@ -6,6 +6,8 @@
 
 #pragma once
 
+namespace domain {
+
 //******************************************************************************
 class IConflictSolution {
 public:
@@ -13,3 +15,5 @@ public:
 
 	virtual ~IConflictSolution() = default;
 };
+
+} // namespace domain

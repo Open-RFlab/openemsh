@@ -4,9 +4,8 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#ifdef DEBUG
-#include <iostream>
-#endif // DEBUG
+#include "domain/geometrics/segment.hpp"
+#include "domain/geometrics/space.hpp"
 
 #include <algorithm>
 
@@ -15,6 +14,8 @@
 #include "domain/geometrics/polygon.hpp"
 
 #include "conflict_edge_in_polygon.hpp"
+
+namespace domain {
 
 using namespace std;
 
@@ -69,8 +70,9 @@ void sort_overlaps_by_p0_by_vector_orientation(vector<Overlap>& overlaps, Point 
 }
 
 //******************************************************************************
-ConflictEdgeInPolygon::ConflictEdgeInPolygon(Edge* a, Polygon const* polygon, Range const range, optional<Edge const*> b)
+ConflictEdgeInPolygon::ConflictEdgeInPolygon(Plane plane, Edge* a, Polygon const* polygon, Range const range, optional<Edge const*> b)
 : Conflict(Kind::EDGE_IN_POLYGON)
+, plane(plane)
 , edge(a) {
 	overlaps.emplace_back(polygon, range, b);
 }
@@ -102,29 +104,4 @@ void ConflictEdgeInPolygon::auto_solve(MeshlinePolicyManager& /*line_policy_mana
 	is_solved = true;
 }
 
-#ifdef DEBUG
-//******************************************************************************
-void ConflictEdgeInPolygon::print() const {
-	cout << "ConflictEdgeInPolygon :" << endl;
-	if(edge) {
-		cout << "edge : " << edge << endl;
-		edge->print();
-	} else {
-		cout << "edge : nullptr" << endl;
-	}
-	cout << "overlaps : " << overlaps.size() << endl;
-	for(auto const& overlap : overlaps) {
-		cout << "overlap :" << endl;
-		cout << "polygon : " << get<POLYGON>(overlap) << endl;
-//		get<POLYGON>(overlap)->print();
-//		cout << "range :" << endl;
-		get<RANGE>(overlap).print();
-		if(get<EDGE>(overlap).has_value()) {
-			cout << "optedge : " << get<EDGE>(overlap).value() << endl;
-			get<EDGE>(overlap).value()->print();
-		} else {
-			cout << "optedge : nullopt" << endl;
-		}
-	}
-}
-#endif // DEBUG
+} // namespace domain

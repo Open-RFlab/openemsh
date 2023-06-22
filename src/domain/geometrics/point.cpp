@@ -4,13 +4,9 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#ifdef DEBUG
-#include <iostream>
-#endif // DEBUG
-
 #include "point.hpp"
 
-using namespace std;
+namespace domain {
 
 //******************************************************************************
 Point::Point(Coord x, Coord y) noexcept
@@ -46,9 +42,4 @@ Point mid(Point const& a, Point const& b) noexcept {
 	return Point(mid(a.x, b.x), mid(a.y, b.y));
 }
 
-#ifdef DEBUG
-//******************************************************************************
-void Point::print() const {
-	cout << "x: " << x << "\ty: " << y << endl;
-}
-#endif // DEBUG
+} // namespace domain

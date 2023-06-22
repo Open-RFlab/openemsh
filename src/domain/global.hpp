@@ -6,11 +6,20 @@
 
 #pragma once
 
+#include <cstddef>
+
+namespace domain {
+
 //******************************************************************************
 struct Params {
 	double metal_res;
 	double substrate_res;
-	double proximity_limit;
+	double proximity_limit = 1; // TODO must be linked to initial d
+	double lambda = 2;
+	std::size_t lmin = 10;
+	double dmax = 2.5;
 };
 
 inline double equality_tolerance = 1e-8;
+
+} // namespace domain

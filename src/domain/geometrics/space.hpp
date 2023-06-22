@@ -4,17 +4,16 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#include <memory>
-#include <vector>
+#pragma once
+
+#include "utils/enum_utils.hpp"
+
+namespace domain {
 
 //******************************************************************************
-template<typename T>
-std::vector<T*> create_view(std::vector<std::unique_ptr<T>> const& original) noexcept {
-	std::vector<T*> view(original.size());
+ARRAY_WITH_ITERABLE_ENUM_INDEX(AxisSpace, Axis, X, Y, Z)
 
-	for(size_t i = 0, size = original.size(); i < size; ++i) {
-		view[i] = original[i].get();
-	}
+//******************************************************************************
+ARRAY_WITH_ITERABLE_ENUM_INDEX(PlaneSpace, Plane, YZ, ZX, XY)
 
-	return view;
-}
+} // namespace domain

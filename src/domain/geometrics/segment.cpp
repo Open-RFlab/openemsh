@@ -4,20 +4,19 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-//#include <vector>
-
+#include "utils/unreachable.hpp"
 #include "point.hpp"
 #include "polygon.hpp"
 #include "range.hpp"
 
 #include "segment.hpp"
 
+namespace domain {
+
 using namespace std;
 
-namespace {
-
 //******************************************************************************
-bool are_parallel(Segment const& a, Segment const& b) noexcept {
+static bool are_parallel(Segment const& a, Segment const& b) noexcept {
 	Point a_vec(a.p1() - a.p0());
 	Point b_vec(b.p1() - b.p0());
 	return (a.axis == Segment::Axis::H && b.axis == Segment::Axis::H)
@@ -25,29 +24,28 @@ bool are_parallel(Segment const& a, Segment const& b) noexcept {
 		|| (a_vec.y / a_vec.x == b_vec.y / b_vec.x);
 }
 
-} // namespace
-
 //******************************************************************************
 Segment::Segment(Axis const axis) noexcept
 : axis(axis)
 {}
 
 /// Cf. https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect
+/// @warning Assumes both segments are on the same Plane.
 ///*****************************************************************************
 relation::SegmentSegment Segment::relation_to(Segment const& segment) const {
 	vector<Point const*> v1({ &p0(), &p1(), &segment.p0() });
 	vector<Point const*> v2({ &p0(), &p1(), &segment.p1() });
 	vector<Point const*> v3({ &segment.p0(), &segment.p1(), &p0() });
 	vector<Point const*> v4({ &segment.p0(), &segment.p1(), &p1() });
-	Polygon::Rotation r1(detect_rotation(v1));
-	Polygon::Rotation r2(detect_rotation(v2));
-	Polygon::Rotation r3(detect_rotation(v3));
-	Polygon::Rotation r4(detect_rotation(v4));
+	Polygon::Rotation const r1(detect_rotation(v1));
+	Polygon::Rotation const r2(detect_rotation(v2));
+	Polygon::Rotation const r3(detect_rotation(v3));
+	Polygon::Rotation const r4(detect_rotation(v4));
 
 	if(r1 == Polygon::Rotation::COLINEAR && r2 == Polygon::Rotation::COLINEAR
 	&& r3 == Polygon::Rotation::COLINEAR && r4 == Polygon::Rotation::COLINEAR) {
-		Bounding2D a_bnd(bounding(segment));
-		Bounding2D b_bnd(bounding(*this));
+		Bounding2D const a_bnd(bounding(segment));
+		Bounding2D const b_bnd(bounding(*this));
 
 		if(((a_bnd[XMIN] >= b_bnd[XMIN] && a_bnd[XMIN] <= b_bnd[XMAX]) || (a_bnd[XMAX] >= b_bnd[XMIN] && a_bnd[XMAX] <= b_bnd[XMAX])
 		||  (b_bnd[XMIN] >= a_bnd[XMIN] && b_bnd[XMIN] <= a_bnd[XMAX]) || (b_bnd[XMAX] >= a_bnd[XMIN] && b_bnd[XMAX] <= a_bnd[XMAX]))
@@ -115,14 +113,14 @@ optional<Point> intersection(Segment const& a, Segment const& b) {
 		// Diagonal
 		Point a_vec(a.p1() - a.p0());
 		Point b_vec(b.p1() - b.p0());
-		double div = double (a_vec.x * b_vec.y - a_vec.y * b_vec.x);
+		auto div = double (a_vec.x * b_vec.y - a_vec.y * b_vec.x);
 
 		if(div != 0) {
-			double m = double (a_vec.x * a.p0().y
-			         - a_vec.x * b.p0().y
-			         - a_vec.y * a.p0().x
-			         + a_vec.y * b.p0().x)
-			         / div;
+			auto m = double (a_vec.x * a.p0().y
+			       - a_vec.x * b.p0().y
+			       - a_vec.y * a.p0().x
+			       + a_vec.y * b.p0().x)
+			       / div;
 			if(m >= 0 && m <= 1) // When we are not sure edges are crossing.
 				return Point(b.p0() + m * b_vec);
 		}
@@ -216,3 +214,27 @@ optional<Range> overlap(Segment const& a, Segment const& b) {
 	}
 	return nullopt;
 }
+
+//******************************************************************************
+optional<Axis> transpose(Plane const plane, Segment::Axis const axis) noexcept {
+	switch(axis) {
+	case Segment::Axis::H:
+		switch(plane) {
+		case YZ: return Z;
+		case ZX: return X;
+		case XY: return Y;
+		default: unreachable();
+		}
+	case Segment::Axis::V:
+		switch(plane) {
+		case YZ: return Y;
+		case ZX: return Z;
+		case XY: return X;
+		default: unreachable();
+		}
+	default:
+		return nullopt;
+	}
+}
+
+} // namespace domain

@@ -12,7 +12,10 @@
 #include <vector>
 
 #include "domain/geometrics/range.hpp"
+#include "domain/geometrics/space.hpp"
 #include "conflict.hpp"
+
+namespace domain {
 
 class Edge;
 class Polygon;
@@ -28,23 +31,24 @@ enum OverlapIndex {
 };
 
 //******************************************************************************
-class ConflictEdgeInPolygon : public Conflict {
+class ConflictEdgeInPolygon
+: public Conflict
+, public Visitable<ConflictEdgeInPolygon, EntityVisitor> {
 public:
+	Plane const plane;
 	Edge* const edge;
 
 	std::vector<Overlap> overlaps;
 
-	ConflictEdgeInPolygon(Edge* a, Polygon const* polygon, Range const range, std::optional<Edge const*> b);
+	ConflictEdgeInPolygon(Plane plane, Edge* a, Polygon const* polygon, Range const range, std::optional<Edge const*> b);
 
 	void append(Polygon const* polygon, Range const range, std::optional<Edge const*> edge);
 
 	void auto_solve(MeshlinePolicyManager& line_policy_manager) override;
-
-#ifdef DEBUG
-	void print() const override;
-#endif // DEBUG
 };
 
 #ifdef UNITTEST
 void sort_overlaps_by_p0_by_vector_orientation(std::vector<Overlap>& overlaps, Point const& vector);
 #endif // UNITTEST
+
+} // namespace domain

@@ -10,6 +10,8 @@
 
 // TODO use std::complex instead of Point?
 
+namespace domain {
+
 //******************************************************************************
 class Point {
 public:
@@ -17,10 +19,6 @@ public:
 	Coord y;
 
 	Point(Coord x, Coord y) noexcept;
-
-#ifdef DEBUG
-	void print() const;
-#endif // DEBUG
 };
 
 //******************************************************************************
@@ -49,3 +47,5 @@ Point operator*(Point const& p, T const& n) noexcept {
 
 //******************************************************************************
 Point mid(Point const& a, Point const& b) noexcept;
+
+} // namespace domain
