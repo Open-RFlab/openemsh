@@ -4,8 +4,7 @@
 [![Version](https://img.shields.io/github/v/release/Open-RFlab/openemsh)](https://github.com/Open-RFlab/openemsh/releases/latest)
 [![Nix](https://img.shields.io/static/v1?logo=nixos&logoColor=white&label=&message=Built%20with%20Nix&color=41439a)](https://builtwithnix.org/)
 
-[![LGTM grade](https://img.shields.io/lgtm/grade/cpp/g/Open-RFlab/openemsh.svg?logo=lgtm)](https://lgtm.com/projects/g/Open-RFlab/openemsh/context:cpp)
-[![CodeQL](https://img.shields.io/github/workflow/status/Open-RFlab/openemsh/Test%20CodeQL?label=CodeQL&logo=github)](https://github.com/Open-RFlab/openemsh/security/code-scanning?query=is%3Aopen+branch%3Amain+tool%3ACodeQL)
+[![CodeQL](https://img.shields.io/github/actions/workflow/status/Open-RFlab/openemsh/test_codeql.yml?label=CodeQL&logo=github)](https://github.com/Open-RFlab/openemsh/security/code-scanning?query=is%3Aopen+branch%3Amain+tool%3ACodeQL)
 [![SonarCloud quality gate](https://sonarcloud.io/api/project_badges/measure?project=Open-RFlab_openemsh&metric=alert_status)](https://sonarcloud.io/dashboard?id=Open-RFlab_openemsh)
 [![SonarCloud coverage](https://sonarcloud.io/api/project_badges/measure?project=Open-RFlab_openemsh&metric=coverage)](https://sonarcloud.io/dashboard?id=Open-RFlab_openemsh)
 
@@ -22,7 +21,7 @@ By creating myself one of those converter ([Qucs-RFlayout](https://github.com/th
 - All polygon edges should be detected and not just the edges of the polygon minimal bounding boxes.
 - The collinear edges' detection is not related to the mesh and thus should be treated _independently_, before any thirds rule application or smoothmesh generation.
 - The user should be able to give directives to customize the mesh / solve meshlines conflicts through a decent interface.
-- The [thirds rule](https://openems.de/index.php/FDTD_Mesh.html) should not be applied statically at the chosen mesh resolution before smoothmeshing, but should be applied _while_ smoothmeshing. The reason is fixed meshlines make the structure really difficult to smoothmesh correctly. Also, this way is not possible to correctly handle structure parts that are equivalent or thinner than the mesh resolution.
+- The [thirds rule](https://wiki.openems.de/index.php/FDTD_Mesh.html) should not be applied statically at the chosen mesh resolution before smoothmeshing, but should be applied _while_ smoothmeshing. The reason is fixed meshlines make the structure really difficult to smoothmesh correctly. Also, this way is not possible to correctly handle structure parts that are equivalent or thinner than the mesh resolution.
 
 Those considerations led me to think the key to create a correct mesher is about conflict management system :
 - Identifying and classifying conflict kinds.
