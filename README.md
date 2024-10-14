@@ -46,3 +46,9 @@ The development environment is based on [Nix](https://nixos.org/) (which handles
 - `nix develop` For entering the dev env
 
 And then proceed as usual with CMake.
+
+## Acknowledgments
+
+<a href="https://nlnet.nl/project/OpenEMSH/"><img src="https://nlnet.nl/logo/banner.svg" height="50" title="NLnet"/></a>
+&nbsp;&nbsp;&nbsp;
+<a href="https://nlnet.nl/project/OpenEMSH/"><img src="https://nlnet.nl/image/logos/NGI0Core_tag.svg" height="50" title="NGI0 Core"/></a>
