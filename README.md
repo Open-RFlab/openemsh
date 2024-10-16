@@ -1,3 +1,5 @@
+<img src="./icon/openemsh.svg" align="right" style="float:right;" width="15%" title="OpenEMSH"/>
+
 [![Liberapay patrons](https://img.shields.io/liberapay/patrons/thomaslepoix.svg?logo=liberapay)](https://liberapay.com/thomaslepoix/donate)
 [![Discord](https://img.shields.io/discord/616889479298547722?logo=discord)](https://discord.gg/P82fEmE)
 [![License](https://img.shields.io/github/license/Open-RFlab/openemsh)](LICENSE)

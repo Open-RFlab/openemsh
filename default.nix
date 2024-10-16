@@ -4,6 +4,7 @@
 , cmake
 , cmake-utils
 , git
+, texlive
 }:
 
 with pkgs;
@@ -18,6 +19,9 @@ stdenv.mkDerivation {
     cmake
     cmake-utils
     git
+    (texlive.combine {
+      inherit (texlive) scheme-small standalone pgfplots;
+    })
   ];
 
   meta = {

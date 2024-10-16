@@ -61,6 +61,7 @@ endif()
 
 add_subdirectory( "${CMAKE_SOURCE_DIR}/src" )
 add_subdirectory( "${CMAKE_SOURCE_DIR}/test" )
+add_subdirectory( "${CMAKE_SOURCE_DIR}/icon" )
 
 if( CMakeUtils_FOUND )
 	coverage_global()

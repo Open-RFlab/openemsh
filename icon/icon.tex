@@ -1,0 +1,54 @@
+\documentclass[tikz]{standalone}
+
+\usepackage{tikz}
+\usetikzlibrary{fadings}
+\usetikzlibrary{shadings}
+\usepackage{xfp}
+
+% https://raw.githubusercontent.com/thliebig/openEMS-Project/refs/heads/master/other/openEMS.svg
+\definecolor{openemsblue}{HTML}{304090}
+
+\begin{document}
+\begin{tikzpicture}
+
+\def\width{3}
+\def\height{3}
+\def\ox{\fpeval{\width /2}}
+\def\oy{\fpeval{\height /2}}
+
+\path [use as bounding box] (0,0) rectangle (\width,\height);
+
+% SHADES
+\fill [openemsblue, path fading=west] (\ox,\oy)
+	+(-1.2,-1.2) --
+	+(0.5,-1.2) --
+	+(0.5,0.5) --
+	+(-1.2,0.5) --
+	cycle;
+
+% TODO Converting this to SVG invert the Y axis for the fading only.
+% Tested with pdf2svg, pdftocairo, dvisvgm, inkscape.
+% Probably a bug in PGF/TikZ.
+% Workaround:
+% - Open PDF with inkscape with poppler/cairo import
+% - Flip vertically this shading (keep this code after/on-top for easier selection)
+% - Export to SVG
+\fill [openemsblue, path fading=south] (\ox,\oy)
+	+(-1.2,-1.2) --
+	+(0.5,-1.2) --
+	+(0.5,0.5) --
+	+(-1.2,0.5) --
+	cycle;
+
+% VERTICAL LINES
+\draw [line width=3pt] (\ox,\oy) ++(0.5,0)
+	+(0.4,-1.5) -- +(0.4,1.5)
+	+(-0.2,-1.5) -- +(-0.2,1.5);
+
+% HORIZONTAL LINES
+\draw [line width=3pt] (\ox,\oy) ++(0,0.5)
+	+(-1.5,0.4) -- +(1.5,0.4)
+	+(-1.5,-0.2) -- +(1.5,-0.2);
+
+\end{tikzpicture}
+\end{document}
