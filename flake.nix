@@ -4,56 +4,59 @@
   nixConfig.bash-prompt-suffix = "(openemsh) ";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/8cec3cc";
+    nixpkgs.url = "github:NixOS/nixpkgs/22.11";
 
-    utils.url = "github:numtide/flake-utils";
-    utils.inputs.nixpkgs.follows = "nixpkgs";
+    flake-utils.url = "github:numtide/flake-utils";
 
-    cmake-utils-src.url = "github:conformism/cmake-utils";
+    cmake-utils = {
+      url = "github:conformism/cmake-utils";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
   };
 
   outputs = { self
-    , nixpkgs
-    , cmake-utils-src
-    , ...
-    }@inputs:
-    inputs.utils.lib.eachDefaultSystem (system:
-    let
-      pkgs = import nixpkgs { inherit system; };
+  , nixpkgs
+  , cmake-utils
+  , flake-utils
+  , ...
+  }@inputs:
+  flake-utils.lib.eachDefaultSystem (system:
+  let
+    pkgs = (nixpkgs.legacyPackages.${system}
+      .extend cmake-utils.overlays.pkgs)
+      .extend self.overlays.pkgs;
 
-      cmake-utils = import cmake-utils-src {
-        inherit pkgs;
-      };
-
-      cmake-utils-dev = import cmake-utils-src {
-        inherit pkgs;
-        need-all = true;
-      };
-
-      this-package = pkgs.callPackage ./default.nix {
-        inherit pkgs cmake-utils;
-        stdenv = pkgs.llvmPackages_13.stdenv;
-      };
-
-    in {
-      devShell = with pkgs; mkShell rec {
+  in {
+    devShells = {
+      default = pkgs.mkShell {
         inputsFrom = [
-          this-package
-          cmake-utils-dev
+          pkgs.openemsh
+          pkgs.cmake-utils-all
         ];
       };
 
-      devShells = {
-        doc = pkgs.mkShell {
-          packages = [
-            (pkgs.python3.withPackages (python-pkgs: [
-              python-pkgs.numpy
-              python-pkgs.matplotlib
-            ]))
-          ];
+      doc = pkgs.mkShell {
+        packages = [
+          (pkgs.python3.withPackages (python-pkgs: [
+            python-pkgs.numpy
+            python-pkgs.matplotlib
+          ]))
+        ];
+      };
+    };
+
+    packages = {
+      default = pkgs.openemsh;
+      openemsh = pkgs.openemsh;
+    };
+  }) // {
+    overlays = {
+      pkgs = final: prev: {
+        openemsh = prev.callPackage ./default.nix {
+          stdenv = prev.llvmPackages_13.stdenv;
         };
       };
-
-      defaultPackage = this-package;
-    });
+    };
+  };
 }
