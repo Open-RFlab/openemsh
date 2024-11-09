@@ -23,16 +23,17 @@
   }@inputs:
   flake-utils.lib.eachDefaultSystem (system:
   let
-    pkgs = (nixpkgs.legacyPackages.${system}
-      .extend cmake-utils.overlays.pkgs)
-      .extend self.overlays.pkgs;
+    pkgs = nixpkgs.legacyPackages.${system}.appendOverlays [
+      cmake-utils.overlays.pkgs
+      self.overlays.pkgs
+    ];
 
   in {
     devShells = {
       default = pkgs.mkShell {
         inputsFrom = [
           pkgs.openemsh
-          pkgs.cmake-utils-all
+          pkgs.cmake-utils-full
         ];
       };
 
