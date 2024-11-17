@@ -12,6 +12,8 @@ namespace domain {
 Conflict::Conflict(Kind const kind)
 : IMeshLineOrigin()
 , kind(kind)
+, is_solved(false)
+, solution(nullptr)
 {}
 
 } // namespace domain

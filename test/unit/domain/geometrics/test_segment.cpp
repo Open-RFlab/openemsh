@@ -170,7 +170,8 @@ SCENARIO("std::optional<Axis> transpose(Plane const plane, Segment::Axis const a
 				std::optional<Axis> c(transpose(XY, Segment::Axis::POINT));
 				REQUIRE_FALSE(a.has_value());
 				REQUIRE_FALSE(b.has_value());
-				REQUIRE_FALSE(c.has_value());			}
+				REQUIRE_FALSE(c.has_value());
+			}
 		}
 	}
 }

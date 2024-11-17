@@ -110,7 +110,7 @@ SCENARIO("template<typename T, typename P> bool contains_that(std::vector<T> con
 				std::string b("b");
 				REQUIRE(contains_that(a,
 					[&b](std::unique_ptr<std::string> const& str) {
-						return str->c_str() == b.c_str();
+						return *str == b;
 					}));
 			}
 		}
@@ -120,7 +120,7 @@ SCENARIO("template<typename T, typename P> bool contains_that(std::vector<T> con
 				std::string b("ccc");
 				REQUIRE_FALSE(contains_that(a,
 					[&b](std::unique_ptr<std::string> const& str) {
-						return str->c_str() == b.c_str();
+						return *str == b;
 					}));
 			}
 		}
