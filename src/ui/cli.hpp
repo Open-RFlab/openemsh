@@ -6,22 +6,11 @@
 
 #pragma once
 
-#include <optional>
-
-#include "domain/global.hpp"
-#include "infra/parsers/parser_from_csx.hpp"
-#include "infra/serializers/serializer_to_csx.hpp"
+#include "app/openemsh.hpp"
 
 namespace ui {
 
 //******************************************************************************
-struct CliParams final
-: public domain::Params
-, public ParserFromCsx::Params
-, public SerializerToCsx::Params
-{};
-
-//******************************************************************************
-std::optional<CliParams> cli(int argc, char* argv[]);
+app::OpenEMSH::Params cli(int argc, char* argv[]) noexcept(false);
 
 } // namespace ui

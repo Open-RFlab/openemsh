@@ -5,6 +5,7 @@
 , cmake-utils
 , git
 , texlive
+, cli11
 , pugixml
 }:
 

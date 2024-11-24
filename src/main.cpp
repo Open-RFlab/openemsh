@@ -4,27 +4,20 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#include <memory>
-#include <vector>
-#include <iostream>
-#include <fstream>
+#include <cstdlib>
 
-#include "domain/board.hpp"
-#include "infra/parsers/parser_from_csx.hpp"
-#include "infra/serializers/serializer_to_csx.hpp"
-#include "infra/serializers/serializer_to_plantuml.hpp"
-#include "infra/serializers/serializer_to_prettyprint.hpp"
+#include "app/openemsh.hpp"
 #include "ui/cli.hpp"
-
-using namespace domain;
-using namespace std;
-using namespace ui;
 
 //******************************************************************************
 int main(int argc, char* argv[]) {
-	optional<CliParams> const params = cli(argc, argv);
-	if(!params)
-		return 1;
+	app::OpenEMSH oemsh(ui::cli(argc, argv));
 
-	return 0;
+	if(!oemsh.get_params().gui) {
+		oemsh.parse();
+		oemsh.do_all_step();
+		oemsh.write();
+	}
+
+	return EXIT_SUCCESS;
 }
