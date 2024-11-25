@@ -32,6 +32,11 @@ target_sources( openemsh
 	"${CMAKE_CURRENT_SOURCE_DIR}/app/openemsh.cpp"
 	)
 
+set_target_properties( openemsh
+	PROPERTIES
+	POSITION_INDEPENDENT_CODE ON
+	)
+
 target_compile_definitions( openemsh
 	PRIVATE
 	$<$<CONFIG:Debug>:DEBUG>
@@ -48,7 +53,7 @@ target_compile_options( openemsh
 	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Wall>
 	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Wextra>
 #	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-Weffc++>
-	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-fexceptions>
+	$<$<OR:$<CONFIG:Coverage>,$<CONFIG:Debug>>:-fno-exceptions>
 	)
 
 target_include_directories( openemsh
