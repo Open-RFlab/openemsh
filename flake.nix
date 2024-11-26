@@ -6,6 +6,8 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/22.11";
 
+    nix-filter.url = "github:numtide/nix-filter";
+
     flake-utils.url = "github:numtide/flake-utils";
 
     cmake-utils = {
@@ -17,11 +19,15 @@
 
   outputs = { self
   , nixpkgs
+  , nix-filter
   , cmake-utils
   , flake-utils
   , ...
   }@inputs:
-  flake-utils.lib.eachDefaultSystem (system:
+  let
+    lib = nixpkgs.lib.extend nix-filter.overlays.default;
+
+  in flake-utils.lib.eachDefaultSystem (system:
   let
     pkgs = nixpkgs.legacyPackages.${system}.appendOverlays [
       cmake-utils.overlays.pkgs
@@ -64,6 +70,7 @@
     overlays = {
       pkgs = final: prev: {
         openemsh = prev.callPackage ./default.nix {
+          inherit lib;
           stdenv = prev.llvmPackages_13.stdenv;
         };
 

@@ -14,7 +14,18 @@ stdenv.mkDerivation {
   name = "openemsh";
   version = "0.0.0";
 
-  src = ./.;
+  src = lib.nix-filter {
+    root = ./.;
+    include = [
+      "cmake"
+      "src"
+      "doc"
+      "icon"
+      "test"
+      "CMakeLists.txt"
+      "CMakePresets.json"
+    ];
+  };
 
   nativeBuildInputs = [
     cmake
