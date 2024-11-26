@@ -35,6 +35,7 @@ stdenv.mkDerivation {
   ];
 
   shellHook = ''
+    unset NIX_HARDENING_ENABLE
     export CPM_DISABLE=ON
   '';
 
