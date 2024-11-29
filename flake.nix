@@ -74,6 +74,8 @@
           stdenv = prev.llvmPackages_13.stdenv;
         };
 
+        inherit (prev.python310Packages) cairosvg;
+
         csxcad = (prev.csxcad.overrideAttrs (new: old: {
           version = "0.6.3";
           src = prev.fetchFromGitHub {
