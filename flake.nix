@@ -69,7 +69,7 @@
   }) // {
     overlays = {
       pkgs = final: prev: {
-        openemsh = prev.callPackage ./default.nix {
+        openemsh = prev.qt6.callPackage ./default.nix {
           inherit lib;
           stdenv = prev.llvmPackages_13.stdenv;
         };

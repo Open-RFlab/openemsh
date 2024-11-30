@@ -6,6 +6,11 @@ project( openemsh
 	DESCRIPTION "openEMS mesher"
 	HOMEPAGE_URL "https://github.com/Open-RFlab/openemsh"
 	)
+message( STATUS "Version: ${PROJECT_VERSION}" )
+
+set( OEMSH_BUGREPORT "https://github.com/Open-RFlab/openemsh/issues" )
+set( OEMSH_FUNDING   "https://liberapay.com/thomaslepoix" )
+#file( READ "${CMAKE_SOURCE_DIR}/CHANGELOG" OEMSH_CHANGELOG )
 
 if( NOT CMAKE_BUILD_TYPE )
 	set( CMAKE_BUILD_TYPE "Release" )
@@ -78,6 +83,16 @@ endif()
 find_package( CLI11 REQUIRED )
 if( CLI11_FOUND )
 	message( STATUS "Found CLI11: ${CLI11_DIR} ${CLI11_VERSION}" )
+endif()
+
+find_package( Qt6
+	COMPONENTS
+	Core          REQUIRED
+	Gui           REQUIRED
+	Widgets       REQUIRED
+	)
+if( Qt6_FOUND )
+	message( STATUS "Found Qt: ${Qt6_DIR} ${Qt6_VERSION}" )
 endif()
 
 if( CMakeUtils_FOUND )

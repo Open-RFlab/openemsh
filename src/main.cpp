@@ -4,10 +4,13 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <QApplication>
+
 #include <cstdlib>
 
 #include "app/openemsh.hpp"
 #include "ui/cli.hpp"
+#include "ui/qt/main_window.hpp"
 
 //******************************************************************************
 int main(int argc, char* argv[]) {
@@ -17,6 +20,13 @@ int main(int argc, char* argv[]) {
 		oemsh.parse();
 		oemsh.do_all_step();
 		oemsh.write();
+	} else {
+		QApplication a(argc, argv);
+		// Avoid a stold() bug introduced by QApplication() performing setlocale(LC_ALL, "")
+		setlocale(LC_NUMERIC, "C");
+		ui::qt::MainWindow w(oemsh);
+		w.show();
+		return a.exec();
 	}
 
 	return EXIT_SUCCESS;
