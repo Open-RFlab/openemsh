@@ -7,6 +7,8 @@
 , texlive
 , cli11
 , pugixml
+, qtbase
+, wrapQtAppsHook
 }:
 
 with pkgs;
@@ -32,6 +34,7 @@ stdenv.mkDerivation {
     cmake
     cmake-utils
     git
+    wrapQtAppsHook
     (texlive.combine {
       inherit (texlive) scheme-small standalone pgfplots;
     })
@@ -40,6 +43,7 @@ stdenv.mkDerivation {
   buildInputs = [
     cli11
     (pugixml.override { shared = true; })
+    qtbase
   ];
 
   cmakeFlags = [
@@ -50,6 +54,8 @@ stdenv.mkDerivation {
     unset NIX_HARDENING_ENABLE
     export CPM_DISABLE=ON
   '';
+
+  QT_XCB_GL_INTEGRATION = "none";
 
   meta = {
     homepage = "https://github.com/Open-RFlab/openemsh";

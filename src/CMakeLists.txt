@@ -71,12 +71,18 @@ add_executable( openemsh_bin )
 target_sources( openemsh_bin
 	PRIVATE
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/cli.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/about_dialog.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/main_window.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/resources.qrc"
 	"${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
 	)
 
 target_compile_definitions( openemsh_bin
 	PRIVATE
 	OEMSH_VERSION="${PROJECT_VERSION}"
+	OEMSH_HOMEPAGE="${PROJECT_HOMEPAGE_URL}"
+	OEMSH_FUNDING="${OEMSH_FUNDING}"
+	OEMSH_BUGREPORT="${OEMSH_BUGREPORT}"
 	)
 
 target_compile_features( openemsh_bin
@@ -102,6 +108,9 @@ target_link_libraries( openemsh_bin
 	PRIVATE
 	openemsh
 	CLI11::CLI11
+	Qt6::Core
+	Qt6::Gui
+	Qt6::Widgets
 	)
 
 #[[
@@ -111,6 +120,13 @@ install(
 	RUNTIME DESTINATION "bin" #"${CMAKE_INSTALL_BINDIR}"
 	)
 #]]
+
+set_target_properties( openemsh_bin
+	PROPERTIES
+	AUTOMOC ON
+	AUTORCC ON
+	AUTOUIC ON
+	)
 
 if( CMakeUtils_FOUND )
 	file( GLOB_RECURSE OPENEMSH_HEADERS "*.hpp" )
