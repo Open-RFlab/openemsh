@@ -6,6 +6,7 @@
 
 #include "about_dialog.hpp"
 
+#include "ui_main_window.h"
 #include "main_window.hpp"
 
 namespace ui::qt {
@@ -24,6 +25,9 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 	oemsh.parse();
 	oemsh.do_all_step();
 }
+
+//******************************************************************************
+MainWindow::~MainWindow() = default;
 
 //******************************************************************************
 void MainWindow::on_a_about_triggered() {

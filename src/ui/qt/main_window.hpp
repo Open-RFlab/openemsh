@@ -6,14 +6,16 @@
 
 #pragma once
 
+#include <memory>
+
 #include <QMainWindow>
 #include <QObject>
 
-#include <memory>
-
 #include "app/openemsh.hpp"
 
-#include "ui_main_window.h"
+namespace Ui {
+class MainWindow;
+} // namespace Ui
 
 namespace ui::qt {
 
@@ -33,6 +35,7 @@ private slots:
 
 public:
 	MainWindow(app::OpenEMSH& oemsh, QWidget* parent = nullptr);
+	~MainWindow();
 };
 
 } // namespace ui::qt
