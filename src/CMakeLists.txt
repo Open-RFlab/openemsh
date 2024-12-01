@@ -3,6 +3,7 @@ add_library( openemsh SHARED )
 
 target_sources( openemsh
 	PRIVATE
+	"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/space.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/relation.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/bounding.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/coord.cpp"
