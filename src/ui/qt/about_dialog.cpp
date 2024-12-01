@@ -8,6 +8,7 @@
 
 //#include "changelog.hpp"
 
+#include "ui_about_dialog.h"
 #include "about_dialog.hpp"
 
 namespace ui::qt {
@@ -41,6 +42,9 @@ AboutDialog::AboutDialog(QWidget* parent)
 		"Main developer: <thomas.lepoix@protonmail.ch>\n\n"
 		"Funding: " OEMSH_FUNDING);
 }
+
+//******************************************************************************
+AboutDialog::~AboutDialog() = default;
 
 //******************************************************************************
 void AboutDialog::on_pb_ok_clicked() {

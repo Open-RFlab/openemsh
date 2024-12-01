@@ -11,7 +11,9 @@
 
 #include <memory>
 
-#include "ui_about_dialog.h"
+namespace Ui {
+class AboutDialog;
+} // namespace Ui
 
 namespace ui::qt {
 
@@ -26,7 +28,7 @@ private slots:
 
 public:
 	explicit AboutDialog(QWidget* parent = nullptr);
-	~AboutDialog()=default;
+	~AboutDialog();
 };
 
 } // namespace ui::qt
