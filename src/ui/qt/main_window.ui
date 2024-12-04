@@ -279,7 +279,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QGraphicsView" name="structure_view">
+      <widget class="ui::qt::StructureView" name="structure_view">
        <property name="sizeAdjustPolicy">
         <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
        </property>
@@ -324,7 +324,13 @@
    </property>
   </action>
  </widget>
- <customwidgets/>
+ <customwidgets>
+  <customwidget>
+   <class>ui::qt::StructureView</class>
+   <extends>QGraphicsView</extends>
+   <header>ui/qt/structure_view/structure_view.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
