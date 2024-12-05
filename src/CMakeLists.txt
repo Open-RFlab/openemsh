@@ -72,6 +72,12 @@ add_executable( openemsh_bin )
 target_sources( openemsh_bin
 	PRIVATE
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/cli.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/port.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/text.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/rect.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/node.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/container.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/wire.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/structure_view/structure_edge.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/structure_view/structure_meshline.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/structure_view/structure_polygon.cpp"
