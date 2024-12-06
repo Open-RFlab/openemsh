@@ -12,6 +12,13 @@
 #include "domain/mesh/meshline.hpp"
 #include "utils/unreachable.hpp"
 
+#include "utils/nodegraph/wire.hpp"
+#include "processing_view/processing_conflict_colinear_edges.hpp"
+#include "processing_view/processing_edge.hpp"
+#include "processing_view/processing_axis.hpp"
+#include "processing_view/processing_plane.hpp"
+#include "processing_view/processing_polygon.hpp"
+#include "processing_view/processing_view.hpp"
 #include "structure_view/structure_view.hpp"
 #include "structure_view/structure_edge.hpp"
 #include "structure_view/structure_polygon.hpp"
@@ -34,17 +41,65 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 	setWindowIcon(QPixmap(":/openemsh.ico"));
 	ui->setupUi(this);
 	ui->structure_view->setup(ui->s_structure_zoom, ui->s_structure_rotation);
+	ui->processing_view->setup(ui->s_processing_zoom);
 
 	oemsh.parse();
 	oemsh.do_all_step();
 
 	update_structure();
+	update_processing();
 
 	ui->structure_view->setScene(&(ui->structure_view->scenes[domain::XY]));
 }
 
 //******************************************************************************
 MainWindow::~MainWindow() = default;
+
+//******************************************************************************
+void MainWindow::update_processing() {
+	for(domain::Plane const plane : domain::AllPlane) {
+		ProcessingPlane* processing_plane = new ProcessingPlane(plane);
+		ui->processing_view->processing_scene->addItem(processing_plane);
+		ui->processing_view->processing_scene->planes.append(processing_plane);
+		for(auto const& polygon : oemsh.get_board().get_polygons(plane)) {
+			ProcessingPolygon* processing_polygon = new ProcessingPolygon(polygon.get());
+			ui->processing_view->processing_scene->index[polygon.get()] = processing_polygon;
+			processing_plane->add(processing_polygon);
+			ui->processing_view->processing_scene->polygons.append(processing_polygon);
+			for(auto const& edge : polygon->edges) {
+				ProcessingEdge* processing_edge = new ProcessingEdge(edge.get());
+				ui->processing_view->processing_scene->index[edge.get()] = processing_edge;
+				processing_polygon->add(processing_edge);
+				processing_edge->updateGeometry();
+			}
+			processing_polygon->fit();
+		}
+		processing_plane->fit();
+	}
+
+	for(domain::Axis const axis : domain::AllAxis) {
+		ProcessingAxis* processing_axis = new ProcessingAxis(axis);
+		ui->processing_view->processing_scene->addItem(processing_axis);
+		ui->processing_view->processing_scene->axes.append(processing_axis);
+		for(auto const& conflict : oemsh.get_board().get_conflicts_colinear_edges(axis)) {
+			ProcessingConflictColinearEdges* processing_conflict = new ProcessingConflictColinearEdges(conflict.get());
+			ui->processing_view->processing_scene->index[conflict.get()] = processing_conflict;
+			processing_axis->add(processing_conflict);
+			ui->processing_view->processing_scene->conflict_colinear_edges.append(processing_conflict);
+			processing_conflict->updateGeometry();
+
+			for(auto const& [entity, port] : processing_conflict->port_index) {
+				auto* item = dynamic_cast<nodegraph::Node*>(ui->processing_view->processing_scene->index[entity]);
+				if(item) {
+					nodegraph::Wire* wire = new nodegraph::Wire(item->output_ports[0], port);
+					ui->processing_view->processing_scene->addItem(wire);
+					ui->processing_view->processing_scene->wires.append(wire);
+				}
+			}
+		}
+		processing_axis->fit();
+	}
+}
 
 //******************************************************************************
 void MainWindow::update_structure() {
@@ -104,6 +159,11 @@ void MainWindow::on_rb_plane_zx_toggled(bool const is_checked) {
 }
 
 //******************************************************************************
+void MainWindow::on_s_processing_zoom_valueChanged(int const /*value*/) {
+	ui->processing_view->transform_view();
+}
+
+//******************************************************************************
 void MainWindow::on_s_structure_rotation_valueChanged(int const /*value*/) {
 	ui->structure_view->transform_view();
 }
@@ -124,6 +184,9 @@ void MainWindow::on_tb_anchor_clicked(bool const is_checked) {
 
 //******************************************************************************
 void MainWindow::on_tb_reset_clicked() {
+	ui->processing_view->processing_scene->fit_containers();
+	ui->processing_view->fitInView(ui->processing_view->processing_scene->itemsBoundingRect(), Qt::KeepAspectRatio);
+
 	ui->s_structure_rotation->setValue((ui->s_structure_rotation->minimum() + ui->s_structure_rotation->maximum()) / 2);
 
 	// TODO zoom slider must be updated too
@@ -177,6 +240,16 @@ void MainWindow::on_tb_show_vertical_mesh_clicked() {
 //******************************************************************************
 void MainWindow::on_tb_show_no_mesh_clicked() {
 	ui->structure_view->set_mesh_visibility(StructureScene::MeshVisibility::NONE);
+}
+
+//******************************************************************************
+void MainWindow::on_tb_curved_wires_clicked() {
+	ui->processing_view->processing_scene->set_wire_style(nodegraph::Wire::Style::CURVED);
+}
+
+//******************************************************************************
+void MainWindow::on_tb_direct_wires_clicked() {
+	ui->processing_view->processing_scene->set_wire_style(nodegraph::Wire::Style::DIRECT);
 }
 
 } // namespace ui::qt

@@ -78,6 +78,13 @@ target_sources( openemsh_bin
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/node.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/container.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/wire.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/processing_view/processing_axis.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/processing_view/processing_plane.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/processing_view/processing_polygon.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/processing_view/processing_edge.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/processing_view/processing_conflict_colinear_edges.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/processing_view/processing_scene.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/processing_view/processing_view.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/structure_view/structure_edge.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/structure_view/structure_meshline.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/structure_view/structure_polygon.cpp"
@@ -95,6 +102,7 @@ target_compile_definitions( openemsh_bin
 	OEMSH_HOMEPAGE="${PROJECT_HOMEPAGE_URL}"
 	OEMSH_FUNDING="${OEMSH_FUNDING}"
 	OEMSH_BUGREPORT="${OEMSH_BUGREPORT}"
+#	OEMSH_NODEGRAPH_DEBUG
 	)
 
 target_compile_features( openemsh_bin
