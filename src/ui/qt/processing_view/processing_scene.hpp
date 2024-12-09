@@ -49,7 +49,17 @@ public:
 	QList<QGraphicsItem*> policies;
 
 //	std::map<std::size_t, QGraphicsItem*> index;
-	std::map<Entity*, QGraphicsItem*> index;
+	std::map<Entity const*, QGraphicsItem*> index;
+
+private slots:
+	void on_selectionChanged();
+signals:
+	void selection_changed(QList<QGraphicsItem*> items);
+public slots:
+	void select_counterparts(QList<QGraphicsItem*> foreign_items);
+
+private:
+	bool is_select_counterparts_locked = false;
 };
 
 } // namespace ui::qt

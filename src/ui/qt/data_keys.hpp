@@ -14,6 +14,7 @@ namespace DataKeys {
 enum DataKeys : int {
 	TYPE,
 	ID,
+	ENTITY,
 	NAME
 };
 } // namespace DataKeys

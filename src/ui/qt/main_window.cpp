@@ -43,6 +43,15 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 	ui->structure_view->setup(ui->s_structure_zoom, ui->s_structure_rotation);
 	ui->processing_view->setup(ui->s_processing_zoom);
 
+	for(domain::Plane const plane : domain::AllPlane) {
+		connect(
+			ui->processing_view->processing_scene, &ProcessingScene::selection_changed,
+			&(ui->structure_view->scenes[plane]), &StructureScene::select_counterparts);
+		connect(
+			&(ui->structure_view->scenes[plane]), &StructureScene::selection_changed,
+			ui->processing_view->processing_scene, &ProcessingScene::select_counterparts);
+	}
+
 	oemsh.parse();
 	oemsh.do_all_step();
 
@@ -107,12 +116,16 @@ void MainWindow::update_structure() {
 		ui->structure_view->scenes[plane].clear();
 
 		for(auto const& polygon : oemsh.get_board().get_polygons(plane)) {
-			ui->structure_view->scenes[plane].add(new StructurePolygon(polygon.get()));
+			StructurePolygon* structure_polygon = new StructurePolygon(polygon.get());
+			ui->structure_view->scenes[plane].index[polygon.get()] = structure_polygon;
+			ui->structure_view->scenes[plane].add(structure_polygon);
 		}
 
 		for(auto const& polygon : oemsh.get_board().get_polygons(plane)) {
 			for(auto const& edge : polygon->edges) {
-				ui->structure_view->scenes[plane].add(new StructureEdge(edge.get()));
+				StructureEdge* structure_edge = new StructureEdge(edge.get());
+				ui->structure_view->scenes[plane].index[edge.get()] = structure_edge;
+				ui->structure_view->scenes[plane].add(structure_edge);
 			}
 		}
 
@@ -121,7 +134,9 @@ void MainWindow::update_structure() {
 		for(domain::Axis const axis : domain::Axes[plane]) {
 			for(auto const& meshline : oemsh.get_board().get_meshlines(axis)) {
 				if(auto const view_axis = domain::transpose(plane, axis); view_axis) {
-					ui->structure_view->scenes[plane].add(new StructureMeshline(reverse(view_axis.value()), meshline.get(), scene_rect));
+					StructureMeshline* structure_meshline = new StructureMeshline(reverse(view_axis.value()), meshline.get(), scene_rect);
+					ui->structure_view->scenes[plane].index[meshline.get()] = structure_meshline;
+					ui->structure_view->scenes[plane].add(structure_meshline);
 				}
 			}
 		}

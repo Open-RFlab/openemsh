@@ -175,4 +175,25 @@ void StructureScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 	}
 }
 
+//******************************************************************************
+void StructureScene::on_selectionChanged() {
+	// Avoid infinite recursion by being synchronized back.
+	is_select_counterparts_locked = true;
+	emit selection_changed(selectedItems());
+	is_select_counterparts_locked = false;
+}
+
+//******************************************************************************
+void StructureScene::select_counterparts(QList<QGraphicsItem*> foreign_items) {
+	if(!is_select_counterparts_locked) {
+		clearSelection();
+		for(auto* foreign_item : foreign_items) {
+			Entity const* entity = static_cast<Entity const*>(foreign_item->data(DataKeys::ENTITY).value<void const*>());
+			if(index.contains(entity)) {
+				index.at(entity)->setSelected(true);
+			}
+		}
+	}
+}
+
 } // namespace ui::qt
