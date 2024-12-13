@@ -10,7 +10,7 @@ on:
 #    cron: "0 13 * * 1" # Every monday at 13h
 
 env:
-  SONAR_SCANNER_VERSION: 4.7.0.2747
+  SONAR_SCANNER_VERSION: 6.2.1.4610
 
 jobs:
   run:
@@ -21,15 +21,17 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y \
-            gcovr
-#            gcovr \
+            gcovr \
+            texlive-xetex \
+            cairosvg \
+            imagemagick
 #            libxml2-utils
 
       - name: "Dependencies: Sonar"
         run: |
           mkdir -p /tmp/sonar
           wget \
-            https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip \
+            https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux-x64.zip \
             -O /tmp/sonar/sonar-scanner.zip
           unzip \
             -o /tmp/sonar/sonar-scanner.zip \
@@ -79,7 +81,7 @@ jobs:
 
       - name: Scan
         run: |
-          /tmp/sonar/sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux/bin/sonar-scanner \
+          /tmp/sonar/sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux-x64/bin/sonar-scanner \
             -Dproject.settings=.sonar-project.properties \
             -Dsonar.cfamily.build-wrapper-output=build_wrapper_output_directory \
             -Dsonar.host.url="https://sonarcloud.io" \
