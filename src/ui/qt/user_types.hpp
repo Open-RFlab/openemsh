@@ -6,13 +6,15 @@
 
 #pragma once
 
+#include <QGraphicsItem>
+
 namespace ui::qt {
 
 // Scoped enum is not used but imitated because implicit conversion is wanted.
 //******************************************************************************
 namespace UserTypes {
-enum UserTypes : int {
-	STRUCTURE_EDGE = 1,
+enum UserTypes {
+	STRUCTURE_EDGE = QGraphicsItem::UserType + 1,
 	STRUCTURE_POLYGON,
 	STRUCTURE_MESHLINE,
 	PROCESSING_EDGE,

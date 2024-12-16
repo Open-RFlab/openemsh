@@ -12,12 +12,10 @@
 
 namespace ui::qt {
 
-class ProcessingEdge;
-
 //******************************************************************************
 class ProcessingAxis : public nodegraph::Container {
 public:
-	enum { Type = UserType + UserTypes::PROCESSING_AXIS };
+	enum { Type = UserTypes::PROCESSING_AXIS };
 
 	explicit ProcessingAxis(domain::Axis axis, QGraphicsItem* parent = nullptr);
 	~ProcessingAxis();

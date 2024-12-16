@@ -15,7 +15,7 @@ namespace ui::qt {
 //******************************************************************************
 class ProcessingPlane : public nodegraph::Container {
 public:
-	enum { Type = UserType + UserTypes::PROCESSING_PLANE };
+	enum { Type = UserTypes::PROCESSING_PLANE };
 
 	explicit ProcessingPlane(domain::Plane plane, QGraphicsItem* parent = nullptr);
 	~ProcessingPlane();

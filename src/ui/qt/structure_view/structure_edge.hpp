@@ -19,7 +19,7 @@ namespace ui::qt {
 //******************************************************************************
 class StructureEdge : public QGraphicsLineItem {
 public:
-	enum { Type = UserType + UserTypes::STRUCTURE_EDGE };
+	enum { Type = UserTypes::STRUCTURE_EDGE };
 
 	explicit StructureEdge(domain::Edge const* edge, QGraphicsItem* parent = nullptr);
 

@@ -18,7 +18,7 @@ namespace ui::qt {
 //******************************************************************************
 class ProcessingConflictColinearEdges : public nodegraph::Node {
 public:
-	enum { Type = UserType + UserTypes::PROCESSING_CONFLICT_CE };
+	enum { Type = UserTypes::PROCESSING_CONFLICT_CE };
 
 	explicit ProcessingConflictColinearEdges(domain::ConflictColinearEdges const* conflict, QGraphicsItem* parent = nullptr);
 	~ProcessingConflictColinearEdges();

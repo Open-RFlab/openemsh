@@ -20,7 +20,7 @@ namespace ui::qt {
 //******************************************************************************
 class StructureMeshline : public QGraphicsLineItem {
 public:
-	enum { Type = UserType + UserTypes::STRUCTURE_MESHLINE };
+	enum { Type = UserTypes::STRUCTURE_MESHLINE };
 
 	StructureMeshline(domain::ViewAxis axis, domain::Meshline const* meshline, QRectF scene_rect, QGraphicsItem* parent = nullptr);
 

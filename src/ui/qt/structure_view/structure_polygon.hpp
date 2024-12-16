@@ -19,7 +19,7 @@ namespace ui::qt {
 //******************************************************************************
 class StructurePolygon : public QGraphicsPolygonItem {
 public:
-	enum { Type = UserType + UserTypes::STRUCTURE_POLYGON };
+	enum { Type = UserTypes::STRUCTURE_POLYGON };
 
 	explicit StructurePolygon(domain::Polygon const* polygon, QGraphicsItem* parent = nullptr);
 

@@ -22,7 +22,7 @@ class ProcessingEdge;
 //******************************************************************************
 class ProcessingPolygon : public nodegraph::Container {
 public:
-	enum { Type = UserType + UserTypes::PROCESSING_POLYGON };
+	enum { Type = UserTypes::PROCESSING_POLYGON };
 
 	explicit ProcessingPolygon(domain::Polygon const* polygon, QGraphicsItem* parent = nullptr);
 	~ProcessingPolygon();
