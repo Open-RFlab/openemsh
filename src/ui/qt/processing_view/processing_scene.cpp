@@ -39,11 +39,14 @@ ProcessingScene::ProcessingScene(QObject* parent)
 	connect(
 		this, &QGraphicsScene::selectionChanged,
 		this, &ProcessingScene::on_selectionChanged);
-
 }
 
 //******************************************************************************
-ProcessingScene::~ProcessingScene() = default;
+ProcessingScene::~ProcessingScene() {
+	disconnect(
+		this, &QGraphicsScene::selectionChanged,
+		this, &ProcessingScene::on_selectionChanged);
+}
 
 //******************************************************************************
 void ProcessingScene::set_wire_style(nodegraph::Wire::Style style) {

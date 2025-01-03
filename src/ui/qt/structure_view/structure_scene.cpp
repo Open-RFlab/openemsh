@@ -57,6 +57,17 @@ StructureScene::StructureScene(QObject* parent)
 	edges->stackBefore(horizontal_meshlines);
 
 	setBackgroundBrush(Qt::white);
+
+	connect(
+		this, &QGraphicsScene::selectionChanged,
+		this, &StructureScene::on_selectionChanged);
+}
+
+//******************************************************************************
+StructureScene::~StructureScene() {
+	disconnect(
+		this, &QGraphicsScene::selectionChanged,
+		this, &StructureScene::on_selectionChanged);
 }
 
 //******************************************************************************

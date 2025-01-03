@@ -40,7 +40,7 @@ public:
 	};
 
 	explicit StructureScene(QObject* parent = nullptr);
-	~StructureScene() = default;
+	~StructureScene();
 
 	void add(StructureEdge* edge);
 	void add(StructurePolygon* polygon);
