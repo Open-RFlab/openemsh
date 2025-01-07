@@ -34,6 +34,7 @@ public:
 	QList<Port*> input_ports;
 	QList<Port*> output_ports;
 protected:
+	void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 	QVariant itemChange(GraphicsItemChange change, QVariant const& value) override;
 
 	QGraphicsLinearLayout* layout();

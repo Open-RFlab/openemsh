@@ -26,10 +26,10 @@ Node::Node(QString title, QGraphicsItem* parent)
 	setAcceptHoverEvents(true);
 	setAcceptTouchEvents(true);
 	setLayout(linear_layout);
-	this->title->setBrush(Qt::white);
+	this->title->setFlag(QGraphicsItem::ItemIsSelectable);
+	this->title->setAcceptedMouseButtons(Qt::NoButton);
 	linear_layout->addItem(this->title);
 }
-
 
 //******************************************************************************
 Node::Node(QGraphicsItem* parent)
@@ -60,8 +60,25 @@ QVariant Node::itemChange(GraphicsItemChange change, QVariant const& value) {
 			newPos.setY(qMin(rect.bottom(), qMax(newPos.y(), rect.top())));
 			return newPos;
 		}
+	} else if(change == ItemSelectedChange) {
+		for(auto* item : childItems()) {
+			item->setSelected(value.toBool());
+		}
+		return value;
 	}
 	return QGraphicsItem::itemChange(change, value);
+}
+
+//******************************************************************************
+void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+	QGraphicsItem::mouseReleaseEvent(event);
+	// Propagate selection to children as QGraphicsItem::mouseReleaseEvent() may
+	// perform QGraphicsScene::clearSelection().
+	if(isSelected()) {
+		for(auto* item : childItems()) {
+			item->setSelected(true);
+		}
+	}
 }
 
 //******************************************************************************
