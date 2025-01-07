@@ -38,7 +38,7 @@ if( Catch2_FOUND )
 
 	target_compile_features( openemsh_unittest
 		PRIVATE
-		cxx_std_17
+		cxx_std_23
 		)
 
 	target_compile_options( openemsh_unittest

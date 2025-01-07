@@ -45,7 +45,7 @@ target_compile_definitions( openemsh
 
 target_compile_features( openemsh
 	PRIVATE
-	cxx_std_17
+	cxx_std_23
 	)
 
 target_compile_options( openemsh
@@ -108,7 +108,7 @@ target_compile_definitions( openemsh_bin
 
 target_compile_features( openemsh_bin
 	PRIVATE
-	cxx_std_17
+	cxx_std_23
 	)
 
 target_compile_options( openemsh_bin
