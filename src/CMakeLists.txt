@@ -80,6 +80,7 @@ target_sources( openemsh_bin
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/wire.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/processing_view/processing_axis.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/processing_view/processing_plane.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/processing_view/processing_style.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/processing_view/processing_polygon.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/processing_view/processing_edge.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/processing_view/processing_conflict_colinear_edges.cpp"

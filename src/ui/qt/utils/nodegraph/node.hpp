@@ -6,8 +6,11 @@
 
 #pragma once
 
+#include <QBrush>
 #include <QGraphicsWidget>
 #include <QList>
+
+#include <functional>
 
 #include "port.hpp"
 
@@ -20,6 +23,20 @@ class Text;
 //******************************************************************************
 class Node : public QGraphicsWidget {
 public:
+	struct Params final {
+		qreal radius = 1;
+		QBrush title_background_regular = QBrush(Qt::black);
+		QBrush title_background_highlighted = title_background_regular;
+		QBrush title_background_selected = title_background_regular;
+		QBrush title_background_selected_highlighted = title_background_selected;
+		QBrush background_regular = QBrush(Qt::darkGray);
+		QBrush background_highlighted = background_regular;
+		QBrush background_selected = background_regular;
+		QBrush background_selected_highlighted = background_selected;
+	};
+
+	std::function<Params const& ()> locate_node_params;
+
 	explicit Node(QString title, QGraphicsItem* parent = nullptr);
 	explicit Node(QGraphicsItem* parent = nullptr);
 	~Node();

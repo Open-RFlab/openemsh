@@ -8,6 +8,7 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QPen>
+#include <QStyleOptionGraphicsItem>
 
 #include "rect.hpp"
 #include "text.hpp"
@@ -22,10 +23,9 @@ Container::Container(QSizeF margins, QGraphicsItem* parent)
 , nested_zone(new Rect(this))
 , margins(std::move(margins))
 {
+	nested_zone->setFlag(QGraphicsItem::ItemContainsChildrenInShape);
 	nested_zone->setFlag(QGraphicsItem::ItemDoesntPropagateOpacityToChildren);
-	nested_zone->setOpacity(0.5);
-	nested_zone->setPen(QPen(QColor(57, 57, 57)));
-	nested_zone->setBrush(QColor(57, 57, 57));
+	nested_zone->setFiltersChildEvents(false);
 	layout()->addItem(nested_zone);
 }
 
@@ -35,10 +35,9 @@ Container::Container(QString title, QSizeF margins, QGraphicsItem* parent)
 , nested_zone(new Rect(this))
 , margins(std::move(margins))
 {
+	nested_zone->setFlag(QGraphicsItem::ItemContainsChildrenInShape);
 	nested_zone->setFlag(QGraphicsItem::ItemDoesntPropagateOpacityToChildren);
-	nested_zone->setOpacity(0.5);
-	nested_zone->setPen(QPen(QColor(57, 57, 57)));
-	nested_zone->setBrush(QColor(57, 57, 57));
+	nested_zone->setFiltersChildEvents(false);
 	layout()->addItem(nested_zone);
 }
 
@@ -90,28 +89,41 @@ void Container::add(QGraphicsItem* item) {
 }
 
 //******************************************************************************
-void Container::paint(QPainter* painter, QStyleOptionGraphicsItem const* /*option*/, QWidget* /*widget*/) {
-//	Node::paint(painter, option, widget);
+void Container::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* /*widget*/) {
+	Node::Params const& params = locate_node_params();
 
-	painter->setPen(Qt::NoPen);
-	painter->setBrush(QColor(27, 27, 27));
-//	painter->setBrush(Qt::white);
+	if(option->state & QStyle::State_MouseOver
+	&& option->state & QStyle::State_Selected) {
+		painter->setBrush(params.background_selected_highlighted);
+	} else if(option->state & QStyle::State_MouseOver) {
+		painter->setBrush(params.background_highlighted);
+	} else if(option->state & QStyle::State_Selected) {
+		painter->setBrush(params.background_selected);
+	} else {
+		painter->setBrush(params.background_regular);
+	}
 
-	// TODO radius = title height / 2
-//	painter->drawRoundedRect(boundingRect(), 10, 10);
 	QPainterPath path;
 	QPainterPath nested;
-	path.addRoundedRect(boundingRect(), 10, 10);
+	path.addRoundedRect(boundingRect(), params.radius, params.radius);
 	nested.addRect(nested_zone->mapToParent(nested_zone->boundingRect()).boundingRect());
+	painter->setPen(Qt::NoPen);
 	painter->drawPath(path - nested);
 
-
 	if(title) {
-		painter->setBrush(QColor(33, 33, 33));
+		if(option->state & QStyle::State_MouseOver
+		&& option->state & QStyle::State_Selected) {
+			painter->setBrush(params.title_background_selected_highlighted);
+		} else if(option->state & QStyle::State_MouseOver) {
+			painter->setBrush(params.title_background_highlighted);
+		} else if(option->state & QStyle::State_Selected) {
+			painter->setBrush(params.title_background_selected);
+		} else {
+			painter->setBrush(params.title_background_regular);
+		}
 		QRectF titlebar = boundingRect();
 		titlebar.setBottom(title->mapToParent(title->boundingRect()).boundingRect().bottom());
-//		painter->drawRoundedRect(title->boundingRect(), 10, 10);
-		painter->drawRoundedRect(titlebar, 10, 10);
+		painter->drawRoundedRect(titlebar, params.radius, params.radius);
 		titlebar.setTop(titlebar.center().y());
 		painter->drawRect(titlebar);
 	}

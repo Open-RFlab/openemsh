@@ -13,6 +13,7 @@
 #include <map>
 
 #include "ui/qt/utils/nodegraph/wire.hpp"
+#include "processing_style.hpp"
 
 class Entity;
 
@@ -34,6 +35,8 @@ public:
 
 	void set_wire_style(nodegraph::Wire::Style style);
 	void fit_containers();
+
+	ProcessingStyleSelector style_selector;
 
 //private: //TODO
 	QList<nodegraph::Wire*> wires;

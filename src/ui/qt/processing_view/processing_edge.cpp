@@ -20,28 +20,30 @@ namespace ui::qt {
 //******************************************************************************
 ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 : nodegraph::Node("Edge", parent)
+, locate_processing_edge_params(default_locator<Params>)
 , edge(edge)
 {
 	setData(DataKeys::TYPE, "Edge");
 	setData(DataKeys::ID, (qulonglong) edge->id);
 	setData(DataKeys::ENTITY, QVariant::fromValue(static_cast<void const*>(edge)));
 
-	QGraphicsLinearLayout* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
-	QGraphicsLinearLayout* v_box1 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
-	QGraphicsLinearLayout* v_box2 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
-	QGraphicsLinearLayout* v_box3 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
-	layout()->addItem(h_box);
-	v_box1->addStretch();
-	v_box1->addItem(add_input_port());
-	v_box1->addStretch();
-	h_box->addItem(v_box1);
-	h_box->addItem(v_box2);
-	h_box->addItem(v_box3);
+	locate_node_params = [&]() -> auto& {
+		return locate_processing_edge_params().node;
+	};
+
+	title->locate_text_params = [&]() -> auto& {
+		return locate_processing_edge_params().title;
+	};
+
+	nodegraph::Port* input_port = add_input_port();
+	input_port->locate_port_params = [&]() -> auto& {
+		return locate_processing_edge_params().port;
+	};
+
 	nodegraph::Port* output_port = add_output_port();
-	v_box3->addStretch();
-	v_box3->addItem(output_port);
-	v_box3->addStretch();
-	v_box3->setAlignment(output_port, Qt::AlignRight | Qt::AlignVCenter);
+	output_port->locate_port_params = [&]() -> auto& {
+		return locate_processing_edge_params().port;
+	};
 
 	QString normal("Normal: ");
 	QString to_mesh("To mesh: ");
@@ -50,23 +52,46 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 		to_mesh += (edge->to_mesh ? "true" : "false");
 	}
 
-	{
-		nodegraph::Text* text = new nodegraph::Text(normal, this);
-		text->setBrush(Qt::white);
-		v_box2->addItem(text);
+	nodegraph::Text* text_normal = new nodegraph::Text(normal, this);
+	text_normal->setFlag(QGraphicsItem::ItemIsSelectable);
+	text_normal->setAcceptedMouseButtons(Qt::NoButton);
+	text_normal->locate_text_params = [&]() -> auto& {
+		return locate_processing_edge_params().main;
+	};
+
+	nodegraph::Text* text_to_mesh = new nodegraph::Text(to_mesh, this);
+	if(edge) {
+		if(edge->to_mesh)
+			text_to_mesh->locate_text_params = [&]() -> auto& {
+				return locate_processing_edge_params().enabled;
+			};
+		else
+			text_to_mesh->locate_text_params = [&]() -> auto& {
+				return locate_processing_edge_params().disabled;
+			};
+	} else {
+		text_to_mesh->locate_text_params = [&]() -> auto& {
+			return locate_processing_edge_params().main;
+		};
 	}
-	{
-		nodegraph::Text* text = new nodegraph::Text(to_mesh, this);
-		if(edge) {
-			if(edge->to_mesh)
-				text->setBrush(Qt::darkGreen);
-			else
-				text->setBrush(Qt::darkRed);
-		} else {
-			text->setBrush(Qt::white);
-		}
-		v_box2->addItem(text);
-	}
+
+	QGraphicsLinearLayout* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
+	QGraphicsLinearLayout* v_box1 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	QGraphicsLinearLayout* v_box2 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	QGraphicsLinearLayout* v_box3 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	layout()->addItem(h_box);
+	h_box->addItem(v_box1);
+	h_box->addItem(v_box2);
+	h_box->addItem(v_box3);
+	v_box1->addStretch();
+	v_box1->addItem(input_port);
+	v_box1->addStretch();
+	v_box2->addItem(text_normal);
+	v_box2->addItem(text_to_mesh);
+	v_box3->addStretch();
+	v_box3->addItem(output_port);
+	v_box3->addStretch();
+	v_box3->setAlignment(output_port, Qt::AlignRight | Qt::AlignVCenter);
 }
 
 //******************************************************************************
@@ -75,17 +100,6 @@ ProcessingEdge::~ProcessingEdge() = default;
 //******************************************************************************
 int ProcessingEdge::type() const {
 	return Type;
-}
-
-//******************************************************************************
-void ProcessingEdge::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) {
-	nodegraph::Node::paint(painter, option, widget);
-
-#ifdef OEMSH_NODEGRAPH_DEBUG
-	painter->setBrush(Qt::NoBrush);
-	painter->setPen(QPen(Qt::red));
-	painter->drawRect(boundingRect());
-#endif // OEMSH_NODEGRAPH_DEBUG
 }
 
 } // namespace ui::qt

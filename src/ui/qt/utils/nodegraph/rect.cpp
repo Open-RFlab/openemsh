@@ -4,6 +4,11 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <QPainter>
+#include <QStyleOptionGraphicsItem>
+
+#include "utils/default_locator.hpp"
+
 #include "rect.hpp"
 
 namespace ui::qt::nodegraph {
@@ -12,6 +17,7 @@ namespace ui::qt::nodegraph {
 Rect::Rect(QGraphicsItem* parent)
 : QGraphicsRectItem(parent)
 , QGraphicsLayoutItem()
+, locate_rect_params(default_locator<Params>)
 {
 	setGraphicsItem(this);
 }
@@ -20,6 +26,7 @@ Rect::Rect(QGraphicsItem* parent)
 Rect::Rect(qreal x, qreal y, qreal width, qreal height, QGraphicsItem* parent)
 : QGraphicsRectItem(x, y, width, height, parent)
 , QGraphicsLayoutItem()
+, locate_rect_params(default_locator<Params>)
 {
 	setGraphicsItem(this);
 }
@@ -37,6 +44,32 @@ void Rect::setGeometry(QRectF const& geom) {
 //******************************************************************************
 QSizeF Rect::sizeHint(Qt::SizeHint /*which*/, QSizeF const& /*constraint*/) const {
 	return boundingRect().size();
+}
+
+//******************************************************************************
+void Rect::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) {
+	Params const& params = locate_rect_params();
+
+	if(option->state & QStyle::State_MouseOver
+	&& option->state & QStyle::State_Selected) {
+		painter->setBrush(params.fill_selected_highlighted);
+		painter->setPen(params.contour_selected_highlighted);
+		painter->setOpacity(params.opacity_selected_highlighted);
+	} else if(option->state & QStyle::State_MouseOver) {
+		painter->setBrush(params.fill_highlighted);
+		painter->setPen(params.contour_highlighted);
+		painter->setOpacity(params.opacity_highlighted);
+	} else if(option->state & QStyle::State_Selected) {
+		painter->setBrush(params.fill_selected);
+		painter->setPen(params.contour_selected);
+		painter->setOpacity(params.opacity_selected);
+	} else {
+		painter->setBrush(params.fill_regular);
+		painter->setPen(params.contour_regular);
+		painter->setOpacity(params.opacity_regular);
+	}
+
+	painter->drawRect(rect());
 }
 
 } // namespace ui:qt::nodegraph

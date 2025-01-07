@@ -10,6 +10,7 @@
 
 #include <cmath>
 
+#include "utils/default_locator.hpp"
 #include "utils/unreachable.hpp"
 #include "port.hpp"
 
@@ -21,6 +22,7 @@ namespace ui::qt::nodegraph {
 Wire::Wire(Port* begin, Port* end, QGraphicsItem* parent)
 : QGraphicsPathItem(parent)
 , style(Style::CURVED)
+, locate_wire_params(default_locator<Params>)
 , begin(begin)
 , end(end)
 {
@@ -108,14 +110,17 @@ Wire* Wire::unwire() {
 //******************************************************************************
 void Wire::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* /*widget*/) {
 	if(begin && end) {
-		painter->setPen(QPen(Qt::green, 2, Qt::SolidLine, Qt::RoundCap));
+		Params const& params = locate_wire_params();
 
-		if(option->state & QStyle::State_MouseOver) {
-			QPen pen = painter->pen();
-			pen.setColor(pen.color().lighter());
-			pen.setWidth(4);
-//			brush.setColor(brush.color().darker());
-			painter->setPen(pen);
+		if(option->state & QStyle::State_MouseOver
+		&& option->state & QStyle::State_Selected) {
+			painter->setPen(params.selected_highlighted);
+		} else if(option->state & QStyle::State_MouseOver) {
+			painter->setPen(params.highlighted);
+		} else if(option->state & QStyle::State_Selected) {
+			painter->setPen(params.selected);
+		} else {
+			painter->setPen(params.regular);
 		}
 
 		painter->drawPath(path());

@@ -6,7 +6,9 @@
 
 #include <QGraphicsLinearLayout>
 #include <QPainter>
+#include <QStyleOptionGraphicsItem>
 
+#include "utils/default_locator.hpp"
 #include "utils/unreachable.hpp"
 #include "wire.hpp"
 
@@ -18,6 +20,7 @@ namespace ui::qt::nodegraph {
 Port::Port(QString const& text, AnchorPoint anchor, QGraphicsItem* parent)
 : QGraphicsSimpleTextItem(text, parent)
 , QGraphicsLayoutItem()
+, locate_port_params(default_locator<Params>)
 , anchor(anchor)
 , wire(nullptr)
 {
@@ -40,15 +43,35 @@ void Port::setGeometry(QRectF const& geom) {
 }
 
 //******************************************************************************
-void Port::paint(QPainter* painter, QStyleOptionGraphicsItem const* /*option*/, QWidget* /*widget*/) {
-	painter->setPen(QPen(Qt::white));
-//	QGraphicsSimpleTextItem::paint(painter, option, widget);
-	painter->drawText(boundingRect(), Qt::AlignHCenter | Qt::AlignVCenter, text());
+void Port::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* /*widget*/) {
+	Params const& params = locate_port_params();
 
-	painter->setPen(QPen(Qt::black));
-	painter->setBrush(QColor(255, 119, 0));
-	painter->drawEllipse(attach_pos(), radius, radius);
-//	painter->drawEllipse(QPointF(boundingRect().left(), boundingRect().center().y()), 5, 5);
+	if(option->state & QStyle::State_MouseOver
+	&& option->state & QStyle::State_Selected) {
+		painter->setPen(params.text_selected_highlighted);
+		painter->drawText(boundingRect(), Qt::AlignHCenter | Qt::AlignVCenter, text());
+		painter->setPen(params.contour_selected_highlighted);
+		painter->setBrush(params.fill_selected_highlighted);
+		painter->drawEllipse(attach_pos(), params.radius, params.radius);
+	} else if(option->state & QStyle::State_MouseOver) {
+		painter->setPen(params.text_highlighted);
+		painter->drawText(boundingRect(), Qt::AlignHCenter | Qt::AlignVCenter, text());
+		painter->setPen(params.contour_highlighted);
+		painter->setBrush(params.fill_highlighted);
+		painter->drawEllipse(attach_pos(), params.radius, params.radius);
+	} else if(option->state & QStyle::State_Selected) {
+		painter->setPen(params.text_selected);
+		painter->drawText(boundingRect(), Qt::AlignHCenter | Qt::AlignVCenter, text());
+		painter->setPen(params.contour_selected);
+		painter->setBrush(params.fill_selected);
+		painter->drawEllipse(attach_pos(), params.radius, params.radius);
+	} else {
+		painter->setPen(params.text_regular);
+		painter->drawText(boundingRect(), Qt::AlignHCenter | Qt::AlignVCenter, text());
+		painter->setPen(params.contour_regular);
+		painter->setBrush(params.fill_regular);
+		painter->drawEllipse(attach_pos(), params.radius, params.radius);
+	}
 
 #ifdef OEMSH_NODEGRAPH_DEBUG
 	painter->setBrush(Qt::NoBrush);
@@ -64,12 +87,17 @@ void Port::paint(QPainter* painter, QStyleOptionGraphicsItem const* /*option*/, 
 //******************************************************************************
 QPointF Port::attach_pos() const {
 	//TODO if hidden return parent(aka node)->parent(aka container)->in/out port
-	QRectF rect = boundingRect();
+	QRectF const rect = boundingRect();
+	QGraphicsItem const* const parent = parentItem();
+	QRectF const parent_rect = parent
+	                         ? mapFromParent(parent->boundingRect()).boundingRect()
+	                         : rect;
+
 	switch(anchor) {
-	case AnchorPoint::TOP:    return QPointF(rect.center().x(), rect.top()-radius*1.8);
-	case AnchorPoint::BOTTOM: return QPointF(rect.center().x(), rect.bottom()+radius*1.8);
-	case AnchorPoint::LEFT:   return QPointF(rect.left()-radius*1.8, rect.center().y());
-	case AnchorPoint::RIGHT:  return QPointF(rect.right()+radius*1.8, rect.center().y());
+	case AnchorPoint::TOP:    return QPointF(rect.center().x(), parent_rect.top());
+	case AnchorPoint::BOTTOM: return QPointF(rect.center().x(), parent_rect.bottom());
+	case AnchorPoint::LEFT:   return QPointF(parent_rect.left(), rect.center().y());
+	case AnchorPoint::RIGHT:  return QPointF(parent_rect.right(), rect.center().y());
 	default: unreachable();
 	}
 }

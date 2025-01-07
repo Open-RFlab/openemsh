@@ -6,8 +6,10 @@
 
 #pragma once
 
+#include <QBrush>
 #include <QGraphicsLayoutItem>
 #include <QGraphicsSimpleTextItem>
+#include <QPen>
 
 namespace ui::qt::nodegraph {
 
@@ -20,6 +22,24 @@ class Port
 {
 public:
 	enum class AnchorPoint { TOP, BOTTOM, LEFT, RIGHT };
+
+	struct Params final {
+		qreal radius = 5;
+		QPen text_regular = QPen(Qt::white);
+		QPen text_highlighted = text_regular;
+		QPen text_selected = text_regular;
+		QPen text_selected_highlighted = text_selected;
+		QPen contour_regular = QPen(Qt::black);
+		QPen contour_highlighted = contour_regular;
+		QPen contour_selected = contour_regular;
+		QPen contour_selected_highlighted = contour_selected;
+		QBrush fill_regular = QBrush(Qt::yellow);
+		QBrush fill_highlighted = fill_regular;
+		QBrush fill_selected = fill_regular;
+		QBrush fill_selected_highlighted = fill_selected;
+	};
+
+	std::function<Params const& ()> locate_port_params;
 
 	Port(QString const& text, AnchorPoint anchor, QGraphicsItem* parent = nullptr);
 	~Port();
@@ -36,7 +56,6 @@ protected:
 private:
 	friend class Wire;
 
-	static qreal constexpr radius = 5;
 	AnchorPoint const anchor;
 	Wire* wire; // TODO QList<Wire*>
 };

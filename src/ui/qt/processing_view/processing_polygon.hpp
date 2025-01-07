@@ -10,6 +10,11 @@
 
 #include "ui/qt/user_types.hpp"
 #include "ui/qt/utils/nodegraph/container.hpp"
+#include "ui/qt/utils/nodegraph/rect.hpp"
+#include "ui/qt/utils/nodegraph/text.hpp"
+#include "utils/default_locator.hpp"
+
+#include <functional>
 
 namespace domain {
 class Polygon;
@@ -24,12 +29,18 @@ class ProcessingPolygon : public nodegraph::Container {
 public:
 	enum { Type = UserTypes::PROCESSING_POLYGON };
 
+	struct Params final {
+		nodegraph::Node::Params const& node = default_locator<nodegraph::Node::Params>();
+		nodegraph::Text::Params const& title = default_locator<nodegraph::Text::Params>();
+		nodegraph::Rect::Params const& nested_zone = default_locator<nodegraph::Rect::Params>();
+	};
+
+	std::function<Params const& ()> locate_processing_polygon_params;
+
 	explicit ProcessingPolygon(domain::Polygon const* polygon, QGraphicsItem* parent = nullptr);
 	~ProcessingPolygon();
 
 	int type() const override;
-
-	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;
 
 	QList<ProcessingEdge*> edges();
 

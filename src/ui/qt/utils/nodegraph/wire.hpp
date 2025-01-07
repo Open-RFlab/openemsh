@@ -6,7 +6,10 @@
 
 #pragma once
 
+#include <QPen>
 #include <QGraphicsPathItem>
+
+#include <functional>
 
 namespace ui::qt::nodegraph {
 
@@ -17,7 +20,16 @@ class Wire : public QGraphicsPathItem {
 public:
 	enum class Style { DIRECT, CURVED } style;
 
-	explicit Wire(Port* begin, Port* end, QGraphicsItem* parent = nullptr);
+	struct Params final {
+		QPen regular = QPen(Qt::green, 2, Qt::SolidLine, Qt::RoundCap);
+		QPen highlighted = QPen(QColor(Qt::green).lighter(), 4, Qt::SolidLine, Qt::RoundCap);
+		QPen selected = regular;
+		QPen selected_highlighted = highlighted;
+	};
+
+	std::function<Params const& ()> locate_wire_params;
+
+	Wire(Port* begin, Port* end, QGraphicsItem* parent = nullptr);
 	~Wire();
 
 	void update_path();

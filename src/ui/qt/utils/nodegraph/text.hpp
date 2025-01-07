@@ -6,8 +6,11 @@
 
 #pragma once
 
+#include <QPen>
 #include <QGraphicsLayoutItem>
 #include <QGraphicsSimpleTextItem>
+
+#include <functional>
 
 namespace ui::qt::nodegraph {
 
@@ -17,6 +20,15 @@ class Text
 , public QGraphicsLayoutItem
 {
 public:
+	struct Params final {
+		QPen regular = QPen(Qt::white);
+		QPen highlighted = regular;
+		QPen selected = regular;
+		QPen selected_highlighted = selected;
+	};
+
+	std::function<Params const& ()> locate_text_params;
+
 	explicit Text(QString const& text, QGraphicsItem* parent = nullptr);
 	~Text();
 

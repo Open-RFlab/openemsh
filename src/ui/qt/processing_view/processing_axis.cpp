@@ -13,8 +13,21 @@ namespace ui::qt {
 //******************************************************************************
 ProcessingAxis::ProcessingAxis(domain::Axis axis, QGraphicsItem* parent)
 : nodegraph::Container("Axis " + QString::fromStdString(to_string(axis)), QSizeF(50, 10), parent)
+, locate_processing_axis_params(default_locator<Params>)
 , axis(axis)
-{}
+{
+	locate_node_params = [&]() -> auto& {
+		return locate_processing_axis_params().node;
+	};
+
+	title->locate_text_params = [&]() -> auto& {
+		return locate_processing_axis_params().title;
+	};
+
+	nested_zone->locate_rect_params = [&]() -> auto& {
+		return locate_processing_axis_params().nested_zone;
+	};
+}
 
 //******************************************************************************
 ProcessingAxis::~ProcessingAxis() = default;
@@ -22,11 +35,6 @@ ProcessingAxis::~ProcessingAxis() = default;
 //******************************************************************************
 int ProcessingAxis::type() const {
 	return Type;
-}
-
-//******************************************************************************
-void ProcessingAxis::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) {
-	nodegraph::Container::paint(painter, option, widget);
 }
 
 } // namespace ui::qt
