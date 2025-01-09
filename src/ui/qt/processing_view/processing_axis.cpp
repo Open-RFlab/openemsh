@@ -16,6 +16,16 @@ ProcessingAxis::ProcessingAxis(domain::Axis axis, QGraphicsItem* parent)
 , locate_processing_axis_params(default_locator<Params>)
 , axis(axis)
 {
+	get_column = [](QGraphicsItem const* item) {
+		if(!item)
+			return 0;
+		switch(item->type()) {
+		case UserTypes::PROCESSING_CONFLICT_CE: return 0;
+		case UserTypes::PROCESSING_MESHLINE_POLICY: return 1;
+		default: return 0;
+		}
+	};
+
 	locate_node_params = [&]() -> auto& {
 		return locate_processing_axis_params().node;
 	};

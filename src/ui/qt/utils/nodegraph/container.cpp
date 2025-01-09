@@ -10,6 +10,8 @@
 #include <QPen>
 #include <QStyleOptionGraphicsItem>
 
+#include <map>
+
 #include "rect.hpp"
 #include "text.hpp"
 
@@ -20,6 +22,7 @@ namespace ui::qt::nodegraph {
 //******************************************************************************
 Container::Container(QSizeF margins, QGraphicsItem* parent)
 : Node(parent)
+, get_column([](QGraphicsItem const*) { return 0; })
 , nested_zone(new Rect(this))
 , margins(std::move(margins))
 {
@@ -32,6 +35,7 @@ Container::Container(QSizeF margins, QGraphicsItem* parent)
 //******************************************************************************
 Container::Container(QString title, QSizeF margins, QGraphicsItem* parent)
 : Node(std::move(title), parent)
+, get_column([](QGraphicsItem const*) { return 0; })
 , nested_zone(new Rect(this))
 , margins(std::move(margins))
 {
@@ -59,26 +63,47 @@ void Container::fit() {
 	if(!nested_zone->childItems().isEmpty()) {
 		prepareGeometryChange();
 
-// TODO if active only + add columns & type/column associations
+		// TODO if active only
 
-		qreal x = 0;
-		qreal y = margins.height();
+		std::map<std::size_t, qreal> column_w; // without margins
+		std::map<std::size_t, qreal> column_h; // with margins
+		std::map<QGraphicsItem const*, qreal> item_y;
+
+		// Calculate columns sizes.
 		for(QGraphicsItem* item : nested_zone->childItems()) {
-			x = qMax(x, item->boundingRect().width());
-			y += item->boundingRect().height() + margins.height();
+			std::size_t const col = get_column(item);
+			if(!column_w.contains(col))
+				column_w[col] = 0;
+			if(!column_h.contains(col))
+				column_h[col] = margins.height();
+
+			item_y[item] = column_h[col];
+			column_h[col] += item->boundingRect().height() + margins.height();
+			column_w[col] = qMax(column_w[col], item->boundingRect().width());
 		}
-		x += margins.width() * 2;
-		nested_zone->setMinimumSize(x, y); // <-----------------
-		nested_zone->setRect(QRectF(0, 0, x, y));
+
+		// Calculate column positions.
+		std::map<std::size_t, qreal> column_x = column_w; // Copy for the key part.
+		std::begin(column_x)->second = margins.width();
+		for(auto it = std::next(std::begin(column_x)); it != std::end(column_x); ++it) {
+			it->second = prev(it)->second + column_w[prev(it)->first] + margins.width();
+		}
+
+		// Calculate container size.
+		qreal w = std::rbegin(column_x)->second + std::rbegin(column_w)->second + margins.width();
+		qreal h = 0;
+		for(auto& it : column_h)
+			h = qMax(h, it.second);
+
+		// Update the Container size.
+		nested_zone->setMinimumSize(w, h); // <-----------------
+		nested_zone->setRect(QRectF(0, 0, w, h));
 		layout()->updateGeometry();
 		updateGeometry();
 
-		y = margins.height();
+		// Place items for real.
 		for(QGraphicsItem* item : nested_zone->childItems()) {
-//			item->moveBy(margins.width(), y);
-			item->setPos(margins.width(), y);
-
-			y += item->boundingRect().height() + margins.height();
+			item->setPos(column_x[get_column(item)], item_y[item]);
 		}
 	}
 }

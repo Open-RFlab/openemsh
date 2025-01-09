@@ -8,6 +8,8 @@
 
 #include <QSizeF>
 
+#include <functional>
+
 #include "node.hpp"
 
 namespace ui::qt::nodegraph {
@@ -28,6 +30,7 @@ public:
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;
 
 protected:
+	std::function<std::size_t (QGraphicsItem const*)> get_column;
 	Rect* const nested_zone;
 	QSizeF const margins;
 };
