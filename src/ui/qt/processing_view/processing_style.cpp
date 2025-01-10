@@ -87,6 +87,7 @@ ProcessingStyleSelector::ProcessingStyleSelector()
 , polygon(make_polygon())
 , plane(make_plane())
 , axis(make_axis())
+, meshline_policy(make_meshline_policy())
 , conflict_ce(make_conflict_ce())
 {}
 
@@ -106,6 +107,7 @@ ProcessingStyleSelector::ProcessingStyleSelector(ProcessingStyle style)
 , polygon(make_polygon())
 , plane(make_plane())
 , axis(make_axis())
+, meshline_policy(make_meshline_policy())
 , conflict_ce(make_conflict_ce())
 {}
 
@@ -266,6 +268,19 @@ ProcessingEdge::Params ProcessingStyleSelector::make_edge() const {
 }
 
 //******************************************************************************
+ProcessingMeshlinePolicy::Params ProcessingStyleSelector::make_meshline_policy() const {
+	return {
+		.node = get_node(),
+		.port = get_port(),
+		.title = get_title(),
+		.main = get_text_normal(),
+		.enabled = get_text_enabled(),
+		.enabled_for_sure = get_text_enabled_for_sure(),
+		.disabled = get_text_disabled()
+	};
+}
+
+//******************************************************************************
 ProcessingPolygon::Params ProcessingStyleSelector::make_polygon() const {
 	return {
 		.node = get_node(),
@@ -354,6 +369,11 @@ nodegraph::Text::Params const& ProcessingStyleSelector::get_text_disabled() cons
 //******************************************************************************
 ProcessingEdge::Params const& ProcessingStyleSelector::get_edge() const {
 	return edge;
+}
+
+//******************************************************************************
+ProcessingMeshlinePolicy::Params const& ProcessingStyleSelector::get_meshline_policy() const {
+	return meshline_policy;
 }
 
 //******************************************************************************

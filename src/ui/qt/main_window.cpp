@@ -14,6 +14,7 @@
 
 #include "utils/nodegraph/wire.hpp"
 #include "processing_view/processing_conflict_colinear_edges.hpp"
+#include "processing_view/processing_meshline_policy.hpp"
 #include "processing_view/processing_edge.hpp"
 #include "processing_view/processing_axis.hpp"
 #include "processing_view/processing_plane.hpp"
@@ -67,28 +68,13 @@ MainWindow::~MainWindow() = default;
 //******************************************************************************
 void MainWindow::update_processing() {
 	for(domain::Plane const plane : domain::AllPlane) {
-		ProcessingPlane* processing_plane = new ProcessingPlane(plane);
-		processing_plane->locate_processing_plane_params = [&]() -> auto& {
-			return ui->processing_view->processing_scene->style_selector.get_plane();
-		};
-		ui->processing_view->processing_scene->addItem(processing_plane);
-		ui->processing_view->processing_scene->planes.append(processing_plane);
+		auto* processing_plane = ui->processing_view->processing_scene->add(plane);
+
 		for(auto const& polygon : oemsh.get_board().get_polygons(plane)) {
-			ProcessingPolygon* processing_polygon = new ProcessingPolygon(polygon.get());
-			ui->processing_view->processing_scene->index[polygon.get()] = processing_polygon;
-			processing_polygon->locate_processing_polygon_params = [&]() -> auto& {
-				return ui->processing_view->processing_scene->style_selector.get_polygon();
-			};
-			processing_plane->add(processing_polygon);
-			ui->processing_view->processing_scene->polygons.append(processing_polygon);
+			auto* processing_polygon = ui->processing_view->processing_scene->add(polygon.get(), processing_plane);
+
 			for(auto const& edge : polygon->edges) {
-				ProcessingEdge* processing_edge = new ProcessingEdge(edge.get());
-				ui->processing_view->processing_scene->index[edge.get()] = processing_edge;
-				processing_edge->locate_processing_edge_params = [&]() -> auto& {
-					return ui->processing_view->processing_scene->style_selector.get_edge();
-				};
-				processing_polygon->add(processing_edge);
-				processing_edge->updateGeometry();
+				ui->processing_view->processing_scene->add(edge.get(), processing_polygon);
 			}
 			processing_polygon->fit();
 		}
@@ -96,23 +82,28 @@ void MainWindow::update_processing() {
 	}
 
 	for(domain::Axis const axis : domain::AllAxis) {
-		ProcessingAxis* processing_axis = new ProcessingAxis(axis);
-		processing_axis->locate_processing_axis_params = [&]() -> auto& {
-			return ui->processing_view->processing_scene->style_selector.get_axis();
-		};
-		ui->processing_view->processing_scene->addItem(processing_axis);
-		ui->processing_view->processing_scene->axes.append(processing_axis);
+		auto* processing_axis = ui->processing_view->processing_scene->add(axis);
+
 		for(auto const& conflict : oemsh.get_board().get_conflicts_colinear_edges(axis)) {
-			ProcessingConflictColinearEdges* processing_conflict = new ProcessingConflictColinearEdges(conflict.get());
-			processing_conflict->locate_processing_conflict_ce_params = [&]() -> auto& {
-				return ui->processing_view->processing_scene->style_selector.get_conflict_ce();
-			};
-			ui->processing_view->processing_scene->index[conflict.get()] = processing_conflict;
-			processing_axis->add(processing_conflict);
-			ui->processing_view->processing_scene->conflict_colinear_edges.append(processing_conflict);
-			processing_conflict->updateGeometry();
+			auto* processing_conflict = ui->processing_view->processing_scene->add(conflict.get(), processing_axis);
 
 			for(auto const& [entity, port] : processing_conflict->port_index) {
+				auto* item = dynamic_cast<nodegraph::Node*>(ui->processing_view->processing_scene->index[entity]);
+				if(item) {
+					nodegraph::Wire* wire = new nodegraph::Wire(item->output_ports[0], port);
+					wire->locate_wire_params = [&]() -> auto& {
+						return ui->processing_view->processing_scene->style_selector.get_wire();
+					};
+					ui->processing_view->processing_scene->addItem(wire);
+					ui->processing_view->processing_scene->wires.append(wire);
+				}
+			}
+		}
+
+		for(auto const& policy : oemsh.get_board().get_meshline_policies(axis)) {
+			auto* processing_policy = ui->processing_view->processing_scene->add(policy.get(), processing_axis);
+
+			for(auto const& [entity, port] : processing_policy->port_index) {
 				auto* item = dynamic_cast<nodegraph::Node*>(ui->processing_view->processing_scene->index[entity]);
 				if(item) {
 					nodegraph::Wire* wire = new nodegraph::Wire(item->output_ports[0], port);

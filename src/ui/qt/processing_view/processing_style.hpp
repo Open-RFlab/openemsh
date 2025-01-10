@@ -16,6 +16,7 @@
 #include "processing_axis.hpp"
 #include "processing_conflict_colinear_edges.hpp"
 #include "processing_edge.hpp"
+#include "processing_meshline_policy.hpp"
 #include "processing_plane.hpp"
 #include "processing_polygon.hpp"
 
@@ -121,6 +122,7 @@ class ProcessingStyleSelector {
 	ProcessingPolygon::Params const polygon;
 	ProcessingPlane::Params const plane;
 	ProcessingAxis::Params const axis;
+	ProcessingMeshlinePolicy::Params const meshline_policy;
 	ProcessingConflictColinearEdges::Params const conflict_ce;
 
 	nodegraph::Wire::Params make_wire(ProcessingStyle const& style) const;
@@ -136,6 +138,7 @@ class ProcessingStyleSelector {
 	ProcessingPolygon::Params make_polygon() const;
 	ProcessingPlane::Params make_plane() const;
 	ProcessingAxis::Params make_axis() const;
+	ProcessingMeshlinePolicy::Params make_meshline_policy() const;
 	ProcessingConflictColinearEdges::Params make_conflict_ce() const;
 
 public:
@@ -155,6 +158,7 @@ public:
 	ProcessingPolygon::Params const& get_polygon() const;
 	ProcessingPlane::Params const& get_plane() const;
 	ProcessingAxis::Params const& get_axis() const;
+	ProcessingMeshlinePolicy::Params const& get_meshline_policy() const;
 	ProcessingConflictColinearEdges::Params const& get_conflict_ce() const;
 
 	ProcessingStyleSelector();

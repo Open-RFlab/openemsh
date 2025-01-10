@@ -12,6 +12,7 @@
 
 #include <map>
 
+#include "domain/geometrics/space.hpp"
 #include "ui/qt/utils/nodegraph/wire.hpp"
 #include "processing_style.hpp"
 
@@ -24,6 +25,7 @@ class ProcessingPlane;
 class ProcessingPolygon;
 class ProcessingEdge;
 class ProcessingConflictColinearEdges;
+class ProcessingMeshlinePolicy;
 
 //******************************************************************************
 class ProcessingScene : public QGraphicsScene {
@@ -36,15 +38,23 @@ public:
 	void set_wire_style(nodegraph::Wire::Style style);
 	void fit_containers();
 
+	ProcessingPlane* add(domain::Plane plane);
+	ProcessingAxis* add(domain::Axis axis);
+	ProcessingPolygon* add(domain::Polygon* polygon, ProcessingPlane* to_plane);
+	ProcessingEdge* add(domain::Edge* edge, ProcessingPolygon* to_polygon);
+	ProcessingConflictColinearEdges* add(domain::ConflictColinearEdges* conflict, ProcessingAxis* to_axis);
+	ProcessingMeshlinePolicy* add(domain::MeshlinePolicy* policy, ProcessingAxis* to_axis);
+
 	ProcessingStyleSelector style_selector;
 
 //private: //TODO
 	QList<nodegraph::Wire*> wires;
-	QList<ProcessingPlane*> planes;
-	QList<ProcessingAxis*> axes;
+	domain::PlaneSpace<ProcessingPlane*> planes;
+	domain::AxisSpace<ProcessingAxis*> axes;
 	QList<ProcessingPolygon*> polygons;
 	QList<ProcessingEdge*> edges;
 	QList<QGraphicsItem*> meshlines;
+	QList<ProcessingMeshlinePolicy*> meshline_policies;
 	QList<QGraphicsItem*> intervals;
 	QList<QGraphicsItem*> conflict_edge_in_polygons;
 	QList<ProcessingConflictColinearEdges*> conflict_colinear_edges;
@@ -63,6 +73,13 @@ public slots:
 
 private:
 	bool is_select_counterparts_locked = false;
+
+	template<typename Item, typename Space>
+	Item* add_node(Space space);
+	template<typename Item, typename Entity>
+	Item* add_node(Entity* entity);
+	template<typename Item, typename Entity>
+	Item* add_node(Entity* entity, nodegraph::Container* to_container);
 };
 
 } // namespace ui::qt

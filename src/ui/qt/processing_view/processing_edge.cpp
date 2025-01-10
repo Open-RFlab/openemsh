@@ -60,6 +60,8 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 	};
 
 	nodegraph::Text* text_to_mesh = new nodegraph::Text(to_mesh, this);
+	text_to_mesh->setFlag(QGraphicsItem::ItemIsSelectable);
+	text_to_mesh->setAcceptedMouseButtons(Qt::NoButton);
 	if(edge) {
 		if(edge->to_mesh)
 			text_to_mesh->locate_text_params = [&]() -> auto& {
