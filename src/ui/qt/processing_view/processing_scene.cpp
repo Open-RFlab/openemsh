@@ -154,6 +154,17 @@ ProcessingMeshlinePolicy* ProcessingScene::add(domain::MeshlinePolicy* policy, P
 }
 
 //******************************************************************************
+nodegraph::Wire* ProcessingScene::wire_together(nodegraph::Port* begin, nodegraph::Port* end) {
+	nodegraph::Wire* wire = new nodegraph::Wire(begin, end);
+	addItem(wire);
+	wires.append(wire);
+	wire->locate_wire_params = [&]() -> auto& {
+		return style_selector.get_wire();
+	};
+	return wire;
+}
+
+//******************************************************************************
 void ProcessingScene::on_selectionChanged() {
 	// Avoid infinite recursion by being synchronized back.
 	is_select_counterparts_locked = true;

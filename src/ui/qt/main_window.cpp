@@ -85,37 +85,34 @@ void MainWindow::update_processing() {
 		auto* processing_axis = ui->processing_view->processing_scene->add(axis);
 
 		for(auto const& conflict : oemsh.get_board().get_conflicts_colinear_edges(axis)) {
-			auto* processing_conflict = ui->processing_view->processing_scene->add(conflict.get(), processing_axis);
-
-			for(auto const& [entity, port] : processing_conflict->port_index) {
-				auto* item = dynamic_cast<nodegraph::Node*>(ui->processing_view->processing_scene->index[entity]);
-				if(item) {
-					nodegraph::Wire* wire = new nodegraph::Wire(item->output_ports[0], port);
-					wire->locate_wire_params = [&]() -> auto& {
-						return ui->processing_view->processing_scene->style_selector.get_wire();
-					};
-					ui->processing_view->processing_scene->addItem(wire);
-					ui->processing_view->processing_scene->wires.append(wire);
-				}
-			}
+			ui->processing_view->processing_scene->add(conflict.get(), processing_axis);
 		}
 
 		for(auto const& policy : oemsh.get_board().get_meshline_policies(axis)) {
-			auto* processing_policy = ui->processing_view->processing_scene->add(policy.get(), processing_axis);
+			ui->processing_view->processing_scene->add(policy.get(), processing_axis);
+		}
+		processing_axis->fit();
+	}
 
-			for(auto const& [entity, port] : processing_policy->port_index) {
-				auto* item = dynamic_cast<nodegraph::Node*>(ui->processing_view->processing_scene->index[entity]);
-				if(item) {
-					nodegraph::Wire* wire = new nodegraph::Wire(item->output_ports[0], port);
-					wire->locate_wire_params = [&]() -> auto& {
-						return ui->processing_view->processing_scene->style_selector.get_wire();
-					};
-					ui->processing_view->processing_scene->addItem(wire);
-					ui->processing_view->processing_scene->wires.append(wire);
+	for(auto* conflict : ui->processing_view->processing_scene->conflict_colinear_edges) {
+		for(auto const& [entity, port] : conflict->port_index) {
+			if(ui->processing_view->processing_scene->index.contains(entity)) {
+				if(auto* item = dynamic_cast<nodegraph::Node*>(ui->processing_view->processing_scene->index.at(entity))
+				; item) {
+					ui->processing_view->processing_scene->wire_together(item->output_ports[0], port);
 				}
 			}
 		}
-		processing_axis->fit();
+	}
+	for(auto* policy : ui->processing_view->processing_scene->meshline_policies) {
+		for(auto const& [entity, port] : policy->port_index) {
+			if(ui->processing_view->processing_scene->index.contains(entity)) {
+				if(auto* item = dynamic_cast<nodegraph::Node*>(ui->processing_view->processing_scene->index.at(entity))
+				; item) {
+					ui->processing_view->processing_scene->wire_together(item->output_ports[0], port);
+				}
+			}
+		}
 	}
 }
 

@@ -45,6 +45,8 @@ public:
 	ProcessingConflictColinearEdges* add(domain::ConflictColinearEdges* conflict, ProcessingAxis* to_axis);
 	ProcessingMeshlinePolicy* add(domain::MeshlinePolicy* policy, ProcessingAxis* to_axis);
 
+	nodegraph::Wire* wire_together(nodegraph::Port* begin, nodegraph::Port* end);
+
 	ProcessingStyleSelector style_selector;
 
 //private: //TODO
