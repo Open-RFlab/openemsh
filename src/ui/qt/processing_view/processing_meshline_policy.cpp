@@ -8,9 +8,12 @@
 #include <QGraphicsWidget>
 #include <QGraphicsLinearLayout>
 
+#include "domain/geometrics/edge.hpp"
+#include "domain/conflicts/conflict_colinear_edges.hpp"
 #include "domain/mesh/meshline_policy.hpp"
 #include "ui/qt/data_keys.hpp"
 #include "ui/qt/utils/nodegraph/text.hpp"
+#include "utils/down_up_cast.hpp"
 #include "infra/utils/to_string.hpp"
 
 #include "processing_meshline_policy.hpp"
@@ -53,7 +56,12 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 			return locate_processing_meshline_policy_params().port;
 		};
 		v_box1->addItem(port);
-		port_index[static_cast<Entity*>(static_cast<void*>(origin))] = port; // TODO either store indexes as void*, either use QGraphicsItem* instead of entity
+		// Downcast from IMeshLineOrigin is mandatory to upcast to Entity.
+		if(auto* entity = down_up_cast<Entity,
+			domain::Edge,
+			domain::ConflictColinearEdges>(origin)
+		; entity)
+			port_index[entity] = port;
 	}
 
 	v_box1->addStretch();
