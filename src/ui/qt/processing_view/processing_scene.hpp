@@ -64,7 +64,7 @@ public:
 	QList<QGraphicsItem*> policies;
 
 //	std::map<std::size_t, QGraphicsItem*> index;
-	std::map<Entity const*, QGraphicsItem*> index;
+	std::map<Entity const*, nodegraph::Node*> index;
 
 private slots:
 	void on_selectionChanged();

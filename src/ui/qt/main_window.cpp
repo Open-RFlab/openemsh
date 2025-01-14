@@ -97,20 +97,16 @@ void MainWindow::update_processing() {
 	for(auto* conflict : ui->processing_view->processing_scene->conflict_colinear_edges) {
 		for(auto const& [entity, port] : conflict->port_index) {
 			if(ui->processing_view->processing_scene->index.contains(entity)) {
-				if(auto* item = dynamic_cast<nodegraph::Node*>(ui->processing_view->processing_scene->index.at(entity))
-				; item) {
-					ui->processing_view->processing_scene->wire_together(item->output_ports[0], port);
-				}
+				auto* item = ui->processing_view->processing_scene->index.at(entity);
+				ui->processing_view->processing_scene->wire_together(item->output_ports[0], port);
 			}
 		}
 	}
 	for(auto* policy : ui->processing_view->processing_scene->meshline_policies) {
 		for(auto const& [entity, port] : policy->port_index) {
 			if(ui->processing_view->processing_scene->index.contains(entity)) {
-				if(auto* item = dynamic_cast<nodegraph::Node*>(ui->processing_view->processing_scene->index.at(entity))
-				; item) {
-					ui->processing_view->processing_scene->wire_together(item->output_ports[0], port);
-				}
+				auto* item = ui->processing_view->processing_scene->index.at(entity);
+				ui->processing_view->processing_scene->wire_together(item->output_ports[0], port);
 			}
 		}
 	}
