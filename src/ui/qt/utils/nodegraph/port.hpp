@@ -48,6 +48,8 @@ public:
 	void setGeometry(QRectF const& geom) override;
 
 	QPointF attach_pos() const;
+	bool is_wired() const;
+	bool is_wired_to(Port const* port) const;
 
 protected:
 	QVariant itemChange(GraphicsItemChange change, QVariant const& value) override;

@@ -103,6 +103,19 @@ QPointF Port::attach_pos() const {
 }
 
 //******************************************************************************
+bool Port::is_wired() const {
+	return wire;
+}
+
+//******************************************************************************
+bool Port::is_wired_to(Port const* port) const {
+	if(wire)
+		return wire->traverse(port);
+	else
+		return false;
+}
+
+//******************************************************************************
 QVariant Port::itemChange(GraphicsItemChange change, QVariant const& value) {
 	if(change == ItemScenePositionHasChanged && wire != nullptr) {
 		wire->update_path();

@@ -97,14 +97,24 @@ void Wire::update_path() {
 	}
 }
 
-// Ownership is transfered to the caller.
-//******************************************************************************
+/// Ownership is transfered to the caller.
+///*****************************************************************************
 Wire* Wire::unwire() {
 	if(scene())
 		scene()->removeItem(this);
 	begin->wire = nullptr;
 	end->wire = nullptr;
 	return this;
+}
+
+//******************************************************************************
+Port* Wire::traverse(Port const* port) const {
+	if(port == begin)
+		return end;
+	else if(port == end)
+		return begin;
+	else
+		return nullptr;
 }
 
 //******************************************************************************

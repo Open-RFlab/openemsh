@@ -35,6 +35,7 @@ public:
 	void update_path();
 
 	Wire* unwire();
+	Port* traverse(Port const* port) const;
 
 protected:
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;
