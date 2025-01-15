@@ -9,6 +9,7 @@
 #include <QBrush>
 #include <QGraphicsLayoutItem>
 #include <QGraphicsSimpleTextItem>
+#include <QList>
 #include <QPen>
 
 namespace ui::qt::nodegraph {
@@ -59,7 +60,7 @@ private:
 	friend class Wire;
 
 	AnchorPoint const anchor;
-	Wire* wire; // TODO QList<Wire*>
+	QList<Wire*> wires;
 };
 
 } // namespace ui:qt::nodegraph

@@ -34,7 +34,7 @@ public:
 
 	void update_path();
 
-	Wire* unwire();
+	Wire* unwire(Port const* called_from_dtor_of = nullptr);
 	Port* traverse(Port const* port) const;
 
 protected:

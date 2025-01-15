@@ -8,6 +8,8 @@
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 
+#include <algorithm>
+
 #include "utils/default_locator.hpp"
 #include "utils/unreachable.hpp"
 #include "wire.hpp"
@@ -22,7 +24,6 @@ Port::Port(QString const& text, AnchorPoint anchor, QGraphicsItem* parent)
 , QGraphicsLayoutItem()
 , locate_port_params(default_locator<Params>)
 , anchor(anchor)
-, wire(nullptr)
 {
 	setGraphicsItem(this);
 //	setFlag(QGraphicsItem::ItemSendsGeometryChanges);
@@ -31,8 +32,9 @@ Port::Port(QString const& text, AnchorPoint anchor, QGraphicsItem* parent)
 
 //******************************************************************************
 Port::~Port() {
-	if(wire)
-		delete wire->unwire();
+	for(auto* wire : wires)
+		if(wire)
+			delete wire->unwire(this);
 }
 
 //******************************************************************************
@@ -104,21 +106,22 @@ QPointF Port::attach_pos() const {
 
 //******************************************************************************
 bool Port::is_wired() const {
-	return wire;
+	return !wires.empty();
 }
 
 //******************************************************************************
 bool Port::is_wired_to(Port const* port) const {
-	if(wire)
+	return std::any_of(wires.cbegin(), wires.cend(), [port](Wire* wire)-> bool {
 		return wire->traverse(port);
-	else
-		return false;
+	});
 }
 
 //******************************************************************************
 QVariant Port::itemChange(GraphicsItemChange change, QVariant const& value) {
-	if(change == ItemScenePositionHasChanged && wire != nullptr) {
-		wire->update_path();
+	if(change == ItemScenePositionHasChanged) {
+		for(auto* wire : wires)
+			if(wire)
+				wire->update_path();
 	}
 	return QGraphicsItem::itemChange(change, value);
 }

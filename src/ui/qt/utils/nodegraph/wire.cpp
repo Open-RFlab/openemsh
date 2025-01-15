@@ -30,10 +30,10 @@ Wire::Wire(Port* begin, Port* end, QGraphicsItem* parent)
 //	setZValue(-1);
 
 	if(begin) {
-		begin->wire = this;
+		begin->wires.append(this);
 	}
 	if(end) {
-		end->wire = this;
+		end->wires.append(this);
 	}
 	update_path();
 }
@@ -99,11 +99,13 @@ void Wire::update_path() {
 
 /// Ownership is transfered to the caller.
 ///*****************************************************************************
-Wire* Wire::unwire() {
+Wire* Wire::unwire(Port const* called_from_dtor_of) {
 	if(scene())
 		scene()->removeItem(this);
-	begin->wire = nullptr;
-	end->wire = nullptr;
+	if(begin && called_from_dtor_of != begin)
+		begin->wires.removeAll(this);
+	if(end && called_from_dtor_of != end)
+		end->wires.removeAll(this);
 	return this;
 }
 
