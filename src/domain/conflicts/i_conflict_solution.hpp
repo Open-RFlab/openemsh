@@ -8,6 +8,8 @@
 
 namespace domain {
 
+class Conflict;
+
 //******************************************************************************
 class IConflictSolution {
 public:

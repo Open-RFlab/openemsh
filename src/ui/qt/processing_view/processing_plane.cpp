@@ -5,6 +5,7 @@
 ///*****************************************************************************
 
 #include "infra/utils/to_string.hpp"
+#include "ui/qt/data_keys.hpp"
 
 #include "processing_plane.hpp"
 
@@ -27,6 +28,9 @@ ProcessingPlane::ProcessingPlane(domain::Plane plane, QGraphicsItem* parent)
 	nested_zone->locate_rect_params = [&]() -> auto& {
 		return locate_processing_plane_params().nested_zone;
 	};
+
+	setData(DataKeys::TYPE, "Plane");
+	setData(DataKeys::NAME, QString::fromStdString(to_string(plane)));
 }
 
 //******************************************************************************

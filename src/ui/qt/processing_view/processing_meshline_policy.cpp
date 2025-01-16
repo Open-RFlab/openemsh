@@ -26,9 +26,7 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 , locate_processing_meshline_policy_params(default_locator<Params>)
 , meshline_policy(meshline_policy)
 {
-	setData(DataKeys::TYPE, "MeshlinePolicy");
-	setData(DataKeys::ID, (qulonglong) meshline_policy->id);
-	setData(DataKeys::ENTITY, QVariant::fromValue(static_cast<void const*>(meshline_policy)));
+	QList<QVariant> to_wire;
 
 	locate_node_params = [&]() -> auto& {
 		return locate_processing_meshline_policy_params().node;
@@ -61,7 +59,7 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 			domain::Edge,
 			domain::ConflictColinearEdges>(origin)
 		; entity)
-			port_index[entity] = port;
+			to_wire.emplace_back(std::in_place_type<DataKeys::ToWire>, entity, port);
 	}
 
 	v_box1->addStretch();
@@ -129,6 +127,11 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 	v_box3->addItem(output_port);
 	v_box3->addStretch();
 	v_box3->setAlignment(output_port, Qt::AlignRight | Qt::AlignVCenter);
+
+	setData(DataKeys::TYPE, "MeshlinePolicy");
+	setData(DataKeys::ID, (qulonglong) meshline_policy->id);
+	setData(DataKeys::ENTITY, DataKeys::set_entity(meshline_policy));
+	setData(DataKeys::TO_WIRE, std::move(to_wire));
 }
 
 //******************************************************************************

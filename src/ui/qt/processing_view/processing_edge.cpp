@@ -9,6 +9,7 @@
 #include <QGraphicsLinearLayout>
 
 #include "domain/geometrics/edge.hpp"
+#include "domain/conflicts/conflict.hpp"
 #include "ui/qt/data_keys.hpp"
 #include "ui/qt/utils/nodegraph/text.hpp"
 #include "infra/utils/to_string.hpp"
@@ -23,9 +24,7 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 , locate_processing_edge_params(default_locator<Params>)
 , edge(edge)
 {
-	setData(DataKeys::TYPE, "Edge");
-	setData(DataKeys::ID, (qulonglong) edge->id);
-	setData(DataKeys::ENTITY, QVariant::fromValue(static_cast<void const*>(edge)));
+	QList<QVariant> to_wire;
 
 	locate_node_params = [&]() -> auto& {
 		return locate_processing_edge_params().node;
@@ -39,6 +38,9 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 	input_port->locate_port_params = [&]() -> auto& {
 		return locate_processing_edge_params().port;
 	};
+	if(edge->conflict) {
+		to_wire.emplace_back(std::in_place_type<DataKeys::ToWire>, edge->conflict, input_port);
+	}
 
 	nodegraph::Port* output_port = add_output_port();
 	output_port->locate_port_params = [&]() -> auto& {
@@ -94,6 +96,11 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 	v_box3->addItem(output_port);
 	v_box3->addStretch();
 	v_box3->setAlignment(output_port, Qt::AlignRight | Qt::AlignVCenter);
+
+	setData(DataKeys::TYPE, "Edge");
+	setData(DataKeys::ID, (qulonglong) edge->id);
+	setData(DataKeys::ENTITY, DataKeys::set_entity(edge));
+	setData(DataKeys::TO_WIRE, std::move(to_wire));
 }
 
 //******************************************************************************

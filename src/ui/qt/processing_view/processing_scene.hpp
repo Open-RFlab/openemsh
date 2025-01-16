@@ -47,6 +47,8 @@ public:
 
 	nodegraph::Wire* wire_together(nodegraph::Port* begin, nodegraph::Port* end);
 
+	void wire_to_destination_first_output_port(nodegraph::Node* node);
+
 	ProcessingStyleSelector style_selector;
 
 //private: //TODO

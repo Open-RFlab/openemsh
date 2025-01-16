@@ -100,6 +100,7 @@ void ConflictEdgeInPolygon::auto_solve(MeshlinePolicyManager& /*line_policy_mana
 	}
 
 	edge->to_mesh = !(merged_range == *edge);
+	edge->conflict = this;
 	solution = edge;
 	is_solved = true;
 }

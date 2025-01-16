@@ -9,6 +9,7 @@
 
 #include "domain/conflicts/conflict_colinear_edges.hpp"
 #include "infra/utils/to_string.hpp"
+#include "ui/qt/data_keys.hpp"
 
 #include "processing_conflict_colinear_edges.hpp"
 
@@ -20,6 +21,8 @@ ProcessingConflictColinearEdges::ProcessingConflictColinearEdges(domain::Conflic
 , locate_processing_conflict_ce_params(default_locator<Params>)
 , conflict(conflict)
 {
+	QList<QVariant> to_wire;
+
 	locate_node_params = [&]() -> auto& {
 		return locate_processing_conflict_ce_params().node;
 	};
@@ -43,7 +46,7 @@ ProcessingConflictColinearEdges::ProcessingConflictColinearEdges(domain::Conflic
 			return locate_processing_conflict_ce_params().port;
 		};
 		v_box1->addItem(port);
-		port_index[edge] = port;
+		to_wire.emplace_back(std::in_place_type<DataKeys::ToWire>, edge, port);
 	}
 
 	nodegraph::Port* out = add_output_port();
@@ -57,6 +60,11 @@ ProcessingConflictColinearEdges::ProcessingConflictColinearEdges(domain::Conflic
 	v_box2->addItem(out);
 	v_box2->addStretch();
 	v_box2->setAlignment(out, Qt::AlignRight | Qt::AlignVCenter);
+
+	setData(DataKeys::TYPE, "ConflictColinearEdges");
+	setData(DataKeys::ID, (qulonglong) conflict->id);
+	setData(DataKeys::ENTITY, DataKeys::set_entity(conflict));
+	setData(DataKeys::TO_WIRE, std::move(to_wire));
 }
 
 //******************************************************************************

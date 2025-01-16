@@ -25,6 +25,7 @@ StructureEdge::StructureEdge(domain::Edge const* edge, QGraphicsItem* parent)
 	setAcceptTouchEvents(true);
 	setData(DataKeys::TYPE, "Edge");
 	setData(DataKeys::ID, (qulonglong) edge->id);
+	setData(DataKeys::ENTITY, DataKeys::set_entity(edge));
 //	setData(DataKeys::NAME, polygon->name); // TODO What should be edge name? <polygon>-<edge-n> ?
 }
 

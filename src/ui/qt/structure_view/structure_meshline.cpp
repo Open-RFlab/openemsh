@@ -46,6 +46,7 @@ StructureMeshline::StructureMeshline(domain::ViewAxis axis, domain::Meshline con
 
 	setData(DataKeys::TYPE, "Meshline");
 	setData(DataKeys::ID, (qulonglong) meshline->id);
+	setData(DataKeys::ENTITY, DataKeys::set_entity(meshline));
 //	setData(DataKeys::NAME, meshline->name.c_str());
 }
 

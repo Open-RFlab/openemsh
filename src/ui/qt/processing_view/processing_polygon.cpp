@@ -19,11 +19,6 @@ ProcessingPolygon::ProcessingPolygon(domain::Polygon const* polygon, QGraphicsIt
 , locate_processing_polygon_params(default_locator<Params>)
 , polygon(polygon)
 {
-	setData(DataKeys::TYPE, "Polygon");
-	setData(DataKeys::ID, (qulonglong) polygon->id);
-	setData(DataKeys::ENTITY, QVariant::fromValue(static_cast<void const*>(polygon)));
-	setData(DataKeys::NAME, polygon->name.c_str());
-
 	locate_node_params = [&]() -> auto& {
 		return locate_processing_polygon_params().node;
 	};
@@ -35,6 +30,11 @@ ProcessingPolygon::ProcessingPolygon(domain::Polygon const* polygon, QGraphicsIt
 	nested_zone->locate_rect_params = [&]() -> auto& {
 		return locate_processing_polygon_params().nested_zone;
 	};
+
+	setData(DataKeys::TYPE, "Polygon");
+	setData(DataKeys::ID, (qulonglong) polygon->id);
+	setData(DataKeys::NAME, polygon->name.c_str());
+	setData(DataKeys::ENTITY, DataKeys::set_entity(polygon));
 }
 
 //******************************************************************************

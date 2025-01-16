@@ -95,24 +95,11 @@ void MainWindow::update_processing() {
 	}
 
 	for(auto* conflict : ui->processing_view->processing_scene->conflict_colinear_edges) {
-		for(auto const& [entity, port] : conflict->port_index) {
-			if(ui->processing_view->processing_scene->index.contains(entity)) {
-				auto* item = ui->processing_view->processing_scene->index.at(entity);
-				if(!port->is_wired_to(item->output_ports[0])) {
-					ui->processing_view->processing_scene->wire_together(item->output_ports[0], port);
-				}
-			}
-		}
+		ui->processing_view->processing_scene->wire_to_destination_first_output_port(conflict);
 	}
+
 	for(auto* policy : ui->processing_view->processing_scene->meshline_policies) {
-		for(auto const& [entity, port] : policy->port_index) {
-			if(ui->processing_view->processing_scene->index.contains(entity)) {
-				auto* item = ui->processing_view->processing_scene->index.at(entity);
-				if(!port->is_wired_to(item->output_ports[0])) {
-					ui->processing_view->processing_scene->wire_together(item->output_ports[0], port);
-				}
-			}
-		}
+		ui->processing_view->processing_scene->wire_to_destination_first_output_port(policy);
 	}
 }
 

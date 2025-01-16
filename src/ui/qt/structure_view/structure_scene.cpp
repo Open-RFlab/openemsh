@@ -199,7 +199,7 @@ void StructureScene::select_counterparts(QList<QGraphicsItem*> foreign_items) {
 	if(!is_select_counterparts_locked) {
 		clearSelection();
 		for(auto* foreign_item : foreign_items) {
-			Entity const* entity = static_cast<Entity const*>(foreign_item->data(DataKeys::ENTITY).value<void const*>());
+			auto const* entity = DataKeys::get_entity(foreign_item->data(DataKeys::ENTITY));
 			if(index.contains(entity)) {
 				index.at(entity)->setSelected(true);
 			}

@@ -165,6 +165,20 @@ nodegraph::Wire* ProcessingScene::wire_together(nodegraph::Port* begin, nodegrap
 }
 
 //******************************************************************************
+void ProcessingScene::wire_to_destination_first_output_port(nodegraph::Node* node) {
+	for(auto const& to_wire : node->data(DataKeys::TO_WIRE).toList()) {
+		auto const& [entity, port] = to_wire.value<DataKeys::ToWire>();
+		if(index.contains(entity)) {
+			auto* item = index.at(entity);
+			if(!port->is_wired_to(item->output_ports[0])) {
+				wire_together(item->output_ports[0], port);
+			}
+		}
+	}
+	node->setData(DataKeys::TO_WIRE, QList<QVariant>());
+}
+
+//******************************************************************************
 void ProcessingScene::on_selectionChanged() {
 	// Avoid infinite recursion by being synchronized back.
 	is_select_counterparts_locked = true;
@@ -177,7 +191,7 @@ void ProcessingScene::select_counterparts(QList<QGraphicsItem*> foreign_items) {
 	if(!is_select_counterparts_locked) {
 		clearSelection();
 		for(auto* foreign_item : foreign_items) {
-			Entity const* entity = static_cast<Entity const*>(foreign_item->data(DataKeys::ENTITY).value<void const*>());
+			auto const* entity = DataKeys::get_entity(foreign_item->data(DataKeys::ENTITY));
 			if(index.contains(entity)) {
 				index.at(entity)->setSelected(true);
 			}

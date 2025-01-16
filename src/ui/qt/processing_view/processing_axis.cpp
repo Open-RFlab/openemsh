@@ -5,6 +5,7 @@
 ///*****************************************************************************
 
 #include "infra/utils/to_string.hpp"
+#include "ui/qt/data_keys.hpp"
 
 #include "processing_axis.hpp"
 
@@ -37,6 +38,9 @@ ProcessingAxis::ProcessingAxis(domain::Axis axis, QGraphicsItem* parent)
 	nested_zone->locate_rect_params = [&]() -> auto& {
 		return locate_processing_axis_params().nested_zone;
 	};
+
+	setData(DataKeys::TYPE, "Axis");
+	setData(DataKeys::NAME, QString::fromStdString(to_string(axis)));
 }
 
 //******************************************************************************

@@ -37,6 +37,7 @@ StructurePolygon::StructurePolygon(domain::Polygon const* polygon, QGraphicsItem
 	setAcceptTouchEvents(true);
 	setData(DataKeys::TYPE, "Polygon");
 	setData(DataKeys::ID, (qulonglong) polygon->id);
+	setData(DataKeys::ENTITY, DataKeys::set_entity(polygon));
 	setData(DataKeys::NAME, polygon->name.c_str());
 }
 

@@ -11,7 +11,6 @@
 #include <QList>
 
 #include <functional>
-#include <map>
 
 #include "port.hpp"
 
@@ -52,7 +51,6 @@ public:
 
 	QList<Port*> input_ports;
 	QList<Port*> output_ports;
-	std::map<Entity*, Port*> port_index;
 
 protected:
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
