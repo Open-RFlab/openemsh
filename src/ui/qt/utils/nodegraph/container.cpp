@@ -12,6 +12,7 @@
 
 #include <map>
 
+#include "utils/unreachable.hpp"
 #include "rect.hpp"
 #include "text.hpp"
 
@@ -22,6 +23,7 @@ namespace ui::qt::nodegraph {
 //******************************************************************************
 Container::Container(QSizeF margins, QGraphicsItem* parent)
 : Node(parent)
+, spacement(Spacement::UNPACKED_REGULAR)
 , get_column([](QGraphicsItem const*) { return 0; })
 , nested_zone(new Rect(this))
 , margins(std::move(margins))
@@ -35,6 +37,7 @@ Container::Container(QSizeF margins, QGraphicsItem* parent)
 //******************************************************************************
 Container::Container(QString title, QSizeF margins, QGraphicsItem* parent)
 : Node(std::move(title), parent)
+, spacement(Spacement::UNPACKED_REGULAR)
 , get_column([](QGraphicsItem const*) { return 0; })
 , nested_zone(new Rect(this))
 , margins(std::move(margins))
@@ -65,35 +68,44 @@ void Container::fit() {
 
 		// TODO if active only
 
-		std::map<std::size_t, qreal> column_w; // without margins
-		std::map<std::size_t, qreal> column_h; // with margins
+		struct Column {
+			qreal w = 0;
+			qreal h = 0;
+			qreal x = 0;
+			qreal n_items = 0;
+			qreal shift_y = 0;
+			qreal margin_y = 0;
+		};
+
+		std::map<std::size_t, Column> columns;
 		std::map<QGraphicsItem const*, qreal> item_y;
 
 		// Calculate columns sizes.
-		for(QGraphicsItem* item : nested_zone->childItems()) {
-			std::size_t const col = get_column(item);
-			if(!column_w.contains(col))
-				column_w[col] = 0;
-			if(!column_h.contains(col))
-				column_h[col] = margins.height();
+		for(QGraphicsItem const* item : nested_zone->childItems()) {
+			std::size_t const i = get_column(item);
+			if(!columns.contains(i))
+				columns[i].h = margins.height();
 
-			item_y[item] = column_h[col];
-			column_h[col] += item->boundingRect().height() + margins.height();
-			column_w[col] = qMax(column_w[col], item->boundingRect().width());
+			auto& col = columns[i];
+			item_y[item] = col.h;
+			col.h += item->boundingRect().height() + margins.height();
+			col.w = qMax(col.w, item->boundingRect().width());
+			++col.n_items;
 		}
 
 		// Calculate column positions.
-		std::map<std::size_t, qreal> column_x = column_w; // Copy for the key part.
-		std::begin(column_x)->second = margins.width();
-		for(auto it = std::next(std::begin(column_x)); it != std::end(column_x); ++it) {
-			it->second = prev(it)->second + column_w[prev(it)->first] + margins.width();
+		std::begin(columns)->second.x = margins.width();
+		for(auto it = std::next(std::begin(columns)); it != std::end(columns); ++it) {
+			auto& current_col = it->second;
+			auto& prev_col = prev(it)->second;
+			current_col.x = prev_col.x + prev_col.w + margins.width();
 		}
 
 		// Calculate container size.
-		qreal w = std::rbegin(column_x)->second + std::rbegin(column_w)->second + margins.width();
+		qreal w = std::rbegin(columns)->second.x + std::rbegin(columns)->second.w + margins.width();
 		qreal h = 0;
-		for(auto& it : column_h)
-			h = qMax(h, it.second);
+		for(auto& it : columns)
+			h = qMax(h, it.second.h);
 
 		// Update the Container size.
 		nested_zone->setMinimumSize(w, h); // <-----------------
@@ -101,9 +113,48 @@ void Container::fit() {
 		layout()->updateGeometry();
 		updateGeometry();
 
-		// Place items for real.
-		for(QGraphicsItem* item : nested_zone->childItems()) {
-			item->setPos(column_x[get_column(item)], item_y[item]);
+		// Take care of spacement policy and place items.
+		switch(spacement) {
+		case Spacement::PACKED_UP: {
+			for(QGraphicsItem* item : nested_zone->childItems()) {
+				item->setPos(columns[get_column(item)].x, item_y[item]);
+			}
+		} break;
+		case Spacement::PACKED_DOWN: {
+			for(auto& [i, col] : columns) {
+				col.shift_y = h - col.h;
+			}
+			for(QGraphicsItem* item : nested_zone->childItems()) {
+				std::size_t const col = get_column(item);
+				item->setPos(columns[col].x, item_y[item] + columns[col].shift_y);
+			}
+		} break;
+		case Spacement::UNPACKED_MAX: {
+			for(auto& [i, col] : columns) {
+				qreal const items_summed_size = col.h - (col.n_items + 1) * margins.height();
+				col.margin_y = (h - items_summed_size - 2 * margins.height()) / (col.n_items - 1);
+				col.h = margins.height(); // Reset.
+			}
+			for(QGraphicsItem* item : nested_zone->childItems()) {
+				std::size_t const col = get_column(item);
+				item->setPos(columns[col].x, columns[col].h);
+				columns[col].h += item->boundingRect().height() + columns[col].margin_y;
+			}
+		} break;
+		case Spacement::UNPACKED_REGULAR: {
+			for(auto& [i, col] : columns) {
+				qreal const items_summed_size = col.h - (col.n_items + 1) * margins.height();
+				col.margin_y = (h - items_summed_size) / (col.n_items + 1);
+				col.h = col.margin_y; // Reset.
+			}
+			for(QGraphicsItem* item : nested_zone->childItems()) {
+				std::size_t const col = get_column(item);
+				item->setPos(columns[col].x, columns[col].h);
+				columns[col].h += item->boundingRect().height() + columns[col].margin_y;
+			}
+		} break;
+		default:
+			unreachable();
 		}
 	}
 }

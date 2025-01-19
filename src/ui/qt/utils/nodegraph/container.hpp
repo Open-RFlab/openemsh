@@ -19,6 +19,8 @@ class Rect;
 //******************************************************************************
 class Container : public Node {
 public:
+	enum class Spacement { PACKED_UP, PACKED_DOWN, UNPACKED_MAX, UNPACKED_REGULAR } spacement;
+
 	explicit Container(QSizeF margins, QGraphicsItem* parent = nullptr);
 	Container(QString title, QSizeF margins, QGraphicsItem* parent = nullptr);
 	~Container();
