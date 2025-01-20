@@ -15,7 +15,11 @@
 #include "ui/qt/utils/nodegraph/wire.hpp"
 #include "processing_axis.hpp"
 #include "processing_conflict_colinear_edges.hpp"
+#include "processing_conflict_edge_in_polygon.hpp"
+#include "processing_conflict_too_close_meshline_policies.hpp"
 #include "processing_edge.hpp"
+#include "processing_interval.hpp"
+#include "processing_meshline.hpp"
 #include "processing_meshline_policy.hpp"
 #include "processing_plane.hpp"
 #include "processing_polygon.hpp"
@@ -123,7 +127,11 @@ class ProcessingStyleSelector {
 	ProcessingPlane::Params const plane;
 	ProcessingAxis::Params const axis;
 	ProcessingMeshlinePolicy::Params const meshline_policy;
+	ProcessingInterval::Params const interval;
+	ProcessingMeshline::Params const meshline;
 	ProcessingConflictColinearEdges::Params const conflict_ce;
+	ProcessingConflictEdgeInPolygon::Params const conflict_eip;
+	ProcessingConflictTooCloseMeshlinePolicies::Params const conflict_tcmlp;
 
 	nodegraph::Wire::Params make_wire(ProcessingStyle const& style) const;
 	nodegraph::Port::Params make_port(ProcessingStyle const& style) const;
@@ -139,7 +147,11 @@ class ProcessingStyleSelector {
 	ProcessingPlane::Params make_plane() const;
 	ProcessingAxis::Params make_axis() const;
 	ProcessingMeshlinePolicy::Params make_meshline_policy() const;
+	ProcessingInterval::Params make_interval() const;
+	ProcessingMeshline::Params make_meshline() const;
 	ProcessingConflictColinearEdges::Params make_conflict_ce() const;
+	ProcessingConflictEdgeInPolygon::Params make_conflict_eip() const;
+	ProcessingConflictTooCloseMeshlinePolicies::Params make_conflict_tcmlp() const;
 
 public:
 	static std::vector<ProcessingStyle> const available_styles;
@@ -159,7 +171,11 @@ public:
 	ProcessingPlane::Params const& get_plane() const;
 	ProcessingAxis::Params const& get_axis() const;
 	ProcessingMeshlinePolicy::Params const& get_meshline_policy() const;
+	ProcessingInterval::Params const& get_interval() const;
+	ProcessingMeshline::Params const& get_meshline() const;
 	ProcessingConflictColinearEdges::Params const& get_conflict_ce() const;
+	ProcessingConflictEdgeInPolygon::Params const& get_conflict_eip() const;
+	ProcessingConflictTooCloseMeshlinePolicies::Params const& get_conflict_tcmlp() const;
 
 	ProcessingStyleSelector();
 	ProcessingStyleSelector(ProcessingStyle style);

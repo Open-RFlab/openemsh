@@ -12,13 +12,6 @@
 #include "domain/mesh/meshline.hpp"
 #include "utils/unreachable.hpp"
 
-#include "utils/nodegraph/wire.hpp"
-#include "processing_view/processing_conflict_colinear_edges.hpp"
-#include "processing_view/processing_meshline_policy.hpp"
-#include "processing_view/processing_edge.hpp"
-#include "processing_view/processing_axis.hpp"
-#include "processing_view/processing_plane.hpp"
-#include "processing_view/processing_polygon.hpp"
 #include "processing_view/processing_view.hpp"
 #include "structure_view/structure_view.hpp"
 #include "structure_view/structure_edge.hpp"
@@ -73,34 +66,59 @@ void MainWindow::update_processing() {
 		for(auto const& polygon : oemsh.get_board().get_polygons(plane)) {
 			auto* processing_polygon = ui->processing_view->processing_scene->add(polygon.get(), processing_plane);
 
-			for(auto const& edge : polygon->edges) {
+			for(auto const& edge : polygon->edges)
 				ui->processing_view->processing_scene->add(edge.get(), processing_polygon);
-			}
+
 			processing_polygon->fit();
 		}
+
+		for(auto const& conflict : oemsh.get_board().get_conflicts_edge_in_polygons(plane))
+			ui->processing_view->processing_scene->add(conflict.get(), processing_plane);
+
 		processing_plane->fit();
 	}
 
 	for(domain::Axis const axis : domain::AllAxis) {
 		auto* processing_axis = ui->processing_view->processing_scene->add(axis);
 
-		for(auto const& conflict : oemsh.get_board().get_conflicts_colinear_edges(axis)) {
+		for(auto const& conflict : oemsh.get_board().get_conflicts_colinear_edges(axis))
 			ui->processing_view->processing_scene->add(conflict.get(), processing_axis);
-		}
 
-		for(auto const& policy : oemsh.get_board().get_meshline_policies(axis)) {
+		for(auto const& conflict : oemsh.get_board().get_conflicts_too_close_meshline_policies(axis))
+			ui->processing_view->processing_scene->add(conflict.get(), processing_axis);
+
+		for(auto const& policy : oemsh.get_board().get_meshline_policies(axis))
 			ui->processing_view->processing_scene->add(policy.get(), processing_axis);
-		}
+
+		for(auto const& interval : oemsh.get_board().get_intervals(axis))
+			ui->processing_view->processing_scene->add(interval.get(), processing_axis);
+
+		for(auto const& meshline : oemsh.get_board().get_meshlines(axis))
+			ui->processing_view->processing_scene->add(meshline.get(), processing_axis);
+
 		processing_axis->fit();
 	}
 
-	for(auto* conflict : ui->processing_view->processing_scene->conflict_colinear_edges) {
-		ui->processing_view->processing_scene->wire_to_destination_first_output_port(conflict);
-	}
+	for(auto* edge : ui->processing_view->processing_scene->edges)
+		ui->processing_view->processing_scene->wire_to_destination_first_output_port(edge);
 
-	for(auto* policy : ui->processing_view->processing_scene->meshline_policies) {
+	for(auto* conflict : ui->processing_view->processing_scene->conflict_colinear_edges)
+		ui->processing_view->processing_scene->wire_to_destination_first_output_port(conflict);
+
+	for(auto* conflict : ui->processing_view->processing_scene->conflict_too_close_meshline_policies)
+		ui->processing_view->processing_scene->wire_to_destination_first_output_port(conflict);
+
+	for(auto* conflict : ui->processing_view->processing_scene->conflict_edge_in_polygons)
+		ui->processing_view->processing_scene->wire_to_destination_first_output_port(conflict);
+
+	for(auto* policy : ui->processing_view->processing_scene->meshline_policies)
 		ui->processing_view->processing_scene->wire_to_destination_first_output_port(policy);
-	}
+
+	for(auto* meshline : ui->processing_view->processing_scene->meshlines)
+		ui->processing_view->processing_scene->wire_to_destination_first_output_port(meshline);
+
+	for(auto* interval : ui->processing_view->processing_scene->intervals)
+		ui->processing_view->processing_scene->wire_to_destination_first_output_port(interval);
 }
 
 //******************************************************************************

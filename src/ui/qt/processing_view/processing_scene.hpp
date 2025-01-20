@@ -25,7 +25,11 @@ class ProcessingPlane;
 class ProcessingPolygon;
 class ProcessingEdge;
 class ProcessingConflictColinearEdges;
+class ProcessingConflictEdgeInPolygon;
+class ProcessingConflictTooCloseMeshlinePolicies;
 class ProcessingMeshlinePolicy;
+class ProcessingInterval;
+class ProcessingMeshline;
 
 //******************************************************************************
 class ProcessingScene : public QGraphicsScene {
@@ -43,7 +47,11 @@ public:
 	ProcessingPolygon* add(domain::Polygon* polygon, ProcessingPlane* to_plane);
 	ProcessingEdge* add(domain::Edge* edge, ProcessingPolygon* to_polygon);
 	ProcessingConflictColinearEdges* add(domain::ConflictColinearEdges* conflict, ProcessingAxis* to_axis);
+	ProcessingConflictEdgeInPolygon* add(domain::ConflictEdgeInPolygon* conflict, ProcessingPlane* to_plane);
+	ProcessingConflictTooCloseMeshlinePolicies* add(domain::ConflictTooCloseMeshlinePolicies* conflict, ProcessingAxis* to_axis);
 	ProcessingMeshlinePolicy* add(domain::MeshlinePolicy* policy, ProcessingAxis* to_axis);
+	ProcessingInterval* add(domain::Interval* interval, ProcessingAxis* to_axis);
+	ProcessingMeshline* add(domain::Meshline* meshline, ProcessingAxis* to_axis);
 
 	nodegraph::Wire* wire_together(nodegraph::Port* begin, nodegraph::Port* end);
 
@@ -57,13 +65,12 @@ public:
 	domain::AxisSpace<ProcessingAxis*> axes;
 	QList<ProcessingPolygon*> polygons;
 	QList<ProcessingEdge*> edges;
-	QList<QGraphicsItem*> meshlines;
+	QList<ProcessingMeshline*> meshlines;
 	QList<ProcessingMeshlinePolicy*> meshline_policies;
-	QList<QGraphicsItem*> intervals;
-	QList<QGraphicsItem*> conflict_edge_in_polygons;
+	QList<ProcessingInterval*> intervals;
 	QList<ProcessingConflictColinearEdges*> conflict_colinear_edges;
-	QList<QGraphicsItem*> conflict_too_close_meshline_policies;
-	QList<QGraphicsItem*> policies;
+	QList<ProcessingConflictEdgeInPolygon*> conflict_edge_in_polygons;
+	QList<ProcessingConflictTooCloseMeshlinePolicies*> conflict_too_close_meshline_policies;
 
 //	std::map<std::size_t, QGraphicsItem*> index;
 	std::map<Entity const*, nodegraph::Node*> index;

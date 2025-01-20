@@ -12,36 +12,34 @@
 #include "utils/default_locator.hpp"
 
 namespace domain {
-class MeshlinePolicy;
+class ConflictEdgeInPolygon;
 } // namespace domain
 
 namespace ui::qt {
 
 //******************************************************************************
-class ProcessingMeshlinePolicy : public nodegraph::Node {
+class ProcessingConflictEdgeInPolygon : public nodegraph::Node {
 public:
-	enum { Type = UserTypes::PROCESSING_MESHLINE_POLICY };
+	enum { Type = UserTypes::PROCESSING_CONFLICT_EIP };
 
 	struct Params final {
 		nodegraph::Node::Params const& node = default_locator<nodegraph::Node::Params>();
-		nodegraph::Port::Params const& port = default_locator<nodegraph::Port::Params>();
 		nodegraph::Text::Params const& title = default_locator<nodegraph::Text::Params>();
+		nodegraph::Port::Params const& port = default_locator<nodegraph::Port::Params>();
 		nodegraph::Text::Params const& main = default_locator<nodegraph::Text::Params>();
 		nodegraph::Text::Params const& enabled = default_locator<nodegraph::Text::Params>();
-		nodegraph::Text::Params const& enabled_for_sure = default_locator<nodegraph::Text::Params>();
 		nodegraph::Text::Params const& disabled = default_locator<nodegraph::Text::Params>();
 	};
 
-	std::function<Params const& ()> locate_processing_meshline_policy_params;
+	std::function<Params const& ()> locate_processing_conflict_eip_params;
 
-	explicit ProcessingMeshlinePolicy(domain::MeshlinePolicy const* meshline_policy, QGraphicsItem* parent = nullptr);
-	~ProcessingMeshlinePolicy();
+	explicit ProcessingConflictEdgeInPolygon(domain::ConflictEdgeInPolygon const* conflict, QGraphicsItem* parent = nullptr);
+	~ProcessingConflictEdgeInPolygon();
 
 	int type() const override;
-	bool has_conflict_tcmlp_origin() const;
 
 private:
-	domain::MeshlinePolicy const* const meshline_policy;
+	domain::ConflictEdgeInPolygon const* const conflict;
 };
 
 } // namespace ui::qt

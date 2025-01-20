@@ -88,7 +88,11 @@ ProcessingStyleSelector::ProcessingStyleSelector()
 , plane(make_plane())
 , axis(make_axis())
 , meshline_policy(make_meshline_policy())
+, interval(make_interval())
+, meshline(make_meshline())
 , conflict_ce(make_conflict_ce())
+, conflict_eip(make_conflict_eip())
+, conflict_tcmlp(make_conflict_tcmlp())
 {}
 
 //******************************************************************************
@@ -108,7 +112,11 @@ ProcessingStyleSelector::ProcessingStyleSelector(ProcessingStyle style)
 , plane(make_plane())
 , axis(make_axis())
 , meshline_policy(make_meshline_policy())
+, interval(make_interval())
+, meshline(make_meshline())
 , conflict_ce(make_conflict_ce())
+, conflict_eip(make_conflict_eip())
+, conflict_tcmlp(make_conflict_tcmlp())
 {}
 
 //******************************************************************************
@@ -281,9 +289,30 @@ ProcessingMeshlinePolicy::Params ProcessingStyleSelector::make_meshline_policy()
 }
 
 //******************************************************************************
+ProcessingInterval::Params ProcessingStyleSelector::make_interval() const {
+	return {
+		.node = get_node(),
+		.port = get_port(),
+		.title = get_title(),
+		.main = get_text_normal()
+	};
+}
+
+//******************************************************************************
+ProcessingMeshline::Params ProcessingStyleSelector::make_meshline() const {
+	return {
+		.node = get_node(),
+		.port = get_port(),
+		.title = get_title(),
+		.main = get_text_normal()
+	};
+}
+
+//******************************************************************************
 ProcessingPolygon::Params ProcessingStyleSelector::make_polygon() const {
 	return {
 		.node = get_node(),
+		.port = get_port(),
 		.title = get_title(),
 		.nested_zone = get_nested_zone()
 	};
@@ -309,6 +338,27 @@ ProcessingAxis::Params ProcessingStyleSelector::make_axis() const {
 
 //******************************************************************************
 ProcessingConflictColinearEdges::Params ProcessingStyleSelector::make_conflict_ce() const {
+	return {
+		.node = get_node(),
+		.title = get_title(),
+		.port = get_port()
+	};
+}
+
+//******************************************************************************
+ProcessingConflictEdgeInPolygon::Params ProcessingStyleSelector::make_conflict_eip() const {
+	return {
+		.node = get_node(),
+		.title = get_title(),
+		.port = get_port(),
+		.main = get_text_normal(),
+		.enabled = get_text_enabled(),
+		.disabled = get_text_disabled()
+	};
+}
+
+//******************************************************************************
+ProcessingConflictTooCloseMeshlinePolicies::Params ProcessingStyleSelector::make_conflict_tcmlp() const {
 	return {
 		.node = get_node(),
 		.title = get_title(),
@@ -377,6 +427,16 @@ ProcessingMeshlinePolicy::Params const& ProcessingStyleSelector::get_meshline_po
 }
 
 //******************************************************************************
+ProcessingInterval::Params const& ProcessingStyleSelector::get_interval() const {
+	return interval;
+}
+
+//******************************************************************************
+ProcessingMeshline::Params const& ProcessingStyleSelector::get_meshline() const {
+	return meshline;
+}
+
+//******************************************************************************
 ProcessingPolygon::Params const& ProcessingStyleSelector::get_polygon() const {
 	return polygon;
 }
@@ -394,6 +454,16 @@ ProcessingAxis::Params const& ProcessingStyleSelector::get_axis() const {
 //******************************************************************************
 ProcessingConflictColinearEdges::Params const& ProcessingStyleSelector::get_conflict_ce() const {
 	return conflict_ce;
+}
+
+//******************************************************************************
+ProcessingConflictEdgeInPolygon::Params const& ProcessingStyleSelector::get_conflict_eip() const {
+	return conflict_eip;
+}
+
+//******************************************************************************
+ProcessingConflictTooCloseMeshlinePolicies::Params const& ProcessingStyleSelector::get_conflict_tcmlp() const {
+	return conflict_tcmlp;
 }
 
 } // namespace ui::qt

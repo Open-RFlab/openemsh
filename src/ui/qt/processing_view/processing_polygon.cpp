@@ -4,6 +4,8 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <QGraphicsLinearLayout>
+
 #include "domain/geometrics/polygon.hpp"
 #include "ui/qt/data_keys.hpp"
 #include "ui/qt/utils/nodegraph/rect.hpp"
@@ -30,6 +32,20 @@ ProcessingPolygon::ProcessingPolygon(domain::Polygon const* polygon, QGraphicsIt
 	nested_zone->locate_rect_params = [&]() -> auto& {
 		return locate_processing_polygon_params().nested_zone;
 	};
+
+	nodegraph::Port* output_port = add_output_port("", nodegraph::Port::AnchorPoint::BOTTOM);
+	output_port->setFlag(QGraphicsItem::ItemIsSelectable);
+	output_port->setAcceptedMouseButtons(Qt::NoButton);
+	output_port->locate_port_params = [&]() -> auto& {
+		return locate_processing_polygon_params().port;
+	};
+
+	QGraphicsLinearLayout* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
+	layout()->addItem(h_box);
+	h_box->addStretch();
+	h_box->addItem(output_port);
+	h_box->addStretch();
+	h_box->setAlignment(output_port, Qt::AlignHCenter | Qt::AlignVCenter);
 
 	setData(DataKeys::TYPE, "Polygon");
 	setData(DataKeys::ID, (qulonglong) polygon->id);

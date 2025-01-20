@@ -6,6 +6,7 @@
 
 #include "infra/utils/to_string.hpp"
 #include "ui/qt/data_keys.hpp"
+#include "processing_meshline_policy.hpp"
 
 #include "processing_axis.hpp"
 
@@ -22,7 +23,15 @@ ProcessingAxis::ProcessingAxis(domain::Axis axis, QGraphicsItem* parent)
 			return 0;
 		switch(item->type()) {
 		case UserTypes::PROCESSING_CONFLICT_CE: return 0;
-		case UserTypes::PROCESSING_MESHLINE_POLICY: return 1;
+		case UserTypes::PROCESSING_MESHLINE_POLICY:
+			if(auto* policy = dynamic_cast<ProcessingMeshlinePolicy const*>(item)
+			; policy && policy->has_conflict_tcmlp_origin())
+				return 3;
+			else
+				return 1;
+		case UserTypes::PROCESSING_CONFLICT_TCMLP: return 2;
+		case UserTypes::PROCESSING_INTERVAL: return 4;
+		case UserTypes::PROCESSING_MESHLINE: return 5;
 		default: return 0;
 		}
 	};

@@ -17,6 +17,16 @@ ProcessingPlane::ProcessingPlane(domain::Plane plane, QGraphicsItem* parent)
 , locate_processing_plane_params(default_locator<Params>)
 , plane(plane)
 {
+	get_column = [](QGraphicsItem const* item) {
+		if(!item)
+			return 0;
+		switch(item->type()) {
+		case UserTypes::PROCESSING_CONFLICT_EIP: return 0;
+		case UserTypes::PROCESSING_POLYGON: return 1;
+		default: return 0;
+		}
+	};
+
 	locate_node_params = [&]() -> auto& {
 		return locate_processing_plane_params().node;
 	};

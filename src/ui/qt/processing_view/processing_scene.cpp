@@ -7,14 +7,22 @@
 #include <type_traits>
 
 #include "domain/conflicts/conflict_colinear_edges.hpp"
+#include "domain/conflicts/conflict_edge_in_polygon.hpp"
+#include "domain/conflicts/conflict_too_close_meshline_policies.hpp"
 #include "domain/geometrics/edge.hpp"
 #include "domain/geometrics/polygon.hpp"
 #include "domain/geometrics/space.hpp"
+#include "domain/mesh/interval.hpp"
+#include "domain/mesh/meshline.hpp"
 #include "domain/mesh/meshline_policy.hpp"
 #include "ui/qt/data_keys.hpp"
 #include "processing_axis.hpp"
 #include "processing_conflict_colinear_edges.hpp"
+#include "processing_conflict_edge_in_polygon.hpp"
+#include "processing_conflict_too_close_meshline_policies.hpp"
 #include "processing_edge.hpp"
+#include "processing_interval.hpp"
+#include "processing_meshline.hpp"
 #include "processing_meshline_policy.hpp"
 #include "processing_plane.hpp"
 #include "processing_polygon.hpp"
@@ -143,6 +151,29 @@ ProcessingConflictColinearEdges* ProcessingScene::add(domain::ConflictColinearEd
 }
 
 //******************************************************************************
+ProcessingConflictEdgeInPolygon* ProcessingScene::add(domain::ConflictEdgeInPolygon* conflict, ProcessingPlane* to_plane) {
+	auto* processing_conflict = add_node<ProcessingConflictEdgeInPolygon>(conflict, to_plane);
+	conflict_edge_in_polygons.append(processing_conflict);
+	processing_conflict->locate_processing_conflict_eip_params = [&]() -> auto& {
+		return style_selector.get_conflict_eip();
+	};
+	processing_conflict->updateGeometry();
+	return processing_conflict;
+
+}
+
+//******************************************************************************
+ProcessingConflictTooCloseMeshlinePolicies* ProcessingScene::add(domain::ConflictTooCloseMeshlinePolicies* conflict, ProcessingAxis* to_axis) {
+	auto* processing_conflict = add_node<ProcessingConflictTooCloseMeshlinePolicies>(conflict, to_axis);
+	conflict_too_close_meshline_policies.append(processing_conflict);
+	processing_conflict->locate_processing_conflict_tcmlp_params = [&]() -> auto& {
+		return style_selector.get_conflict_tcmlp();
+	};
+	processing_conflict->updateGeometry();
+	return processing_conflict;
+}
+
+//******************************************************************************
 ProcessingMeshlinePolicy* ProcessingScene::add(domain::MeshlinePolicy* policy, ProcessingAxis* to_axis) {
 	auto* processing_policy = add_node<ProcessingMeshlinePolicy>(policy, to_axis);
 	meshline_policies.append(processing_policy);
@@ -151,6 +182,28 @@ ProcessingMeshlinePolicy* ProcessingScene::add(domain::MeshlinePolicy* policy, P
 	};
 	processing_policy->updateGeometry();
 	return processing_policy;
+}
+
+//******************************************************************************
+ProcessingInterval* ProcessingScene::add(domain::Interval* interval, ProcessingAxis* to_axis) {
+	auto* processing_interval = add_node<ProcessingInterval>(interval, to_axis);
+	intervals.append(processing_interval);
+	processing_interval->locate_processing_interval_params = [&]() -> auto& {
+		return style_selector.get_interval();
+	};
+	processing_interval->updateGeometry();
+	return processing_interval;
+}
+
+//******************************************************************************
+ProcessingMeshline* ProcessingScene::add(domain::Meshline* meshline, ProcessingAxis* to_axis) {
+	auto* processing_meshline = add_node<ProcessingMeshline>(meshline, to_axis);
+	meshlines.append(processing_meshline);
+	processing_meshline->locate_processing_meshline_params = [&]() -> auto& {
+		return style_selector.get_meshline();
+	};
+	processing_meshline->updateGeometry();
+	return processing_meshline;
 }
 
 //******************************************************************************

@@ -10,6 +10,7 @@
 
 #include "domain/geometrics/edge.hpp"
 #include "domain/conflicts/conflict_colinear_edges.hpp"
+#include "domain/conflicts/conflict_too_close_meshline_policies.hpp"
 #include "domain/mesh/meshline_policy.hpp"
 #include "ui/qt/data_keys.hpp"
 #include "ui/qt/utils/nodegraph/text.hpp"
@@ -57,7 +58,8 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 		// Downcast from IMeshLineOrigin is mandatory to upcast to Entity.
 		if(auto* entity = down_up_cast<Entity,
 			domain::Edge,
-			domain::ConflictColinearEdges>(origin)
+			domain::ConflictColinearEdges,
+			domain::ConflictTooCloseMeshlinePolicies>(origin)
 		; entity)
 			to_wire.emplace_back(std::in_place_type<DataKeys::ToWire>, entity, port);
 	}
@@ -65,6 +67,8 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 	v_box1->addStretch();
 
 	nodegraph::Port* output_port = add_output_port();
+	output_port->setFlag(QGraphicsItem::ItemIsSelectable);
+	output_port->setAcceptedMouseButtons(Qt::NoButton);
 	output_port->locate_port_params = [&]() -> auto& {
 		return locate_processing_meshline_policy_params().port;
 	};
@@ -140,6 +144,22 @@ ProcessingMeshlinePolicy::~ProcessingMeshlinePolicy() = default;
 //******************************************************************************
 int ProcessingMeshlinePolicy::type() const {
 	return Type;
+}
+
+//******************************************************************************
+bool ProcessingMeshlinePolicy::has_conflict_tcmlp_origin() const {
+	bool has_conflict_tcmlp = false;
+
+	if(meshline_policy) {
+		for(auto const* origin : meshline_policy->origins) {
+			if(dynamic_cast<domain::ConflictTooCloseMeshlinePolicies const*>(origin)) {
+				has_conflict_tcmlp = true;
+				break;
+			}
+		}
+	}
+
+	return has_conflict_tcmlp;
 }
 
 } // namespace ui::qt

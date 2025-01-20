@@ -35,6 +35,8 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 	};
 
 	nodegraph::Port* input_port = add_input_port();
+	input_port->setFlag(QGraphicsItem::ItemIsSelectable);
+	input_port->setAcceptedMouseButtons(Qt::NoButton);
 	input_port->locate_port_params = [&]() -> auto& {
 		return locate_processing_edge_params().port;
 	};
@@ -43,6 +45,8 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 	}
 
 	nodegraph::Port* output_port = add_output_port();
+	output_port->setFlag(QGraphicsItem::ItemIsSelectable);
+	output_port->setAcceptedMouseButtons(Qt::NoButton);
 	output_port->locate_port_params = [&]() -> auto& {
 		return locate_processing_edge_params().port;
 	};
