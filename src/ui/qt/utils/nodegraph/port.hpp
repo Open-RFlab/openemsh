@@ -14,6 +14,7 @@
 
 namespace ui::qt::nodegraph {
 
+class Node;
 class Wire;
 
 //******************************************************************************
@@ -51,6 +52,8 @@ public:
 	QPointF attach_pos() const;
 	bool is_wired() const;
 	bool is_wired_to(Port const* port) const;
+	QList<Wire*> const& get_wires() const;
+	Node* get_node() const;
 
 protected:
 	QVariant itemChange(GraphicsItemChange change, QVariant const& value) override;

@@ -12,6 +12,7 @@
 
 #include "utils/default_locator.hpp"
 #include "utils/unreachable.hpp"
+#include "node.hpp"
 #include "wire.hpp"
 
 #include "port.hpp"
@@ -114,6 +115,17 @@ bool Port::is_wired_to(Port const* port) const {
 	return std::any_of(wires.cbegin(), wires.cend(), [port](Wire* wire)-> bool {
 		return wire->traverse(port);
 	});
+}
+
+//******************************************************************************
+QList<Wire*> const& Port::get_wires() const {
+	return wires;
+}
+
+//******************************************************************************
+Node* Port::get_node() const {
+	// TODO optimize with something similar to qgraphicsitem_cast.
+	return dynamic_cast<Node*>(parentItem());
 }
 
 //******************************************************************************

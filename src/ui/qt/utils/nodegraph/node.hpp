@@ -9,6 +9,7 @@
 #include <QBrush>
 #include <QGraphicsWidget>
 #include <QList>
+#include <QSet>
 
 #include <functional>
 
@@ -46,6 +47,10 @@ public:
 
 	Port* add_input_port(QString const& text = QString(), Port::AnchorPoint anchor = Port::AnchorPoint::LEFT);
 	Port* add_output_port(QString const& text = QString(), Port::AnchorPoint anchor = Port::AnchorPoint::RIGHT);
+
+	QList<Node*> get_chain() const;
+	static void traverse_up(QSet<Node*>& out, Node const* node);
+	static void traverse_down(QSet<Node*>& out, Node const* node);
 
 	using QGraphicsWidget::updateGeometry;
 

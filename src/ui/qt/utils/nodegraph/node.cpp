@@ -10,6 +10,7 @@
 
 #include "utils/default_locator.hpp"
 #include "text.hpp"
+#include "wire.hpp"
 
 #include "node.hpp"
 
@@ -140,6 +141,50 @@ Port* Node::add_output_port(QString const& text, Port::AnchorPoint anchor) {
 	Port* port = new Port(text, anchor, this);
 	output_ports.append(port);
 	return port;
+}
+
+//******************************************************************************
+void Node::traverse_up(QSet<Node*>& out, Node const* node) {
+	for(auto const* port : node->input_ports) {
+		for(auto const* wire : port->get_wires()) {
+			if(wire) {
+				if(auto const* forward_port = wire->traverse(port)
+				; forward_port) {
+					if(auto* forward_node = forward_port->get_node()
+					; forward_node && !out.contains(forward_node)) {
+						out.insert(forward_node);
+						traverse_up(out, forward_node);
+					}
+				}
+			}
+		}
+	}
+}
+
+//******************************************************************************
+void Node::traverse_down(QSet<Node*>& out, Node const* node) {
+	for(auto const* port : node->output_ports) {
+		for(auto const* wire : port->get_wires()) {
+			if(wire) {
+				if(auto const* forward_port = wire->traverse(port)
+				; forward_port) {
+					if(auto* forward_node = forward_port->get_node()
+					; forward_node && !out.contains(forward_node)) {
+						out.insert(forward_node);
+						traverse_down(out, forward_node);
+					}
+				}
+			}
+		}
+	}
+}
+
+//******************************************************************************
+QList<Node*> Node::get_chain() const {
+	QSet<Node*> up, down;
+	traverse_up(up, this);
+	traverse_down(down, this);
+	return (std::move(up) + std::move(down)).values();
 }
 
 } // namespace ui::qt
