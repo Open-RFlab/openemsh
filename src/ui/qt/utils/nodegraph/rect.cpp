@@ -47,26 +47,39 @@ QSizeF Rect::sizeHint(Qt::SizeHint /*which*/, QSizeF const& /*constraint*/) cons
 }
 
 //******************************************************************************
-void Rect::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget) {
+void Rect::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* /*widget*/) {
 	Params const& params = locate_rect_params();
 
-	if(option->state & QStyle::State_MouseOver
-	&& option->state & QStyle::State_Selected) {
-		painter->setBrush(params.fill_selected_highlighted);
-		painter->setPen(params.contour_selected_highlighted);
-		painter->setOpacity(params.opacity_selected_highlighted);
-	} else if(option->state & QStyle::State_MouseOver) {
-		painter->setBrush(params.fill_highlighted);
-		painter->setPen(params.contour_highlighted);
-		painter->setOpacity(params.opacity_highlighted);
-	} else if(option->state & QStyle::State_Selected) {
-		painter->setBrush(params.fill_selected);
-		painter->setPen(params.contour_selected);
-		painter->setOpacity(params.opacity_selected);
+	if(option->state & QStyle::State_Selected) {
+		if(option->state & QStyle::State_MouseOver) {
+			painter->setBrush(params.fill_selected_hovered);
+			painter->setPen(params.contour_selected_hovered);
+			painter->setOpacity(params.opacity_selected_hovered);
+		} else {
+			painter->setBrush(params.fill_selected);
+			painter->setPen(params.contour_selected);
+			painter->setOpacity(params.opacity_selected);
+		}
+	} else if(is_highlighted()) {
+		if(option->state & QStyle::State_MouseOver) {
+			painter->setBrush(params.fill_highlighted_hovered);
+			painter->setPen(params.contour_highlighted_hovered);
+			painter->setOpacity(params.opacity_highlighted_hovered);
+		} else {
+			painter->setBrush(params.fill_highlighted);
+			painter->setPen(params.contour_highlighted);
+			painter->setOpacity(params.opacity_highlighted);
+		}
 	} else {
-		painter->setBrush(params.fill_regular);
-		painter->setPen(params.contour_regular);
-		painter->setOpacity(params.opacity_regular);
+		if(option->state & QStyle::State_MouseOver) {
+			painter->setBrush(params.fill_regular_hovered);
+			painter->setPen(params.contour_regular_hovered);
+			painter->setOpacity(params.opacity_regular_hovered);
+		} else {
+			painter->setBrush(params.fill_regular);
+			painter->setPen(params.contour_regular);
+			painter->setOpacity(params.opacity_regular);
+		}
 	}
 
 	painter->drawRect(rect());

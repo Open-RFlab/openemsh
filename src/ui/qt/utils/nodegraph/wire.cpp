@@ -124,15 +124,21 @@ void Wire::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWid
 	if(begin && end) {
 		Params const& params = locate_wire_params();
 
-		if(option->state & QStyle::State_MouseOver
-		&& option->state & QStyle::State_Selected) {
-			painter->setPen(params.selected_highlighted);
-		} else if(option->state & QStyle::State_MouseOver) {
-			painter->setPen(params.highlighted);
-		} else if(option->state & QStyle::State_Selected) {
-			painter->setPen(params.selected);
+		if(option->state & QStyle::State_Selected) {
+			if(option->state & QStyle::State_MouseOver)
+				painter->setPen(params.selected_hovered);
+			else
+				painter->setPen(params.selected);
+		} else if(is_highlighted()) {
+			if(option->state & QStyle::State_MouseOver)
+				painter->setPen(params.highlighted_hovered);
+			else
+				painter->setPen(params.highlighted);
 		} else {
-			painter->setPen(params.regular);
+			if(option->state & QStyle::State_MouseOver)
+				painter->setPen(params.regular_hovered);
+			else
+				painter->setPen(params.regular);
 		}
 
 		painter->drawPath(path());

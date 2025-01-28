@@ -33,80 +33,106 @@ struct ProcessingStyle {
 	QColor background = QColor(57, 57, 57);
 
 
-	QColor node_background_regular              = QColor(27, 27, 27);
-	QColor node_background_highlighted          = node_background_regular;
-	QColor node_background_selected             = node_background_regular;
-	QColor node_background_selected_highlighted = node_background_selected;
+	QColor node_background_regular             = QColor(27, 27, 27);
+	QColor node_background_highlighted         = node_background_regular;
+	QColor node_background_selected            = node_background_regular;
+	QColor node_background_regular_hovered     = node_background_regular.lighter();
+	QColor node_background_highlighted_hovered = node_background_highlighted.lighter();
+	QColor node_background_selected_hovered    = node_background_selected.darker();
 
-	QColor node_title_background_regular              = QColor(33, 33, 33);
-	QColor node_title_background_highlighted          = node_title_background_regular;
-	QColor node_title_background_selected             = node_title_background_regular;
-	QColor node_title_background_selected_highlighted = node_title_background_selected;
+	QColor node_title_background_regular             = QColor(33, 33, 33);
+	QColor node_title_background_highlighted         = node_title_background_regular;
+	QColor node_title_background_selected            = node_title_background_regular;
+	QColor node_title_background_regular_hovered     = node_title_background_regular.lighter();
+	QColor node_title_background_highlighted_hovered = node_title_background_highlighted.lighter();
+	QColor node_title_background_selected_hovered    = node_title_background_selected.darker();
 
-	QColor node_title_text_regular              = Qt::white;
-	QColor node_title_text_highlighted          = node_title_text_regular;
-	QColor node_title_text_selected             = Qt::black;
-	QColor node_title_text_selected_highlighted = node_title_text_selected;
+	QColor node_title_text_regular             = Qt::white;
+	QColor node_title_text_highlighted         = node_title_text_regular;
+	QColor node_title_text_selected            = Qt::black;
+	QColor node_title_text_regular_hovered     = node_title_text_regular;
+	QColor node_title_text_highlighted_hovered = node_title_text_highlighted;
+	QColor node_title_text_selected_hovered    = node_title_text_selected;
 
 	qreal node_radius = 10;
 
 
-	QColor container_nested_zone_regular              = background;
-	QColor container_nested_zone_highlighted          = container_nested_zone_regular;
-	QColor container_nested_zone_selected             = container_nested_zone_regular;
-	QColor container_nested_zone_selected_highlighted = container_nested_zone_selected;
+	QColor container_nested_zone_regular             = background;
+	QColor container_nested_zone_highlighted         = container_nested_zone_regular;
+	QColor container_nested_zone_selected            = container_nested_zone_regular;
+	QColor container_nested_zone_regular_hovered     = container_nested_zone_regular;
+	QColor container_nested_zone_highlighted_hovered = container_nested_zone_highlighted;
+	QColor container_nested_zone_selected_hovered    = container_nested_zone_selected;
 
 	qreal container_nested_zone_opacity = 0.5;
 
 
-	QColor wire_regular              = Qt::green;
-	QColor wire_highlighted          = QColor(Qt::green).lighter();
-	QColor wire_selected             = wire_regular;
-	QColor wire_selected_highlighted = wire_regular;
+	QColor wire_regular             = Qt::green;
+	QColor wire_highlighted         = wire_regular;
+	QColor wire_selected            = wire_regular;
+	QColor wire_regular_hovered     = wire_regular.lighter();
+	QColor wire_highlighted_hovered = wire_highlighted.lighter();
+	QColor wire_selected_hovered    = wire_selected.lighter();
 
-	qreal wire_width_regular              = 2;
-	qreal wire_width_highlighted          = 4;
-	qreal wire_width_selected             = wire_width_regular;
-	qreal wire_width_selected_highlighted = wire_width_highlighted;
+	qreal wire_width_regular             = 2;
+	qreal wire_width_highlighted         = wire_width_regular;
+	qreal wire_width_selected            = wire_width_regular;
+	qreal wire_width_regular_hovered     = wire_width_regular * 2;
+	qreal wire_width_highlighted_hovered = wire_width_highlighted * 2;
+	qreal wire_width_selected_hovered    = wire_width_selected * 2;
 
 
-	QColor port_text_regular              = Qt::white;
-	QColor port_text_highlighted          = port_text_regular;
-	QColor port_text_selected             = port_text_regular;
-	QColor port_text_selected_highlighted = port_text_selected;
+	QColor port_text_regular             = Qt::white;
+	QColor port_text_highlighted         = port_text_regular;
+	QColor port_text_selected            = port_text_regular;
+	QColor port_text_regular_hovered     = port_text_regular;
+	QColor port_text_highlighted_hovered = port_text_highlighted;
+	QColor port_text_selected_hovered    = port_text_selected;
 
-	QColor port_contour_regular              = Qt::black;
-	QColor port_contour_highlighted          = port_contour_regular;
-	QColor port_contour_selected             = port_contour_regular;
-	QColor port_contour_selected_highlighted = port_contour_selected;
+	QColor port_contour_regular             = Qt::black;
+	QColor port_contour_highlighted         = port_contour_regular;
+	QColor port_contour_selected            = port_contour_regular;
+	QColor port_contour_regular_hovered     = port_contour_regular;
+	QColor port_contour_highlighted_hovered = port_contour_highlighted;
+	QColor port_contour_selected_hovered    = port_contour_selected;
 
-	QColor port_fill_regular              = QColor(255, 119, 0);
-	QColor port_fill_highlighted          = port_fill_regular;
-	QColor port_fill_selected             = port_fill_regular;
-	QColor port_fill_selected_highlighted = port_fill_selected;
+	QColor port_fill_regular             = QColor(255, 119, 0);
+	QColor port_fill_highlighted         = port_fill_regular;
+	QColor port_fill_selected            = port_fill_regular;
+	QColor port_fill_regular_hovered     = port_fill_regular;
+	QColor port_fill_highlighted_hovered = port_fill_highlighted;
+	QColor port_fill_selected_hovered    = port_fill_selected;
 
 	qreal port_radius = 5;
 
 
-	QColor text_normal_regular              = Qt::white;
-	QColor text_normal_highlighted          = text_normal_regular;
-	QColor text_normal_selected             = text_normal_regular;
-	QColor text_normal_selected_highlighted = text_normal_selected;
+	QColor text_normal_regular             = Qt::white;
+	QColor text_normal_highlighted         = text_normal_regular;
+	QColor text_normal_selected            = text_normal_regular;
+	QColor text_normal_regular_hovered     = text_normal_regular;
+	QColor text_normal_highlighted_hovered = text_normal_highlighted;
+	QColor text_normal_selected_hovered    = text_normal_selected;
 
-	QColor text_enabled_regular              = Qt::darkGreen;
-	QColor text_enabled_highlighted          = text_enabled_regular;
-	QColor text_enabled_selected             = text_enabled_regular;
-	QColor text_enabled_selected_highlighted = text_enabled_selected;
+	QColor text_enabled_regular             = Qt::darkGreen;
+	QColor text_enabled_highlighted         = text_enabled_regular;
+	QColor text_enabled_selected            = text_enabled_regular;
+	QColor text_enabled_regular_hovered     = text_enabled_regular;
+	QColor text_enabled_highlighted_hovered = text_enabled_highlighted;
+	QColor text_enabled_selected_hovered    = text_enabled_selected;
 
-	QColor text_enabled_for_sure_regular              = Qt::green;
-	QColor text_enabled_for_sure_highlighted          = text_enabled_for_sure_regular;
-	QColor text_enabled_for_sure_selected             = text_enabled_for_sure_regular;
-	QColor text_enabled_for_sure_selected_highlighted = text_enabled_for_sure_selected;
+	QColor text_enabled_for_sure_regular             = Qt::green;
+	QColor text_enabled_for_sure_highlighted         = text_enabled_for_sure_regular;
+	QColor text_enabled_for_sure_selected            = text_enabled_for_sure_regular;
+	QColor text_enabled_for_sure_regular_hovered     = text_enabled_for_sure_regular;
+	QColor text_enabled_for_sure_highlighted_hovered = text_enabled_for_sure_highlighted;
+	QColor text_enabled_for_sure_selected_hovered    = text_enabled_for_sure_selected;
 
-	QColor text_disabled_regular              = Qt::darkRed;
-	QColor text_disabled_highlighted          = text_disabled_regular;
-	QColor text_disabled_selected             = text_disabled_regular;
-	QColor text_disabled_selected_highlighted = text_disabled_selected;
+	QColor text_disabled_regular             = Qt::darkRed;
+	QColor text_disabled_highlighted         = text_disabled_regular;
+	QColor text_disabled_selected            = text_disabled_regular;
+	QColor text_disabled_regular_hovered     = text_disabled_regular;
+	QColor text_disabled_highlighted_hovered = text_disabled_highlighted;
+	QColor text_disabled_selected_hovered    = text_disabled_selected;
 };
 
 //******************************************************************************

@@ -49,31 +49,48 @@ void Port::setGeometry(QRectF const& geom) {
 void Port::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* /*widget*/) {
 	Params const& params = locate_port_params();
 
-	if(option->state & QStyle::State_MouseOver
-	&& option->state & QStyle::State_Selected) {
-		painter->setPen(params.text_selected_highlighted);
-		painter->drawText(boundingRect(), Qt::AlignHCenter | Qt::AlignVCenter, text());
-		painter->setPen(params.contour_selected_highlighted);
-		painter->setBrush(params.fill_selected_highlighted);
-		painter->drawEllipse(attach_pos(), params.radius, params.radius);
-	} else if(option->state & QStyle::State_MouseOver) {
-		painter->setPen(params.text_highlighted);
-		painter->drawText(boundingRect(), Qt::AlignHCenter | Qt::AlignVCenter, text());
-		painter->setPen(params.contour_highlighted);
-		painter->setBrush(params.fill_highlighted);
-		painter->drawEllipse(attach_pos(), params.radius, params.radius);
-	} else if(option->state & QStyle::State_Selected) {
-		painter->setPen(params.text_selected);
-		painter->drawText(boundingRect(), Qt::AlignHCenter | Qt::AlignVCenter, text());
-		painter->setPen(params.contour_selected);
-		painter->setBrush(params.fill_selected);
-		painter->drawEllipse(attach_pos(), params.radius, params.radius);
+	if(option->state & QStyle::State_Selected) {
+		if(option->state & QStyle::State_MouseOver) {
+			painter->setPen(params.text_selected_hovered);
+			painter->drawText(boundingRect(), Qt::AlignHCenter | Qt::AlignVCenter, text());
+			painter->setPen(params.contour_selected_hovered);
+			painter->setBrush(params.fill_selected_hovered);
+			painter->drawEllipse(attach_pos(), params.radius, params.radius);
+		} else {
+			painter->setPen(params.text_selected);
+			painter->drawText(boundingRect(), Qt::AlignHCenter | Qt::AlignVCenter, text());
+			painter->setPen(params.contour_selected);
+			painter->setBrush(params.fill_selected);
+			painter->drawEllipse(attach_pos(), params.radius, params.radius);
+		}
+	} else if(is_highlighted()) {
+		if(option->state & QStyle::State_MouseOver) {
+			painter->setPen(params.text_highlighted_hovered);
+			painter->drawText(boundingRect(), Qt::AlignHCenter | Qt::AlignVCenter, text());
+			painter->setPen(params.contour_highlighted_hovered);
+			painter->setBrush(params.fill_highlighted_hovered);
+			painter->drawEllipse(attach_pos(), params.radius, params.radius);
+		} else {
+			painter->setPen(params.text_highlighted);
+			painter->drawText(boundingRect(), Qt::AlignHCenter | Qt::AlignVCenter, text());
+			painter->setPen(params.contour_highlighted);
+			painter->setBrush(params.fill_highlighted);
+			painter->drawEllipse(attach_pos(), params.radius, params.radius);
+		}
 	} else {
-		painter->setPen(params.text_regular);
-		painter->drawText(boundingRect(), Qt::AlignHCenter | Qt::AlignVCenter, text());
-		painter->setPen(params.contour_regular);
-		painter->setBrush(params.fill_regular);
-		painter->drawEllipse(attach_pos(), params.radius, params.radius);
+		if(option->state & QStyle::State_MouseOver) {
+			painter->setPen(params.text_regular_hovered);
+			painter->drawText(boundingRect(), Qt::AlignHCenter | Qt::AlignVCenter, text());
+			painter->setPen(params.contour_regular_hovered);
+			painter->setBrush(params.fill_regular_hovered);
+			painter->drawEllipse(attach_pos(), params.radius, params.radius);
+		} else {
+			painter->setPen(params.text_regular);
+			painter->drawText(boundingRect(), Qt::AlignHCenter | Qt::AlignVCenter, text());
+			painter->setPen(params.contour_regular);
+			painter->setBrush(params.fill_regular);
+			painter->drawEllipse(attach_pos(), params.radius, params.radius);
+		}
 	}
 
 #ifdef OEMSH_NODEGRAPH_DEBUG

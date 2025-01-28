@@ -34,11 +34,15 @@ public:
 		QBrush title_background_regular = QBrush(Qt::black);
 		QBrush title_background_highlighted = title_background_regular;
 		QBrush title_background_selected = title_background_regular;
-		QBrush title_background_selected_highlighted = title_background_selected;
+		QBrush title_background_regular_hovered = title_background_regular;
+		QBrush title_background_highlighted_hovered = title_background_highlighted;
+		QBrush title_background_selected_hovered = title_background_selected;
 		QBrush background_regular = QBrush(Qt::darkGray);
 		QBrush background_highlighted = background_regular;
 		QBrush background_selected = background_regular;
-		QBrush background_selected_highlighted = background_selected;
+		QBrush background_regular_hovered = background_regular;
+		QBrush background_highlighted_hovered = background_highlighted;
+		QBrush background_selected_hovered = background_selected;
 	};
 
 	std::function<Params const& ()> locate_node_params;

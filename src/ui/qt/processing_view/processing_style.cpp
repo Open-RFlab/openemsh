@@ -13,61 +13,87 @@ std::vector<ProcessingStyle> const ProcessingStyleSelector::available_styles {
 	{
 		.name = "Main",
 		.background = QColor(57, 57, 57),
-		.node_background_regular              = QColor(27, 27, 27),
-//		.node_background_highlighted          = node_background_regular,
-		.node_background_selected             = Qt::white,
-//		.node_background_selected_highlighted = node_background_selected,
-		.node_title_background_regular              = QColor(33, 33, 33),
-//		.node_title_background_highlighted          = node_title_background_regular,
-		.node_title_background_selected             = QColor(222, 222, 222),
-//		.node_title_background_selected_highlighted = node_title_background_selected,
-		.node_title_text_regular              = Qt::white,
-//		.node_title_text_highlighted          = node_title_text_regular,
-		.node_title_text_selected             = Qt::black,
-//		.node_title_text_selected_highlighted = node_title_text_selected,
+		.node_background_regular             = QColor(27, 27, 27),
+//		.node_background_highlighted         = node_background_regular,
+		.node_background_selected            = Qt::white,
+//		.node_background_regular_hovered     = node_background_regular.lighter(),
+//		.node_background_highlighted_hovered = node_background_highlighted.lighter(),
+		.node_background_selected_hovered    = QColor(Qt::white).darker(150),
+		.node_title_background_regular             = QColor(33, 33, 33),
+		.node_title_background_highlighted         = QColor(222, 222, 222),
+		.node_title_background_selected            = QColor(222, 222, 222),
+		.node_title_background_regular_hovered     = QColor(33, 33, 33).lighter(150),
+		.node_title_background_highlighted_hovered = QColor(222, 222, 222).darker(150),
+		.node_title_background_selected_hovered    = QColor(222, 222, 222).darker(150),
+		.node_title_text_regular             = Qt::white,
+		.node_title_text_highlighted         = Qt::black,
+		.node_title_text_selected            = Qt::black,
+//		.node_title_text_regular_hovered     = node_title_text_regular,
+//		.node_title_text_highlighted_hovered = node_title_text_highlighted,
+//		.node_title_text_selected_hovered    = node_title_text_selected,
 //		.node_radius = 10,
-//		.container_nested_zone_regular              = background,
-//		.container_nested_zone_highlighted          = container_nested_zone_regular,
-//		.container_nested_zone_selected             = container_nested_zone_regular,
-//		.container_nested_zone_selected_highlighted = container_nested_zone_selected,
+//		.container_nested_zone_regular             = background,
+//		.container_nested_zone_highlighted         = container_nested_zone_regular,
+//		.container_nested_zone_selected            = container_nested_zone_regular,
+//		.container_nested_zone_regular_hovered     = container_nested_zone_regular,
+//		.container_nested_zone_highlighted_hovered = container_nested_zone_highlighted,
+//		.container_nested_zone_selected_hovered    = container_nested_zone_selected,
 //		.container_nested_zone_opacity = 0.5,
-//		.wire_regular              = Qt::green,
-//		.wire_highlighted          = QColor(Qt::green).lighter(),
-//		.wire_selected             = wire_regular,
-//		.wire_selected_highlighted = wire_regular,
-//		.wire_width_regular              = 2,
-//		.wire_width_highlighted          = 4,
-//		.wire_width_selected             = wire_width_regular,
-//		.wire_width_selected_highlighted = wire_width_highlighted,
-		.port_text_regular              = Qt::white,
-//		.port_text_highlighted          = port_text_regular,
-		.port_text_selected             = Qt::black,
-//		.port_text_selected_highlighted = port_text_selected,
-//		.port_contour_regular              = Qt::black,
-//		.port_contour_highlighted          = port_contour_regular,
-//		.port_contour_selected             = port_contour_regular,
-//		.port_contour_selected_highlighted = port_contour_selected,
-//		.port_fill_regular              = QColor(255, 119, 0),
-//		.port_fill_highlighted          = port_fill_regular,
-//		.port_fill_selected             = port_fill_regular,
-//		.port_fill_selected_highlighted = port_fill_selected,
+//		.wire_regular             = Qt::green,
+//		.wire_highlighted         = wire_regular,
+//		.wire_selected            = wire_regular,
+//		.wire_regular_hovered     = wire_regular.lighter(),
+//		.wire_highlighted_hovered = wire_highlighted.lighter(),
+//		.wire_selected_hovered    = wire_selected.lighter(),
+//		.wire_width_regular             = 2,
+//		.wire_width_highlighted         = wire_width_regular,
+//		.wire_width_selected            = wire_width_regular,
+//		.wire_width_regular_hovered     = wire_width_regular * 2,
+//		.wire_width_highlighted_hovered = wire_width_highlighted * 2,
+//		.wire_width_selected_hovered    = wire_width_selected * 2,
+		.port_text_regular             = Qt::white,
+//		.port_text_highlighted         = port_text_regular,
+		.port_text_selected            = Qt::black,
+//		.port_text_regular_hovered     = port_text_regular,
+//		.port_text_highlighted_hovered = port_text_highlighted,
+//		.port_text_selected_hovered    = port_text_selected,
+//		.port_contour_regular             = Qt::black,
+//		.port_contour_highlighted         = port_contour_regular,
+//		.port_contour_selected            = port_contour_regular,
+//		.port_contour_regular_hovered     = port_contour_regular,
+//		.port_contour_highlighted_hovered = port_contour_highlighted,
+//		.port_contour_selected_hovered    = port_contour_selected,
+//		.port_fill_regular             = QColor(255, 119, 0),
+//		.port_fill_highlighted         = port_fill_regular,
+//		.port_fill_selected            = port_fill_regular,
+//		.port_fill_regular_hovered     = port_fill_regular,
+//		.port_fill_highlighted_hovered = port_fill_highlighted,
+//		.port_fill_selected_hovered    = port_fill_selected,
 //		.port_radius = 5,
-		.text_normal_regular              = Qt::white,
-//		.text_normal_highlighted          = text_normal_regular,
-		.text_normal_selected             = Qt::black,
-//		.text_normal_selected_highlighted = text_normal_selected,
-//		.text_enabled_regular              = Qt::darkGreen,
-//		.text_enabled_highlighted          = text_enabled_regular,
-//		.text_enabled_selected             = text_enabled_regular,
-//		.text_enabled_selected_highlighted = text_enabled_selected,
-//		.text_enabled_for_sure_regular              = Qt::green,
-//		.text_enabled_for_sure_highlighted          = text_enabled_for_sure_regular,
-//		.text_enabled_for_sure_selected             = text_enabled_for_sure_regular,
-//		.text_enabled_for_sure_selected_highlighted = text_enabled_for_sure_selected,
-//		.text_disabled_regular              = Qt::darkRed,
-//		.text_disabled_highlighted          = text_disabled_regular,
-//		.text_disabled_selected             = text_disabled_regular,
-//		.text_disabled_selected_highlighted = text_disabled_selected
+		.text_normal_regular             = Qt::white,
+//		.text_normal_highlighted         = text_normal_regular,
+		.text_normal_selected            = Qt::black,
+//		.text_normal_regular_hovered     = text_normal_regular,
+//		.text_normal_highlighted_hovered = text_normal_highlighted,
+//		.text_normal_selected_hovered    = text_normal_selected,
+//		.text_enabled_regular             = Qt::darkGreen,
+//		.text_enabled_highlighted         = text_enabled_regular,
+//		.text_enabled_selected            = text_enabled_regular,
+//		.text_enabled_regular_hovered     = text_enabled_regular,
+//		.text_enabled_highlighted_hovered = text_enabled_highlighted,
+//		.text_enabled_selected_hovered    = text_enabled_selected,
+//		.text_enabled_for_sure_regular             = Qt::green,
+//		.text_enabled_for_sure_highlighted         = text_enabled_for_sure_regular,
+//		.text_enabled_for_sure_selected            = text_enabled_for_sure_regular,
+//		.text_enabled_for_sure_regular_hovered     = text_enabled_for_sure_regular,
+//		.text_enabled_for_sure_highlighted_hovered = text_enabled_for_sure_highlighted,
+//		.text_enabled_for_sure_selected_hovered    = text_enabled_for_sure_selected,
+//		.text_disabled_regular             = Qt::darkRed,
+//		.text_disabled_highlighted         = text_disabled_regular,
+//		.text_disabled_selected            = text_disabled_regular,
+//		.text_disabled_regular_hovered     = text_disabled_regular,
+//		.text_disabled_highlighted_hovered = text_disabled_highlighted,
+//		.text_disabled_selected_hovered    = text_disabled_selected
 	}
 };
 
@@ -155,7 +181,9 @@ nodegraph::Wire::Params ProcessingStyleSelector::make_wire(ProcessingStyle const
 		.regular = QPen(style.wire_regular, style.wire_width_regular, Qt::SolidLine, Qt::RoundCap),
 		.highlighted = QPen(style.wire_highlighted, style.wire_width_highlighted, Qt::SolidLine, Qt::RoundCap),
 		.selected = QPen(style.wire_selected, style.wire_width_selected, Qt::SolidLine, Qt::RoundCap),
-		.selected_highlighted = QPen(style.wire_selected_highlighted, style.wire_width_selected_highlighted, Qt::SolidLine, Qt::RoundCap)
+		.regular_hovered = QPen(style.wire_regular_hovered, style.wire_width_regular_hovered, Qt::SolidLine, Qt::RoundCap),
+		.highlighted_hovered = QPen(style.wire_highlighted_hovered, style.wire_width_highlighted_hovered, Qt::SolidLine, Qt::RoundCap),
+		.selected_hovered = QPen(style.wire_selected_hovered, style.wire_width_selected_hovered, Qt::SolidLine, Qt::RoundCap)
 	};
 }
 
@@ -166,15 +194,21 @@ nodegraph::Port::Params ProcessingStyleSelector::make_port(ProcessingStyle const
 		.text_regular = QPen(style.port_text_regular),
 		.text_highlighted = QPen(style.port_text_highlighted),
 		.text_selected = QPen(style.port_text_selected),
-		.text_selected_highlighted = QPen(style.port_text_selected_highlighted),
+		.text_regular_hovered = QPen(style.port_text_regular_hovered),
+		.text_highlighted_hovered = QPen(style.port_text_highlighted_hovered),
+		.text_selected_hovered = QPen(style.port_text_selected_hovered),
 		.contour_regular = QPen(style.port_contour_regular),
 		.contour_highlighted = QPen(style.port_contour_highlighted),
 		.contour_selected = QPen(style.port_contour_selected),
-		.contour_selected_highlighted = QPen(style.port_contour_selected_highlighted),
+		.contour_regular_hovered = QPen(style.port_contour_regular_hovered),
+		.contour_highlighted_hovered = QPen(style.port_contour_highlighted_hovered),
+		.contour_selected_hovered = QPen(style.port_contour_selected_hovered),
 		.fill_regular = QBrush(style.port_fill_regular),
 		.fill_highlighted = QBrush(style.port_fill_highlighted),
 		.fill_selected = QBrush(style.port_fill_selected),
-		.fill_selected_highlighted = QBrush(style.port_fill_selected_highlighted)
+		.fill_regular_hovered = QBrush(style.port_fill_regular_hovered),
+		.fill_highlighted_hovered = QBrush(style.port_fill_highlighted_hovered),
+		.fill_selected_hovered = QBrush(style.port_fill_selected_hovered)
 	};
 }
 
@@ -185,13 +219,16 @@ nodegraph::Node::Params ProcessingStyleSelector::make_node(ProcessingStyle const
 		.title_background_regular = QBrush(style.node_title_background_regular),
 		.title_background_highlighted = QBrush(style.node_title_background_highlighted),
 		.title_background_selected = QBrush(style.node_title_background_selected),
-		.title_background_selected_highlighted = QBrush(style.node_title_background_selected_highlighted),
+		.title_background_regular_hovered = QBrush(style.node_title_background_regular_hovered),
+		.title_background_highlighted_hovered = QBrush(style.node_title_background_highlighted_hovered),
+		.title_background_selected_hovered = QBrush(style.node_title_background_selected_hovered),
 		.background_regular = QBrush(style.node_background_regular),
 		.background_highlighted = QBrush(style.node_background_highlighted),
 		.background_selected = QBrush(style.node_background_selected),
-		.background_selected_highlighted = QBrush(style.node_background_selected_highlighted)
+		.background_regular_hovered = QBrush(style.node_background_regular_hovered),
+		.background_highlighted_hovered = QBrush(style.node_background_highlighted_hovered),
+		.background_selected_hovered = QBrush(style.node_background_selected_hovered)
 	};
-
 }
 
 //******************************************************************************
@@ -200,15 +237,21 @@ nodegraph::Rect::Params ProcessingStyleSelector::make_nested_zone(ProcessingStyl
 		.opacity_regular = style.container_nested_zone_opacity,
 		.opacity_highlighted = style.container_nested_zone_opacity,
 		.opacity_selected = style.container_nested_zone_opacity,
-		.opacity_selected_highlighted = style.container_nested_zone_opacity,
+		.opacity_regular_hovered = style.container_nested_zone_opacity,
+		.opacity_highlighted_hovered = style.container_nested_zone_opacity,
+		.opacity_selected_hovered = style.container_nested_zone_opacity,
 		.fill_regular = QBrush(style.container_nested_zone_regular),
 		.fill_highlighted = QBrush(style.container_nested_zone_highlighted),
 		.fill_selected = QBrush(style.container_nested_zone_selected),
-		.fill_selected_highlighted = QBrush(style.container_nested_zone_selected_highlighted),
+		.fill_regular_hovered = QBrush(style.container_nested_zone_regular_hovered),
+		.fill_highlighted_hovered = QBrush(style.container_nested_zone_highlighted_hovered),
+		.fill_selected_hovered = QBrush(style.container_nested_zone_selected_hovered),
 		.contour_regular = QPen(style.container_nested_zone_regular),
 		.contour_highlighted = QPen(style.container_nested_zone_highlighted),
 		.contour_selected = QPen(style.container_nested_zone_selected),
-		.contour_selected_highlighted = QPen(style.container_nested_zone_selected_highlighted)
+		.contour_regular_hovered = QPen(style.container_nested_zone_regular_hovered),
+		.contour_highlighted_hovered = QPen(style.container_nested_zone_highlighted_hovered),
+		.contour_selected_hovered = QPen(style.container_nested_zone_selected_hovered)
 	};
 }
 
@@ -218,7 +261,9 @@ nodegraph::Text::Params ProcessingStyleSelector::make_title(ProcessingStyle cons
 		.regular = QPen(style.node_title_text_regular),
 		.highlighted = QPen(style.node_title_text_highlighted),
 		.selected = QPen(style.node_title_text_selected),
-		.selected_highlighted = QPen(style.node_title_text_selected_highlighted)
+		.regular_hovered = QPen(style.node_title_text_regular_hovered),
+		.highlighted_hovered = QPen(style.node_title_text_highlighted_hovered),
+		.selected_hovered = QPen(style.node_title_text_selected_hovered)
 	};
 }
 
@@ -228,7 +273,9 @@ nodegraph::Text::Params ProcessingStyleSelector::make_text_normal(ProcessingStyl
 		.regular = QPen(style.text_normal_regular),
 		.highlighted = QPen(style.text_normal_highlighted),
 		.selected = QPen(style.text_normal_selected),
-		.selected_highlighted = QPen(style.text_normal_selected_highlighted)
+		.regular_hovered = QPen(style.text_normal_regular_hovered),
+		.highlighted_hovered = QPen(style.text_normal_highlighted_hovered),
+		.selected_hovered = QPen(style.text_normal_selected_hovered)
 	};
 }
 
@@ -238,7 +285,9 @@ nodegraph::Text::Params ProcessingStyleSelector::make_text_enabled(ProcessingSty
 		.regular = QPen(style.text_enabled_regular),
 		.highlighted = QPen(style.text_enabled_highlighted),
 		.selected = QPen(style.text_enabled_selected),
-		.selected_highlighted = QPen(style.text_normal_selected_highlighted)
+		.regular_hovered = QPen(style.text_enabled_regular_hovered),
+		.highlighted_hovered = QPen(style.text_enabled_highlighted_hovered),
+		.selected_hovered = QPen(style.text_enabled_selected_hovered)
 	};
 }
 
@@ -248,7 +297,9 @@ nodegraph::Text::Params ProcessingStyleSelector::make_text_enabled_for_sure(Proc
 		.regular = QPen(style.text_enabled_for_sure_regular),
 		.highlighted = QPen(style.text_enabled_for_sure_highlighted),
 		.selected = QPen(style.text_enabled_for_sure_selected),
-		.selected_highlighted = QPen(style.text_normal_selected_highlighted)
+		.regular_hovered = QPen(style.text_enabled_for_sure_regular_hovered),
+		.highlighted_hovered = QPen(style.text_enabled_for_sure_highlighted_hovered),
+		.selected_hovered = QPen(style.text_enabled_for_sure_selected_hovered)
 	};
 }
 
@@ -258,7 +309,9 @@ nodegraph::Text::Params ProcessingStyleSelector::make_text_disabled(ProcessingSt
 		.regular = QPen(style.text_disabled_regular),
 		.highlighted = QPen(style.text_disabled_highlighted),
 		.selected = QPen(style.text_disabled_selected),
-		.selected_highlighted = QPen(style.text_normal_selected_highlighted)
+		.regular_hovered = QPen(style.text_disabled_regular_hovered),
+		.highlighted_hovered = QPen(style.text_disabled_highlighted_hovered),
+		.selected_hovered = QPen(style.text_disabled_selected_hovered)
 	};
 }
 

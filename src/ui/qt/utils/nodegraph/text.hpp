@@ -27,7 +27,9 @@ public:
 		QPen regular = QPen(Qt::white);
 		QPen highlighted = regular;
 		QPen selected = regular;
-		QPen selected_highlighted = selected;
+		QPen regular_hovered = regular;
+		QPen highlighted_hovered = highlighted;
+		QPen selected_hovered = selected;
 	};
 
 	std::function<Params const& ()> locate_text_params;

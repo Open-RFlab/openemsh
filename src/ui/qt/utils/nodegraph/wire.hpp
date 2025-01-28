@@ -29,7 +29,9 @@ public:
 		QPen regular = QPen(Qt::green, 2, Qt::SolidLine, Qt::RoundCap);
 		QPen highlighted = QPen(QColor(Qt::green).lighter(), 4, Qt::SolidLine, Qt::RoundCap);
 		QPen selected = regular;
-		QPen selected_highlighted = highlighted;
+		QPen regular_hovered = regular;
+		QPen highlighted_hovered = highlighted;
+		QPen selected_hovered = selected;
 	};
 
 	std::function<Params const& ()> locate_wire_params;

@@ -175,15 +175,21 @@ void Container::set_highlighted(bool is_highlighted, QGraphicsItem const* by_ite
 void Container::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* /*widget*/) {
 	Node::Params const& params = locate_node_params();
 
-	if(option->state & QStyle::State_MouseOver
-	&& option->state & QStyle::State_Selected) {
-		painter->setBrush(params.background_selected_highlighted);
-	} else if(option->state & QStyle::State_MouseOver) {
-		painter->setBrush(params.background_highlighted);
-	} else if(option->state & QStyle::State_Selected) {
-		painter->setBrush(params.background_selected);
+	if(option->state & QStyle::State_Selected) {
+		if(option->state & QStyle::State_MouseOver)
+			painter->setBrush(params.background_selected_hovered);
+		else
+			painter->setBrush(params.background_selected);
+	} else if(is_highlighted()) {
+		if(option->state & QStyle::State_MouseOver)
+			painter->setBrush(params.background_highlighted_hovered);
+		else
+			painter->setBrush(params.background_highlighted);
 	} else {
-		painter->setBrush(params.background_regular);
+		if(option->state & QStyle::State_MouseOver)
+			painter->setBrush(params.background_regular_hovered);
+		else
+			painter->setBrush(params.background_regular);
 	}
 
 	QPainterPath path;
@@ -194,15 +200,21 @@ void Container::paint(QPainter* painter, QStyleOptionGraphicsItem const* option,
 	painter->drawPath(path - nested);
 
 	if(title) {
-		if(option->state & QStyle::State_MouseOver
-		&& option->state & QStyle::State_Selected) {
-			painter->setBrush(params.title_background_selected_highlighted);
-		} else if(option->state & QStyle::State_MouseOver) {
-			painter->setBrush(params.title_background_highlighted);
-		} else if(option->state & QStyle::State_Selected) {
-			painter->setBrush(params.title_background_selected);
+		if(option->state & QStyle::State_Selected) {
+			if(option->state & QStyle::State_MouseOver)
+				painter->setBrush(params.title_background_selected_hovered);
+			else
+				painter->setBrush(params.title_background_selected);
+		} else if(is_highlighted()) {
+			if(option->state & QStyle::State_MouseOver)
+				painter->setBrush(params.title_background_highlighted_hovered);
+			else
+				painter->setBrush(params.title_background_highlighted);
 		} else {
-			painter->setBrush(params.title_background_regular);
+			if(option->state & QStyle::State_MouseOver)
+				painter->setBrush(params.title_background_regular_hovered);
+			else
+				painter->setBrush(params.title_background_regular);
 		}
 		QRectF titlebar = boundingRect();
 		titlebar.setBottom(title->mapToParent(title->boundingRect()).boundingRect().bottom());
