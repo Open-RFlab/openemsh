@@ -67,8 +67,13 @@ QVariant Node::itemChange(GraphicsItemChange change, QVariant const& value) {
 			return newPos;
 		}
 	} else if(change == ItemSelectedChange) {
+		if(value.toBool())
+			set_highlighted(false, this);
 		for(auto* item : childItems()) {
 			item->setSelected(value.toBool());
+		}
+		for(auto* node : get_chain()) {
+			node->set_highlighted(value.toBool(), this);
 		}
 		return value;
 	}
@@ -83,6 +88,9 @@ void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
 	if(isSelected()) {
 		for(auto* item : childItems()) {
 			item->setSelected(true);
+		}
+		for(auto* node : get_chain()) {
+			node->set_highlighted(true, this);
 		}
 	}
 }
@@ -185,6 +193,19 @@ QList<Node*> Node::get_chain() const {
 	traverse_up(up, this);
 	traverse_down(down, this);
 	return (std::move(up) + std::move(down)).values();
+}
+
+//******************************************************************************
+void Node::set_highlighted(bool is_highlighted, QGraphicsItem const* by_item) {
+	Highlightable::set_highlighted(is_highlighted, by_item);
+	if(title)
+		title->set_highlighted(is_highlighted);
+	for(auto& list : { input_ports, output_ports }) {
+		for(auto* port : list) {
+			if(port)
+				port->set_highlighted(is_highlighted);
+		}
+	}
 }
 
 } // namespace ui::qt

@@ -31,6 +31,8 @@ public:
 	void add(QGraphicsItem* item);
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;
 
+	void set_highlighted(bool is_highlighted, QGraphicsItem const* by_item) override;
+
 protected:
 	std::function<std::size_t (QGraphicsItem const*)> get_column;
 	Rect* const nested_zone;

@@ -13,12 +13,15 @@
 
 #include <functional>
 
+#include "highlightable.hpp"
+
 namespace ui::qt::nodegraph {
 
 //******************************************************************************
 class Rect
 : public QGraphicsRectItem
 , public QGraphicsLayoutItem
+, public Highlightable
 {
 public:
 	struct Params final {

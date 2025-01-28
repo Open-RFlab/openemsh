@@ -72,6 +72,7 @@ add_executable( openemsh_bin )
 target_sources( openemsh_bin
 	PRIVATE
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/cli.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/highlightable.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/port.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/text.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/rect.cpp"

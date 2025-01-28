@@ -13,6 +13,7 @@
 
 #include <functional>
 
+#include "highlightable.hpp"
 #include "port.hpp"
 
 class QGraphicsLinearLayout;
@@ -23,7 +24,10 @@ namespace ui::qt::nodegraph {
 class Text;
 
 //******************************************************************************
-class Node : public QGraphicsWidget {
+class Node
+: public QGraphicsWidget
+, public Highlightable
+{
 public:
 	struct Params final {
 		qreal radius = 1;
@@ -51,6 +55,8 @@ public:
 	QList<Node*> get_chain() const;
 	static void traverse_up(QSet<Node*>& out, Node const* node);
 	static void traverse_down(QSet<Node*>& out, Node const* node);
+
+	void set_highlighted(bool is_highlighted, QGraphicsItem const* by_item) override;
 
 	using QGraphicsWidget::updateGeometry;
 

@@ -165,6 +165,13 @@ void Container::add(QGraphicsItem* item) {
 }
 
 //******************************************************************************
+void Container::set_highlighted(bool is_highlighted, QGraphicsItem const* by_item) {
+	Node::set_highlighted(is_highlighted, by_item);
+	if(nested_zone)
+		nested_zone->set_highlighted(is_highlighted);
+}
+
+//******************************************************************************
 void Container::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* /*widget*/) {
 	Node::Params const& params = locate_node_params();
 

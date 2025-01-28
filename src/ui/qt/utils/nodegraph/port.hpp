@@ -12,6 +12,8 @@
 #include <QList>
 #include <QPen>
 
+#include "highlightable.hpp"
+
 namespace ui::qt::nodegraph {
 
 class Node;
@@ -21,6 +23,7 @@ class Wire;
 class Port
 : public QGraphicsSimpleTextItem
 , public QGraphicsLayoutItem
+, public Highlightable
 {
 public:
 	enum class AnchorPoint { TOP, BOTTOM, LEFT, RIGHT };
