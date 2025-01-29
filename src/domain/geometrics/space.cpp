@@ -13,12 +13,12 @@ namespace domain {
 using namespace std;
 
 //******************************************************************************
-static_assert(Axes[Plane::YZ][0] == Axis::Y);
-static_assert(Axes[Plane::YZ][1] == Axis::Z);
-static_assert(Axes[Plane::ZX][0] == Axis::Z);
-static_assert(Axes[Plane::ZX][1] == Axis::X);
-static_assert(Axes[Plane::XY][0] == Axis::X);
-static_assert(Axes[Plane::XY][1] == Axis::Y);
+static_assert(Axes[YZ][H] == Y);
+static_assert(Axes[YZ][V] == Z);
+static_assert(Axes[ZX][H] == Z);
+static_assert(Axes[ZX][V] == X);
+static_assert(Axes[XY][H] == X);
+static_assert(Axes[XY][V] == Y);
 
 //******************************************************************************
 optional<ViewAxis> transpose(Plane const plane, Axis const axis) noexcept {

@@ -22,11 +22,11 @@ ARRAY_WITH_ITERABLE_ENUM_INDEX(PlaneSpace, Plane, YZ, ZX, XY)
 ARRAY_WITH_ITERABLE_ENUM_INDEX(ViewAxisSpace, ViewAxis, H, V)
 
 //******************************************************************************
-inline static PlaneSpace<std::array<Axis const, 2>> constexpr Axes {
-	Axis::Y, Axis::Z,
-	Axis::Z, Axis::X,
-	Axis::X, Axis::Y
-};
+inline static PlaneSpace<ViewAxisSpace<Axis const>> constexpr Axes {{
+	{ Y, Z },
+	{ Z, X },
+	{ X, Y }
+}};
 
 /// ViewAxis describe the orientation of Axis itself.
 ///*****************************************************************************
