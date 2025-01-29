@@ -31,12 +31,12 @@ enum DataKeys : int {
 
 
 //******************************************************************************
-constexpr Entity const* get_entity(QVariant const& variant) {
+inline Entity const* get_entity(QVariant const& variant) {
 	return static_cast<Entity const*>(variant.value<void const*>());
 }
 
 //******************************************************************************
-constexpr QVariant set_entity(Entity const* entity) {
+inline QVariant set_entity(Entity const* entity) {
 	return QVariant::fromValue(static_cast<void const*>(entity));
 }
 
