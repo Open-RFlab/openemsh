@@ -9,6 +9,7 @@
 #include <QColor>
 
 #include <vector>
+#include <type_traits>
 
 #include "ui/qt/utils/nodegraph/container.hpp"
 #include "ui/qt/utils/nodegraph/rect.hpp"
@@ -136,6 +137,26 @@ struct ProcessingStyle {
 };
 
 //******************************************************************************
+#define GETTER_DEF(VAR_NAME) \
+	decltype(VAR_NAME) const& get_ ##VAR_NAME () const { return VAR_NAME; }
+
+//******************************************************************************
+#define BASIC_MAKER_DECL(VAR_NAME) \
+	decltype(VAR_NAME) make_ ##VAR_NAME (ProcessingStyle const& style) const
+
+//******************************************************************************
+#define BASIC_MAKER_DEF(SCOPE, VAR_NAME) \
+	decltype(SCOPE::VAR_NAME) SCOPE::make_ ##VAR_NAME (ProcessingStyle const& style) const
+
+//******************************************************************************
+#define COMPOUNDED_MAKER_DECL(VAR_NAME) \
+	std::remove_const_t<decltype(VAR_NAME)> make_ ##VAR_NAME () const
+
+//******************************************************************************
+#define COMPOUNDED_MAKER_DEF(SCOPE, VAR_NAME) \
+	std::remove_const_t<decltype(SCOPE::VAR_NAME)> SCOPE::make_ ##VAR_NAME () const
+
+//******************************************************************************
 class ProcessingStyleSelector {
 	ProcessingStyle style;
 
@@ -159,49 +180,50 @@ class ProcessingStyleSelector {
 	ProcessingConflictEdgeInPolygon::Params const conflict_eip;
 	ProcessingConflictTooCloseMeshlinePolicies::Params const conflict_tcmlp;
 
-	nodegraph::Wire::Params make_wire(ProcessingStyle const& style) const;
-	nodegraph::Port::Params make_port(ProcessingStyle const& style) const;
-	nodegraph::Node::Params make_node(ProcessingStyle const& style) const;
-	nodegraph::Rect::Params make_nested_zone(ProcessingStyle const& style) const;
-	nodegraph::Text::Params make_title(ProcessingStyle const& style) const;
-	nodegraph::Text::Params make_text_normal(ProcessingStyle const& style) const;
-	nodegraph::Text::Params make_text_enabled(ProcessingStyle const& style) const;
-	nodegraph::Text::Params make_text_enabled_for_sure(ProcessingStyle const& style) const;
-	nodegraph::Text::Params make_text_disabled(ProcessingStyle const& style) const;
-	ProcessingEdge::Params make_edge() const;
-	ProcessingPolygon::Params make_polygon() const;
-	ProcessingPlane::Params make_plane() const;
-	ProcessingAxis::Params make_axis() const;
-	ProcessingMeshlinePolicy::Params make_meshline_policy() const;
-	ProcessingInterval::Params make_interval() const;
-	ProcessingMeshline::Params make_meshline() const;
-	ProcessingConflictColinearEdges::Params make_conflict_ce() const;
-	ProcessingConflictEdgeInPolygon::Params make_conflict_eip() const;
-	ProcessingConflictTooCloseMeshlinePolicies::Params make_conflict_tcmlp() const;
+	BASIC_MAKER_DECL(wire);
+	BASIC_MAKER_DECL(port);
+	BASIC_MAKER_DECL(node);
+	BASIC_MAKER_DECL(nested_zone);
+	BASIC_MAKER_DECL(title);
+	BASIC_MAKER_DECL(text_normal);
+	BASIC_MAKER_DECL(text_enabled);
+	BASIC_MAKER_DECL(text_enabled_for_sure);
+	BASIC_MAKER_DECL(text_disabled);
+
+	COMPOUNDED_MAKER_DECL(edge);
+	COMPOUNDED_MAKER_DECL(polygon);
+	COMPOUNDED_MAKER_DECL(plane);
+	COMPOUNDED_MAKER_DECL(axis);
+	COMPOUNDED_MAKER_DECL(meshline_policy);
+	COMPOUNDED_MAKER_DECL(interval);
+	COMPOUNDED_MAKER_DECL(meshline);
+	COMPOUNDED_MAKER_DECL(conflict_ce);
+	COMPOUNDED_MAKER_DECL(conflict_eip);
+	COMPOUNDED_MAKER_DECL(conflict_tcmlp);
 
 public:
 	static std::vector<ProcessingStyle> const available_styles;
 
-	ProcessingStyle const& get_style() const;
-	nodegraph::Wire::Params const& get_wire() const;
-	nodegraph::Port::Params const& get_port() const;
-	nodegraph::Node::Params const& get_node() const;
-	nodegraph::Rect::Params const& get_nested_zone() const;
-	nodegraph::Text::Params const& get_title() const;
-	nodegraph::Text::Params const& get_text_normal() const;
-	nodegraph::Text::Params const& get_text_enabled() const;
-	nodegraph::Text::Params const& get_text_enabled_for_sure() const;
-	nodegraph::Text::Params const& get_text_disabled() const;
-	ProcessingEdge::Params const& get_edge() const;
-	ProcessingPolygon::Params const& get_polygon() const;
-	ProcessingPlane::Params const& get_plane() const;
-	ProcessingAxis::Params const& get_axis() const;
-	ProcessingMeshlinePolicy::Params const& get_meshline_policy() const;
-	ProcessingInterval::Params const& get_interval() const;
-	ProcessingMeshline::Params const& get_meshline() const;
-	ProcessingConflictColinearEdges::Params const& get_conflict_ce() const;
-	ProcessingConflictEdgeInPolygon::Params const& get_conflict_eip() const;
-	ProcessingConflictTooCloseMeshlinePolicies::Params const& get_conflict_tcmlp() const;
+	GETTER_DEF(style)
+	GETTER_DEF(wire)
+	GETTER_DEF(port)
+	GETTER_DEF(node)
+	GETTER_DEF(nested_zone)
+	GETTER_DEF(title)
+	GETTER_DEF(text_normal)
+	GETTER_DEF(text_enabled)
+	GETTER_DEF(text_enabled_for_sure)
+	GETTER_DEF(text_disabled)
+	GETTER_DEF(edge)
+	GETTER_DEF(polygon)
+	GETTER_DEF(plane)
+	GETTER_DEF(axis)
+	GETTER_DEF(meshline_policy)
+	GETTER_DEF(interval)
+	GETTER_DEF(meshline)
+	GETTER_DEF(conflict_ce)
+	GETTER_DEF(conflict_eip)
+	GETTER_DEF(conflict_tcmlp)
 
 	ProcessingStyleSelector();
 	ProcessingStyleSelector(ProcessingStyle style);
