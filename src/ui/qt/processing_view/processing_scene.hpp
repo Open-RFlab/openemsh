@@ -10,10 +10,12 @@
 #include <QObject>
 #include <QList>
 
+#include <concepts>
 #include <map>
 
 #include "domain/geometrics/space.hpp"
 #include "ui/qt/utils/nodegraph/wire.hpp"
+#include "utils/concepts.hpp"
 #include "processing_style.hpp"
 
 class Entity;
@@ -85,12 +87,12 @@ public slots:
 private:
 	bool is_select_counterparts_locked = false;
 
-	template<typename Item, typename Space>
-	Item* add_node(Space space);
-	template<typename Item, typename Entity>
-	Item* add_node(Entity* entity);
-	template<typename Item, typename Entity>
-	Item* add_node(Entity* entity, nodegraph::Container* to_container);
+	template<std::derived_from<nodegraph::Node> Node, Enum Space>
+	Node* add_node(Space space);
+	template<std::derived_from<nodegraph::Node> Node, std::derived_from<::Entity> Entity>
+	Node* add_node(Entity* entity);
+	template<std::derived_from<nodegraph::Node> Node, std::derived_from<::Entity> Entity>
+	Node* add_node(Entity* entity, nodegraph::Container* to_container);
 };
 
 } // namespace ui::qt

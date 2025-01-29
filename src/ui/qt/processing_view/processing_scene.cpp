@@ -4,8 +4,6 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#include <type_traits>
-
 #include "domain/conflicts/conflict_colinear_edges.hpp"
 #include "domain/conflicts/conflict_edge_in_polygon.hpp"
 #include "domain/conflicts/conflict_too_close_meshline_policies.hpp"
@@ -67,35 +65,29 @@ void ProcessingScene::fit_containers() {
 }
 
 //******************************************************************************
-template<typename Item, typename Space>
-Item* ProcessingScene::add_node(Space space) {
-	static_assert(std::is_base_of<nodegraph::Node, Item>::value, "Item must derive from nodegraph::Node");
-	static_assert(std::is_enum<Space>::value, "Space must be an enum");
-	Item* item = new Item(space);
-	addItem(item);
-	return item;
+template<std::derived_from<nodegraph::Node> Node, Enum Space>
+Node* ProcessingScene::add_node(Space space) {
+	Node* node = new Node(space);
+	addItem(node);
+	return node;
 }
 
 //******************************************************************************
-template<typename Item, typename Entity>
-Item* ProcessingScene::add_node(Entity* entity) {
-	static_assert(std::is_base_of<nodegraph::Node, Item>::value, "Item must derive from nodegraph::Node");
-	static_assert(std::is_base_of<::Entity, Entity>::value, "Entity must derive from ::Entity");
-	Item* item = new Item(entity);
-	addItem(item);
-	index[entity] = item;
-	return item;
+template<std::derived_from<nodegraph::Node> Node, std::derived_from<::Entity> Entity>
+Node* ProcessingScene::add_node(Entity* entity) {
+	Node* node = new Node(entity);
+	addItem(node);
+	index[entity] = node;
+	return node;
 }
 
 //******************************************************************************
-template<typename Item, typename Entity>
-Item* ProcessingScene::add_node(Entity* entity, nodegraph::Container* to_container) {
-	static_assert(std::is_base_of<nodegraph::Node, Item>::value, "Item must derive from nodegraph::Node");
-	static_assert(std::is_base_of<::Entity, Entity>::value, "Entity must derive from ::Entity");
-	Item* item = new Item(entity);
-	to_container->add(item);
-	index[entity] = item;
-	return item;
+template<std::derived_from<nodegraph::Node> Node, std::derived_from<::Entity> Entity>
+Node* ProcessingScene::add_node(Entity* entity, nodegraph::Container* to_container) {
+	Node* node = new Node(entity);
+	to_container->add(node);
+	index[entity] = node;
+	return node;
 }
 
 //******************************************************************************
