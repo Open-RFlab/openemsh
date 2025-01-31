@@ -10,7 +10,6 @@
 #include "domain/geometrics/edge.hpp"
 #include "domain/geometrics/polygon.hpp"
 #include "domain/mesh/meshline.hpp"
-#include "utils/unreachable.hpp"
 
 #include "processing_view/processing_view.hpp"
 #include "structure_view/structure_view.hpp"
@@ -53,6 +52,8 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 	update_processing();
 
 	ui->structure_view->setScene(&(ui->structure_view->scenes[domain::XY]));
+	ui->processing_view->processing_scene->set_display_plane(domain::XY);
+	ui->processing_view->processing_scene->set_display_view_axes({ true, true });
 }
 
 //******************************************************************************
@@ -165,6 +166,7 @@ void MainWindow::on_rb_plane_xy_toggled(bool const is_checked) {
 	if(is_checked) {
 		ui->structure_view->setScene(&(ui->structure_view->scenes[domain::XY]));
 		ui->structure_view->centerOn(ui->structure_view->scenes[domain::XY].polygons->boundingRect().center());
+		ui->processing_view->processing_scene->set_display_plane(domain::XY);
 	}
 }
 
@@ -173,6 +175,7 @@ void MainWindow::on_rb_plane_yz_toggled(bool const is_checked) {
 	if(is_checked) {
 		ui->structure_view->setScene(&(ui->structure_view->scenes[domain::YZ]));
 		ui->structure_view->centerOn(ui->structure_view->scenes[domain::YZ].polygons->boundingRect().center());
+		ui->processing_view->processing_scene->set_display_plane(domain::YZ);
 	}
 }
 
@@ -181,6 +184,7 @@ void MainWindow::on_rb_plane_zx_toggled(bool const is_checked) {
 	if(is_checked) {
 		ui->structure_view->setScene(&(ui->structure_view->scenes[domain::ZX]));
 		ui->structure_view->centerOn(ui->structure_view->scenes[domain::ZX].polygons->boundingRect().center());
+		ui->processing_view->processing_scene->set_display_plane(domain::ZX);
 	}
 }
 
@@ -211,6 +215,7 @@ void MainWindow::on_tb_anchor_clicked(bool const is_checked) {
 //******************************************************************************
 void MainWindow::on_tb_reset_clicked() {
 	ui->processing_view->processing_scene->fit_containers();
+	ui->processing_view->processing_scene->fit_scene();
 	ui->processing_view->fitInView(ui->processing_view->processing_scene->itemsBoundingRect(), Qt::KeepAspectRatio);
 
 	ui->s_structure_rotation->setValue((ui->s_structure_rotation->minimum() + ui->s_structure_rotation->maximum()) / 2);
@@ -251,21 +256,40 @@ void MainWindow::on_tb_vertical_layout_clicked() {
 //******************************************************************************
 void MainWindow::on_tb_show_all_mesh_clicked() {
 	ui->structure_view->set_mesh_visibility(StructureScene::MeshVisibility::FULL);
+	ui->processing_view->processing_scene->set_display_view_axes({ true, true });
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_horizontal_mesh_clicked() {
 	ui->structure_view->set_mesh_visibility(StructureScene::MeshVisibility::HORIZONTAL);
+	ui->processing_view->processing_scene->set_display_view_axes({ true, false });
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_vertical_mesh_clicked() {
 	ui->structure_view->set_mesh_visibility(StructureScene::MeshVisibility::VERTICAL);
+	ui->processing_view->processing_scene->set_display_view_axes({ false, true });
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_no_mesh_clicked() {
 	ui->structure_view->set_mesh_visibility(StructureScene::MeshVisibility::NONE);
+	ui->processing_view->processing_scene->set_display_view_axes({ false, false });
+}
+
+//******************************************************************************
+void MainWindow::on_tb_show_selected_clicked() {
+	ui->processing_view->processing_scene->set_display(ProcessingScene::DisplayMode::SELECTED_CHAIN);
+}
+
+//******************************************************************************
+void MainWindow::on_tb_show_displayed_clicked() {
+	ui->processing_view->processing_scene->set_display(ProcessingScene::DisplayMode::STRUCTURE_VIEW);
+}
+
+//******************************************************************************
+void MainWindow::on_tb_show_everything_clicked() {
+	ui->processing_view->processing_scene->set_display(ProcessingScene::DisplayMode::EVERYTHING);
 }
 
 //******************************************************************************

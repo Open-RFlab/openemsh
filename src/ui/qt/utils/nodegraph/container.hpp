@@ -34,6 +34,9 @@ public:
 	void set_highlighted(bool is_highlighted, QGraphicsItem const* by_item) override;
 
 protected:
+	bool does_contains_visible_items() const;
+	QList<QGraphicsItem*> visible_contained_items() const;
+
 	std::function<std::size_t (QGraphicsItem const*)> get_column;
 	Rect* const nested_zone;
 	QSizeF const margins;

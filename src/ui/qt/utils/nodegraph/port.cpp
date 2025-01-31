@@ -151,6 +151,10 @@ QVariant Port::itemChange(GraphicsItemChange change, QVariant const& value) {
 		for(auto* wire : wires)
 			if(wire)
 				wire->update_path();
+	} else if(change == ItemVisibleHasChanged) {
+		for(auto* wire : wires)
+			if(wire)
+				wire->setVisible(value.toBool());
 	}
 	return QGraphicsItem::itemChange(change, value);
 }

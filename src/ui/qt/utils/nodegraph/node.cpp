@@ -9,6 +9,8 @@
 #include <QStyleOptionGraphicsItem>
 
 #include "utils/default_locator.hpp"
+#include "container.hpp"
+#include "rect.hpp"
 #include "text.hpp"
 #include "wire.hpp"
 
@@ -205,6 +207,24 @@ QList<Node*> Node::get_chain() const {
 	traverse_up(up, this);
 	traverse_down(down, this);
 	return (std::move(up) + std::move(down)).values();
+}
+
+//******************************************************************************
+Container* Node::get_surrounding_container() const {
+	if(auto* nested_zone = dynamic_cast<Rect*>(parentItem()); nested_zone)
+		return dynamic_cast<Container*>(nested_zone->parentItem());
+	else
+		return nullptr;
+}
+
+//******************************************************************************
+void Node::show_after_parents() {
+	if(!isVisible()) {
+		if(auto* container = get_surrounding_container(); container)
+			container->show_after_parents();
+
+		show();
+	}
 }
 
 //******************************************************************************

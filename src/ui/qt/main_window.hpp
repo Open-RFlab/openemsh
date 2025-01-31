@@ -44,6 +44,9 @@ private slots:
 	void on_tb_show_horizontal_mesh_clicked();
 	void on_tb_show_vertical_mesh_clicked();
 	void on_tb_show_no_mesh_clicked();
+	void on_tb_show_selected_clicked();
+	void on_tb_show_displayed_clicked();
+	void on_tb_show_everything_clicked();
 	void on_tb_curved_wires_clicked();
 	void on_tb_direct_wires_clicked();
 

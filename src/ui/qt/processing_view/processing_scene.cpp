@@ -14,6 +14,7 @@
 #include "domain/mesh/meshline.hpp"
 #include "domain/mesh/meshline_policy.hpp"
 #include "ui/qt/data_keys.hpp"
+#include "utils/unreachable.hpp"
 #include "processing_axis.hpp"
 #include "processing_conflict_colinear_edges.hpp"
 #include "processing_conflict_edge_in_polygon.hpp"
@@ -33,6 +34,11 @@ namespace ui::qt {
 ProcessingScene::ProcessingScene(QObject* parent)
 : QGraphicsScene(parent)
 , style_selector(ProcessingStyleSelector::available_styles[0])
+, is_select_counterparts_locked(false)
+, is_display_selected_chain_locked(false)
+, display_mode(DisplayMode::EVERYTHING)
+, plane_displayed_on_structure_view(domain::XY)
+, axes_displayed_on_structure_view({ true, true })
 {
 	connect(
 		this, &QGraphicsScene::selectionChanged,
@@ -65,10 +71,37 @@ void ProcessingScene::fit_containers() {
 }
 
 //******************************************************************************
+void ProcessingScene::fit_scene() {
+	qreal const margin_x = 1000;
+	qreal const margin_y = 100;
+	qreal x = 0;
+	qreal y = 0;
+	qreal next_x = 0;
+	for(auto* plane : planes) {
+		if(plane->isVisible()) {
+			plane->setPos(x, y);
+			next_x = qMax(next_x, plane->boundingRect().width());
+			y += plane->boundingRect().height() + margin_y;
+		}
+	}
+
+	x = next_x + margin_x;
+	y = 0;
+
+	for(auto* axis : axes) {
+		if(axis->isVisible()) {
+			axis->setPos(x, y);
+			y += axis->boundingRect().height() + margin_y;
+		}
+	}
+}
+
+//******************************************************************************
 template<std::derived_from<nodegraph::Node> Node, Enum Space>
 Node* ProcessingScene::add_node(Space space) {
 	Node* node = new Node(space);
 	addItem(node);
+	nodes.push_back(node);
 	return node;
 }
 
@@ -77,6 +110,7 @@ template<std::derived_from<nodegraph::Node> Node, std::derived_from<::Entity> En
 Node* ProcessingScene::add_node(Entity* entity) {
 	Node* node = new Node(entity);
 	addItem(node);
+	nodes.push_back(node);
 	index[entity] = node;
 	return node;
 }
@@ -86,6 +120,7 @@ template<std::derived_from<nodegraph::Node> Node, std::derived_from<::Entity> En
 Node* ProcessingScene::add_node(Entity* entity, nodegraph::Container* to_container) {
 	Node* node = new Node(entity);
 	to_container->add(node);
+	nodes.push_back(node);
 	index[entity] = node;
 	return node;
 }
@@ -224,11 +259,128 @@ void ProcessingScene::wire_to_destination_first_output_port(nodegraph::Node* nod
 }
 
 //******************************************************************************
+QList<nodegraph::Node*> ProcessingScene::selected_nodes() {
+	QList<nodegraph::Node*> ret;
+	for(auto* node : nodes) {
+		if(node && node->isSelected())
+			ret.append(node);
+	}
+	return ret;
+}
+
+//******************************************************************************
+QList<nodegraph::Node*> ProcessingScene::highlighted_nodes() {
+	QList<nodegraph::Node*> ret;
+	for(auto* node : nodes) {
+		if(node && node->is_highlighted())
+			ret.append(node);
+	}
+	return ret;
+}
+
+//******************************************************************************
+void ProcessingScene::reset_visibility(bool are_visible) {
+	for(auto* node : nodes) {
+		if(node) {
+			if(are_visible)
+				node->show_after_parents();
+			else
+				node->hide();
+		}
+	}
+}
+//******************************************************************************
+void ProcessingScene::set_display_view_axes(domain::ViewAxisSpace<bool> const& axes) {
+	axes_displayed_on_structure_view = axes;
+	if(display_mode == DisplayMode::STRUCTURE_VIEW)
+		display_structure_view();
+}
+
+//******************************************************************************
+void ProcessingScene::set_display_plane(domain::Plane plane) {
+	plane_displayed_on_structure_view = plane;
+	if(display_mode == DisplayMode::STRUCTURE_VIEW)
+		display_structure_view();
+}
+
+//******************************************************************************
+void ProcessingScene::set_display(DisplayMode mode) {
+	display_mode = mode;
+	switch(display_mode) {
+	case DisplayMode::EVERYTHING:
+		reset_visibility();
+		fit_containers();
+		fit_scene();
+		break;
+	case DisplayMode::STRUCTURE_VIEW:
+		display_structure_view();
+		break;
+	case DisplayMode::SELECTED_CHAIN:
+		display_selected_chain();
+		break;
+	default:
+		unreachable();
+	}
+}
+
+//******************************************************************************
+void ProcessingScene::display_structure_view() {
+	reset_visibility();
+
+	for(domain::Plane const plane : domain::AllPlane) {
+		if(plane != plane_displayed_on_structure_view)
+			if(planes[plane])
+				planes[plane]->hide();
+	}
+
+	for(domain::Axis const axis : domain::AllAxis) {
+		if(auto const view_axis = domain::transpose(plane_displayed_on_structure_view, axis)
+		; view_axis) {
+			if(axes[axis])
+				axes[axis]->setVisible(axes_displayed_on_structure_view[domain::reverse(view_axis.value())]);
+		} else {
+			if(axes[axis])
+				axes[axis]->hide();
+		}
+	}
+
+	fit_containers();
+	fit_scene();
+}
+
+//******************************************************************************
+void ProcessingScene::display_selected_chain() {
+	auto const selected = selected_nodes();
+	auto const highlighted = highlighted_nodes();
+	reset_visibility(false);
+
+	for(auto const& list : { selected, highlighted })
+		for(auto* node : list)
+			if(node)
+				node->show_after_parents();
+
+	for(auto* node : selected)
+		if(node)
+			node->setSelected(true);
+
+	fit_containers();
+	fit_scene();
+}
+
+//******************************************************************************
 void ProcessingScene::on_selectionChanged() {
 	// Avoid infinite recursion by being synchronized back.
 	is_select_counterparts_locked = true;
 	emit selection_changed(selectedItems());
 	is_select_counterparts_locked = false;
+
+	if(display_mode == DisplayMode::SELECTED_CHAIN) {
+		if(!is_display_selected_chain_locked) {
+			is_display_selected_chain_locked = true;
+			display_selected_chain();
+			is_display_selected_chain_locked = false;
+		}
+	}
 }
 
 //******************************************************************************
@@ -238,7 +390,9 @@ void ProcessingScene::select_counterparts(QList<QGraphicsItem*> foreign_items) {
 		for(auto* foreign_item : foreign_items) {
 			auto const* entity = DataKeys::get_entity(foreign_item->data(DataKeys::ENTITY));
 			if(index.contains(entity)) {
-				index.at(entity)->setSelected(true);
+				auto* node = index.at(entity);
+				node->show_after_parents();
+				node->setSelected(true);
 			}
 		}
 	}

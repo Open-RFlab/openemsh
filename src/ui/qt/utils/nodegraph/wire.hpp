@@ -46,6 +46,7 @@ public:
 
 protected:
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;
+	QVariant itemChange(GraphicsItemChange change, QVariant const& value) override;
 
 private:
 	Port* begin;

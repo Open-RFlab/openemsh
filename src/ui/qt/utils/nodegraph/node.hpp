@@ -21,6 +21,7 @@ class Entity;
 
 namespace ui::qt::nodegraph {
 
+class Container;
 class Text;
 
 //******************************************************************************
@@ -59,6 +60,9 @@ public:
 	QList<Node*> get_chain() const;
 	static void traverse_up(QSet<Node*>& out, Node const* node);
 	static void traverse_down(QSet<Node*>& out, Node const* node);
+
+	Container* get_surrounding_container() const;
+	void show_after_parents();
 
 	void set_highlighted(bool is_highlighted, QGraphicsItem const* by_item) override;
 

@@ -120,8 +120,17 @@ Port* Wire::traverse(Port const* port) const {
 }
 
 //******************************************************************************
+QVariant Wire::itemChange(GraphicsItemChange change, QVariant const& value) {
+	if(change == ItemVisibleHasChanged) {
+		if(value.toBool())
+			update_path();
+	}
+	return QGraphicsItem::itemChange(change, value);
+}
+
+//******************************************************************************
 void Wire::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* /*widget*/) {
-	if(begin && end) {
+	if(begin && begin->isVisible() && end && end->isVisible()) {
 		Params const& params = locate_wire_params();
 
 		if(option->state & QStyle::State_Selected) {
