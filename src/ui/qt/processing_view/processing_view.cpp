@@ -33,6 +33,10 @@ ProcessingView::ProcessingView(QWidget* parent)
 	setBackgroundBrush(QColor(57, 57, 57));
 
 	setScene(processing_scene);
+	connect(
+		processing_scene, &ProcessingScene::requires_fit,
+		this, &ProcessingView::fit);
+
 }
 
 //******************************************************************************
@@ -73,6 +77,13 @@ void ProcessingView::transform_view() {
 	QTransform matrix;
 	matrix.scale(scale, scale);
 	setTransform(matrix);
+}
+
+//******************************************************************************
+void ProcessingView::fit() {
+	processing_scene->fit();
+	fitInView(processing_scene->sceneRect(), Qt::KeepAspectRatio);
+	centerOn(processing_scene->sceneRect().center());
 }
 
 //******************************************************************************

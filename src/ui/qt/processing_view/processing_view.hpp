@@ -33,6 +33,9 @@ public:
 
 	ProcessingScene* processing_scene;
 
+public slots:
+	void fit();
+
 protected:
 	void wheelEvent(QWheelEvent* event) override;
 

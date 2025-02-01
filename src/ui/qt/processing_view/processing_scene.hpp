@@ -49,6 +49,8 @@ public:
 	void set_wire_style(nodegraph::Wire::Style style);
 	void fit_containers();
 	void fit_scene();
+	void fit(QMarginsF margins = QMarginsF());
+	QRectF visible_items_bounding_rect() const;
 
 	ProcessingPlane* add(domain::Plane plane);
 	ProcessingAxis* add(domain::Axis axis);
@@ -96,6 +98,7 @@ private slots:
 	void on_selectionChanged();
 signals:
 	void selection_changed(QList<QGraphicsItem*> items);
+	void requires_fit();
 public slots:
 	void select_counterparts(QList<QGraphicsItem*> foreign_items);
 

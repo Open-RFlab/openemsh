@@ -120,6 +120,8 @@ void MainWindow::update_processing() {
 
 	for(auto* interval : ui->processing_view->processing_scene->intervals)
 		ui->processing_view->processing_scene->wire_to_destination_first_output_port(interval);
+
+	ui->processing_view->processing_scene->fit_scene();
 }
 
 //******************************************************************************
@@ -216,7 +218,7 @@ void MainWindow::on_tb_anchor_clicked(bool const is_checked) {
 void MainWindow::on_tb_reset_clicked() {
 	ui->processing_view->processing_scene->fit_containers();
 	ui->processing_view->processing_scene->fit_scene();
-	ui->processing_view->fitInView(ui->processing_view->processing_scene->itemsBoundingRect(), Qt::KeepAspectRatio);
+	ui->processing_view->fit();
 
 	ui->s_structure_rotation->setValue((ui->s_structure_rotation->minimum() + ui->s_structure_rotation->maximum()) / 2);
 
@@ -225,7 +227,7 @@ void MainWindow::on_tb_reset_clicked() {
 	// https://code.qt.io/cgit/qt/qtbase.git/tree/src/widgets/graphicsview/qgraphicsview.cpp?h=6.8#n2014
 
 	// TODO Fit twice because of possible scrollbars apparition after first fit
-	ui->structure_view->fitInView(dynamic_cast<StructureScene*>(ui->structure_view->scene())->polygons->boundingRect() + QMarginsF(5, 5, 5, 5), Qt::KeepAspectRatio);
+	ui->structure_view->fitInView(static_cast<StructureScene*>(ui->structure_view->scene())->polygons->boundingRect() + QMarginsF(5, 5, 5, 5), Qt::KeepAspectRatio);
 //	ui->structure_view->fitInView(dynamic_cast<StructureScene*>(ui->structure_view->scene())->polygons->boundingRect() + QMarginsF(5, 5, 5, 5), Qt::KeepAspectRatio);
 }
 
@@ -280,16 +282,19 @@ void MainWindow::on_tb_show_no_mesh_clicked() {
 //******************************************************************************
 void MainWindow::on_tb_show_selected_clicked() {
 	ui->processing_view->processing_scene->set_display(ProcessingScene::DisplayMode::SELECTED_CHAIN);
+	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_displayed_clicked() {
 	ui->processing_view->processing_scene->set_display(ProcessingScene::DisplayMode::STRUCTURE_VIEW);
+	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_everything_clicked() {
 	ui->processing_view->processing_scene->set_display(ProcessingScene::DisplayMode::EVERYTHING);
+	ui->processing_view->fit();
 }
 
 //******************************************************************************

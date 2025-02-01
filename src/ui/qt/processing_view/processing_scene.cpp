@@ -97,6 +97,32 @@ void ProcessingScene::fit_scene() {
 }
 
 //******************************************************************************
+void ProcessingScene::fit(QMarginsF margins) {
+	auto const boundings = visible_items_bounding_rect();
+	if(margins.isNull())
+		margins += qMin(boundings.height(), boundings.width()) / 20;
+
+	setSceneRect(boundings + margins);
+}
+
+//******************************************************************************
+QRectF ProcessingScene::visible_items_bounding_rect() const {
+	QRectF bounding;
+	auto collect_bounding_rect = [&](QGraphicsItem const* item) {
+		if(item && item->isVisible()) {
+			bounding |= item->mapToScene(item->boundingRect()).boundingRect();
+		}
+	};
+
+	for(auto* container : planes)
+		collect_bounding_rect(container);
+	for(auto* container : axes)
+		collect_bounding_rect(container);
+
+	return bounding;
+}
+
+//******************************************************************************
 template<std::derived_from<nodegraph::Node> Node, Enum Space>
 Node* ProcessingScene::add_node(Space space) {
 	Node* node = new Node(space);
@@ -378,6 +404,7 @@ void ProcessingScene::on_selectionChanged() {
 		if(!is_display_selected_chain_locked) {
 			is_display_selected_chain_locked = true;
 			display_selected_chain();
+			emit requires_fit();
 			is_display_selected_chain_locked = false;
 		}
 	}
