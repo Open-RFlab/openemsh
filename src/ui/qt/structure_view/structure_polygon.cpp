@@ -10,7 +10,7 @@
 
 #include "domain/geometrics/point.hpp"
 #include "domain/geometrics/polygon.hpp"
-#include "utils/unreachable.hpp"
+#include "utils/default_locator.hpp"
 #include "ui/qt/data_keys.hpp"
 
 #include "structure_polygon.hpp"
@@ -30,6 +30,7 @@ QPolygonF convert(domain::Polygon const* polygon) {
 //******************************************************************************
 StructurePolygon::StructurePolygon(domain::Polygon const* polygon, QGraphicsItem* parent)
 : QGraphicsPolygonItem(convert(polygon), parent)
+, locate_structure_polygon_params(default_locator<Params>)
 , polygon(polygon)
 {
 	setFlags(ItemIsSelectable);
@@ -48,34 +49,24 @@ int StructurePolygon::type() const {
 
 //******************************************************************************
 void StructurePolygon::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* /*widget*/) {
-	painter->setPen(QPen(Qt::black, 0, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin));
-	switch(polygon->type) {
-	case domain::Polygon::Type::SHAPE:
-		painter->setBrush(Qt::cyan);
-		break;
-	case domain::Polygon::Type::PORT:
-		painter->setBrush(Qt::red);
-		break;
-	case domain::Polygon::Type::GROUND:
-		painter->setBrush(Qt::darkCyan);
-		break;
-	case domain::Polygon::Type::SUBSTRATE:
-		painter->setBrush(Qt::green);
-		break;
-	default:
-		unreachable();
-	}
+	Params const& params = locate_structure_polygon_params();
 
-	if(option->state & QStyle::State_MouseOver) {
-		QBrush brush = painter->brush();
-		brush.setColor(brush.color().lighter());
-//		brush.setColor(brush.color().darker());
-		painter->setBrush(brush);
-	}
 	if(option->state & QStyle::State_Selected) {
-		QBrush brush = painter->brush();
-		brush.setColor(Qt::red);
-		painter->setBrush(brush);
+		if(option->state & QStyle::State_MouseOver) {
+			painter->setBrush(params.fill_selected_hovered);
+			painter->setPen(params.contour_selected_hovered);
+		} else {
+			painter->setBrush(params.fill_selected);
+			painter->setPen(params.contour_selected);
+		}
+	} else {
+		if(option->state & QStyle::State_MouseOver) {
+			painter->setBrush(params.fill_regular_hovered);
+			painter->setPen(params.contour_regular_hovered);
+		} else {
+			painter->setBrush(params.fill_regular);
+			painter->setPen(params.contour_regular);
+		}
 	}
 
 	painter->drawPolygon(QGraphicsPolygonItem::polygon());

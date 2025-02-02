@@ -36,6 +36,16 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 	ui->structure_view->setup(ui->s_structure_zoom, ui->s_structure_rotation);
 	ui->processing_view->setup(ui->s_processing_zoom);
 
+	for(auto const& style : Style::available_styles) {
+		auto* const action = new QAction(style.name, ui->ag_styles);
+		action->setCheckable(true);
+		if(style.name == "Main") {
+			action->setChecked(true);
+			set_style(style);
+		}
+		ui->m_style->addAction(action);
+	}
+
 	for(domain::Plane const plane : domain::AllPlane) {
 		connect(
 			ui->processing_view->processing_scene, &ProcessingScene::selection_changed,
@@ -158,9 +168,27 @@ void MainWindow::update_structure() {
 }
 
 //******************************************************************************
+void MainWindow::set_style(Style const& style) {
+	ui->processing_view->setBackgroundBrush(style.processing.background);
+	ui->structure_view->setBackgroundBrush(style.structure.background);
+	ui->processing_view->processing_scene->style_selector = style.processing;
+	ui->structure_view->style_selector = style.structure;
+	ui->processing_view->processing_scene->update();
+	if(auto* scene = ui->structure_view->scene(); scene)
+		scene->update();
+}
+
+//******************************************************************************
 void MainWindow::on_a_about_triggered() {
 	AboutDialog about(this);
 	about.exec();
+}
+
+//******************************************************************************
+void MainWindow::on_ag_styles_triggered(QAction* const action) {
+	if(auto style = Style::find_style(action->text()); style) {
+		set_style(style.value());
+	}
 }
 
 //******************************************************************************

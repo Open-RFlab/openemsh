@@ -316,6 +316,19 @@
   </widget>
 
   <widget class="QMenuBar" name="menuBar">
+   <widget class="QMenu" name="m_view">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <widget class="QMenu" name="m_style">
+     <property name="title">
+      <string>Style</string>
+     </property>
+     <widget class="QActionGroup" name="ag_styles"/>
+    </widget>
+    <addaction name="m_style"/>
+   </widget>
+   <addaction name="m_view"/>
    <addaction name="a_about"/>
   </widget>
   <action name="a_about">

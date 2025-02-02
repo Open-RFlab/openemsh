@@ -29,9 +29,6 @@ ProcessingView::ProcessingView(QWidget* parent)
 	setDragMode(QGraphicsView::RubberBandDrag);
 	setRubberBandSelectionMode(Qt::IntersectsItemShape); //default
 
-//	setBackgroundBrush(Qt::darkGreen);
-	setBackgroundBrush(QColor(57, 57, 57));
-
 	setScene(processing_scene);
 	connect(
 		processing_scene, &ProcessingScene::requires_fit,

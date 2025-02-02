@@ -12,6 +12,7 @@
 
 #include "domain/geometrics/space.hpp"
 #include "structure_scene.hpp"
+#include "structure_style.hpp"
 
 class QSlider;
 class QGraphicsPathItem;
@@ -37,6 +38,7 @@ public:
 
 	void set_mesh_visibility(StructureScene::MeshVisibility mesh_visibility);
 
+	StructureStyleSelector style_selector;
 	domain::PlaneSpace<StructureScene> scenes;
 
 protected:

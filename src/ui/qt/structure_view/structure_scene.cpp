@@ -14,7 +14,6 @@
 #include "utils/unreachable.hpp"
 #include "ui/qt/data_keys.hpp"
 #include "ui/qt/user_types.hpp"
-
 #include "structure_edge.hpp"
 #include "structure_meshline.hpp"
 #include "structure_polygon.hpp"
@@ -41,8 +40,9 @@ void StructureGroup::paint(QPainter* /*painter*/, QStyleOptionGraphicsItem const
 }
 
 //******************************************************************************
-StructureScene::StructureScene(QObject* parent)
+StructureScene::StructureScene(StructureStyleSelector& style_selector, QObject* parent)
 : QGraphicsScene(parent)
+, style_selector(style_selector)
 , edges(new StructureGroup())
 , polygons(new StructureGroup())
 , vertical_meshlines(new StructureGroup())
@@ -55,8 +55,6 @@ StructureScene::StructureScene(QObject* parent)
 	polygons->stackBefore(edges);
 	edges->stackBefore(vertical_meshlines);
 	edges->stackBefore(horizontal_meshlines);
-
-	setBackgroundBrush(Qt::white);
 
 	connect(
 		this, &QGraphicsScene::selectionChanged,
@@ -73,11 +71,17 @@ StructureScene::~StructureScene() {
 //******************************************************************************
 void StructureScene::add(StructureEdge* edge) {
 	edge->setParentItem(edges);
+	edge->locate_structure_edge_params = [&]() ->auto& {
+		return style_selector.get_edge();
+	};
 }
 
 //******************************************************************************
 void StructureScene::add(StructurePolygon* polygon) {
 	polygon->setParentItem(polygons);
+	polygon->locate_structure_polygon_params = [&]() ->auto& {
+		return style_selector.get_polygon_shape();
+	};
 }
 
 //******************************************************************************
@@ -87,6 +91,9 @@ void StructureScene::add(StructureMeshline* meshline) {
 	case domain::ViewAxis::V: meshline->setParentItem(vertical_meshlines); break;
 	default: unreachable();
 	}
+	meshline->locate_structure_meshline_params = [&]() ->auto& {
+		return style_selector.get_meshline();
+	};
 }
 
 //******************************************************************************

@@ -9,96 +9,6 @@
 namespace ui::qt {
 
 //******************************************************************************
-std::vector<ProcessingStyle> const ProcessingStyleSelector::available_styles {
-	{
-		.name = "Main",
-		.background = QColor(57, 57, 57),
-		.node_background_regular             = QColor(27, 27, 27),
-//		.node_background_highlighted         = node_background_regular,
-		.node_background_selected            = Qt::white,
-//		.node_background_regular_hovered     = node_background_regular.lighter(),
-//		.node_background_highlighted_hovered = node_background_highlighted.lighter(),
-		.node_background_selected_hovered    = QColor(Qt::white).darker(150),
-		.node_title_background_regular             = QColor(33, 33, 33),
-		.node_title_background_highlighted         = QColor(222, 222, 222),
-		.node_title_background_selected            = QColor(222, 222, 222),
-		.node_title_background_regular_hovered     = QColor(33, 33, 33).lighter(150),
-		.node_title_background_highlighted_hovered = QColor(222, 222, 222).darker(150),
-		.node_title_background_selected_hovered    = QColor(222, 222, 222).darker(150),
-		.node_title_text_regular             = Qt::white,
-		.node_title_text_highlighted         = Qt::black,
-		.node_title_text_selected            = Qt::black,
-//		.node_title_text_regular_hovered     = node_title_text_regular,
-//		.node_title_text_highlighted_hovered = node_title_text_highlighted,
-//		.node_title_text_selected_hovered    = node_title_text_selected,
-//		.node_radius = 10,
-//		.container_nested_zone_regular             = background,
-//		.container_nested_zone_highlighted         = container_nested_zone_regular,
-//		.container_nested_zone_selected            = container_nested_zone_regular,
-//		.container_nested_zone_regular_hovered     = container_nested_zone_regular,
-//		.container_nested_zone_highlighted_hovered = container_nested_zone_highlighted,
-//		.container_nested_zone_selected_hovered    = container_nested_zone_selected,
-//		.container_nested_zone_opacity = 0.5,
-//		.wire_regular             = Qt::green,
-//		.wire_highlighted         = wire_regular,
-//		.wire_selected            = wire_regular,
-//		.wire_regular_hovered     = wire_regular.lighter(),
-//		.wire_highlighted_hovered = wire_highlighted.lighter(),
-//		.wire_selected_hovered    = wire_selected.lighter(),
-//		.wire_width_regular             = 2,
-//		.wire_width_highlighted         = wire_width_regular,
-//		.wire_width_selected            = wire_width_regular,
-//		.wire_width_regular_hovered     = wire_width_regular * 2,
-//		.wire_width_highlighted_hovered = wire_width_highlighted * 2,
-//		.wire_width_selected_hovered    = wire_width_selected * 2,
-		.port_text_regular             = Qt::white,
-//		.port_text_highlighted         = port_text_regular,
-		.port_text_selected            = Qt::black,
-//		.port_text_regular_hovered     = port_text_regular,
-//		.port_text_highlighted_hovered = port_text_highlighted,
-//		.port_text_selected_hovered    = port_text_selected,
-//		.port_contour_regular             = Qt::black,
-//		.port_contour_highlighted         = port_contour_regular,
-//		.port_contour_selected            = port_contour_regular,
-//		.port_contour_regular_hovered     = port_contour_regular,
-//		.port_contour_highlighted_hovered = port_contour_highlighted,
-//		.port_contour_selected_hovered    = port_contour_selected,
-//		.port_fill_regular             = QColor(255, 119, 0),
-//		.port_fill_highlighted         = port_fill_regular,
-//		.port_fill_selected            = port_fill_regular,
-//		.port_fill_regular_hovered     = port_fill_regular,
-//		.port_fill_highlighted_hovered = port_fill_highlighted,
-//		.port_fill_selected_hovered    = port_fill_selected,
-//		.port_radius = 5,
-		.text_normal_regular             = Qt::white,
-//		.text_normal_highlighted         = text_normal_regular,
-		.text_normal_selected            = Qt::black,
-//		.text_normal_regular_hovered     = text_normal_regular,
-//		.text_normal_highlighted_hovered = text_normal_highlighted,
-//		.text_normal_selected_hovered    = text_normal_selected,
-//		.text_enabled_regular             = Qt::darkGreen,
-//		.text_enabled_highlighted         = text_enabled_regular,
-//		.text_enabled_selected            = text_enabled_regular,
-//		.text_enabled_regular_hovered     = text_enabled_regular,
-//		.text_enabled_highlighted_hovered = text_enabled_highlighted,
-//		.text_enabled_selected_hovered    = text_enabled_selected,
-//		.text_enabled_for_sure_regular             = Qt::green,
-//		.text_enabled_for_sure_highlighted         = text_enabled_for_sure_regular,
-//		.text_enabled_for_sure_selected            = text_enabled_for_sure_regular,
-//		.text_enabled_for_sure_regular_hovered     = text_enabled_for_sure_regular,
-//		.text_enabled_for_sure_highlighted_hovered = text_enabled_for_sure_highlighted,
-//		.text_enabled_for_sure_selected_hovered    = text_enabled_for_sure_selected,
-//		.text_disabled_regular             = Qt::darkRed,
-//		.text_disabled_highlighted         = text_disabled_regular,
-//		.text_disabled_selected            = text_disabled_regular,
-//		.text_disabled_regular_hovered     = text_disabled_regular,
-//		.text_disabled_highlighted_hovered = text_disabled_highlighted,
-//		.text_disabled_selected_hovered    = text_disabled_selected
-	}
-};
-
-
-//******************************************************************************
 ProcessingStyleSelector::ProcessingStyleSelector()
 : wire(make_wire(style))
 , port(make_port(style))
@@ -176,7 +86,7 @@ ProcessingStyleSelector& ProcessingStyleSelector::operator=(ProcessingStyle&& st
 }
 
 //******************************************************************************
-nodegraph::Wire::Params ProcessingStyleSelector::make_wire(ProcessingStyle const& style) const {
+MAKER_DEF(ProcessingStyleSelector, wire, ProcessingStyle const& style) {
 	return {
 		.regular = QPen(style.wire_regular, style.wire_width_regular, Qt::SolidLine, Qt::RoundCap),
 		.highlighted = QPen(style.wire_highlighted, style.wire_width_highlighted, Qt::SolidLine, Qt::RoundCap),
@@ -188,7 +98,7 @@ nodegraph::Wire::Params ProcessingStyleSelector::make_wire(ProcessingStyle const
 }
 
 //******************************************************************************
-nodegraph::Port::Params ProcessingStyleSelector::make_port(ProcessingStyle const& style) const {
+MAKER_DEF(ProcessingStyleSelector, port, ProcessingStyle const& style) {
 	return {
 		.radius = style.port_radius,
 		.text_regular = QPen(style.port_text_regular),
@@ -213,7 +123,7 @@ nodegraph::Port::Params ProcessingStyleSelector::make_port(ProcessingStyle const
 }
 
 //******************************************************************************
-nodegraph::Node::Params ProcessingStyleSelector::make_node(ProcessingStyle const& style) const {
+MAKER_DEF(ProcessingStyleSelector, node, ProcessingStyle const& style) {
 	return {
 		.radius = style.node_radius,
 		.title_background_regular = QBrush(style.node_title_background_regular),
@@ -232,7 +142,7 @@ nodegraph::Node::Params ProcessingStyleSelector::make_node(ProcessingStyle const
 }
 
 //******************************************************************************
-nodegraph::Rect::Params ProcessingStyleSelector::make_nested_zone(ProcessingStyle const& style) const {
+MAKER_DEF(ProcessingStyleSelector, nested_zone, ProcessingStyle const& style) {
 	return {
 		.opacity_regular = style.container_nested_zone_opacity,
 		.opacity_highlighted = style.container_nested_zone_opacity,
@@ -256,7 +166,7 @@ nodegraph::Rect::Params ProcessingStyleSelector::make_nested_zone(ProcessingStyl
 }
 
 //******************************************************************************
-nodegraph::Text::Params ProcessingStyleSelector::make_title(ProcessingStyle const& style) const {
+MAKER_DEF(ProcessingStyleSelector, title, ProcessingStyle const& style) {
 	return {
 		.regular = QPen(style.node_title_text_regular),
 		.highlighted = QPen(style.node_title_text_highlighted),
@@ -268,7 +178,7 @@ nodegraph::Text::Params ProcessingStyleSelector::make_title(ProcessingStyle cons
 }
 
 //******************************************************************************
-nodegraph::Text::Params ProcessingStyleSelector::make_text_normal(ProcessingStyle const& style) const {
+MAKER_DEF(ProcessingStyleSelector, text_normal, ProcessingStyle const& style) {
 	return {
 		.regular = QPen(style.text_normal_regular),
 		.highlighted = QPen(style.text_normal_highlighted),
@@ -280,7 +190,7 @@ nodegraph::Text::Params ProcessingStyleSelector::make_text_normal(ProcessingStyl
 }
 
 //******************************************************************************
-nodegraph::Text::Params ProcessingStyleSelector::make_text_enabled(ProcessingStyle const& style) const {
+MAKER_DEF(ProcessingStyleSelector, text_enabled, ProcessingStyle const& style) {
 	return {
 		.regular = QPen(style.text_enabled_regular),
 		.highlighted = QPen(style.text_enabled_highlighted),
@@ -292,7 +202,7 @@ nodegraph::Text::Params ProcessingStyleSelector::make_text_enabled(ProcessingSty
 }
 
 //******************************************************************************
-nodegraph::Text::Params ProcessingStyleSelector::make_text_enabled_for_sure(ProcessingStyle const& style) const {
+MAKER_DEF(ProcessingStyleSelector, text_enabled_for_sure, ProcessingStyle const& style) {
 	return {
 		.regular = QPen(style.text_enabled_for_sure_regular),
 		.highlighted = QPen(style.text_enabled_for_sure_highlighted),
@@ -304,7 +214,7 @@ nodegraph::Text::Params ProcessingStyleSelector::make_text_enabled_for_sure(Proc
 }
 
 //******************************************************************************
-nodegraph::Text::Params ProcessingStyleSelector::make_text_disabled(ProcessingStyle const& style) const {
+MAKER_DEF(ProcessingStyleSelector, text_disabled, ProcessingStyle const& style) {
 	return {
 		.regular = QPen(style.text_disabled_regular),
 		.highlighted = QPen(style.text_disabled_highlighted),
@@ -316,7 +226,7 @@ nodegraph::Text::Params ProcessingStyleSelector::make_text_disabled(ProcessingSt
 }
 
 //******************************************************************************
-ProcessingEdge::Params ProcessingStyleSelector::make_edge() const {
+MAKER_DEF(ProcessingStyleSelector, edge) {
 	return {
 		.node = get_node(),
 		.port = get_port(),
@@ -329,7 +239,7 @@ ProcessingEdge::Params ProcessingStyleSelector::make_edge() const {
 }
 
 //******************************************************************************
-ProcessingMeshlinePolicy::Params ProcessingStyleSelector::make_meshline_policy() const {
+MAKER_DEF(ProcessingStyleSelector, meshline_policy) {
 	return {
 		.node = get_node(),
 		.port = get_port(),
@@ -342,7 +252,7 @@ ProcessingMeshlinePolicy::Params ProcessingStyleSelector::make_meshline_policy()
 }
 
 //******************************************************************************
-ProcessingInterval::Params ProcessingStyleSelector::make_interval() const {
+MAKER_DEF(ProcessingStyleSelector, interval) {
 	return {
 		.node = get_node(),
 		.port = get_port(),
@@ -352,7 +262,7 @@ ProcessingInterval::Params ProcessingStyleSelector::make_interval() const {
 }
 
 //******************************************************************************
-ProcessingMeshline::Params ProcessingStyleSelector::make_meshline() const {
+MAKER_DEF(ProcessingStyleSelector, meshline) {
 	return {
 		.node = get_node(),
 		.port = get_port(),
@@ -362,7 +272,7 @@ ProcessingMeshline::Params ProcessingStyleSelector::make_meshline() const {
 }
 
 //******************************************************************************
-ProcessingPolygon::Params ProcessingStyleSelector::make_polygon() const {
+MAKER_DEF(ProcessingStyleSelector, polygon) {
 	return {
 		.node = get_node(),
 		.port = get_port(),
@@ -372,7 +282,7 @@ ProcessingPolygon::Params ProcessingStyleSelector::make_polygon() const {
 }
 
 //******************************************************************************
-ProcessingPlane::Params ProcessingStyleSelector::make_plane() const {
+MAKER_DEF(ProcessingStyleSelector, plane) {
 	return {
 		.node = get_node(),
 		.title = get_title(),
@@ -381,7 +291,7 @@ ProcessingPlane::Params ProcessingStyleSelector::make_plane() const {
 }
 
 //******************************************************************************
-ProcessingAxis::Params ProcessingStyleSelector::make_axis() const {
+MAKER_DEF(ProcessingStyleSelector, axis) {
 	return {
 		.node = get_node(),
 		.title = get_title(),
@@ -390,7 +300,7 @@ ProcessingAxis::Params ProcessingStyleSelector::make_axis() const {
 }
 
 //******************************************************************************
-ProcessingConflictColinearEdges::Params ProcessingStyleSelector::make_conflict_ce() const {
+MAKER_DEF(ProcessingStyleSelector, conflict_ce) {
 	return {
 		.node = get_node(),
 		.title = get_title(),
@@ -399,7 +309,7 @@ ProcessingConflictColinearEdges::Params ProcessingStyleSelector::make_conflict_c
 }
 
 //******************************************************************************
-ProcessingConflictEdgeInPolygon::Params ProcessingStyleSelector::make_conflict_eip() const {
+MAKER_DEF(ProcessingStyleSelector, conflict_eip) {
 	return {
 		.node = get_node(),
 		.title = get_title(),
@@ -411,7 +321,7 @@ ProcessingConflictEdgeInPolygon::Params ProcessingStyleSelector::make_conflict_e
 }
 
 //******************************************************************************
-ProcessingConflictTooCloseMeshlinePolicies::Params ProcessingStyleSelector::make_conflict_tcmlp() const {
+MAKER_DEF(ProcessingStyleSelector, conflict_tcmlp) {
 	return {
 		.node = get_node(),
 		.title = get_title(),

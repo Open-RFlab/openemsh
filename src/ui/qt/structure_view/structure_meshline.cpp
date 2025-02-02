@@ -10,6 +10,7 @@
 //#include <limits>
 
 #include "domain/mesh/meshline.hpp"
+#include "utils/default_locator.hpp"
 #include "utils/unreachable.hpp"
 #include "ui/qt/data_keys.hpp"
 
@@ -39,6 +40,7 @@ static QLineF convert(domain::ViewAxis axis, domain::Meshline const* meshline, Q
 //******************************************************************************
 StructureMeshline::StructureMeshline(domain::ViewAxis axis, domain::Meshline const* meshline, QRectF scene_rect, QGraphicsItem* parent)
 : QGraphicsLineItem(convert(axis, meshline, scene_rect), parent)
+, locate_structure_meshline_params(default_locator<Params>)
 , axis(axis)
 , meshline(meshline)
 {
@@ -57,19 +59,21 @@ int StructureMeshline::type() const {
 
 //******************************************************************************
 void StructureMeshline::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* /*widget*/) {
-	painter->setPen(QPen(Qt::black, 0, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin));
+	Params const& params = locate_structure_meshline_params();
 
 	if(option->state & QStyle::State_Selected) {
-		QPen pen = painter->pen();
-		pen.setColor(Qt::red);
-		painter->setPen(pen);
+		if(option->state & QStyle::State_MouseOver)
+			painter->setPen(params.selected_hovered);
+		else
+			painter->setPen(params.selected);
+	} else {
+		if(option->state & QStyle::State_MouseOver)
+			painter->setPen(params.regular_hovered);
+		else
+			painter->setPen(params.regular);
 	}
 
 	painter->drawLine(line());
-//	painter->drawLine(QLineF(meshline->coord.value(), std::numeric_limits<qreal>::lowest()/10, meshline->coord.value(), std::numeric_limits<qreal>::max()/10));
-//	painter->drawPath(clipPath());
 }
-
-
 
 } // namespace ui::qt

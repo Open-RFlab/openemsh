@@ -11,6 +11,8 @@
 
 #include <map>
 
+#include "structure_style.hpp"
+
 class Entity;
 
 namespace ui::qt {
@@ -39,7 +41,7 @@ public:
 		FULL
 	};
 
-	explicit StructureScene(QObject* parent = nullptr);
+	explicit StructureScene(StructureStyleSelector& style_selector, QObject* parent = nullptr);
 	~StructureScene();
 
 	void add(StructureEdge* edge);
@@ -53,6 +55,7 @@ public:
 
 	void set_mesh_visibility(MeshVisibility mesh_visibility);
 
+	StructureStyleSelector& style_selector;
 //private: //TODO
 	// TODO structure item layer + z value
 	StructureGroup* edges;

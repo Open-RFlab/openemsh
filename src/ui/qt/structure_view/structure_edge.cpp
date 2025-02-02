@@ -10,6 +10,7 @@
 
 #include "domain/geometrics/edge.hpp"
 #include "ui/qt/data_keys.hpp"
+#include "utils/default_locator.hpp"
 
 #include "structure_edge.hpp"
 
@@ -18,6 +19,7 @@ namespace ui::qt {
 //******************************************************************************
 StructureEdge::StructureEdge(domain::Edge const* edge, QGraphicsItem* parent)
 : QGraphicsLineItem(edge->p0().x.value(), edge->p0().y.value(), edge->p1().x.value(), edge->p1().y.value(), parent)
+, locate_structure_edge_params(default_locator<Params>)
 , edge(edge)
 {
 	setFlags(ItemIsSelectable);
@@ -36,19 +38,21 @@ int StructureEdge::type() const {
 
 //******************************************************************************
 void StructureEdge::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* /*widget*/) {
-	if(option->state & QStyle::State_MouseOver) {
-		painter->setPen(QPen(Qt::red, 0.5, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin));
-//		QBrush brush = painter->brush();
-//		brush.setColor(brush.color().lighter());
-////		brush.setColor(brush.color().darker());
-//		painter->setBrush(brush);
-////		painter->setBrush(painter->brush(painter->brush().color().lighter());
-		painter->drawLine(line());
-	}
+	Params const& params = locate_structure_edge_params();
+
 	if(option->state & QStyle::State_Selected) {
-		painter->setPen(QPen(Qt::red, 0, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin));
-		painter->drawLine(line());
+		if(option->state & QStyle::State_MouseOver)
+			painter->setPen(params.selected_hovered);
+		else
+			painter->setPen(params.selected);
+	} else {
+		if(option->state & QStyle::State_MouseOver)
+			painter->setPen(params.regular_hovered);
+		else
+			painter->setPen(params.regular);
 	}
+
+	painter->drawLine(line());
 }
 
 } // namespace ui::qt

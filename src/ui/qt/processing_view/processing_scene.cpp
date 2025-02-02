@@ -33,7 +33,6 @@ namespace ui::qt {
 //******************************************************************************
 ProcessingScene::ProcessingScene(QObject* parent)
 : QGraphicsScene(parent)
-, style_selector(ProcessingStyleSelector::available_styles[0])
 , is_select_counterparts_locked(false)
 , is_display_selected_chain_locked(false)
 , display_mode(DisplayMode::EVERYTHING)

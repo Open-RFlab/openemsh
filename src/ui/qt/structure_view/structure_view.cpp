@@ -40,6 +40,10 @@ static QPainterPath create_repair() {
 //******************************************************************************
 StructureView::StructureView(QWidget* parent)
 : QGraphicsView(parent)
+, scenes{{
+	StructureScene(style_selector),
+	StructureScene(style_selector),
+	StructureScene(style_selector) }}
 , repair(new QGraphicsPathItem(create_repair()))
 , s_structure_zoom(nullptr)
 , s_structure_rotation(nullptr)

@@ -12,6 +12,7 @@
 #include <QObject>
 
 #include "app/openemsh.hpp"
+#include "style.hpp"
 
 namespace Ui {
 class MainWindow;
@@ -28,8 +29,11 @@ private:
 
 	bool dock_layout_order;
 
+	void set_style(Style const& style);
+
 private slots:
 	void on_a_about_triggered();
+	void on_ag_styles_triggered(QAction* const action);
 	void on_rb_plane_xy_toggled(bool const is_checked);
 	void on_rb_plane_yz_toggled(bool const is_checked);
 	void on_rb_plane_zx_toggled(bool const is_checked);
