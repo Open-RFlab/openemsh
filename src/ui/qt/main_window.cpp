@@ -275,24 +275,28 @@ void MainWindow::on_tb_vertical_layout_clicked() {
 void MainWindow::on_tb_show_all_mesh_clicked() {
 	ui->structure_view->set_mesh_visibility(StructureScene::MeshVisibility::FULL);
 	ui->processing_view->processing_scene->set_display_view_axes({ true, true });
+	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_horizontal_mesh_clicked() {
 	ui->structure_view->set_mesh_visibility(StructureScene::MeshVisibility::HORIZONTAL);
 	ui->processing_view->processing_scene->set_display_view_axes({ true, false });
+	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_vertical_mesh_clicked() {
 	ui->structure_view->set_mesh_visibility(StructureScene::MeshVisibility::VERTICAL);
 	ui->processing_view->processing_scene->set_display_view_axes({ false, true });
+	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_no_mesh_clicked() {
 	ui->structure_view->set_mesh_visibility(StructureScene::MeshVisibility::NONE);
 	ui->processing_view->processing_scene->set_display_view_axes({ false, false });
+	ui->processing_view->fit();
 }
 
 //******************************************************************************
