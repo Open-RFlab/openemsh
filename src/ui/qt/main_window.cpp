@@ -4,6 +4,7 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <QDesktopServices>
 #include <QMarginsF>
 
 #include "domain/geometrics/space.hpp"
@@ -182,6 +183,11 @@ void MainWindow::set_style(Style const& style) {
 void MainWindow::on_a_about_triggered() {
 	AboutDialog about(this);
 	about.exec();
+}
+
+//******************************************************************************
+void MainWindow::on_a_doc_oems_meshing_triggered() {
+	QDesktopServices::openUrl(QUrl(OEMSH_OEMS_MESHING));
 }
 
 //******************************************************************************

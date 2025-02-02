@@ -316,6 +316,12 @@
   </widget>
 
   <widget class="QMenuBar" name="menuBar">
+   <widget class="QMenu" name="m_help">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="a_doc_oems_meshing"/>
+   </widget>
    <widget class="QMenu" name="m_view">
     <property name="title">
      <string>View</string>
@@ -329,11 +335,17 @@
     <addaction name="m_style"/>
    </widget>
    <addaction name="m_view"/>
+   <addaction name="m_help"/>
    <addaction name="a_about"/>
   </widget>
   <action name="a_about">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="a_doc_oems_meshing">
+   <property name="text">
+    <string>OpenEMS meshing documentation</string>
    </property>
   </action>
  </widget>

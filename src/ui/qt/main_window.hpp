@@ -33,6 +33,7 @@ private:
 
 private slots:
 	void on_a_about_triggered();
+	void on_a_doc_oems_meshing_triggered();
 	void on_ag_styles_triggered(QAction* const action);
 	void on_rb_plane_xy_toggled(bool const is_checked);
 	void on_rb_plane_yz_toggled(bool const is_checked);
