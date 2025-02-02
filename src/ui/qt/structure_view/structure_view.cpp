@@ -41,9 +41,9 @@ static QPainterPath create_repair() {
 StructureView::StructureView(QWidget* parent)
 : QGraphicsView(parent)
 , scenes{{
-	StructureScene(style_selector),
-	StructureScene(style_selector),
-	StructureScene(style_selector) }}
+	new StructureScene(style_selector, this),
+	new StructureScene(style_selector, this),
+	new StructureScene(style_selector, this) }}
 , repair(new QGraphicsPathItem(create_repair()))
 , s_structure_zoom(nullptr)
 , s_structure_rotation(nullptr)
@@ -87,15 +87,15 @@ void StructureView::drawForeground(QPainter* painter, QRectF const& rect) {
 
 	// TODO wrap switch in set_scene()
 	painter->drawText(box_x, Qt::AlignHCenter | Qt::AlignVCenter, [&]() {
-		if(scene() == &(scenes[domain::Plane::YZ])) return "y";
-		if(scene() == &(scenes[domain::Plane::ZX])) return "z";
-		if(scene() == &(scenes[domain::Plane::XY])) return "x";
+		if(scene() == scenes[domain::Plane::YZ]) return "y";
+		if(scene() == scenes[domain::Plane::ZX]) return "z";
+		if(scene() == scenes[domain::Plane::XY]) return "x";
 		return "?";
 	} ());
 	painter->drawText(box_y, Qt::AlignHCenter | Qt::AlignVCenter, [&]() {
-		if(scene() == &(scenes[domain::Plane::YZ])) return "z";
-		if(scene() == &(scenes[domain::Plane::ZX])) return "x";
-		if(scene() == &(scenes[domain::Plane::XY])) return "y";
+		if(scene() == scenes[domain::Plane::YZ]) return "z";
+		if(scene() == scenes[domain::Plane::ZX]) return "x";
+		if(scene() == scenes[domain::Plane::XY]) return "y";
 		return "?";
 	} ());
 }
@@ -145,7 +145,7 @@ void StructureView::transform_view() {
 //******************************************************************************
 void StructureView::set_mesh_visibility(StructureScene::MeshVisibility mesh_visibility) {
 	for(auto const plane : domain::AllPlane)
-		scenes[plane].set_mesh_visibility(mesh_visibility);
+		scenes[plane]->set_mesh_visibility(mesh_visibility);
 }
 
 //******************************************************************************

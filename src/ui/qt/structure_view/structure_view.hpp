@@ -39,7 +39,7 @@ public:
 	void set_mesh_visibility(StructureScene::MeshVisibility mesh_visibility);
 
 	StructureStyleSelector style_selector;
-	domain::PlaneSpace<StructureScene> scenes;
+	domain::PlaneSpace<StructureScene*> scenes;
 
 protected:
 	void drawForeground(QPainter* painter, QRectF const& rect) override;

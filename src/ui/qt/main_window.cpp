@@ -49,9 +49,9 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 	for(domain::Plane const plane : domain::AllPlane) {
 		connect(
 			ui->processing_view->processing_scene, &ProcessingScene::selection_changed,
-			&(ui->structure_view->scenes[plane]), &StructureScene::select_counterparts);
+			ui->structure_view->scenes[plane], &StructureScene::select_counterparts);
 		connect(
-			&(ui->structure_view->scenes[plane]), &StructureScene::selection_changed,
+			ui->structure_view->scenes[plane], &StructureScene::selection_changed,
 			ui->processing_view->processing_scene, &ProcessingScene::select_counterparts);
 	}
 
@@ -61,7 +61,7 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 	update_structure();
 	update_processing();
 
-	ui->structure_view->setScene(&(ui->structure_view->scenes[domain::XY]));
+	ui->structure_view->setScene(ui->structure_view->scenes[domain::XY]);
 	ui->processing_view->processing_scene->set_display_plane(domain::XY);
 	ui->processing_view->processing_scene->set_display_view_axes({ true, true });
 }
@@ -137,30 +137,30 @@ void MainWindow::update_processing() {
 //******************************************************************************
 void MainWindow::update_structure() {
 	for(domain::Plane const plane : domain::AllPlane) {
-		ui->structure_view->scenes[plane].clear();
+		ui->structure_view->scenes[plane]->clear();
 
 		for(auto const& polygon : oemsh.get_board().get_polygons(plane)) {
 			StructurePolygon* structure_polygon = new StructurePolygon(polygon.get());
-			ui->structure_view->scenes[plane].index[polygon.get()] = structure_polygon;
-			ui->structure_view->scenes[plane].add(structure_polygon);
+			ui->structure_view->scenes[plane]->index[polygon.get()] = structure_polygon;
+			ui->structure_view->scenes[plane]->add(structure_polygon);
 		}
 
 		for(auto const& polygon : oemsh.get_board().get_polygons(plane)) {
 			for(auto const& edge : polygon->edges) {
 				StructureEdge* structure_edge = new StructureEdge(edge.get());
-				ui->structure_view->scenes[plane].index[edge.get()] = structure_edge;
-				ui->structure_view->scenes[plane].add(structure_edge);
+				ui->structure_view->scenes[plane]->index[edge.get()] = structure_edge;
+				ui->structure_view->scenes[plane]->add(structure_edge);
 			}
 		}
 
-		QRectF const scene_rect(ui->structure_view->scenes[plane].sceneRect());
+		QRectF const scene_rect(ui->structure_view->scenes[plane]->sceneRect());
 
 		for(domain::Axis const axis : domain::Axes[plane]) {
 			for(auto const& meshline : oemsh.get_board().get_meshlines(axis)) {
 				if(auto const view_axis = domain::transpose(plane, axis); view_axis) {
 					StructureMeshline* structure_meshline = new StructureMeshline(reverse(view_axis.value()), meshline.get(), scene_rect);
-					ui->structure_view->scenes[plane].index[meshline.get()] = structure_meshline;
-					ui->structure_view->scenes[plane].add(structure_meshline);
+					ui->structure_view->scenes[plane]->index[meshline.get()] = structure_meshline;
+					ui->structure_view->scenes[plane]->add(structure_meshline);
 				}
 			}
 		}
@@ -194,8 +194,8 @@ void MainWindow::on_ag_styles_triggered(QAction* const action) {
 //******************************************************************************
 void MainWindow::on_rb_plane_xy_toggled(bool const is_checked) {
 	if(is_checked) {
-		ui->structure_view->setScene(&(ui->structure_view->scenes[domain::XY]));
-		ui->structure_view->centerOn(ui->structure_view->scenes[domain::XY].polygons->boundingRect().center());
+		ui->structure_view->setScene(ui->structure_view->scenes[domain::XY]);
+		ui->structure_view->centerOn(ui->structure_view->scenes[domain::XY]->polygons->boundingRect().center());
 		ui->processing_view->processing_scene->set_display_plane(domain::XY);
 	}
 }
@@ -203,8 +203,8 @@ void MainWindow::on_rb_plane_xy_toggled(bool const is_checked) {
 //******************************************************************************
 void MainWindow::on_rb_plane_yz_toggled(bool const is_checked) {
 	if(is_checked) {
-		ui->structure_view->setScene(&(ui->structure_view->scenes[domain::YZ]));
-		ui->structure_view->centerOn(ui->structure_view->scenes[domain::YZ].polygons->boundingRect().center());
+		ui->structure_view->setScene(ui->structure_view->scenes[domain::YZ]);
+		ui->structure_view->centerOn(ui->structure_view->scenes[domain::YZ]->polygons->boundingRect().center());
 		ui->processing_view->processing_scene->set_display_plane(domain::YZ);
 	}
 }
@@ -212,8 +212,8 @@ void MainWindow::on_rb_plane_yz_toggled(bool const is_checked) {
 //******************************************************************************
 void MainWindow::on_rb_plane_zx_toggled(bool const is_checked) {
 	if(is_checked) {
-		ui->structure_view->setScene(&(ui->structure_view->scenes[domain::ZX]));
-		ui->structure_view->centerOn(ui->structure_view->scenes[domain::ZX].polygons->boundingRect().center());
+		ui->structure_view->setScene(ui->structure_view->scenes[domain::ZX]);
+		ui->structure_view->centerOn(ui->structure_view->scenes[domain::ZX]->polygons->boundingRect().center());
 		ui->processing_view->processing_scene->set_display_plane(domain::ZX);
 	}
 }
