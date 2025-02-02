@@ -11,6 +11,7 @@
 
 #include <map>
 
+#include "domain/geometrics/space.hpp"
 #include "structure_style.hpp"
 
 class Entity;
@@ -44,9 +45,9 @@ public:
 	explicit StructureScene(StructureStyleSelector& style_selector, QObject* parent = nullptr);
 	~StructureScene();
 
-	void add(StructureEdge* edge);
-	void add(StructurePolygon* polygon);
-	void add(StructureMeshline* meshline);
+	StructureEdge* add(domain::Edge* edge);
+	StructurePolygon* add(domain::Polygon* polygon);
+	StructureMeshline* add(domain::Meshline* meshline, domain::ViewAxis view_axis, QRectF const& scene_rect);
 
 	void clear_edges();
 	void clear_polygons();
@@ -60,8 +61,7 @@ public:
 	// TODO structure item layer + z value
 	StructureGroup* edges;
 	StructureGroup* polygons;
-	StructureGroup* vertical_meshlines;
-	StructureGroup* horizontal_meshlines;
+	domain::ViewAxisSpace<StructureGroup*> meshlines;
 
 //	std::map<std::size_t, QGraphicsItem*> index;
 	std::map<Entity const*, QGraphicsItem*> index;

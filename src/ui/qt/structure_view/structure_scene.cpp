@@ -10,7 +10,9 @@
 #include <QMenu>
 #include <QPainter>
 
-#include "domain/geometrics/space.hpp"
+#include "domain/geometrics/polygon.hpp"
+#include "domain/geometrics/edge.hpp"
+#include "domain/mesh/meshline.hpp"
 #include "utils/unreachable.hpp"
 #include "ui/qt/data_keys.hpp"
 #include "ui/qt/user_types.hpp"
@@ -45,16 +47,16 @@ StructureScene::StructureScene(StructureStyleSelector& style_selector, QObject* 
 , style_selector(style_selector)
 , edges(new StructureGroup())
 , polygons(new StructureGroup())
-, vertical_meshlines(new StructureGroup())
-, horizontal_meshlines(new StructureGroup())
+, meshlines{{ new StructureGroup(), new StructureGroup() }}
 {
 	addItem(edges);
 	addItem(polygons);
-	addItem(vertical_meshlines);
-	addItem(horizontal_meshlines);
+	for(auto* group : meshlines)
+		addItem(group);
+
 	polygons->stackBefore(edges);
-	edges->stackBefore(vertical_meshlines);
-	edges->stackBefore(horizontal_meshlines);
+	for(auto* group : meshlines)
+		edges->stackBefore(group);
 
 	connect(
 		this, &QGraphicsScene::selectionChanged,
@@ -69,47 +71,79 @@ StructureScene::~StructureScene() {
 }
 
 //******************************************************************************
-void StructureScene::add(StructureEdge* edge) {
-	edge->setParentItem(edges);
-	edge->locate_structure_edge_params = [&]() ->auto& {
+StructureEdge* StructureScene::add(domain::Edge* edge) {
+	auto* item = new StructureEdge(edge, edges);
+	index[edge] = item;
+	item->locate_structure_edge_params = [&]() -> auto& {
 		return style_selector.get_edge();
 	};
+	return item;
 }
 
 //******************************************************************************
-void StructureScene::add(StructurePolygon* polygon) {
-	polygon->setParentItem(polygons);
-	polygon->locate_structure_polygon_params = [&]() ->auto& {
-		return style_selector.get_polygon_shape();
-	};
-}
-
-//******************************************************************************
-void StructureScene::add(StructureMeshline* meshline) {
-	switch(meshline->axis) {
-	case domain::ViewAxis::H: meshline->setParentItem(horizontal_meshlines); break;
-	case domain::ViewAxis::V: meshline->setParentItem(vertical_meshlines); break;
-	default: unreachable();
+StructurePolygon* StructureScene::add(domain::Polygon* polygon) {
+	auto* item = new StructurePolygon(polygon, polygons);
+	index[polygon] = item;
+	switch(polygon->type) {
+	case domain::Polygon::Type::SHAPE:
+		item->locate_structure_polygon_params = [&]() -> auto& {
+			return style_selector.get_polygon_shape();
+		};
+		break;
+	case domain::Polygon::Type::PORT:
+		item->locate_structure_polygon_params = [&]() -> auto& {
+			return style_selector.get_polygon_port();
+		};
+		break;
+	case domain::Polygon::Type::GROUND:
+		item->locate_structure_polygon_params = [&]() -> auto& {
+			return style_selector.get_polygon_ground();
+		};
+		break;
+	case domain::Polygon::Type::SUBSTRATE:
+		item->locate_structure_polygon_params = [&]() -> auto& {
+			return style_selector.get_polygon_substrate();
+		};
+		break;
+	default:
+		unreachable();
 	}
-	meshline->locate_structure_meshline_params = [&]() ->auto& {
+	return item;
+}
+
+//******************************************************************************
+StructureMeshline* StructureScene::add(domain::Meshline* meshline, domain::ViewAxis view_axis, QRectF const& scene_rect) {
+	auto const meshline_axis = reverse(view_axis);
+	auto* item = new StructureMeshline(meshline_axis, meshline, scene_rect, meshlines[meshline_axis]);
+	index[meshline] = item;
+	item->locate_structure_meshline_params = [&]() ->auto& {
 		return style_selector.get_meshline();
 	};
+	return item;
 }
 
 //******************************************************************************
 void StructureScene::clear_edges() {
+	auto const items = edges->childItems();
+	std::erase_if(index, [&](auto const& item) {
+		return items.contains(item.second);
+	});
 	removeItem(edges);
 	delete edges;
 	edges = new StructureGroup();
 	addItem(edges);
 
 	polygons->stackBefore(edges);
-	edges->stackBefore(vertical_meshlines);
-	edges->stackBefore(horizontal_meshlines);
+	for(auto* group : meshlines)
+		edges->stackBefore(group);
 }
 
 //******************************************************************************
 void StructureScene::clear_polygons() {
+	auto const items = polygons->childItems();
+	std::erase_if(index, [&](auto const& item) {
+		return items.contains(item.second);
+	});
 	removeItem(polygons);
 	delete polygons;
 	polygons = new StructureGroup();
@@ -120,21 +154,23 @@ void StructureScene::clear_polygons() {
 
 //******************************************************************************
 void StructureScene::clear_meshlines() {
-	removeItem(vertical_meshlines);
-	removeItem(horizontal_meshlines);
-	delete vertical_meshlines;
-	delete horizontal_meshlines;
-	vertical_meshlines = new StructureGroup();
-	horizontal_meshlines = new StructureGroup();
-	addItem(vertical_meshlines);
-	addItem(horizontal_meshlines);
+	for(auto const view_axis : domain::AllViewAxis) {
+		auto const items = meshlines[view_axis]->childItems();
+		std::erase_if(index, [&](auto const& item) {
+			return items.contains(item.second);
+		});
+		removeItem(meshlines[view_axis]);
+		delete meshlines[view_axis];
+		meshlines[view_axis] = new StructureGroup();
+		addItem(meshlines[view_axis]);
 
-	edges->stackBefore(vertical_meshlines);
-	edges->stackBefore(horizontal_meshlines);
+		edges->stackBefore(meshlines[view_axis]);
+	}
 }
 
 //******************************************************************************
 void StructureScene::clear() {
+	index.clear();
 	clear_edges();
 	clear_polygons();
 	clear_meshlines();
@@ -144,20 +180,20 @@ void StructureScene::clear() {
 void StructureScene::set_mesh_visibility(MeshVisibility mesh_visibility) {
 	switch(mesh_visibility) {
 	case MeshVisibility::NONE:
-		horizontal_meshlines->setVisible(false);
-		vertical_meshlines->setVisible(false);
+		meshlines[domain::H]->setVisible(false);
+		meshlines[domain::V]->setVisible(false);
 		break;
 	case MeshVisibility::VERTICAL:
-		horizontal_meshlines->setVisible(false);
-		vertical_meshlines->setVisible(true);
+		meshlines[domain::H]->setVisible(false);
+		meshlines[domain::V]->setVisible(true);
 		break;
 	case MeshVisibility::HORIZONTAL:
-		horizontal_meshlines->setVisible(true);
-		vertical_meshlines->setVisible(false);
+		meshlines[domain::H]->setVisible(true);
+		meshlines[domain::V]->setVisible(false);
 		break;
 	case MeshVisibility::FULL:
-		horizontal_meshlines->setVisible(true);
-		vertical_meshlines->setVisible(true);
+		meshlines[domain::H]->setVisible(true);
+		meshlines[domain::V]->setVisible(true);
 		break;
 	default:
 		unreachable();
