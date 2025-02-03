@@ -230,14 +230,14 @@ void Node::show_after_parents() {
 //******************************************************************************
 void Node::set_highlighted(bool is_highlighted, QGraphicsItem const* by_item) {
 	Highlightable::set_highlighted(is_highlighted, by_item);
-	if(title)
-		title->set_highlighted(is_highlighted);
-	for(auto& list : { input_ports, output_ports }) {
-		for(auto* port : list) {
-			if(port)
-				port->set_highlighted(is_highlighted);
-		}
-	}
+	for(auto* item : propagate_highlight)
+		if(item)
+			item->set_highlighted(Highlightable::is_highlighted());
+}
+
+//******************************************************************************
+void Node::retrieve_highlightable_children() {
+	return retrieve_highlightable_children<Text, Port, Rect>();
 }
 
 } // namespace ui::qt

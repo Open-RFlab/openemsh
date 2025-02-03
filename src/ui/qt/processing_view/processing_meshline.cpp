@@ -81,6 +81,7 @@ ProcessingMeshline::ProcessingMeshline(domain::Meshline const* meshline, QGraphi
 	setData(DataKeys::ID, (qulonglong) meshline->id);
 	setData(DataKeys::ENTITY, DataKeys::set_entity(meshline));
 	setData(DataKeys::TO_WIRE, std::move(to_wire));
+	retrieve_highlightable_children();
 }
 
 //******************************************************************************

@@ -134,6 +134,7 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 	setData(DataKeys::ID, (qulonglong) interval->id);
 	setData(DataKeys::ENTITY, DataKeys::set_entity(interval));
 	setData(DataKeys::TO_WIRE, std::move(to_wire));
+	retrieve_highlightable_children();
 }
 
 //******************************************************************************

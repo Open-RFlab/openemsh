@@ -41,6 +41,7 @@ ProcessingPlane::ProcessingPlane(domain::Plane plane, QGraphicsItem* parent)
 
 	setData(DataKeys::TYPE, "Plane");
 	setData(DataKeys::NAME, QString::fromStdString(to_string(plane)));
+	retrieve_highlightable_children();
 }
 
 //******************************************************************************

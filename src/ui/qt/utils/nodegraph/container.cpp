@@ -171,13 +171,6 @@ void Container::add(QGraphicsItem* item) {
 }
 
 //******************************************************************************
-void Container::set_highlighted(bool is_highlighted, QGraphicsItem const* by_item) {
-	Node::set_highlighted(is_highlighted, by_item);
-	if(nested_zone)
-		nested_zone->set_highlighted(is_highlighted);
-}
-
-//******************************************************************************
 bool Container::does_contains_visible_items() const {
 	return std::ranges::any_of(nested_zone->childItems(), [](QGraphicsItem const* item) {
 		return item && item->isVisible();

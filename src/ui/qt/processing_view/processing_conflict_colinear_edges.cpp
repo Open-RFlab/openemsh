@@ -65,6 +65,7 @@ ProcessingConflictColinearEdges::ProcessingConflictColinearEdges(domain::Conflic
 	setData(DataKeys::ID, (qulonglong) conflict->id);
 	setData(DataKeys::ENTITY, DataKeys::set_entity(conflict));
 	setData(DataKeys::TO_WIRE, std::move(to_wire));
+	retrieve_highlightable_children();
 }
 
 //******************************************************************************

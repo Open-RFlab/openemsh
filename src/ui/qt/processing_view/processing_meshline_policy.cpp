@@ -136,6 +136,7 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 	setData(DataKeys::ID, (qulonglong) meshline_policy->id);
 	setData(DataKeys::ENTITY, DataKeys::set_entity(meshline_policy));
 	setData(DataKeys::TO_WIRE, std::move(to_wire));
+	retrieve_highlightable_children();
 }
 
 //******************************************************************************

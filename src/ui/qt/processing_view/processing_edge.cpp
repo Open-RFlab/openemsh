@@ -105,6 +105,7 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 	setData(DataKeys::ID, (qulonglong) edge->id);
 	setData(DataKeys::ENTITY, DataKeys::set_entity(edge));
 	setData(DataKeys::TO_WIRE, std::move(to_wire));
+	retrieve_highlightable_children();
 }
 
 //******************************************************************************

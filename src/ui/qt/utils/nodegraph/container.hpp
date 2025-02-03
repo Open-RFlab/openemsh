@@ -31,8 +31,6 @@ public:
 	void add(QGraphicsItem* item);
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;
 
-	void set_highlighted(bool is_highlighted, QGraphicsItem const* by_item) override;
-
 protected:
 	bool does_contains_visible_items() const;
 	QList<QGraphicsItem*> visible_contained_items() const;

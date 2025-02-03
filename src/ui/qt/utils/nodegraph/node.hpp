@@ -13,6 +13,7 @@
 
 #include <functional>
 
+#include "utils/down_up_cast.hpp"
 #include "highlightable.hpp"
 #include "port.hpp"
 
@@ -75,8 +76,22 @@ protected:
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 	QVariant itemChange(GraphicsItemChange change, QVariant const& value) override;
 
+	// Convenience function that's costly: don't use it often.
+	// It is better to populate propagate_highlight satically.
+	//**************************************************************************
+	template<typename ...T>
+	requires (sizeof...(T) > 0)
+	void retrieve_highlightable_children() {
+		for(auto* item : childItems())
+			if(auto* highlightable = down_up_cast<Highlightable, T...>(item)
+			; highlightable)
+				propagate_highlight.insert(highlightable);
+	}
+	void retrieve_highlightable_children();
+
 	QGraphicsLinearLayout* layout();
 
+	QSet<Highlightable*> propagate_highlight;
 	Text* title;
 
 private:
