@@ -16,10 +16,20 @@
 
 class Entity;
 
+namespace domain {
+class Edge;
+class Interval;
+class Meshline;
+class MeshlinePolicy;
+class Polygon;
+} // namespace domain
+
 namespace ui::qt {
 
 class StructureEdge;
+class StructureInterval;
 class StructureMeshline;
+class StructureMeshlinePolicy;
 class StructurePolygon;
 
 //******************************************************************************
@@ -46,8 +56,10 @@ public:
 	~StructureScene();
 
 	StructureEdge* add(domain::Edge* edge);
-	StructurePolygon* add(domain::Polygon* polygon);
+	StructureInterval* add(domain::Interval* interval, domain::ViewAxis view_axis, QRectF const& scene_rect);
 	StructureMeshline* add(domain::Meshline* meshline, domain::ViewAxis view_axis, QRectF const& scene_rect);
+	StructureMeshlinePolicy* add(domain::MeshlinePolicy* policy, domain::ViewAxis view_axis, QRectF const& scene_rect);
+	StructurePolygon* add(domain::Polygon* polygon);
 
 	void clear_edges();
 	void clear_polygons();
@@ -61,7 +73,9 @@ public:
 	// TODO structure item layer + z value
 	StructureGroup* edges;
 	StructureGroup* polygons;
+	domain::ViewAxisSpace<StructureGroup*> intervals;
 	domain::ViewAxisSpace<StructureGroup*> meshlines;
+	domain::ViewAxisSpace<StructureGroup*> meshline_policies;
 
 //	std::map<std::size_t, QGraphicsItem*> index;
 	std::map<Entity const*, QGraphicsItem*> index;

@@ -29,7 +29,6 @@ enum DataKeys : int {
 	TO_WIRE
 };
 
-
 //******************************************************************************
 inline Entity const* get_entity(QVariant const& variant) {
 	return static_cast<Entity const*>(variant.value<void const*>());

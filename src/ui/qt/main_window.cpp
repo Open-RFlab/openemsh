@@ -143,9 +143,16 @@ void MainWindow::update_structure() {
 		QRectF const scene_rect(ui->structure_view->scenes[plane]->sceneRect());
 
 		for(domain::Axis const axis : domain::Axes[plane]) {
-			for(auto const& meshline : oemsh.get_board().get_meshlines(axis))
-				if(auto const view_axis = domain::transpose(plane, axis); view_axis)
+			if(auto const view_axis = domain::transpose(plane, axis); view_axis) {
+				for(auto const& meshline : oemsh.get_board().get_meshlines(axis))
 					ui->structure_view->scenes[plane]->add(meshline.get(), view_axis.value(), scene_rect);
+
+				for(auto const& policy : oemsh.get_board().get_meshline_policies(axis))
+					ui->structure_view->scenes[plane]->add(policy.get(), view_axis.value(), scene_rect);
+
+				for(auto const& interval : oemsh.get_board().get_intervals(axis))
+					ui->structure_view->scenes[plane]->add(interval.get(), view_axis.value(), scene_rect);
+			}
 		}
 	}
 }

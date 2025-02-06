@@ -12,12 +12,16 @@
 
 #include "domain/geometrics/polygon.hpp"
 #include "domain/geometrics/edge.hpp"
+#include "domain/mesh/interval.hpp"
 #include "domain/mesh/meshline.hpp"
+#include "domain/mesh/meshline_policy.hpp"
 #include "utils/unreachable.hpp"
 #include "ui/qt/data_keys.hpp"
 #include "ui/qt/user_types.hpp"
 #include "structure_edge.hpp"
+#include "structure_interval.hpp"
 #include "structure_meshline.hpp"
+#include "structure_meshline_policy.hpp"
 #include "structure_polygon.hpp"
 
 #include "structure_scene.hpp"
@@ -47,16 +51,21 @@ StructureScene::StructureScene(StructureStyleSelector& style_selector, QObject* 
 , style_selector(style_selector)
 , edges(new StructureGroup())
 , polygons(new StructureGroup())
+, intervals{{ new StructureGroup(), new StructureGroup() }}
 , meshlines{{ new StructureGroup(), new StructureGroup() }}
+, meshline_policies{{ new StructureGroup(), new StructureGroup() }}
 {
+	// Adding order matters.
 	addItem(edges);
 	addItem(polygons);
-	for(auto* group : meshlines)
-		addItem(group);
+	for(auto const& list : { meshlines, intervals, meshline_policies })
+		for(auto* group : list)
+			addItem(group);
 
 	polygons->stackBefore(edges);
-	for(auto* group : meshlines)
-		edges->stackBefore(group);
+	for(auto const& list : { meshlines, intervals, meshline_policies })
+		for(auto* group : list)
+			edges->stackBefore(group);
 
 	connect(
 		this, &QGraphicsScene::selectionChanged,
@@ -112,6 +121,17 @@ StructurePolygon* StructureScene::add(domain::Polygon* polygon) {
 }
 
 //******************************************************************************
+StructureInterval* StructureScene::add(domain::Interval* interval, domain::ViewAxis view_axis, QRectF const& scene_rect) {
+	auto const meshline_axis = reverse(view_axis); // Let stick to meshline axis definition.
+	auto* item = new StructureInterval(meshline_axis, interval, scene_rect, intervals[meshline_axis]);
+	index[interval] = item;
+	item->locate_structure_interval_params = [&]() ->auto& {
+		return style_selector.get_interval();
+	};
+	return item;
+}
+
+//******************************************************************************
 StructureMeshline* StructureScene::add(domain::Meshline* meshline, domain::ViewAxis view_axis, QRectF const& scene_rect) {
 	auto const meshline_axis = reverse(view_axis);
 	auto* item = new StructureMeshline(meshline_axis, meshline, scene_rect, meshlines[meshline_axis]);
@@ -119,6 +139,23 @@ StructureMeshline* StructureScene::add(domain::Meshline* meshline, domain::ViewA
 	item->locate_structure_meshline_params = [&]() ->auto& {
 		return style_selector.get_meshline();
 	};
+	return item;
+}
+
+//******************************************************************************
+StructureMeshlinePolicy* StructureScene::add(domain::MeshlinePolicy* policy, domain::ViewAxis view_axis, QRectF const& scene_rect) {
+	auto const meshline_axis = reverse(view_axis); // Let stick to meshline axis definition.
+	auto* item = new StructureMeshlinePolicy(meshline_axis, policy, scene_rect, meshline_policies[meshline_axis]);
+	index[policy] = item;
+	if(policy->is_enabled) {
+		item->locate_structure_meshline_policy_params = [&]() ->auto& {
+			return style_selector.get_meshline_policy_enabled();
+		};
+	} else {
+		item->locate_structure_meshline_policy_params = [&]() ->auto& {
+			return style_selector.get_meshline_policy_disabled();
+		};
+	}
 	return item;
 }
 

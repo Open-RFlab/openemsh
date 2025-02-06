@@ -10,7 +10,9 @@
 
 #include "utils/class_utils.hpp"
 #include "structure_edge.hpp"
+#include "structure_interval.hpp"
 #include "structure_meshline.hpp"
+#include "structure_meshline_policy.hpp"
 #include "structure_polygon.hpp"
 
 namespace ui::qt {
@@ -76,6 +78,33 @@ struct StructureStyle {
 	QColor meshline_selected = Qt::red;
 	QColor meshline_regular_hovered = meshline_regular;
 	QColor meshline_selected_hovered = meshline_selected;
+
+
+	QColor meshline_policy_enabled_main_line_regular = Qt::transparent;
+	QColor meshline_policy_enabled_main_line_selected = Qt::green;
+	QColor meshline_policy_enabled_main_line_regular_hovered = meshline_policy_enabled_main_line_regular;
+	QColor meshline_policy_enabled_main_line_selected_hovered = meshline_policy_enabled_main_line_selected;
+
+	QColor meshline_policy_enabled_policy_lines_regular = Qt::transparent;
+	QColor meshline_policy_enabled_policy_lines_selected = Qt::green;
+	QColor meshline_policy_enabled_policy_lines_regular_hovered = meshline_policy_enabled_policy_lines_regular;
+	QColor meshline_policy_enabled_policy_lines_selected_hovered = meshline_policy_enabled_policy_lines_selected;
+
+	QColor meshline_policy_disabled_main_line_regular = Qt::transparent;
+	QColor meshline_policy_disabled_main_line_selected = Qt::red;
+	QColor meshline_policy_disabled_main_line_regular_hovered = meshline_policy_disabled_main_line_regular;
+	QColor meshline_policy_disabled_main_line_selected_hovered = meshline_policy_disabled_main_line_selected;
+
+	QColor meshline_policy_disabled_policy_lines_regular = Qt::transparent;
+	QColor meshline_policy_disabled_policy_lines_selected = Qt::red;
+	QColor meshline_policy_disabled_policy_lines_regular_hovered = meshline_policy_disabled_policy_lines_regular;
+	QColor meshline_policy_disabled_policy_lines_selected_hovered = meshline_policy_disabled_policy_lines_selected;
+
+
+	QColor interval_regular = Qt::transparent;
+	QColor interval_selected = QColor(0, 255, 0, 100);
+	QColor interval_regular_hovered = meshline_regular;
+	QColor interval_selected_hovered = meshline_selected;
 };
 
 //******************************************************************************
@@ -88,6 +117,9 @@ class StructureStyleSelector {
 	StructurePolygon::Params polygon_ground;
 	StructurePolygon::Params polygon_substrate;
 	StructureMeshline::Params meshline;
+	StructureMeshlinePolicy::Params meshline_policy_enabled;
+	StructureMeshlinePolicy::Params meshline_policy_disabled;
+	StructureInterval::Params interval;
 
 	MAKER_DECL(edge, StructureStyle const& style);
 	MAKER_DECL(polygon_shape, StructureStyle const& style);
@@ -95,6 +127,9 @@ class StructureStyleSelector {
 	MAKER_DECL(polygon_ground, StructureStyle const& style);
 	MAKER_DECL(polygon_substrate, StructureStyle const& style);
 	MAKER_DECL(meshline, StructureStyle const& style);
+	MAKER_DECL(meshline_policy_enabled, StructureStyle const& style);
+	MAKER_DECL(meshline_policy_disabled, StructureStyle const& style);
+	MAKER_DECL(interval, StructureStyle const& style);
 
 public:
 	GETTER(style)
@@ -104,6 +139,9 @@ public:
 	GETTER(polygon_ground)
 	GETTER(polygon_substrate)
 	GETTER(meshline)
+	GETTER(meshline_policy_enabled)
+	GETTER(meshline_policy_disabled)
+	GETTER(interval)
 
 	StructureStyleSelector();
 	StructureStyleSelector(StructureStyle style);

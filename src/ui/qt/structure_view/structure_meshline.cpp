@@ -7,8 +7,6 @@
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 
-//#include <limits>
-
 #include "domain/mesh/meshline.hpp"
 #include "utils/default_locator.hpp"
 #include "utils/unreachable.hpp"
