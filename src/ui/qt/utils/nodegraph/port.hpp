@@ -63,6 +63,8 @@ public:
 	bool is_wired_to(Port const* port) const;
 	QList<Wire*> const& get_wires() const;
 	Node* get_node() const;
+	QList<Port*> traverse() const;
+	QList<Node*> traverse_to_nodes() const;
 
 protected:
 	QVariant itemChange(GraphicsItemChange change, QVariant const& value) override;

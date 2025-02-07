@@ -146,6 +146,29 @@ Node* Port::get_node() const {
 }
 
 //******************************************************************************
+QList<Port*> Port::traverse() const {
+	QList<Port*> ret;
+
+	for(auto const* wire : wires)
+		if(wire)
+			if(auto* forward_port = wire->traverse(this); forward_port)
+				ret.append(forward_port);
+
+	return ret;
+}
+
+//******************************************************************************
+QList<Node*> Port::traverse_to_nodes() const {
+	QList<Node*> ret;
+
+	for(auto const* forward_port : traverse())
+		if(auto* forward_node = forward_port->get_node(); forward_node)
+			ret.append(forward_node);
+
+	return ret;
+}
+
+//******************************************************************************
 QVariant Port::itemChange(GraphicsItemChange change, QVariant const& value) {
 	if(change == ItemScenePositionHasChanged) {
 		for(auto* wire : wires)

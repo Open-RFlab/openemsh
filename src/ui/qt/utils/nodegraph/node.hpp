@@ -62,6 +62,11 @@ public:
 	static void traverse_up(QSet<Node*>& out, Node const* node);
 	static void traverse_down(QSet<Node*>& out, Node const* node);
 
+	QList<Node*> traverse(Port const* port) const;
+	QList<Node*> traverse(QList<Port*> const& ports) const;
+	QList<Node*> get_input_nodes() const;
+	QList<Node*> get_output_nodes() const;
+
 	Container* get_surrounding_container() const;
 	void show_after_parents();
 

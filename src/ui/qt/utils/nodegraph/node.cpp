@@ -167,36 +167,20 @@ Port* Node::add_output_port(QString const& text, Port::AnchorPoint anchor) {
 
 //******************************************************************************
 void Node::traverse_up(QSet<Node*>& out, Node const* node) {
-	for(auto const* port : node->input_ports) {
-		for(auto const* wire : port->get_wires()) {
-			if(wire) {
-				if(auto const* forward_port = wire->traverse(port)
-				; forward_port) {
-					if(auto* forward_node = forward_port->get_node()
-					; forward_node && !out.contains(forward_node)) {
-						out.insert(forward_node);
-						traverse_up(out, forward_node);
-					}
-				}
-			}
+	for(auto* forward_node : node->get_input_nodes()) {
+		if(!out.contains(forward_node)) {
+			out.insert(forward_node);
+			traverse_up(out, forward_node);
 		}
 	}
 }
 
 //******************************************************************************
 void Node::traverse_down(QSet<Node*>& out, Node const* node) {
-	for(auto const* port : node->output_ports) {
-		for(auto const* wire : port->get_wires()) {
-			if(wire) {
-				if(auto const* forward_port = wire->traverse(port)
-				; forward_port) {
-					if(auto* forward_node = forward_port->get_node()
-					; forward_node && !out.contains(forward_node)) {
-						out.insert(forward_node);
-						traverse_down(out, forward_node);
-					}
-				}
-			}
+	for(auto* forward_node : node->get_output_nodes()) {
+		if(!out.contains(forward_node)) {
+			out.insert(forward_node);
+			traverse_down(out, forward_node);
 		}
 	}
 }
@@ -207,6 +191,34 @@ QList<Node*> Node::get_chain() const {
 	traverse_up(up, this);
 	traverse_down(down, this);
 	return (std::move(up) + std::move(down)).values();
+}
+
+//******************************************************************************
+QList<Node*> Node::traverse(Port const* port) const {
+	if(port)
+		return port->traverse_to_nodes();
+	else
+		return QList<Node*>();
+}
+
+//******************************************************************************
+QList<Node*> Node::traverse(QList<Port*> const& ports) const {
+	QList<Node*> ret;
+
+	for(auto const* port : ports)
+		ret += traverse(port);
+
+	return ret;
+}
+
+//******************************************************************************
+QList<Node*> Node::get_input_nodes() const {
+	return traverse(input_ports);
+}
+
+//******************************************************************************
+QList<Node*> Node::get_output_nodes() const {
+	return traverse(output_ports);
 }
 
 //******************************************************************************
@@ -240,4 +252,4 @@ void Node::retrieve_highlightable_children() {
 	return retrieve_highlightable_children<Text, Port, Rect>();
 }
 
-} // namespace ui::qt
+} // namespace ui::qt::nodegraph
