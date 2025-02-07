@@ -10,6 +10,7 @@
 #include "domain/mesh/meshline_policy.hpp"
 #include "domain/conflicts/conflict_too_close_meshline_policies.hpp"
 #include "ui/qt/data_keys.hpp"
+#include "processing_meshline_policy.hpp"
 
 #include "processing_conflict_too_close_meshline_policies.hpp"
 
@@ -74,6 +75,34 @@ ProcessingConflictTooCloseMeshlinePolicies::~ProcessingConflictTooCloseMeshlineP
 //******************************************************************************
 int ProcessingConflictTooCloseMeshlinePolicies::type() const {
 	return Type;
+}
+
+//******************************************************************************
+QList<ProcessingMeshlinePolicy*> ProcessingConflictTooCloseMeshlinePolicies::get_mlp_origins() const {
+	QList<ProcessingMeshlinePolicy*> ret;
+
+	for(auto* node : get_input_nodes())
+		if(auto* policy = qgraphicsitem_cast<ProcessingMeshlinePolicy*>(node)
+		; policy)
+			ret.append(policy);
+
+	return ret;
+}
+
+//******************************************************************************
+std::size_t ProcessingConflictTooCloseMeshlinePolicies::count_tcmlp_mlp_deepness() const {
+	std::size_t deepness = 0;
+
+	for(auto const* policy : get_mlp_origins()) {
+		for(auto* node : policy->get_input_nodes()) {
+			if(auto* conflict = qgraphicsitem_cast<ProcessingConflictTooCloseMeshlinePolicies*>(node)
+			; conflict) {
+				deepness = qMax(deepness, conflict->count_tcmlp_mlp_deepness() + 2);
+			}
+		}
+	}
+
+	return deepness;
 }
 
 } // namespace ui::qt

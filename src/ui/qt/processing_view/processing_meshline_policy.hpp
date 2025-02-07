@@ -17,6 +17,8 @@ class MeshlinePolicy;
 
 namespace ui::qt {
 
+class ProcessingConflictTooCloseMeshlinePolicies;
+
 //******************************************************************************
 class ProcessingMeshlinePolicy : public nodegraph::Node {
 public:
@@ -38,7 +40,9 @@ public:
 	~ProcessingMeshlinePolicy();
 
 	int type() const override;
-	bool has_conflict_tcmlp_origin() const;
+
+	QList<ProcessingConflictTooCloseMeshlinePolicies*> get_tcmlp_origins() const;
+	std::size_t count_mlp_tcmlp_deepness() const;
 
 private:
 	domain::MeshlinePolicy const* const meshline_policy;

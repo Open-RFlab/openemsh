@@ -16,6 +16,7 @@
 #include "ui/qt/utils/nodegraph/text.hpp"
 #include "utils/down_up_cast.hpp"
 #include "infra/utils/to_string.hpp"
+#include "processing_conflict_too_close_meshline_policies.hpp"
 
 #include "processing_meshline_policy.hpp"
 
@@ -148,19 +149,31 @@ int ProcessingMeshlinePolicy::type() const {
 }
 
 //******************************************************************************
-bool ProcessingMeshlinePolicy::has_conflict_tcmlp_origin() const {
-	bool has_conflict_tcmlp = false;
+QList<ProcessingConflictTooCloseMeshlinePolicies*> ProcessingMeshlinePolicy::get_tcmlp_origins() const {
+	QList<ProcessingConflictTooCloseMeshlinePolicies*> ret;
 
-	if(meshline_policy) {
-		for(auto const* origin : meshline_policy->origins) {
-			if(dynamic_cast<domain::ConflictTooCloseMeshlinePolicies const*>(origin)) {
-				has_conflict_tcmlp = true;
-				break;
+	for(auto* node : get_input_nodes())
+		if(auto* conflict = qgraphicsitem_cast<ProcessingConflictTooCloseMeshlinePolicies*>(node)
+		; conflict)
+			ret.append(conflict);
+
+	return ret;
+}
+
+//******************************************************************************
+std::size_t ProcessingMeshlinePolicy::count_mlp_tcmlp_deepness() const {
+	std::size_t deepness = 0;
+
+	for(auto const* conflict : get_tcmlp_origins()) {
+		for(auto* node : conflict->get_input_nodes()) {
+			if(auto* policy = qgraphicsitem_cast<ProcessingMeshlinePolicy*>(node)
+			; policy) {
+				deepness = qMax(deepness, policy->count_mlp_tcmlp_deepness() + 2);
 			}
 		}
 	}
 
-	return has_conflict_tcmlp;
+	return deepness;
 }
 
 } // namespace ui::qt
