@@ -42,9 +42,14 @@ ProcessingConflictColinearEdges::ProcessingConflictColinearEdges(domain::Conflic
 		nodegraph::Port* port = add_input_port("Normal: " + QString::fromStdString(to_string(edge->normal)) + (edge->to_mesh ? " enabled" : " disabled"));
 		port->setFlag(QGraphicsItem::ItemIsSelectable);
 		port->setAcceptedMouseButtons(Qt::NoButton);
-		port->locate_port_params = [&]() -> auto& {
-			return locate_processing_conflict_ce_params().port;
-		};
+		if(edge->to_mesh)
+			port->locate_port_params = [&]() -> auto& {
+				return locate_processing_conflict_ce_params().port_enabled;
+			};
+		else
+			port->locate_port_params = [&]() -> auto& {
+				return locate_processing_conflict_ce_params().port_disabled;
+			};
 		v_box1->addItem(port);
 		to_wire.emplace_back(std::in_place_type<DataKeys::ToWire>, edge, port);
 	}
@@ -53,7 +58,7 @@ ProcessingConflictColinearEdges::ProcessingConflictColinearEdges(domain::Conflic
 	out->setFlag(QGraphicsItem::ItemIsSelectable);
 	out->setAcceptedMouseButtons(Qt::NoButton);
 	out->locate_port_params = [&]() -> auto& {
-		return locate_processing_conflict_ce_params().port;
+		return locate_processing_conflict_ce_params().port_normal;
 	};
 
 	v_box2->addStretch();

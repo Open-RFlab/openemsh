@@ -25,7 +25,9 @@ public:
 	struct Params final {
 		nodegraph::Node::Params const& node = default_locator<nodegraph::Node::Params>();
 		nodegraph::Text::Params const& title = default_locator<nodegraph::Text::Params>();
-		nodegraph::Port::Params const& port = default_locator<nodegraph::Port::Params>();
+		nodegraph::Port::Params const& port_normal = default_locator<nodegraph::Port::Params>();
+		nodegraph::Port::Params const& port_enabled = default_locator<nodegraph::Port::Params>();
+		nodegraph::Port::Params const& port_disabled = default_locator<nodegraph::Port::Params>();
 	};
 
 	std::function<Params const& ()> locate_processing_conflict_ce_params;

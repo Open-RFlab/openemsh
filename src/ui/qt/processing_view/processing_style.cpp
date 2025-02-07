@@ -11,7 +11,9 @@ namespace ui::qt {
 //******************************************************************************
 ProcessingStyleSelector::ProcessingStyleSelector()
 : wire(make_wire(style))
-, port(make_port(style))
+, port_normal(make_port_normal(style))
+, port_enabled(make_port_enabled(style))
+, port_disabled(make_port_disabled(style))
 , node(make_node(style))
 , nested_zone(make_nested_zone(style))
 , title(make_title(style))
@@ -35,7 +37,9 @@ ProcessingStyleSelector::ProcessingStyleSelector()
 ProcessingStyleSelector::ProcessingStyleSelector(ProcessingStyle style)
 : style(style)
 , wire(make_wire(style))
-, port(make_port(style))
+, port_normal(make_port_normal(style))
+, port_enabled(make_port_enabled(style))
+, port_disabled(make_port_disabled(style))
 , node(make_node(style))
 , nested_zone(make_nested_zone(style))
 , title(make_title(style))
@@ -59,7 +63,9 @@ ProcessingStyleSelector::ProcessingStyleSelector(ProcessingStyle style)
 ProcessingStyleSelector& ProcessingStyleSelector::operator=(ProcessingStyle const& style) {
 	this->style = style;
 	wire = make_wire(style);
-	port = make_port(style);
+	port_normal = make_port_normal(style);
+	port_enabled = make_port_enabled(style);
+	port_disabled = make_port_disabled(style);
 	node = make_node(style);
 	nested_zone = make_nested_zone(style);
 	title = make_title(style);
@@ -74,7 +80,9 @@ ProcessingStyleSelector& ProcessingStyleSelector::operator=(ProcessingStyle cons
 ProcessingStyleSelector& ProcessingStyleSelector::operator=(ProcessingStyle&& style) {
 	this->style = style;
 	wire = make_wire(style);
-	port = make_port(style);
+	port_normal = make_port_normal(style);
+	port_enabled = make_port_enabled(style);
+	port_disabled = make_port_disabled(style);
 	node = make_node(style);
 	nested_zone = make_nested_zone(style);
 	title = make_title(style);
@@ -98,15 +106,65 @@ MAKER_DEF(ProcessingStyleSelector, wire, ProcessingStyle const& style) {
 }
 
 //******************************************************************************
-MAKER_DEF(ProcessingStyleSelector, port, ProcessingStyle const& style) {
+MAKER_DEF(ProcessingStyleSelector, port_normal, ProcessingStyle const& style) {
 	return {
 		.radius = style.port_radius,
-		.text_regular = QPen(style.port_text_regular),
-		.text_highlighted = QPen(style.port_text_highlighted),
-		.text_selected = QPen(style.port_text_selected),
-		.text_regular_hovered = QPen(style.port_text_regular_hovered),
-		.text_highlighted_hovered = QPen(style.port_text_highlighted_hovered),
-		.text_selected_hovered = QPen(style.port_text_selected_hovered),
+		.text_regular = QPen(style.port_text_normal_regular),
+		.text_highlighted = QPen(style.port_text_normal_highlighted),
+		.text_selected = QPen(style.port_text_normal_selected),
+		.text_regular_hovered = QPen(style.port_text_normal_regular_hovered),
+		.text_highlighted_hovered = QPen(style.port_text_normal_highlighted_hovered),
+		.text_selected_hovered = QPen(style.port_text_normal_selected_hovered),
+		.contour_regular = QPen(style.port_contour_regular),
+		.contour_highlighted = QPen(style.port_contour_highlighted),
+		.contour_selected = QPen(style.port_contour_selected),
+		.contour_regular_hovered = QPen(style.port_contour_regular_hovered),
+		.contour_highlighted_hovered = QPen(style.port_contour_highlighted_hovered),
+		.contour_selected_hovered = QPen(style.port_contour_selected_hovered),
+		.fill_regular = QBrush(style.port_fill_regular),
+		.fill_highlighted = QBrush(style.port_fill_highlighted),
+		.fill_selected = QBrush(style.port_fill_selected),
+		.fill_regular_hovered = QBrush(style.port_fill_regular_hovered),
+		.fill_highlighted_hovered = QBrush(style.port_fill_highlighted_hovered),
+		.fill_selected_hovered = QBrush(style.port_fill_selected_hovered)
+	};
+}
+
+//******************************************************************************
+MAKER_DEF(ProcessingStyleSelector, port_enabled, ProcessingStyle const& style) {
+	return {
+		.radius = style.port_radius,
+		.text_regular = QPen(style.port_text_enabled_regular),
+		.text_highlighted = QPen(style.port_text_enabled_highlighted),
+		.text_selected = QPen(style.port_text_enabled_selected),
+		.text_regular_hovered = QPen(style.port_text_enabled_regular_hovered),
+		.text_highlighted_hovered = QPen(style.port_text_enabled_highlighted_hovered),
+		.text_selected_hovered = QPen(style.port_text_enabled_selected_hovered),
+		.contour_regular = QPen(style.port_contour_regular),
+		.contour_highlighted = QPen(style.port_contour_highlighted),
+		.contour_selected = QPen(style.port_contour_selected),
+		.contour_regular_hovered = QPen(style.port_contour_regular_hovered),
+		.contour_highlighted_hovered = QPen(style.port_contour_highlighted_hovered),
+		.contour_selected_hovered = QPen(style.port_contour_selected_hovered),
+		.fill_regular = QBrush(style.port_fill_regular),
+		.fill_highlighted = QBrush(style.port_fill_highlighted),
+		.fill_selected = QBrush(style.port_fill_selected),
+		.fill_regular_hovered = QBrush(style.port_fill_regular_hovered),
+		.fill_highlighted_hovered = QBrush(style.port_fill_highlighted_hovered),
+		.fill_selected_hovered = QBrush(style.port_fill_selected_hovered)
+	};
+}
+
+//******************************************************************************
+MAKER_DEF(ProcessingStyleSelector, port_disabled, ProcessingStyle const& style) {
+	return {
+		.radius = style.port_radius,
+		.text_regular = QPen(style.port_text_disabled_regular),
+		.text_highlighted = QPen(style.port_text_disabled_highlighted),
+		.text_selected = QPen(style.port_text_disabled_selected),
+		.text_regular_hovered = QPen(style.port_text_disabled_regular_hovered),
+		.text_highlighted_hovered = QPen(style.port_text_disabled_highlighted_hovered),
+		.text_selected_hovered = QPen(style.port_text_disabled_selected_hovered),
 		.contour_regular = QPen(style.port_contour_regular),
 		.contour_highlighted = QPen(style.port_contour_highlighted),
 		.contour_selected = QPen(style.port_contour_selected),
@@ -229,7 +287,7 @@ MAKER_DEF(ProcessingStyleSelector, text_disabled, ProcessingStyle const& style) 
 MAKER_DEF(ProcessingStyleSelector, edge) {
 	return {
 		.node = get_node(),
-		.port = get_port(),
+		.port = get_port_normal(),
 		.title = get_title(),
 		.main = get_text_normal(),
 		.enabled = get_text_enabled(),
@@ -242,7 +300,7 @@ MAKER_DEF(ProcessingStyleSelector, edge) {
 MAKER_DEF(ProcessingStyleSelector, meshline_policy) {
 	return {
 		.node = get_node(),
-		.port = get_port(),
+		.port = get_port_normal(),
 		.title = get_title(),
 		.main = get_text_normal(),
 		.enabled = get_text_enabled(),
@@ -255,7 +313,7 @@ MAKER_DEF(ProcessingStyleSelector, meshline_policy) {
 MAKER_DEF(ProcessingStyleSelector, interval) {
 	return {
 		.node = get_node(),
-		.port = get_port(),
+		.port = get_port_normal(),
 		.title = get_title(),
 		.main = get_text_normal()
 	};
@@ -265,7 +323,7 @@ MAKER_DEF(ProcessingStyleSelector, interval) {
 MAKER_DEF(ProcessingStyleSelector, meshline) {
 	return {
 		.node = get_node(),
-		.port = get_port(),
+		.port = get_port_normal(),
 		.title = get_title(),
 		.main = get_text_normal()
 	};
@@ -275,7 +333,7 @@ MAKER_DEF(ProcessingStyleSelector, meshline) {
 MAKER_DEF(ProcessingStyleSelector, polygon) {
 	return {
 		.node = get_node(),
-		.port = get_port(),
+		.port = get_port_normal(),
 		.title = get_title(),
 		.nested_zone = get_nested_zone()
 	};
@@ -304,7 +362,9 @@ MAKER_DEF(ProcessingStyleSelector, conflict_ce) {
 	return {
 		.node = get_node(),
 		.title = get_title(),
-		.port = get_port()
+		.port_normal = get_port_normal(),
+		.port_enabled = get_port_enabled(),
+		.port_disabled = get_port_disabled()
 	};
 }
 
@@ -313,7 +373,7 @@ MAKER_DEF(ProcessingStyleSelector, conflict_eip) {
 	return {
 		.node = get_node(),
 		.title = get_title(),
-		.port = get_port(),
+		.port = get_port_normal(),
 		.main = get_text_normal(),
 		.enabled = get_text_enabled(),
 		.disabled = get_text_disabled()
@@ -325,7 +385,7 @@ MAKER_DEF(ProcessingStyleSelector, conflict_tcmlp) {
 	return {
 		.node = get_node(),
 		.title = get_title(),
-		.port = get_port()
+		.port = get_port_normal()
 	};
 }
 

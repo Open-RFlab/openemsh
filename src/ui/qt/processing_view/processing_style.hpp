@@ -79,30 +79,6 @@ struct ProcessingStyle {
 	qreal wire_width_selected_hovered    = wire_width_selected * 2;
 
 
-	QColor port_text_regular             = Qt::white;
-	QColor port_text_highlighted         = port_text_regular;
-	QColor port_text_selected            = port_text_regular;
-	QColor port_text_regular_hovered     = port_text_regular;
-	QColor port_text_highlighted_hovered = port_text_highlighted;
-	QColor port_text_selected_hovered    = port_text_selected;
-
-	QColor port_contour_regular             = Qt::black;
-	QColor port_contour_highlighted         = port_contour_regular;
-	QColor port_contour_selected            = port_contour_regular;
-	QColor port_contour_regular_hovered     = port_contour_regular;
-	QColor port_contour_highlighted_hovered = port_contour_highlighted;
-	QColor port_contour_selected_hovered    = port_contour_selected;
-
-	QColor port_fill_regular             = QColor(255, 119, 0);
-	QColor port_fill_highlighted         = port_fill_regular;
-	QColor port_fill_selected            = port_fill_regular;
-	QColor port_fill_regular_hovered     = port_fill_regular;
-	QColor port_fill_highlighted_hovered = port_fill_highlighted;
-	QColor port_fill_selected_hovered    = port_fill_selected;
-
-	qreal port_radius = 5;
-
-
 	QColor text_normal_regular             = Qt::white;
 	QColor text_normal_highlighted         = text_normal_regular;
 	QColor text_normal_selected            = text_normal_regular;
@@ -130,6 +106,44 @@ struct ProcessingStyle {
 	QColor text_disabled_regular_hovered     = text_disabled_regular;
 	QColor text_disabled_highlighted_hovered = text_disabled_highlighted;
 	QColor text_disabled_selected_hovered    = text_disabled_selected;
+
+
+	QColor port_text_normal_regular             = text_normal_regular;
+	QColor port_text_normal_highlighted         = port_text_normal_regular;
+	QColor port_text_normal_selected            = port_text_normal_regular;
+	QColor port_text_normal_regular_hovered     = port_text_normal_regular;
+	QColor port_text_normal_highlighted_hovered = port_text_normal_highlighted;
+	QColor port_text_normal_selected_hovered    = port_text_normal_selected;
+
+	QColor port_text_enabled_regular             = text_enabled_regular;
+	QColor port_text_enabled_highlighted         = port_text_enabled_regular;
+	QColor port_text_enabled_selected            = port_text_enabled_regular;
+	QColor port_text_enabled_regular_hovered     = port_text_enabled_regular;
+	QColor port_text_enabled_highlighted_hovered = port_text_enabled_highlighted;
+	QColor port_text_enabled_selected_hovered    = port_text_enabled_selected;
+
+	QColor port_text_disabled_regular             = text_disabled_regular;
+	QColor port_text_disabled_highlighted         = port_text_disabled_regular;
+	QColor port_text_disabled_selected            = port_text_disabled_regular;
+	QColor port_text_disabled_regular_hovered     = port_text_disabled_regular;
+	QColor port_text_disabled_highlighted_hovered = port_text_disabled_highlighted;
+	QColor port_text_disabled_selected_hovered    = port_text_disabled_selected;
+
+	QColor port_contour_regular             = Qt::black;
+	QColor port_contour_highlighted         = port_contour_regular;
+	QColor port_contour_selected            = port_contour_regular;
+	QColor port_contour_regular_hovered     = port_contour_regular;
+	QColor port_contour_highlighted_hovered = port_contour_highlighted;
+	QColor port_contour_selected_hovered    = port_contour_selected;
+
+	QColor port_fill_regular             = QColor(255, 119, 0);
+	QColor port_fill_highlighted         = port_fill_regular;
+	QColor port_fill_selected            = port_fill_regular;
+	QColor port_fill_regular_hovered     = port_fill_regular;
+	QColor port_fill_highlighted_hovered = port_fill_highlighted;
+	QColor port_fill_selected_hovered    = port_fill_selected;
+
+	qreal port_radius = 5;
 };
 
 //******************************************************************************
@@ -137,7 +151,9 @@ class ProcessingStyleSelector {
 	ProcessingStyle style;
 
 	nodegraph::Wire::Params wire;
-	nodegraph::Port::Params port;
+	nodegraph::Port::Params port_normal;
+	nodegraph::Port::Params port_enabled;
+	nodegraph::Port::Params port_disabled;
 	nodegraph::Node::Params node;
 	nodegraph::Rect::Params nested_zone;
 	nodegraph::Text::Params title;
@@ -157,7 +173,9 @@ class ProcessingStyleSelector {
 	ProcessingConflictTooCloseMeshlinePolicies::Params const conflict_tcmlp;
 
 	MAKER_DECL(wire, ProcessingStyle const& style);
-	MAKER_DECL(port, ProcessingStyle const& style);
+	MAKER_DECL(port_normal, ProcessingStyle const& style);
+	MAKER_DECL(port_enabled, ProcessingStyle const& style);
+	MAKER_DECL(port_disabled, ProcessingStyle const& style);
 	MAKER_DECL(node, ProcessingStyle const& style);
 	MAKER_DECL(nested_zone, ProcessingStyle const& style);
 	MAKER_DECL(title, ProcessingStyle const& style);
@@ -180,7 +198,9 @@ class ProcessingStyleSelector {
 public:
 	GETTER(style)
 	GETTER(wire)
-	GETTER(port)
+	GETTER(port_normal)
+	GETTER(port_enabled)
+	GETTER(port_disabled)
 	GETTER(node)
 	GETTER(nested_zone)
 	GETTER(title)
