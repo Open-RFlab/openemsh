@@ -7,8 +7,11 @@
 #include <QAction>
 #include <QGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
+#include <QList>
 #include <QMenu>
 #include <QPainter>
+
+#include <algorithm>
 
 #include "domain/geometrics/polygon.hpp"
 #include "domain/geometrics/edge.hpp"
@@ -242,8 +245,26 @@ void StructureScene::set_mesh_visibility(MeshVisibility mesh_visibility) {
 void StructureScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 	event->accept();
 
+	static QList<int> const ordered_type_index = {
+		UserTypes::STRUCTURE_EDGE,
+		UserTypes::STRUCTURE_POLYGON,
+		UserTypes::STRUCTURE_MESHLINE
+	};
+
 	QList<QGraphicsItem*> items = QGraphicsScene::items(event->scenePos());
 	items.removeIf([](auto const it) { return it->type() <= QGraphicsItem::UserType; });
+//	items.removeIf([](auto const it) { return !ordered_type_index.contains(it->type()); });
+
+	std::ranges::sort(items, [&](auto const* a, auto const* b) {
+		static auto constexpr index_of = [&](int const type) {
+			for(qsizetype i = 0; i < ordered_type_index.size(); ++i)
+				if(type == ordered_type_index[i])
+					return i;
+			return std::numeric_limits<qsizetype>::max();
+		};
+
+		return index_of(a->type()) < index_of(b->type());
+	});
 
 	if(items.isEmpty()) {
 		clearSelection();
