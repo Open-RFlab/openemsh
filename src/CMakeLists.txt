@@ -93,6 +93,8 @@ target_sources( openemsh_bin
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/processing_view/processing_scene.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/processing_view/processing_view.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/structure_view/structure_edge.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/structure_view/structure_conflict_colinear_edges.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/structure_view/structure_conflict_too_close_meshline_policies.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/structure_view/structure_meshline_policy.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/structure_view/structure_meshline.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/structure_view/structure_interval.cpp"

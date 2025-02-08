@@ -15,26 +15,26 @@
 #include "ui/qt/user_types.hpp"
 
 namespace domain {
-class Meshline;
+class ConflictColinearEdges;
 } // namespace domain
 
 namespace ui::qt {
 
 //******************************************************************************
-class StructureMeshline : public QGraphicsLineItem {
+class StructureConflictColinearEdges : public QGraphicsLineItem {
 public:
-	enum { Type = UserTypes::STRUCTURE_MESHLINE };
+	enum { Type = UserTypes::STRUCTURE_CONFLICT_CE };
 
 	struct Params final {
-		QPen regular = QPen(Qt::black, 0, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
+		QPen regular = Qt::NoPen;
 		QPen selected = QPen(Qt::red, 0, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 		QPen regular_hovered = regular;
 		QPen selected_hovered = selected;
 	};
 
-	std::function<Params const& ()> locate_structure_meshline_params;
+	std::function<Params const& ()> locate_structure_conflict_ce_params;
 
-	StructureMeshline(domain::ViewAxis axis, domain::Meshline const* meshline, QRectF scene_rect, QGraphicsItem* parent = nullptr);
+	StructureConflictColinearEdges(domain::ViewAxis axis, domain::ConflictColinearEdges const* conflict, QRectF scene_rect, QGraphicsItem* parent = nullptr);
 
 	int type() const override;
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;
@@ -42,7 +42,7 @@ public:
 	domain::ViewAxis const axis;
 
 private:
-	domain::Meshline const* const meshline;
+	domain::ConflictColinearEdges const* const conflict;
 };
 
 } // namespace ui::qt

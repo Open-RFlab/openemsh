@@ -19,6 +19,8 @@ StructureStyleSelector::StructureStyleSelector()
 , meshline_policy_enabled(make_meshline_policy_enabled(style))
 , meshline_policy_disabled(make_meshline_policy_disabled(style))
 , interval(make_interval(style))
+, conflict_ce(make_conflict_ce(style))
+, conflict_tcmlp(make_conflict_tcmlp(style))
 {}
 
 //******************************************************************************
@@ -33,6 +35,8 @@ StructureStyleSelector::StructureStyleSelector(StructureStyle style)
 , meshline_policy_enabled(make_meshline_policy_enabled(style))
 , meshline_policy_disabled(make_meshline_policy_disabled(style))
 , interval(make_interval(style))
+, conflict_ce(make_conflict_ce(style))
+, conflict_tcmlp(make_conflict_tcmlp(style))
 {}
 
 //******************************************************************************
@@ -47,6 +51,8 @@ StructureStyleSelector& StructureStyleSelector::operator=(StructureStyle const& 
 	meshline_policy_enabled = make_meshline_policy_enabled(style);
 	meshline_policy_disabled = make_meshline_policy_disabled(style);
 	interval = make_interval(style);
+	conflict_ce = make_conflict_ce(style);
+	conflict_tcmlp = make_conflict_tcmlp(style);
 	return *this;
 }
 
@@ -62,6 +68,8 @@ StructureStyleSelector& StructureStyleSelector::operator=(StructureStyle&& style
 	meshline_policy_enabled = make_meshline_policy_enabled(style);
 	meshline_policy_disabled = make_meshline_policy_disabled(style);
 	interval = make_interval(style);
+	conflict_ce = make_conflict_ce(style);
+	conflict_tcmlp = make_conflict_tcmlp(style);
 	return *this;
 }
 
@@ -134,38 +142,38 @@ MAKER_DEF(StructureStyleSelector, polygon_substrate, StructureStyle const& style
 //******************************************************************************
 MAKER_DEF(StructureStyleSelector, meshline, StructureStyle const& style) {
 	return {
-		.regular = QPen(style.meshline_regular, 0, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin),
-		.selected = QPen(style.meshline_selected, 0, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin),
-		.regular_hovered = QPen(style.meshline_regular_hovered, 0, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin),
-		.selected_hovered = QPen(style.meshline_selected_hovered, 0, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin)
+		.regular = QPen(style.meshline_regular, 0, Qt::SolidLine),
+		.selected = QPen(style.meshline_selected, 0, Qt::SolidLine),
+		.regular_hovered = QPen(style.meshline_regular_hovered, 0, Qt::SolidLine),
+		.selected_hovered = QPen(style.meshline_selected_hovered, 0, Qt::SolidLine)
 	};
 }
 
 //******************************************************************************
 MAKER_DEF(StructureStyleSelector, meshline_policy_enabled, StructureStyle const& style) {
 	return {
-		.main_line_regular = QPen(style.meshline_policy_enabled_main_line_regular, 0.1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin),
-		.main_line_selected = QPen(style.meshline_policy_enabled_main_line_selected, 0.1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin),
-		.main_line_regular_hovered = QPen(style.meshline_policy_enabled_main_line_regular_hovered, 0.1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin),
-		.main_line_selected_hovered = QPen(style.meshline_policy_enabled_main_line_selected_hovered, 0.1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin),
-		.policy_lines_regular = QPen(style.meshline_policy_enabled_policy_lines_regular, 0.1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin),
-		.policy_lines_selected = QPen(style.meshline_policy_enabled_policy_lines_selected, 0.1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin),
-		.policy_lines_regular_hovered = QPen(style.meshline_policy_enabled_policy_lines_regular_hovered, 0.1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin),
-		.policy_lines_selected_hovered = QPen(style.meshline_policy_enabled_policy_lines_selected_hovered, 0.1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin)
+		.main_line_regular = QPen(style.meshline_policy_enabled_main_line_regular, 0.1, Qt::DashLine),
+		.main_line_selected = QPen(style.meshline_policy_enabled_main_line_selected, 0.1, Qt::DashLine),
+		.main_line_regular_hovered = QPen(style.meshline_policy_enabled_main_line_regular_hovered, 0.1, Qt::DashLine),
+		.main_line_selected_hovered = QPen(style.meshline_policy_enabled_main_line_selected_hovered, 0.1, Qt::DashLine),
+		.policy_lines_regular = QPen(style.meshline_policy_enabled_policy_lines_regular, 0.1, Qt::DashLine),
+		.policy_lines_selected = QPen(style.meshline_policy_enabled_policy_lines_selected, 0.1, Qt::DashLine),
+		.policy_lines_regular_hovered = QPen(style.meshline_policy_enabled_policy_lines_regular_hovered, 0.1, Qt::DashLine),
+		.policy_lines_selected_hovered = QPen(style.meshline_policy_enabled_policy_lines_selected_hovered, 0.1, Qt::DashLine)
 	};
 }
 
 //******************************************************************************
 MAKER_DEF(StructureStyleSelector, meshline_policy_disabled, StructureStyle const& style) {
 	return {
-		.main_line_regular = QPen(style.meshline_policy_disabled_main_line_regular, 0.1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin),
-		.main_line_selected = QPen(style.meshline_policy_disabled_main_line_selected, 0.1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin),
-		.main_line_regular_hovered = QPen(style.meshline_policy_disabled_main_line_regular_hovered, 0.1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin),
-		.main_line_selected_hovered = QPen(style.meshline_policy_disabled_main_line_selected_hovered, 0.1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin),
-		.policy_lines_regular = QPen(style.meshline_policy_disabled_policy_lines_regular, 0.1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin),
-		.policy_lines_selected = QPen(style.meshline_policy_disabled_policy_lines_selected, 0.1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin),
-		.policy_lines_regular_hovered = QPen(style.meshline_policy_disabled_policy_lines_regular_hovered, 0.1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin),
-		.policy_lines_selected_hovered = QPen(style.meshline_policy_disabled_policy_lines_selected_hovered, 0.1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin)
+		.main_line_regular = QPen(style.meshline_policy_disabled_main_line_regular, 0.1, Qt::DashLine),
+		.main_line_selected = QPen(style.meshline_policy_disabled_main_line_selected, 0.1, Qt::DashLine),
+		.main_line_regular_hovered = QPen(style.meshline_policy_disabled_main_line_regular_hovered, 0.1, Qt::DashLine),
+		.main_line_selected_hovered = QPen(style.meshline_policy_disabled_main_line_selected_hovered, 0.1, Qt::DashLine),
+		.policy_lines_regular = QPen(style.meshline_policy_disabled_policy_lines_regular, 0.1, Qt::DashLine),
+		.policy_lines_selected = QPen(style.meshline_policy_disabled_policy_lines_selected, 0.1, Qt::DashLine),
+		.policy_lines_regular_hovered = QPen(style.meshline_policy_disabled_policy_lines_regular_hovered, 0.1, Qt::DashLine),
+		.policy_lines_selected_hovered = QPen(style.meshline_policy_disabled_policy_lines_selected_hovered, 0.1, Qt::DashLine)
 	};
 }
 
@@ -176,6 +184,30 @@ MAKER_DEF(StructureStyleSelector, interval, StructureStyle const& style) {
 		.selected = QBrush(style.interval_selected),
 		.regular_hovered = QBrush(style.interval_regular_hovered),
 		.selected_hovered = QBrush(style.interval_selected_hovered)
+	};
+}
+
+//******************************************************************************
+MAKER_DEF(StructureStyleSelector, conflict_ce, StructureStyle const& style) {
+	return {
+		.regular = QPen(style.conflict_ce_regular, 0.1, Qt::DashLine),
+		.selected = QPen(style.conflict_ce_selected, 0.1, Qt::DashLine),
+		.regular_hovered = QPen(style.conflict_ce_regular_hovered, 0.1, Qt::DashLine),
+		.selected_hovered = QPen(style.conflict_ce_selected_hovered, 0.1, Qt::DashLine)
+	};
+}
+
+//******************************************************************************
+MAKER_DEF(StructureStyleSelector, conflict_tcmlp, StructureStyle const& style) {
+	return {
+		.solution_line_regular = QPen(style.conflict_tcmlp_solution_line_regular, 0, Qt::SolidLine),
+		.solution_line_selected = QPen(style.conflict_tcmlp_solution_line_selected, 0, Qt::SolidLine),
+		.solution_line_regular_hovered = QPen(style.conflict_tcmlp_solution_line_regular_hovered, 0, Qt::SolidLine),
+		.solution_line_selected_hovered = QPen(style.conflict_tcmlp_solution_line_selected_hovered, 0, Qt::SolidLine),
+		.origin_lines_regular = QPen(style.conflict_tcmlp_origin_lines_regular, 0, Qt::SolidLine),
+		.origin_lines_selected = QPen(style.conflict_tcmlp_origin_lines_selected, 0, Qt::SolidLine),
+		.origin_lines_regular_hovered = QPen(style.conflict_tcmlp_origin_lines_regular_hovered, 0, Qt::SolidLine),
+		.origin_lines_selected_hovered = QPen(style.conflict_tcmlp_origin_lines_selected_hovered, 0, Qt::SolidLine)
 	};
 }
 

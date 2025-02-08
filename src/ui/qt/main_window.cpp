@@ -152,6 +152,12 @@ void MainWindow::update_structure() {
 
 				for(auto const& interval : oemsh.get_board().get_intervals(axis))
 					ui->structure_view->scenes[plane]->add(interval.get(), view_axis.value(), scene_rect);
+
+				for(auto const& conflict : oemsh.get_board().get_conflicts_colinear_edges(axis))
+					ui->structure_view->scenes[plane]->add(conflict.get(), view_axis.value(), scene_rect);
+
+				for(auto const& conflict : oemsh.get_board().get_conflicts_too_close_meshline_policies(axis))
+					ui->structure_view->scenes[plane]->add(conflict.get(), view_axis.value(), scene_rect);
 			}
 		}
 	}

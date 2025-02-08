@@ -43,6 +43,7 @@ protected:
 	QVariant itemChange(GraphicsItemChange change, QVariant const& value) override;
 
 	domain::ViewAxis const axis;
+
 private:
 	domain::Interval const* const interval;
 };

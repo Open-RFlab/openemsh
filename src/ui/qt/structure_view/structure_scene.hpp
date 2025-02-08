@@ -17,6 +17,8 @@
 class Entity;
 
 namespace domain {
+class ConflictColinearEdges;
+class ConflictTooCloseMeshlinePolicies;
 class Edge;
 class Interval;
 class Meshline;
@@ -26,6 +28,8 @@ class Polygon;
 
 namespace ui::qt {
 
+class StructureConflictColinearEdges;
+class StructureConflictTooCloseMeshlinePolicies;
 class StructureEdge;
 class StructureInterval;
 class StructureMeshline;
@@ -56,10 +60,12 @@ public:
 	~StructureScene();
 
 	StructureEdge* add(domain::Edge* edge);
+	StructurePolygon* add(domain::Polygon* polygon);
+	StructureConflictColinearEdges* add(domain::ConflictColinearEdges* conflict, domain::ViewAxis view_axis, QRectF const& scene_rect);
+	StructureConflictTooCloseMeshlinePolicies* add(domain::ConflictTooCloseMeshlinePolicies* conflict, domain::ViewAxis view_axis, QRectF const& scene_rect);
 	StructureInterval* add(domain::Interval* interval, domain::ViewAxis view_axis, QRectF const& scene_rect);
 	StructureMeshline* add(domain::Meshline* meshline, domain::ViewAxis view_axis, QRectF const& scene_rect);
 	StructureMeshlinePolicy* add(domain::MeshlinePolicy* policy, domain::ViewAxis view_axis, QRectF const& scene_rect);
-	StructurePolygon* add(domain::Polygon* polygon);
 
 	void clear_edges();
 	void clear_polygons();
@@ -73,6 +79,8 @@ public:
 	// TODO structure item layer + z value
 	StructureGroup* edges;
 	StructureGroup* polygons;
+	domain::ViewAxisSpace<StructureGroup*> conflict_colinear_edges;
+	domain::ViewAxisSpace<StructureGroup*> conflict_too_close_meshline_policies;
 	domain::ViewAxisSpace<StructureGroup*> intervals;
 	domain::ViewAxisSpace<StructureGroup*> meshlines;
 	domain::ViewAxisSpace<StructureGroup*> meshline_policies;

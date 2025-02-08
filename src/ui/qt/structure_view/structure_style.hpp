@@ -9,6 +9,8 @@
 #include <QColor>
 
 #include "utils/class_utils.hpp"
+#include "structure_conflict_colinear_edges.hpp"
+#include "structure_conflict_too_close_meshline_policies.hpp"
 #include "structure_edge.hpp"
 #include "structure_interval.hpp"
 #include "structure_meshline.hpp"
@@ -103,8 +105,24 @@ struct StructureStyle {
 
 	QColor interval_regular = Qt::transparent;
 	QColor interval_selected = QColor(0, 255, 0, 100);
-	QColor interval_regular_hovered = meshline_regular;
-	QColor interval_selected_hovered = meshline_selected;
+	QColor interval_regular_hovered = interval_regular;
+	QColor interval_selected_hovered = interval_selected;
+
+
+	QColor conflict_ce_regular = Qt::transparent;
+	QColor conflict_ce_selected = Qt::red;
+	QColor conflict_ce_regular_hovered = conflict_ce_regular;
+	QColor conflict_ce_selected_hovered = conflict_ce_selected;
+
+
+	QColor conflict_tcmlp_solution_line_regular = Qt::transparent;
+	QColor conflict_tcmlp_solution_line_selected = Qt::green;
+	QColor conflict_tcmlp_solution_line_regular_hovered = conflict_tcmlp_solution_line_regular;
+	QColor conflict_tcmlp_solution_line_selected_hovered = conflict_tcmlp_solution_line_selected;
+	QColor conflict_tcmlp_origin_lines_regular = Qt::transparent;
+	QColor conflict_tcmlp_origin_lines_selected = Qt::red;
+	QColor conflict_tcmlp_origin_lines_regular_hovered = conflict_tcmlp_origin_lines_regular;
+	QColor conflict_tcmlp_origin_lines_selected_hovered = conflict_tcmlp_origin_lines_selected;
 };
 
 //******************************************************************************
@@ -120,6 +138,8 @@ class StructureStyleSelector {
 	StructureMeshlinePolicy::Params meshline_policy_enabled;
 	StructureMeshlinePolicy::Params meshline_policy_disabled;
 	StructureInterval::Params interval;
+	StructureConflictColinearEdges::Params conflict_ce;
+	StructureConflictTooCloseMeshlinePolicies::Params conflict_tcmlp;
 
 	MAKER_DECL(edge, StructureStyle const& style);
 	MAKER_DECL(polygon_shape, StructureStyle const& style);
@@ -130,6 +150,8 @@ class StructureStyleSelector {
 	MAKER_DECL(meshline_policy_enabled, StructureStyle const& style);
 	MAKER_DECL(meshline_policy_disabled, StructureStyle const& style);
 	MAKER_DECL(interval, StructureStyle const& style);
+	MAKER_DECL(conflict_ce, StructureStyle const& style);
+	MAKER_DECL(conflict_tcmlp, StructureStyle const& style);
 
 public:
 	GETTER(style)
@@ -142,6 +164,8 @@ public:
 	GETTER(meshline_policy_enabled)
 	GETTER(meshline_policy_disabled)
 	GETTER(interval)
+	GETTER(conflict_ce)
+	GETTER(conflict_tcmlp)
 
 	StructureStyleSelector();
 	StructureStyleSelector(StructureStyle style);

@@ -45,6 +45,7 @@ public:
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;
 
 	domain::ViewAxis const axis;
+
 private:
 	domain::MeshlinePolicy const* const meshline_policy;
 	std::array<QLineF, 2> const policy_lines;
