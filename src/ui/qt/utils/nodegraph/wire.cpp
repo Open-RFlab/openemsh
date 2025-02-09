@@ -46,7 +46,7 @@ Wire::~Wire() = default;
 // https://github.com/paceholder/nodeeditor/blob/master/src/ConnectionGraphicsObject.cpp#L318-L378
 //******************************************************************************
 void Wire::update_path() {
-	if(begin && end) {
+	if(isVisible() && begin && end) {
 		prepareGeometryChange();
 		QPointF p1 = mapFromScene(begin->mapToScene(begin->attach_pos()));
 		QPointF p2 = mapFromScene(end->mapToScene(end->attach_pos()));
@@ -138,7 +138,7 @@ void Wire::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWid
 				painter->setPen(params.selected_hovered);
 			else
 				painter->setPen(params.selected);
-		} else if(is_highlighted()) {
+		} else if((begin->is_highlighted() || begin->isSelected()) && (end->is_highlighted() || end->isSelected())) {
 			if(option->state & QStyle::State_MouseOver)
 				painter->setPen(params.highlighted_hovered);
 			else

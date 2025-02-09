@@ -11,8 +11,6 @@
 
 #include <functional>
 
-#include "highlightable.hpp"
-
 namespace ui::qt::nodegraph {
 
 class Port;
@@ -20,7 +18,6 @@ class Port;
 //******************************************************************************
 class Wire
 : public QGraphicsPathItem
-, public Highlightable
 {
 public:
 	enum class Style { DIRECT, CURVED } style;
