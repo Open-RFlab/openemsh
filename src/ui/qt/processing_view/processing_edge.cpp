@@ -54,7 +54,7 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 	QString normal("Normal: ");
 	QString to_mesh("To mesh: ");
 	if(edge) {
-		normal += to_string(edge->normal);
+		normal += QString::fromStdString(to_string(edge->normal));
 		to_mesh += (edge->to_mesh ? "true" : "false");
 	}
 
