@@ -22,6 +22,12 @@ jobs:
         language: [ 'cpp' ]
 
     steps:
+    - name: "Dependencies: APT"
+      run: |
+        sudo apt update
+        sudo apt install -y \
+          qt6-base-dev
+
     - name: Checkout
       uses: actions/checkout@v3
 

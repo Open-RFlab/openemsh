@@ -21,6 +21,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y \
+            qt6-base-dev \
             gcovr \
             texlive-xetex \
             cairosvg \
