@@ -27,9 +27,6 @@ public:
 	~ProcessingView();
 
 	void set(domain::Board const* board);
-	void setup(QSlider* s_processing_zoom);
-
-	void transform_view();
 
 	ProcessingScene* processing_scene;
 
@@ -40,7 +37,6 @@ protected:
 	void wheelEvent(QWheelEvent* event) override;
 
 private:
-	QSlider* s_processing_zoom;
 	domain::Board const* board;
 };
 

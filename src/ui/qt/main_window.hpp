@@ -38,9 +38,6 @@ private slots:
 	void on_rb_plane_xy_toggled(bool const is_checked);
 	void on_rb_plane_yz_toggled(bool const is_checked);
 	void on_rb_plane_zx_toggled(bool const is_checked);
-	void on_s_processing_zoom_valueChanged(int const value);
-	void on_s_structure_rotation_valueChanged(int const value);
-	void on_s_structure_zoom_valueChanged(int const value);
 	void on_tb_anchor_clicked(bool const is_checked);
 	void on_tb_reset_clicked();
 	void on_tb_horizontal_layout_clicked();
@@ -54,6 +51,12 @@ private slots:
 	void on_tb_show_everything_clicked();
 	void on_tb_curved_wires_clicked();
 	void on_tb_direct_wires_clicked();
+	void on_tb_structure_rotate_cw_clicked();
+	void on_tb_structure_rotate_ccw_clicked();
+	void on_tb_structure_zoom_in_clicked();
+	void on_tb_structure_zoom_out_clicked();
+	void on_tb_processing_zoom_in_clicked();
+	void on_tb_processing_zoom_out_clicked();
 
 public:
 	MainWindow(app::OpenEMSH& oemsh, QWidget* parent = nullptr);

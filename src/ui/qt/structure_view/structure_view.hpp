@@ -31,10 +31,12 @@ public:
 	~StructureView();
 
 	void set(domain::Board const* board);
-	void setup(QSlider* s_structure_zoom, QSlider* s_structure_rotation);
 	void reset_view();
 
-	void transform_view();
+	void fit();
+	void rotate_view(qreal angle);
+	void reset_rotation();
+	qreal get_rotation() const;
 
 	void set_mesh_visibility(StructureScene::MeshVisibility mesh_visibility);
 
@@ -54,9 +56,10 @@ private:
 
 //	qreal scale_max;
 	QGraphicsPathItem const* const repair;
-	QSlider* s_structure_zoom;
-	QSlider* s_structure_rotation;
 	domain::Board const* board;
+
+	using QGraphicsView::rotate;
+	qreal rotation;
 };
 
 } // namespace ui::qt

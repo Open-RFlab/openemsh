@@ -27,8 +27,6 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 	setWindowState(Qt::WindowMaximized);
 	setWindowIcon(QPixmap(":/openemsh.ico"));
 	ui->setupUi(this);
-	ui->structure_view->setup(ui->s_structure_zoom, ui->s_structure_rotation);
-	ui->processing_view->setup(ui->s_processing_zoom);
 
 	for(auto const& style : Style::available_styles) {
 		auto* const action = new QAction(style.name, ui->ag_styles);
@@ -220,21 +218,6 @@ void MainWindow::on_rb_plane_zx_toggled(bool const is_checked) {
 }
 
 //******************************************************************************
-void MainWindow::on_s_processing_zoom_valueChanged(int const /*value*/) {
-	ui->processing_view->transform_view();
-}
-
-//******************************************************************************
-void MainWindow::on_s_structure_rotation_valueChanged(int const /*value*/) {
-	ui->structure_view->transform_view();
-}
-
-//******************************************************************************
-void MainWindow::on_s_structure_zoom_valueChanged(int const /*value*/) {
-	ui->structure_view->transform_view();
-}
-
-//******************************************************************************
 void MainWindow::on_tb_anchor_clicked(bool const is_checked) {
 	if(is_checked) {
 		ui->structure_view->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
@@ -249,15 +232,8 @@ void MainWindow::on_tb_reset_clicked() {
 	ui->processing_view->processing_scene->fit_scene();
 	ui->processing_view->fit();
 
-	ui->s_structure_rotation->setValue((ui->s_structure_rotation->minimum() + ui->s_structure_rotation->maximum()) / 2);
-
-	// TODO zoom slider must be updated too
-	// fitInView operates on the transform matrix
-	// https://code.qt.io/cgit/qt/qtbase.git/tree/src/widgets/graphicsview/qgraphicsview.cpp?h=6.8#n2014
-
-	// TODO Fit twice because of possible scrollbars apparition after first fit
-	ui->structure_view->fitInView(static_cast<StructureScene*>(ui->structure_view->scene())->polygons->boundingRect() + QMarginsF(5, 5, 5, 5), Qt::KeepAspectRatio);
-//	ui->structure_view->fitInView(dynamic_cast<StructureScene*>(ui->structure_view->scene())->polygons->boundingRect() + QMarginsF(5, 5, 5, 5), Qt::KeepAspectRatio);
+	ui->structure_view->reset_rotation();
+	ui->structure_view->fit();
 }
 
 //******************************************************************************
@@ -338,6 +314,36 @@ void MainWindow::on_tb_curved_wires_clicked() {
 //******************************************************************************
 void MainWindow::on_tb_direct_wires_clicked() {
 	ui->processing_view->processing_scene->set_wire_style(nodegraph::Wire::Style::DIRECT);
+}
+
+//******************************************************************************
+void MainWindow::on_tb_structure_rotate_cw_clicked() {
+	ui->structure_view->rotate_view(-5);
+}
+
+//******************************************************************************
+void MainWindow::on_tb_structure_rotate_ccw_clicked() {
+	ui->structure_view->rotate_view(5);
+}
+
+//******************************************************************************
+void MainWindow::on_tb_structure_zoom_in_clicked() {
+	ui->structure_view->scale(1.2, 1.2);
+}
+
+//******************************************************************************
+void MainWindow::on_tb_structure_zoom_out_clicked() {
+	ui->structure_view->scale(1 / 1.2, 1 / 1.2);
+}
+
+//******************************************************************************
+void MainWindow::on_tb_processing_zoom_in_clicked() {
+	ui->processing_view->scale(1.2, 1.2);
+}
+
+//******************************************************************************
+void MainWindow::on_tb_processing_zoom_out_clicked() {
+	ui->processing_view->scale(1 / 1.2, 1 / 1.2);
 }
 
 } // namespace ui::qt

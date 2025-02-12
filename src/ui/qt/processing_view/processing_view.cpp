@@ -19,7 +19,6 @@ namespace ui::qt {
 ProcessingView::ProcessingView(QWidget* parent)
 : QGraphicsView(parent)
 , processing_scene(new ProcessingScene(this))
-, s_processing_zoom(nullptr)
 , board(nullptr)
 {
 	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
@@ -44,9 +43,9 @@ void ProcessingView::wheelEvent(QWheelEvent* event) {
 	if(event->modifiers() & Qt::ControlModifier) {
 		// Zoom.
 		if (event->angleDelta().y() > 0)
-			s_processing_zoom->setValue(s_processing_zoom->value() + 6);
+			scale(1.1, 1.1);
 		else
-			s_processing_zoom->setValue(s_processing_zoom->value() - 6);
+			scale(1 / 1.1, 1 / 1.1);
 	} else if(event->modifiers() & Qt::ShiftModifier) {
 		// Horizontal scroll.
 		horizontalScrollBar()->setValue(horizontalScrollBar()->value() - event->angleDelta().y() / 8);
@@ -59,28 +58,9 @@ void ProcessingView::wheelEvent(QWheelEvent* event) {
 }
 
 //******************************************************************************
-void ProcessingView::setup(QSlider* s_processing_zoom) {
-	this->s_processing_zoom = s_processing_zoom;
-}
-
-//******************************************************************************
-void ProcessingView::transform_view() {
-//	qreal scale = qPow(qreal(2), (s_processing_zoom->value() - s_processing_zoom->maximum()/2) / qreal(50));
-	qreal scale = qPow(qreal(2), (s_processing_zoom->value() - s_processing_zoom->maximum()/2) / qreal(25));
-
-//	qreal scale = to_scale(s_processing_zoom->value());
-//	qreal scale = to_slider(s_processing_zoom->value());
-
-	QTransform matrix;
-	matrix.scale(scale, scale);
-	setTransform(matrix);
-}
-
-//******************************************************************************
 void ProcessingView::fit() {
 	processing_scene->fit();
 	fitInView(processing_scene->sceneRect(), Qt::KeepAspectRatio);
-	centerOn(processing_scene->sceneRect().center());
 }
 
 //******************************************************************************

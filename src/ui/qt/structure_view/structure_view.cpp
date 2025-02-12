@@ -11,6 +11,8 @@
 #include <QWheelEvent>
 #include <QGraphicsPathItem>
 
+#include <cmath>
+
 #include "structure_view.hpp"
 
 namespace ui::qt {
@@ -45,9 +47,8 @@ StructureView::StructureView(QWidget* parent)
 	new StructureScene(style_selector, this),
 	new StructureScene(style_selector, this) }}
 , repair(new QGraphicsPathItem(create_repair()))
-, s_structure_zoom(nullptr)
-, s_structure_rotation(nullptr)
 , board(nullptr)
+, rotation(0)
 {
 	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
@@ -75,7 +76,7 @@ void StructureView::drawForeground(QPainter* painter, QRectF const& rect) {
 	matrix.translate(0, viewport()->rect().height());
 	matrix.translate(2 * unit, -2 * unit);
 	matrix.scale(1, -1);
-	matrix.rotate(-s_structure_rotation->value());
+	matrix.rotate(rotation);
 
 	painter->resetTransform();
 	painter->drawPath(matrix.map(repair->path()));
@@ -105,15 +106,15 @@ void StructureView::wheelEvent(QWheelEvent* event) {
 	if(event->modifiers() & Qt::ControlModifier) {
 		// Zoom.
 		if (event->angleDelta().y() > 0)
-			s_structure_zoom->setValue(s_structure_zoom->value() + 6);
+			scale(1.1, 1.1);
 		else
-			s_structure_zoom->setValue(s_structure_zoom->value() - 6);
+			scale(1 / 1.1, 1 / 1.1);
 	} else if(event->modifiers() & Qt::AltModifier) {
 		// Rotation.
 		if (event->angleDelta().x() > 0)
-			s_structure_rotation->setValue(s_structure_rotation->value() + 6);
+			rotate_view(5);
 		else
-			s_structure_rotation->setValue(s_structure_rotation->value() - 6);
+			rotate_view(-5);
 	} else if(event->modifiers() & Qt::ShiftModifier) {
 		// Horizontal scroll.
 		horizontalScrollBar()->setValue(horizontalScrollBar()->value() - event->angleDelta().y() / 8);
@@ -126,20 +127,8 @@ void StructureView::wheelEvent(QWheelEvent* event) {
 }
 
 //******************************************************************************
-void StructureView::setup(QSlider* s_structure_zoom, QSlider* s_structure_rotation) {
-	this->s_structure_zoom = s_structure_zoom;
-	this->s_structure_rotation = s_structure_rotation;
-}
-
-//******************************************************************************
-void StructureView::transform_view() {
-//	qreal scale = qPow(qreal(2), (s_structure_zoom->value() - s_structure_zoom->maximum()/2) / qreal(50));
-	qreal scale = qPow(qreal(2), (s_structure_zoom->value() - s_structure_zoom->maximum()/2) / qreal(25));
-
-	QTransform matrix;
-	matrix.rotate(s_structure_rotation->value());
-	matrix.scale(scale, -scale); // Invert Y axis.
-	setTransform(matrix);
+void StructureView::fit() {
+	fitInView(static_cast<StructureScene*>(scene())->polygons->boundingRect() + QMarginsF(5, 5, 5, 5), Qt::KeepAspectRatio);
 }
 
 //******************************************************************************
@@ -151,6 +140,22 @@ void StructureView::set_mesh_visibility(StructureScene::MeshVisibility mesh_visi
 //******************************************************************************
 void StructureView::set(domain::Board const* board) {
 	this->board = board;
+}
+
+//******************************************************************************
+void StructureView::reset_rotation() {
+	rotate_view(-rotation);
+}
+
+//******************************************************************************
+void StructureView::rotate_view(qreal angle) {
+	rotation = std::fmod(rotation + angle, 360);
+	rotate(angle);
+}
+
+//******************************************************************************
+qreal StructureView::get_rotation() const {
+	return rotation;
 }
 
 } // namespace ui::qt
