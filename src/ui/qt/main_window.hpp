@@ -62,8 +62,6 @@ public:
 	MainWindow(app::OpenEMSH& oemsh, QWidget* parent = nullptr);
 	~MainWindow();
 
-	void update_structure();
-	void update_processing();
 };
 
 } // namespace ui::qt

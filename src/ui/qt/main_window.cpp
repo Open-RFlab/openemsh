@@ -50,8 +50,8 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 	oemsh.parse();
 	oemsh.do_all_step();
 
-	update_structure();
-	update_processing();
+	ui->structure_view->populate(&oemsh.get_board());
+	ui->processing_view->populate(&oemsh.get_board());
 
 	ui->structure_view->setScene(ui->structure_view->scenes[domain::XY]);
 	ui->processing_view->processing_scene->set_display_plane(domain::XY);
@@ -60,106 +60,6 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 
 //******************************************************************************
 MainWindow::~MainWindow() = default;
-
-//******************************************************************************
-void MainWindow::update_processing() {
-	for(domain::Plane const plane : domain::AllPlane) {
-		auto* processing_plane = ui->processing_view->processing_scene->add(plane);
-
-		for(auto const& polygon : oemsh.get_board().get_polygons(plane)) {
-			auto* processing_polygon = ui->processing_view->processing_scene->add(polygon.get(), processing_plane);
-
-			for(auto const& edge : polygon->edges)
-				ui->processing_view->processing_scene->add(edge.get(), processing_polygon);
-
-			processing_polygon->fit();
-		}
-
-		for(auto const& conflict : oemsh.get_board().get_conflicts_edge_in_polygons(plane))
-			ui->processing_view->processing_scene->add(conflict.get(), processing_plane);
-
-		processing_plane->fit();
-	}
-
-	for(domain::Axis const axis : domain::AllAxis) {
-		auto* processing_axis = ui->processing_view->processing_scene->add(axis);
-
-		for(auto const& conflict : oemsh.get_board().get_conflicts_colinear_edges(axis))
-			ui->processing_view->processing_scene->add(conflict.get(), processing_axis);
-
-		for(auto const& conflict : oemsh.get_board().get_conflicts_too_close_meshline_policies(axis))
-			ui->processing_view->processing_scene->add(conflict.get(), processing_axis);
-
-		for(auto const& policy : oemsh.get_board().get_meshline_policies(axis))
-			ui->processing_view->processing_scene->add(policy.get(), processing_axis);
-
-		for(auto const& interval : oemsh.get_board().get_intervals(axis))
-			ui->processing_view->processing_scene->add(interval.get(), processing_axis);
-
-		for(auto const& meshline : oemsh.get_board().get_meshlines(axis))
-			ui->processing_view->processing_scene->add(meshline.get(), processing_axis);
-
-		processing_axis->fit();
-	}
-
-	for(auto* edge : ui->processing_view->processing_scene->edges)
-		ui->processing_view->processing_scene->wire_to_destination_first_output_port(edge);
-
-	for(auto* conflict : ui->processing_view->processing_scene->conflict_colinear_edges)
-		ui->processing_view->processing_scene->wire_to_destination_first_output_port(conflict);
-
-	for(auto* conflict : ui->processing_view->processing_scene->conflict_too_close_meshline_policies)
-		ui->processing_view->processing_scene->wire_to_destination_first_output_port(conflict);
-
-	for(auto* conflict : ui->processing_view->processing_scene->conflict_edge_in_polygons)
-		ui->processing_view->processing_scene->wire_to_destination_first_output_port(conflict);
-
-	for(auto* policy : ui->processing_view->processing_scene->meshline_policies)
-		ui->processing_view->processing_scene->wire_to_destination_first_output_port(policy);
-
-	for(auto* meshline : ui->processing_view->processing_scene->meshlines)
-		ui->processing_view->processing_scene->wire_to_destination_first_output_port(meshline);
-
-	for(auto* interval : ui->processing_view->processing_scene->intervals)
-		ui->processing_view->processing_scene->wire_to_destination_first_output_port(interval);
-
-	ui->processing_view->processing_scene->fit_scene();
-}
-
-//******************************************************************************
-void MainWindow::update_structure() {
-	for(domain::Plane const plane : domain::AllPlane) {
-		ui->structure_view->scenes[plane]->clear();
-
-		for(auto const& polygon : oemsh.get_board().get_polygons(plane)) {
-			ui->structure_view->scenes[plane]->add(polygon.get());
-
-			for(auto const& edge : polygon->edges)
-				ui->structure_view->scenes[plane]->add(edge.get());
-		}
-
-		QRectF const scene_rect(ui->structure_view->scenes[plane]->sceneRect());
-
-		for(domain::Axis const axis : domain::Axes[plane]) {
-			if(auto const view_axis = domain::transpose(plane, axis); view_axis) {
-				for(auto const& meshline : oemsh.get_board().get_meshlines(axis))
-					ui->structure_view->scenes[plane]->add(meshline.get(), view_axis.value(), scene_rect);
-
-				for(auto const& policy : oemsh.get_board().get_meshline_policies(axis))
-					ui->structure_view->scenes[plane]->add(policy.get(), view_axis.value(), scene_rect);
-
-				for(auto const& interval : oemsh.get_board().get_intervals(axis))
-					ui->structure_view->scenes[plane]->add(interval.get(), view_axis.value(), scene_rect);
-
-				for(auto const& conflict : oemsh.get_board().get_conflicts_colinear_edges(axis))
-					ui->structure_view->scenes[plane]->add(conflict.get(), view_axis.value(), scene_rect);
-
-				for(auto const& conflict : oemsh.get_board().get_conflicts_too_close_meshline_policies(axis))
-					ui->structure_view->scenes[plane]->add(conflict.get(), view_axis.value(), scene_rect);
-			}
-		}
-	}
-}
 
 //******************************************************************************
 void MainWindow::set_style(Style const& style) {

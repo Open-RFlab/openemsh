@@ -4,14 +4,15 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <QGraphicsPathItem>
 #include <QPainter>
 #include <QScrollBar>
-#include <QSlider>
 #include <QTransform>
 #include <QWheelEvent>
-#include <QGraphicsPathItem>
 
 #include <cmath>
+
+#include "domain/board.hpp"
 
 #include "structure_view.hpp"
 
@@ -47,7 +48,6 @@ StructureView::StructureView(QWidget* parent)
 	new StructureScene(style_selector, this),
 	new StructureScene(style_selector, this) }}
 , repair(new QGraphicsPathItem(create_repair()))
-, board(nullptr)
 , rotation(0)
 {
 	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
@@ -138,11 +138,6 @@ void StructureView::set_mesh_visibility(StructureScene::MeshVisibility mesh_visi
 }
 
 //******************************************************************************
-void StructureView::set(domain::Board const* board) {
-	this->board = board;
-}
-
-//******************************************************************************
 void StructureView::reset_rotation() {
 	rotate_view(-rotation);
 }
@@ -156,6 +151,41 @@ void StructureView::rotate_view(qreal angle) {
 //******************************************************************************
 qreal StructureView::get_rotation() const {
 	return rotation;
+}
+
+//******************************************************************************
+void StructureView::populate(domain::Board const* board) {
+	for(domain::Plane const plane : domain::AllPlane) {
+		scenes[plane]->clear();
+
+		for(auto const& polygon : board->get_polygons(plane)) {
+			scenes[plane]->add(polygon.get());
+
+			for(auto const& edge : polygon->edges)
+				scenes[plane]->add(edge.get());
+		}
+
+		QRectF const scene_rect(scenes[plane]->sceneRect());
+
+		for(domain::Axis const axis : domain::Axes[plane]) {
+			if(auto const view_axis = domain::transpose(plane, axis); view_axis) {
+				for(auto const& meshline : board->get_meshlines(axis))
+					scenes[plane]->add(meshline.get(), view_axis.value(), scene_rect);
+
+				for(auto const& policy : board->get_meshline_policies(axis))
+					scenes[plane]->add(policy.get(), view_axis.value(), scene_rect);
+
+				for(auto const& interval : board->get_intervals(axis))
+					scenes[plane]->add(interval.get(), view_axis.value(), scene_rect);
+
+				for(auto const& conflict : board->get_conflicts_colinear_edges(axis))
+					scenes[plane]->add(conflict.get(), view_axis.value(), scene_rect);
+
+				for(auto const& conflict : board->get_conflicts_too_close_meshline_policies(axis))
+					scenes[plane]->add(conflict.get(), view_axis.value(), scene_rect);
+			}
+		}
+	}
 }
 
 } // namespace ui::qt

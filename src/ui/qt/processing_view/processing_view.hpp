@@ -11,8 +11,6 @@
 
 #include "processing_scene.hpp"
 
-class QSlider;
-
 namespace domain {
 class Board;
 } // namespace domain
@@ -26,7 +24,7 @@ public:
 	explicit ProcessingView(QWidget* parent = nullptr);
 	~ProcessingView();
 
-	void set(domain::Board const* board);
+	void populate(domain::Board const* board);
 
 	ProcessingScene* processing_scene;
 
@@ -35,9 +33,6 @@ public slots:
 
 protected:
 	void wheelEvent(QWheelEvent* event) override;
-
-private:
-	domain::Board const* board;
 };
 
 } // namespace ui::qt

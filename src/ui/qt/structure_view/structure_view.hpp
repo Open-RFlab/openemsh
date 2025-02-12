@@ -14,7 +14,6 @@
 #include "structure_scene.hpp"
 #include "structure_style.hpp"
 
-class QSlider;
 class QGraphicsPathItem;
 
 namespace domain {
@@ -30,7 +29,7 @@ public:
 	explicit StructureView(QWidget* parent = nullptr);
 	~StructureView();
 
-	void set(domain::Board const* board);
+	void populate(domain::Board const* board);
 	void reset_view();
 
 	void fit();
@@ -56,7 +55,6 @@ private:
 
 //	qreal scale_max;
 	QGraphicsPathItem const* const repair;
-	domain::Board const* board;
 
 	using QGraphicsView::rotate;
 	qreal rotation;
