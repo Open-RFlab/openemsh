@@ -75,7 +75,7 @@ jobs:
         run: |
           /tmp/sonar/build-wrapper-linux-x86/build-wrapper-linux-x86-64 \
             --out-dir build_wrapper_output_directory \
-            cmake --build build --target unittest
+            cmake --build build --target all unittest
 
       - name: Coverage
         run: cmake --build build --target coverage
