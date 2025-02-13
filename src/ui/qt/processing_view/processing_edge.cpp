@@ -41,7 +41,7 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 		return locate_processing_edge_params().port;
 	};
 	if(edge->conflict) {
-		to_wire.emplace_back(std::in_place_type<DataKeys::ToWire>, edge->conflict, input_port);
+		to_wire.emplace_back(DataKeys::set_to_wire(edge->conflict, input_port));
 	}
 
 	nodegraph::Port* output_port = add_output_port();

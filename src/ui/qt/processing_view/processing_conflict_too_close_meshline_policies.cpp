@@ -47,7 +47,7 @@ ProcessingConflictTooCloseMeshlinePolicies::ProcessingConflictTooCloseMeshlinePo
 			return locate_processing_conflict_tcmlp_params().port;
 		};
 		v_box1->addItem(port);
-		to_wire.emplace_back(std::in_place_type<DataKeys::ToWire>, policy, port);
+		to_wire.emplace_back(DataKeys::set_to_wire(policy, port));
 	}
 
 	nodegraph::Port* out = add_output_port();

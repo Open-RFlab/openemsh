@@ -61,9 +61,9 @@ ProcessingMeshline::ProcessingMeshline(domain::Meshline const* meshline, QGraphi
 	if(meshline) {
 		coord += QString::number(meshline->coord.value(), 'f', 6);
 		if(meshline->interval)
-			to_wire.emplace_back(std::in_place_type<DataKeys::ToWire>, meshline->interval, interval_port);
+			to_wire.emplace_back(DataKeys::set_to_wire(meshline->interval, interval_port));
 		if(meshline->policy)
-			to_wire.emplace_back(std::in_place_type<DataKeys::ToWire>, meshline->policy, policy_port);
+			to_wire.emplace_back(DataKeys::set_to_wire(meshline->policy, policy_port));
 	}
 
 	nodegraph::Text* text_coord = new nodegraph::Text(coord, this);

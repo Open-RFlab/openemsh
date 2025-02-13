@@ -62,7 +62,7 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 			domain::ConflictColinearEdges,
 			domain::ConflictTooCloseMeshlinePolicies>(origin)
 		; entity)
-			to_wire.emplace_back(std::in_place_type<DataKeys::ToWire>, entity, port);
+			to_wire.emplace_back(DataKeys::set_to_wire(entity, port));
 	}
 
 	v_box1->addStretch();

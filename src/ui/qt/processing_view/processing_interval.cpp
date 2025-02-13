@@ -80,9 +80,9 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 		after_lmin += QString::number(interval->after.lmin);
 		after_lambda += QString::number(interval->after.lambda);
 		if(interval->before.meshline_policy)
-			to_wire.emplace_back(std::in_place_type<DataKeys::ToWire>, interval->before.meshline_policy, before_port);
+			to_wire.emplace_back(DataKeys::set_to_wire(interval->before.meshline_policy, before_port));
 		if(interval->after.meshline_policy)
-			to_wire.emplace_back(std::in_place_type<DataKeys::ToWire>, interval->after.meshline_policy, after_port);
+			to_wire.emplace_back(DataKeys::set_to_wire(interval->after.meshline_policy, after_port));
 	}
 
 	nodegraph::Text* text_dmax = new nodegraph::Text(dmax, this);

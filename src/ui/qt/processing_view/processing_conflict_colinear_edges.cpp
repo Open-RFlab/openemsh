@@ -51,7 +51,7 @@ ProcessingConflictColinearEdges::ProcessingConflictColinearEdges(domain::Conflic
 				return locate_processing_conflict_ce_params().port_disabled;
 			};
 		v_box1->addItem(port);
-		to_wire.emplace_back(std::in_place_type<DataKeys::ToWire>, edge, port);
+		to_wire.emplace_back(DataKeys::set_to_wire(edge, port));
 	}
 
 	nodegraph::Port* out = add_output_port();

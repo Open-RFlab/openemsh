@@ -9,13 +9,11 @@
 #include <QPair>
 #include <QVariant>
 
+#include "utils/nodegraph/port.hpp"
+
 class Entity;
 
 namespace ui::qt {
-
-namespace nodegraph {
-class Port;
-} // namespace nodegraph
 
 // Scoped enum is not used but imitated because implicit conversion is wanted.
 //******************************************************************************
@@ -31,16 +29,26 @@ enum DataKeys : int {
 
 //******************************************************************************
 inline Entity const* get_entity(QVariant const& variant) {
-	return static_cast<Entity const*>(variant.value<void const*>());
+	return variant.value<Entity const*>();
 }
 
 //******************************************************************************
 inline QVariant set_entity(Entity const* entity) {
-	return QVariant::fromValue(static_cast<void const*>(entity));
+	return QVariant::fromValue(entity);
 }
 
 //******************************************************************************
 using ToWire = QPair<Entity const*, nodegraph::Port*>;
+
+//******************************************************************************
+inline ToWire get_to_wire(QVariant const& variant) {
+	return variant.value<ToWire>();
+}
+
+//******************************************************************************
+inline QVariant set_to_wire(Entity const* entity, nodegraph::Port* port) {
+	return QVariant::fromValue(ToWire(entity, port));
+}
 
 } // namespace DataKeys
 

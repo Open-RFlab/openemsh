@@ -45,7 +45,7 @@ ProcessingConflictEdgeInPolygon::ProcessingConflictEdgeInPolygon(domain::Conflic
 	in->locate_port_params = [&]() -> auto& {
 		return locate_processing_conflict_eip_params().port;
 	};
-	to_wire.emplace_back(std::in_place_type<DataKeys::ToWire>, conflict->edge, in);
+	to_wire.emplace_back(DataKeys::set_to_wire(conflict->edge, in));
 
 	v_box1->addItem(in);
 
@@ -57,9 +57,9 @@ ProcessingConflictEdgeInPolygon::ProcessingConflictEdgeInPolygon(domain::Conflic
 			return locate_processing_conflict_eip_params().port;
 		};
 		v_box1->addItem(port);
-		to_wire.emplace_back(std::in_place_type<DataKeys::ToWire>, polygon, port);
+		to_wire.emplace_back(DataKeys::set_to_wire(polygon, port));
 //		if(overlapping_edge)
-//			to_wire.emplace_back(std::in_place_type<DataKeys::ToWire>, overlaping_edge, port);
+//			to_wire.emplace_back(DataKeys::set_to_wire(overlaping_edge, port));
 	}
 
 	nodegraph::Port* out = add_output_port();

@@ -272,7 +272,7 @@ nodegraph::Wire* ProcessingScene::wire_together(nodegraph::Port* begin, nodegrap
 //******************************************************************************
 void ProcessingScene::wire_to_destination_first_output_port(nodegraph::Node* node) {
 	for(auto const& to_wire : node->data(DataKeys::TO_WIRE).toList()) {
-		auto const& [entity, port] = to_wire.value<DataKeys::ToWire>();
+		auto const& [entity, port] = DataKeys::get_to_wire(to_wire);
 		if(index.contains(entity)) {
 			auto* item = index.at(entity);
 			if(!port->is_wired_to(item->output_ports[0])) {
