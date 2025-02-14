@@ -31,14 +31,14 @@ ProcessingConflictColinearEdges::ProcessingConflictColinearEdges(domain::Conflic
 		return locate_processing_conflict_ce_params().title;
 	};
 
-	QGraphicsLinearLayout* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
-	QGraphicsLinearLayout* v_box1 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
-	QGraphicsLinearLayout* v_box2 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	auto* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
+	auto* v_box1 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	auto* v_box2 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
 	layout()->addItem(h_box);
 	h_box->addItem(v_box1);
 	h_box->addItem(v_box2);
 
-	for(domain::Edge* edge : conflict->edges) {
+	for(auto const* edge : conflict->edges) {
 		nodegraph::Port* port = add_input_port("Normal: " + QString::fromStdString(to_string(edge->normal)) + (edge->to_mesh ? " enabled" : " disabled"));
 		port->setFlag(QGraphicsItem::ItemIsSelectable);
 		port->setAcceptedMouseButtons(Qt::NoButton);
@@ -69,12 +69,9 @@ ProcessingConflictColinearEdges::ProcessingConflictColinearEdges(domain::Conflic
 	setData(DataKeys::TYPE, "ConflictColinearEdges");
 	setData(DataKeys::ID, (qulonglong) conflict->id);
 	setData(DataKeys::ENTITY, DataKeys::set_entity(conflict));
-	setData(DataKeys::TO_WIRE, std::move(to_wire));
+	setData(DataKeys::TO_WIRE, to_wire);
 	retrieve_highlightable_children();
 }
-
-//******************************************************************************
-ProcessingConflictColinearEdges::~ProcessingConflictColinearEdges() = default;
 
 //******************************************************************************
 int ProcessingConflictColinearEdges::type() const {

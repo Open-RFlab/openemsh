@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
 		setlocale(LC_NUMERIC, "C");
 		ui::qt::MainWindow w(oemsh);
 		w.show();
-		return a.exec();
+		return QApplication::exec();
 	}
 
 	return EXIT_SUCCESS;

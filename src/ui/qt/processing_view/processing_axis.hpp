@@ -29,7 +29,6 @@ public:
 	std::function<Params const& ()> locate_processing_axis_params;
 
 	explicit ProcessingAxis(domain::Axis axis, QGraphicsItem* parent = nullptr);
-	~ProcessingAxis();
 
 	int type() const override;
 

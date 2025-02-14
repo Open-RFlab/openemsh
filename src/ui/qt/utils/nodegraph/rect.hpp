@@ -49,7 +49,6 @@ public:
 
 	explicit Rect(QGraphicsItem* parent = nullptr);
 	Rect(qreal x, qreal y, qreal width, qreal height, QGraphicsItem* parent = nullptr);
-	~Rect();
 
 	void setGeometry(QRectF const& geom) override;
 

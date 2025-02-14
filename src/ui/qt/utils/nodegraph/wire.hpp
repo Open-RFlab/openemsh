@@ -34,7 +34,6 @@ public:
 	std::function<Params const& ()> locate_wire_params;
 
 	Wire(Port* begin, Port* end, QGraphicsItem* parent = nullptr);
-	~Wire();
 
 	void update_path();
 

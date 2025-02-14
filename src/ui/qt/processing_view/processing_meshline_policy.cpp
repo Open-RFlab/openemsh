@@ -38,17 +38,17 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 		return locate_processing_meshline_policy_params().title;
 	};
 
-	QGraphicsLinearLayout* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
-	QGraphicsLinearLayout* v_box1 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
-	QGraphicsLinearLayout* v_box2 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
-	QGraphicsLinearLayout* v_box3 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	auto* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
+	auto* v_box1 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	auto* v_box2 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	auto* v_box3 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
 	layout()->addItem(h_box);
 	h_box->addItem(v_box1);
 	h_box->addItem(v_box2);
 	h_box->addItem(v_box3);
 	v_box1->addStretch();
 
-	for(auto* origin : meshline_policy->origins) {
+	for(auto const* origin : meshline_policy->origins) {
 		nodegraph::Port* port = add_input_port();
 		port->setFlag(QGraphicsItem::ItemIsSelectable);
 		port->setAcceptedMouseButtons(Qt::NoButton);
@@ -57,10 +57,10 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 		};
 		v_box1->addItem(port);
 		// Downcast from IMeshLineOrigin is mandatory to upcast to Entity.
-		if(auto* entity = down_up_cast<Entity,
-			domain::Edge,
-			domain::ConflictColinearEdges,
-			domain::ConflictTooCloseMeshlinePolicies>(origin)
+		if(auto const* entity = down_up_cast<Entity const,
+			domain::Edge const,
+			domain::ConflictColinearEdges const,
+			domain::ConflictTooCloseMeshlinePolicies const>(origin)
 		; entity)
 			to_wire.emplace_back(DataKeys::set_to_wire(entity, port));
 	}
@@ -85,14 +85,14 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 		d += QString::number(meshline_policy->d);
 	}
 
-	nodegraph::Text* text_normal = new nodegraph::Text(normal, this);
+	auto* text_normal = new nodegraph::Text(normal, this);
 	text_normal->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_normal->setAcceptedMouseButtons(Qt::NoButton);
 	text_normal->locate_text_params = [&]() -> auto& {
 		return locate_processing_meshline_policy_params().main;
 	};
 
-	nodegraph::Text* text_is_enabled = new nodegraph::Text(is_enabled, this);
+	auto* text_is_enabled = new nodegraph::Text(is_enabled, this);
 	text_is_enabled->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_is_enabled->setAcceptedMouseButtons(Qt::NoButton);
 	if(meshline_policy) {
@@ -110,14 +110,14 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 		};
 	}
 
-	nodegraph::Text* text_policy = new nodegraph::Text(policy, this);
+	auto* text_policy = new nodegraph::Text(policy, this);
 	text_policy->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_policy->setAcceptedMouseButtons(Qt::NoButton);
 	text_policy->locate_text_params = [&]() -> auto& {
 		return locate_processing_meshline_policy_params().main;
 	};
 
-	nodegraph::Text* text_d = new nodegraph::Text(d, this);
+	auto* text_d = new nodegraph::Text(d, this);
 	text_d->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_d->setAcceptedMouseButtons(Qt::NoButton);
 	text_d->locate_text_params = [&]() -> auto& {
@@ -136,12 +136,9 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 	setData(DataKeys::TYPE, "MeshlinePolicy");
 	setData(DataKeys::ID, (qulonglong) meshline_policy->id);
 	setData(DataKeys::ENTITY, DataKeys::set_entity(meshline_policy));
-	setData(DataKeys::TO_WIRE, std::move(to_wire));
+	setData(DataKeys::TO_WIRE, to_wire);
 	retrieve_highlightable_children();
 }
-
-//******************************************************************************
-ProcessingMeshlinePolicy::~ProcessingMeshlinePolicy() = default;
 
 //******************************************************************************
 int ProcessingMeshlinePolicy::type() const {
@@ -165,8 +162,8 @@ std::size_t ProcessingMeshlinePolicy::count_mlp_tcmlp_deepness() const {
 	std::size_t deepness = 0;
 
 	for(auto const* conflict : get_tcmlp_origins()) {
-		for(auto* node : conflict->get_input_nodes()) {
-			if(auto* policy = qgraphicsitem_cast<ProcessingMeshlinePolicy*>(node)
+		for(auto const* node : conflict->get_input_nodes()) {
+			if(auto const* policy = qgraphicsitem_cast<ProcessingMeshlinePolicy const*>(node)
 			; policy) {
 				deepness = qMax(deepness, policy->count_mlp_tcmlp_deepness() + 2);
 			}

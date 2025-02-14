@@ -32,7 +32,6 @@ public:
 	std::function<Params const& ()> locate_processing_interval_params;
 
 	explicit ProcessingInterval(domain::Interval const* interval, QGraphicsItem* parent = nullptr);
-	~ProcessingInterval();
 
 	int type() const override;
 

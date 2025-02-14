@@ -54,9 +54,6 @@ Node::Node(QGraphicsItem* parent)
 }
 
 //******************************************************************************
-Node::~Node() = default;
-
-//******************************************************************************
 QVariant Node::itemChange(GraphicsItemChange change, QVariant const& value) {
 	if(change == ItemPositionChange && parentItem() != nullptr) {
 		QRectF const rect = parentItem()->boundingRect()
@@ -153,14 +150,14 @@ void Node::paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWid
 
 //******************************************************************************
 Port* Node::add_input_port(QString const& text, Port::AnchorPoint anchor) {
-	Port* port = new Port(text, anchor, this);
+	auto* port = new Port(text, anchor, this);
 	input_ports.append(port);
 	return port;
 }
 
 //******************************************************************************
 Port* Node::add_output_port(QString const& text, Port::AnchorPoint anchor) {
-	Port* port = new Port(text, anchor, this);
+	auto* port = new Port(text, anchor, this);
 	output_ports.append(port);
 	return port;
 }
@@ -187,10 +184,11 @@ void Node::traverse_down(QSet<Node*>& out, Node const* node) {
 
 //******************************************************************************
 QList<Node*> Node::get_chain() const {
-	QSet<Node*> up, down;
+	QSet<Node*> up;
+	QSet<Node*> down;
 	traverse_up(up, this);
 	traverse_down(down, this);
-	return (std::move(up) + std::move(down)).values();
+	return (up + down).values();
 }
 
 //******************************************************************************
@@ -223,7 +221,7 @@ QList<Node*> Node::get_output_nodes() const {
 
 //******************************************************************************
 Container* Node::get_surrounding_container() const {
-	if(auto* nested_zone = dynamic_cast<Rect*>(parentItem()); nested_zone)
+	if(auto const* nested_zone = dynamic_cast<Rect*>(parentItem()); nested_zone)
 		return dynamic_cast<Container*>(nested_zone->parentItem());
 	else
 		return nullptr;

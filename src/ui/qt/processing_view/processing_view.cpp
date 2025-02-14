@@ -35,9 +35,6 @@ ProcessingView::ProcessingView(QWidget* parent)
 }
 
 //******************************************************************************
-ProcessingView::~ProcessingView() = default;
-
-//******************************************************************************
 void ProcessingView::wheelEvent(QWheelEvent* event) {
 	if(event->modifiers() & Qt::ControlModifier) {
 		// Zoom.

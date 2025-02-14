@@ -37,7 +37,6 @@ public:
 	std::function<Params const& ()> locate_processing_meshline_policy_params;
 
 	explicit ProcessingMeshlinePolicy(domain::MeshlinePolicy const* meshline_policy, QGraphicsItem* parent = nullptr);
-	~ProcessingMeshlinePolicy();
 
 	int type() const override;
 

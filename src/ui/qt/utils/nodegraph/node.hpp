@@ -51,7 +51,6 @@ public:
 
 	explicit Node(QString title, QGraphicsItem* parent = nullptr);
 	explicit Node(QGraphicsItem* parent = nullptr);
-	~Node();
 
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;
 

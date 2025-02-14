@@ -45,9 +45,6 @@ ProcessingPlane::ProcessingPlane(domain::Plane plane, QGraphicsItem* parent)
 }
 
 //******************************************************************************
-ProcessingPlane::~ProcessingPlane() = default;
-
-//******************************************************************************
 int ProcessingPlane::type() const {
 	return Type;
 }

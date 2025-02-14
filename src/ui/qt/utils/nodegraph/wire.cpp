@@ -38,9 +38,6 @@ Wire::Wire(Port* begin, Port* end, QGraphicsItem* parent)
 	update_path();
 }
 
-//******************************************************************************
-Wire::~Wire() = default;
-
 // https://github.com/jchanvfx/NodeGraphQt/blob/a8fa9b394d35bf4fcad3c241ec1bd7a98b40bb1c/NodeGraphQt/qgraphics/pipe.py#L205-L366
 // https://github.com/nwaniek/qt5-node-editor/blob/master/src/graphicsbezieredge.cpp#L126-L159
 // https://github.com/paceholder/nodeeditor/blob/master/src/ConnectionGraphicsObject.cpp#L318-L378

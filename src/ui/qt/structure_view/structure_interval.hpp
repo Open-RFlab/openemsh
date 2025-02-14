@@ -34,7 +34,7 @@ public:
 
 	std::function<Params const& ()> locate_structure_interval_params;
 
-	StructureInterval(domain::ViewAxis axis, domain::Interval const* interval, QRectF scene_rect, QGraphicsItem* parent = nullptr);
+	StructureInterval(domain::ViewAxis axis, domain::Interval const* interval, QRectF const& scene_rect, QGraphicsItem* parent = nullptr);
 
 	int type() const override;
 

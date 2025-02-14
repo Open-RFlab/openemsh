@@ -53,7 +53,7 @@ public:
 	std::function<Params const& ()> locate_port_params;
 
 	Port(QString const& text, AnchorPoint anchor, QGraphicsItem* parent = nullptr);
-	~Port();
+	~Port() override;
 
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;
 	void setGeometry(QRectF const& geom) override;

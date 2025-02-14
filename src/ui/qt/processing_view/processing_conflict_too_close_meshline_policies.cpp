@@ -32,14 +32,14 @@ ProcessingConflictTooCloseMeshlinePolicies::ProcessingConflictTooCloseMeshlinePo
 		return locate_processing_conflict_tcmlp_params().title;
 	};
 
-	QGraphicsLinearLayout* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
-	QGraphicsLinearLayout* v_box1 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
-	QGraphicsLinearLayout* v_box2 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	auto* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
+	auto* v_box1 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	auto* v_box2 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
 	layout()->addItem(h_box);
 	h_box->addItem(v_box1);
 	h_box->addItem(v_box2);
 
-	for(domain::MeshlinePolicy* policy : conflict->meshline_policies) {
+	for(auto const* policy : conflict->meshline_policies) {
 		nodegraph::Port* port = add_input_port(" ");
 		port->setFlag(QGraphicsItem::ItemIsSelectable);
 		port->setAcceptedMouseButtons(Qt::NoButton);
@@ -65,12 +65,9 @@ ProcessingConflictTooCloseMeshlinePolicies::ProcessingConflictTooCloseMeshlinePo
 	setData(DataKeys::TYPE, "ConflictTooCloseMeshlinePolicies");
 	setData(DataKeys::ID, (qulonglong) conflict->id);
 	setData(DataKeys::ENTITY, DataKeys::set_entity(conflict));
-	setData(DataKeys::TO_WIRE, std::move(to_wire));
+	setData(DataKeys::TO_WIRE, to_wire);
 	retrieve_highlightable_children();
 }
-
-//******************************************************************************
-ProcessingConflictTooCloseMeshlinePolicies::~ProcessingConflictTooCloseMeshlinePolicies() = default;
 
 //******************************************************************************
 int ProcessingConflictTooCloseMeshlinePolicies::type() const {
@@ -94,8 +91,8 @@ std::size_t ProcessingConflictTooCloseMeshlinePolicies::count_tcmlp_mlp_deepness
 	std::size_t deepness = 0;
 
 	for(auto const* policy : get_mlp_origins()) {
-		for(auto* node : policy->get_input_nodes()) {
-			if(auto* conflict = qgraphicsitem_cast<ProcessingConflictTooCloseMeshlinePolicies*>(node)
+		for(auto const* node : policy->get_input_nodes()) {
+			if(auto const* conflict = qgraphicsitem_cast<ProcessingConflictTooCloseMeshlinePolicies const*>(node)
 			; conflict) {
 				deepness = qMax(deepness, conflict->count_tcmlp_mlp_deepness() + 2);
 			}

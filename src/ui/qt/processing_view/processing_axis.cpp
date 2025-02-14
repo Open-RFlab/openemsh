@@ -52,9 +52,6 @@ ProcessingAxis::ProcessingAxis(domain::Axis axis, QGraphicsItem* parent)
 }
 
 //******************************************************************************
-ProcessingAxis::~ProcessingAxis() = default;
-
-//******************************************************************************
 int ProcessingAxis::type() const {
 	return Type;
 }

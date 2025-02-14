@@ -85,7 +85,7 @@ StructureScene::StructureScene(StructureStyleSelector& style_selector, QObject* 
 		conflict_colinear_edges,
 		conflict_too_close_meshline_policies
 	})
-		for(auto* group : list)
+		for(auto const* group : list)
 			edges->stackBefore(group);
 
 	connect(
@@ -101,7 +101,7 @@ StructureScene::~StructureScene() {
 }
 
 //******************************************************************************
-StructureEdge* StructureScene::add(domain::Edge* edge) {
+StructureEdge* StructureScene::add(domain::Edge const* edge) {
 	auto* item = new StructureEdge(edge, edges);
 	index[edge] = item;
 	item->locate_structure_edge_params = [&]() -> auto& {
@@ -111,7 +111,7 @@ StructureEdge* StructureScene::add(domain::Edge* edge) {
 }
 
 //******************************************************************************
-StructurePolygon* StructureScene::add(domain::Polygon* polygon) {
+StructurePolygon* StructureScene::add(domain::Polygon const* polygon) {
 	auto* item = new StructurePolygon(polygon, polygons);
 	index[polygon] = item;
 	switch(polygon->type) {
@@ -142,7 +142,7 @@ StructurePolygon* StructureScene::add(domain::Polygon* polygon) {
 }
 
 //******************************************************************************
-StructureConflictColinearEdges* StructureScene::add(domain::ConflictColinearEdges* conflict, domain::ViewAxis view_axis, QRectF const& scene_rect) {
+StructureConflictColinearEdges* StructureScene::add(domain::ConflictColinearEdges const* conflict, domain::ViewAxis view_axis, QRectF const& scene_rect) {
 	auto const meshline_axis = reverse(view_axis); // Let stick to meshline axis definition.
 	auto* item = new StructureConflictColinearEdges(meshline_axis, conflict, scene_rect, conflict_colinear_edges[meshline_axis]);
 	index[conflict] = item;
@@ -153,7 +153,7 @@ StructureConflictColinearEdges* StructureScene::add(domain::ConflictColinearEdge
 }
 
 //******************************************************************************
-StructureConflictTooCloseMeshlinePolicies* StructureScene::add(domain::ConflictTooCloseMeshlinePolicies* conflict, domain::ViewAxis view_axis, QRectF const& scene_rect) {
+StructureConflictTooCloseMeshlinePolicies* StructureScene::add(domain::ConflictTooCloseMeshlinePolicies const* conflict, domain::ViewAxis view_axis, QRectF const& scene_rect) {
 	auto const meshline_axis = reverse(view_axis); // Let stick to meshline axis definition.
 	auto* item = new StructureConflictTooCloseMeshlinePolicies(meshline_axis, conflict, scene_rect, conflict_too_close_meshline_policies[meshline_axis]);
 	index[conflict] = item;
@@ -164,7 +164,7 @@ StructureConflictTooCloseMeshlinePolicies* StructureScene::add(domain::ConflictT
 }
 
 //******************************************************************************
-StructureInterval* StructureScene::add(domain::Interval* interval, domain::ViewAxis view_axis, QRectF const& scene_rect) {
+StructureInterval* StructureScene::add(domain::Interval const* interval, domain::ViewAxis view_axis, QRectF const& scene_rect) {
 	auto const meshline_axis = reverse(view_axis); // Let stick to meshline axis definition.
 	auto* item = new StructureInterval(meshline_axis, interval, scene_rect, intervals[meshline_axis]);
 	index[interval] = item;
@@ -175,7 +175,7 @@ StructureInterval* StructureScene::add(domain::Interval* interval, domain::ViewA
 }
 
 //******************************************************************************
-StructureMeshline* StructureScene::add(domain::Meshline* meshline, domain::ViewAxis view_axis, QRectF const& scene_rect) {
+StructureMeshline* StructureScene::add(domain::Meshline const* meshline, domain::ViewAxis view_axis, QRectF const& scene_rect) {
 	auto const meshline_axis = reverse(view_axis);
 	auto* item = new StructureMeshline(meshline_axis, meshline, scene_rect, meshlines[meshline_axis]);
 	index[meshline] = item;
@@ -186,7 +186,7 @@ StructureMeshline* StructureScene::add(domain::Meshline* meshline, domain::ViewA
 }
 
 //******************************************************************************
-StructureMeshlinePolicy* StructureScene::add(domain::MeshlinePolicy* policy, domain::ViewAxis view_axis, QRectF const& scene_rect) {
+StructureMeshlinePolicy* StructureScene::add(domain::MeshlinePolicy const* policy, domain::ViewAxis view_axis, QRectF const& scene_rect) {
 	auto const meshline_axis = reverse(view_axis); // Let stick to meshline axis definition.
 	auto* item = new StructureMeshlinePolicy(meshline_axis, policy, scene_rect, meshline_policies[meshline_axis]);
 	index[policy] = item;
@@ -214,7 +214,7 @@ void StructureScene::clear_edges() {
 	addItem(edges);
 
 	polygons->stackBefore(edges);
-	for(auto* group : meshlines)
+	for(auto const* group : meshlines)
 		edges->stackBefore(group);
 }
 
@@ -317,7 +317,7 @@ void StructureScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 			if(item->type() == StructurePolygon::Type)
 				title.append(" - " + item->data(DataKeys::NAME).toString());
 
-			QAction* action = new QAction(title, &menu);
+			auto* action = new QAction(title, &menu);
 			menu.addAction(action);
 			QObject::connect(action, &QAction::triggered, [item]() {
 				item->setSelected(true);
@@ -339,7 +339,7 @@ void StructureScene::on_selectionChanged() {
 void StructureScene::select_counterparts(QList<QGraphicsItem*> foreign_items) {
 	if(!is_select_counterparts_locked) {
 		clearSelection();
-		for(auto* foreign_item : foreign_items) {
+		for(auto const* foreign_item : foreign_items) {
 			auto const* entity = DataKeys::get_entity(foreign_item->data(DataKeys::ENTITY));
 			if(index.contains(entity)) {
 				index.at(entity)->setSelected(true);

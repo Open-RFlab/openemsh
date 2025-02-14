@@ -35,7 +35,6 @@ public:
 	std::function<Params const& ()> locate_text_params;
 
 	explicit Text(QString const& text, QGraphicsItem* parent = nullptr);
-	~Text();
 
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;
 	void setGeometry(QRectF const& geom) override;

@@ -84,7 +84,7 @@ static std::array<QLineF, 2> convert_policy_lines(domain::ViewAxis axis, domain:
 }
 
 //******************************************************************************
-StructureMeshlinePolicy::StructureMeshlinePolicy(domain::ViewAxis axis, domain::MeshlinePolicy const* meshline_policy, QRectF scene_rect, QGraphicsItem* parent)
+StructureMeshlinePolicy::StructureMeshlinePolicy(domain::ViewAxis axis, domain::MeshlinePolicy const* meshline_policy, QRectF const& scene_rect, QGraphicsItem* parent)
 : QGraphicsLineItem(convert_main(axis, meshline_policy, scene_rect), parent)
 , locate_structure_meshline_policy_params(default_locator<Params>)
 , axis(axis)

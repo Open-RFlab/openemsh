@@ -34,7 +34,6 @@ public:
 	std::function<Params const& ()> locate_processing_conflict_eip_params;
 
 	explicit ProcessingConflictEdgeInPolygon(domain::ConflictEdgeInPolygon const* conflict, QGraphicsItem* parent = nullptr);
-	~ProcessingConflictEdgeInPolygon();
 
 	int type() const override;
 

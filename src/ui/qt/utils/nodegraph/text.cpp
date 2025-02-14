@@ -23,9 +23,6 @@ Text::Text(QString const& text, QGraphicsItem* parent)
 }
 
 //******************************************************************************
-Text::~Text() = default;
-
-//******************************************************************************
 void Text::setGeometry(QRectF const& geom) {
 	prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(geom);

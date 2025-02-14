@@ -49,9 +49,6 @@ Container::Container(QString title, QSizeF margins, QGraphicsItem* parent)
 }
 
 //******************************************************************************
-Container::~Container() = default;
-
-//******************************************************************************
 void Container::expand() {
 	nested_zone->show();
 }
@@ -99,7 +96,7 @@ void Container::fit() {
 			if(columns.size() > 1) {
 				for(auto it = std::next(std::begin(columns)); it != std::end(columns); ++it) {
 					auto& current_col = it->second;
-					auto& prev_col = prev(it)->second;
+					auto const& prev_col = prev(it)->second;
 					current_col.x = prev_col.x + prev_col.w + margins.width();
 				}
 			}
@@ -110,7 +107,7 @@ void Container::fit() {
 		        ? 0
 		        : std::rbegin(columns)->second.x + std::rbegin(columns)->second.w + margins.width();
 		qreal h = 0;
-		for(auto& it : columns)
+		for(auto const& it : columns)
 			h = qMax(h, it.second.h);
 
 		// Update the Container size.

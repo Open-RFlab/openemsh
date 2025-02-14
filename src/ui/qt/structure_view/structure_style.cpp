@@ -25,7 +25,7 @@ StructureStyleSelector::StructureStyleSelector()
 
 //******************************************************************************
 StructureStyleSelector::StructureStyleSelector(StructureStyle style)
-: style(style)
+: style(std::move(style))
 , edge(make_edge(style))
 , polygon_shape(make_polygon_shape(style))
 , polygon_port(make_polygon_port(style))
@@ -58,7 +58,7 @@ StructureStyleSelector& StructureStyleSelector::operator=(StructureStyle const& 
 
 //******************************************************************************
 StructureStyleSelector& StructureStyleSelector::operator=(StructureStyle&& style) {
-	this->style = style;
+	this->style = std::move(style);
 	edge = make_edge(style);
 	polygon_shape = make_polygon_shape(style);
 	polygon_port = make_polygon_port(style);

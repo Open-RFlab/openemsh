@@ -37,7 +37,7 @@ static QLineF convert(domain::ViewAxis axis, domain::ConflictColinearEdges const
 }
 
 //******************************************************************************
-StructureConflictColinearEdges::StructureConflictColinearEdges(domain::ViewAxis axis, domain::ConflictColinearEdges const* conflict, QRectF scene_rect, QGraphicsItem* parent)
+StructureConflictColinearEdges::StructureConflictColinearEdges(domain::ViewAxis axis, domain::ConflictColinearEdges const* conflict, QRectF const& scene_rect, QGraphicsItem* parent)
 : QGraphicsLineItem(convert(axis, conflict, scene_rect), parent)
 , locate_structure_conflict_ce_params(default_locator<Params>)
 , axis(axis)

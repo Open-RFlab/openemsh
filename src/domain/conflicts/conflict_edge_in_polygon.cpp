@@ -24,49 +24,41 @@ void sort_overlaps_by_p0_by_vector_orientation(vector<Overlap>& overlaps, Point 
 	int8_t x_sign = signum(vector.x);
 	int8_t y_sign = signum(vector.y);
 	if(x_sign > 0 && y_sign == 0)
-		sort(begin(overlaps), end(overlaps),
-			[](Overlap const& a, Overlap const& b) {
-				return (get<RANGE>(a).p0().x < get<RANGE>(b).p0().x);
-			});
+		ranges::sort(overlaps, [](Overlap const& a, Overlap const& b) {
+			return (get<RANGE>(a).p0().x < get<RANGE>(b).p0().x);
+		});
 	else if(x_sign == 0 && y_sign > 0)
-		sort(begin(overlaps), end(overlaps),
-			[](Overlap const& a, Overlap const& b) {
-				return (get<RANGE>(a).p0().y < get<RANGE>(b).p0().y);
-			});
+		ranges::sort(overlaps, [](Overlap const& a, Overlap const& b) {
+			return (get<RANGE>(a).p0().y < get<RANGE>(b).p0().y);
+		});
 	else if(x_sign < 0 && y_sign == 0)
-		sort(begin(overlaps), end(overlaps),
-			[](Overlap const& a, Overlap const& b) {
-				return (get<RANGE>(a).p0().x > get<RANGE>(b).p0().x);
-			});
+		ranges::sort(overlaps, [](Overlap const& a, Overlap const& b) {
+			return (get<RANGE>(a).p0().x > get<RANGE>(b).p0().x);
+		});
 	else if(x_sign == 0 && y_sign < 0)
-		sort(begin(overlaps), end(overlaps),
-			[](Overlap const& a, Overlap const& b) {
-				return (get<RANGE>(a).p0().y > get<RANGE>(b).p0().y);
-			});
+		ranges::sort(overlaps, [](Overlap const& a, Overlap const& b) {
+			return (get<RANGE>(a).p0().y > get<RANGE>(b).p0().y);
+		});
 	else if(x_sign > 0 && y_sign > 0)
-		sort(begin(overlaps), end(overlaps),
-			[](Overlap const& a, Overlap const& b) {
-				return (get<RANGE>(a).p0().x < get<RANGE>(b).p0().x
-					&& get<RANGE>(a).p0().y < get<RANGE>(b).p0().y);
-			});
+		ranges::sort(overlaps, [](Overlap const& a, Overlap const& b) {
+			return (get<RANGE>(a).p0().x < get<RANGE>(b).p0().x
+				&& get<RANGE>(a).p0().y < get<RANGE>(b).p0().y);
+		});
 	else if(x_sign < 0 && y_sign > 0)
-		sort(begin(overlaps), end(overlaps),
-			[](Overlap const& a, Overlap const& b) {
-				return (get<RANGE>(a).p0().x > get<RANGE>(b).p0().x
-					&& get<RANGE>(a).p0().y < get<RANGE>(b).p0().y);
-			});
+		ranges::sort(overlaps, [](Overlap const& a, Overlap const& b) {
+			return (get<RANGE>(a).p0().x > get<RANGE>(b).p0().x
+				&& get<RANGE>(a).p0().y < get<RANGE>(b).p0().y);
+		});
 	else if(x_sign < 0 && y_sign < 0)
-		sort(begin(overlaps), end(overlaps),
-			[](Overlap const& a, Overlap const& b) {
-				return (get<RANGE>(a).p0().x > get<RANGE>(b).p0().x
-					&& get<RANGE>(a).p0().y > get<RANGE>(b).p0().y);
-			});
+		ranges::sort(overlaps, [](Overlap const& a, Overlap const& b) {
+			return (get<RANGE>(a).p0().x > get<RANGE>(b).p0().x
+				&& get<RANGE>(a).p0().y > get<RANGE>(b).p0().y);
+		});
 	else if(x_sign > 0 && y_sign < 0)
-		sort(begin(overlaps), end(overlaps),
-			[](Overlap const& a, Overlap const& b) {
-				return (get<RANGE>(a).p0().x < get<RANGE>(b).p0().x
-					&& get<RANGE>(a).p0().y > get<RANGE>(b).p0().y);
-			});
+		ranges::sort(overlaps, [](Overlap const& a, Overlap const& b) {
+			return (get<RANGE>(a).p0().x < get<RANGE>(b).p0().x
+				&& get<RANGE>(a).p0().y > get<RANGE>(b).p0().y);
+		});
 }
 
 //******************************************************************************

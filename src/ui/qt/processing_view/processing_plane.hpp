@@ -31,7 +31,6 @@ public:
 	std::function<Params const& ()> locate_processing_plane_params;
 
 	explicit ProcessingPlane(domain::Plane plane, QGraphicsItem* parent = nullptr);
-	~ProcessingPlane();
 
 	int type() const override;
 

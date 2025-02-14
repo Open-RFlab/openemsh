@@ -23,45 +23,37 @@ void sort_points_by_vector_orientation(vector<Point>& points, Point const& vecto
 	int8_t const x_sign = signum(vector.x);
 	int8_t const y_sign = signum(vector.y);
 	if(x_sign > 0 && y_sign == 0)
-		sort(begin(points), end(points),
-			[](Point const& a, Point const& b) {
-				return (a.x < b.x);
-			});
+		ranges::sort(points, [](Point const& a, Point const& b) {
+			return (a.x < b.x);
+		});
 	else if(x_sign == 0 && y_sign > 0)
-		sort(begin(points), end(points),
-			[](Point const& a, Point const& b) {
-				return (a.y < b.y);
-			});
+		ranges::sort(points, [](Point const& a, Point const& b) {
+			return (a.y < b.y);
+		});
 	else if(x_sign < 0 && y_sign == 0)
-		sort(begin(points), end(points),
-			[](Point const& a, Point const& b) {
-				return (a.x > b.x);
-			});
+		ranges::sort(points, [](Point const& a, Point const& b) {
+			return (a.x > b.x);
+		});
 	else if(x_sign == 0 && y_sign < 0)
-		sort(begin(points), end(points),
-			[](Point const& a, Point const& b) {
-				return (a.y > b.y);
-			});
+		ranges::sort(points, [](Point const& a, Point const& b) {
+			return (a.y > b.y);
+		});
 	else if(x_sign > 0 && y_sign > 0)
-		sort(begin(points), end(points),
-			[](Point const& a, Point const& b) {
-				return (a.x < b.x && a.y < b.y);
-			});
+		ranges::sort(points, [](Point const& a, Point const& b) {
+			return (a.x < b.x && a.y < b.y);
+		});
 	else if(x_sign < 0 && y_sign > 0)
-		sort(begin(points), end(points),
-			[](Point const& a, Point const& b) {
-				return (a.x > b.x && a.y < b.y);
-			});
+		ranges::sort(points, [](Point const& a, Point const& b) {
+			return (a.x > b.x && a.y < b.y);
+		});
 	else if(x_sign < 0 && y_sign < 0)
-		sort(begin(points), end(points),
-			[](Point const& a, Point const& b) {
-				return (a.x > b.x && a.y > b.y);
-			});
+		ranges::sort(points, [](Point const& a, Point const& b) {
+			return (a.x > b.x && a.y > b.y);
+		});
 	else if(x_sign > 0 && y_sign < 0)
-		sort(begin(points), end(points),
-			[](Point const& a, Point const& b) {
-				return (a.x < b.x && a.y > b.y);
-			});
+		ranges::sort(points, [](Point const& a, Point const& b) {
+			return (a.x < b.x && a.y > b.y);
+		});
 }
 
 //******************************************************************************

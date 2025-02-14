@@ -47,7 +47,7 @@ StructureView::StructureView(QWidget* parent)
 	new StructureScene(style_selector, this),
 	new StructureScene(style_selector, this),
 	new StructureScene(style_selector, this) }}
-, repair(new QGraphicsPathItem(create_repair()))
+, repair(std::make_unique<QGraphicsPathItem const>(create_repair()))
 , rotation(0)
 {
 	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
@@ -58,9 +58,7 @@ StructureView::StructureView(QWidget* parent)
 }
 
 //******************************************************************************
-StructureView::~StructureView() {
-	delete repair;
-}
+StructureView::~StructureView() = default;
 
 //******************************************************************************
 void StructureView::drawForeground(QPainter* painter, QRectF const& rect) {

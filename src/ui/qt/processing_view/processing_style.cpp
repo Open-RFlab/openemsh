@@ -35,7 +35,7 @@ ProcessingStyleSelector::ProcessingStyleSelector()
 
 //******************************************************************************
 ProcessingStyleSelector::ProcessingStyleSelector(ProcessingStyle style)
-: style(style)
+: style(std::move(style))
 , wire(make_wire(style))
 , port_normal(make_port_normal(style))
 , port_enabled(make_port_enabled(style))
@@ -78,7 +78,7 @@ ProcessingStyleSelector& ProcessingStyleSelector::operator=(ProcessingStyle cons
 
 //******************************************************************************
 ProcessingStyleSelector& ProcessingStyleSelector::operator=(ProcessingStyle&& style) {
-	this->style = style;
+	this->style = std::move(style);
 	wire = make_wire(style);
 	port_normal = make_port_normal(style);
 	port_enabled = make_port_enabled(style);

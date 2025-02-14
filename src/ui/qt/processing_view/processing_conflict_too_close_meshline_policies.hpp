@@ -33,7 +33,6 @@ public:
 	std::function<Params const& ()> locate_processing_conflict_tcmlp_params;
 
 	explicit ProcessingConflictTooCloseMeshlinePolicies(domain::ConflictTooCloseMeshlinePolicies const* conflict, QGraphicsItem* parent = nullptr);
-	~ProcessingConflictTooCloseMeshlinePolicies();
 
 	int type() const override;
 

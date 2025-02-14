@@ -32,7 +32,6 @@ public:
 	std::function<Params const& ()> locate_processing_meshline_params;
 
 	explicit ProcessingMeshline(domain::Meshline const* meshline, QGraphicsItem* parent = nullptr);
-	~ProcessingMeshline();
 
 	int type() const override;
 

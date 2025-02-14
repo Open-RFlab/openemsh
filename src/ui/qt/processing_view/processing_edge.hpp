@@ -35,7 +35,6 @@ public:
 	std::function<Params const& ()> locate_processing_edge_params;
 
 	explicit ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent = nullptr);
-	~ProcessingEdge();
 
 	int type() const override;
 

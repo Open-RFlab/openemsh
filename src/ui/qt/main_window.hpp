@@ -60,7 +60,7 @@ private slots:
 
 public:
 	MainWindow(app::OpenEMSH& oemsh, QWidget* parent = nullptr);
-	~MainWindow();
+	~MainWindow() override;
 
 };
 

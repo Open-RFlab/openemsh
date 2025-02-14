@@ -57,15 +57,15 @@ public:
 	};
 
 	explicit StructureScene(StructureStyleSelector& style_selector, QObject* parent = nullptr);
-	~StructureScene();
+	~StructureScene() override;
 
-	StructureEdge* add(domain::Edge* edge);
-	StructurePolygon* add(domain::Polygon* polygon);
-	StructureConflictColinearEdges* add(domain::ConflictColinearEdges* conflict, domain::ViewAxis view_axis, QRectF const& scene_rect);
-	StructureConflictTooCloseMeshlinePolicies* add(domain::ConflictTooCloseMeshlinePolicies* conflict, domain::ViewAxis view_axis, QRectF const& scene_rect);
-	StructureInterval* add(domain::Interval* interval, domain::ViewAxis view_axis, QRectF const& scene_rect);
-	StructureMeshline* add(domain::Meshline* meshline, domain::ViewAxis view_axis, QRectF const& scene_rect);
-	StructureMeshlinePolicy* add(domain::MeshlinePolicy* policy, domain::ViewAxis view_axis, QRectF const& scene_rect);
+	StructureEdge* add(domain::Edge const* edge);
+	StructurePolygon* add(domain::Polygon const* polygon);
+	StructureConflictColinearEdges* add(domain::ConflictColinearEdges const* conflict, domain::ViewAxis view_axis, QRectF const& scene_rect);
+	StructureConflictTooCloseMeshlinePolicies* add(domain::ConflictTooCloseMeshlinePolicies const* conflict, domain::ViewAxis view_axis, QRectF const& scene_rect);
+	StructureInterval* add(domain::Interval const* interval, domain::ViewAxis view_axis, QRectF const& scene_rect);
+	StructureMeshline* add(domain::Meshline const* meshline, domain::ViewAxis view_axis, QRectF const& scene_rect);
+	StructureMeshlinePolicy* add(domain::MeshlinePolicy const* policy, domain::ViewAxis view_axis, QRectF const& scene_rect);
 
 	void clear_edges();
 	void clear_polygons();

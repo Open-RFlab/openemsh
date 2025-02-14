@@ -33,10 +33,10 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 		return locate_processing_interval_params().title;
 	};
 
-	QGraphicsLinearLayout* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
-	QGraphicsLinearLayout* v_box1 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
-	QGraphicsLinearLayout* v_box2 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
-	QGraphicsLinearLayout* v_box3 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	auto* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
+	auto* v_box1 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	auto* v_box2 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	auto* v_box3 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
 	layout()->addItem(h_box);
 	h_box->addItem(v_box1);
 	h_box->addItem(v_box2);
@@ -85,35 +85,35 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 			to_wire.emplace_back(DataKeys::set_to_wire(interval->after.meshline_policy, after_port));
 	}
 
-	nodegraph::Text* text_dmax = new nodegraph::Text(dmax, this);
+	auto* text_dmax = new nodegraph::Text(dmax, this);
 	text_dmax->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_dmax->setAcceptedMouseButtons(Qt::NoButton);
 	text_dmax->locate_text_params = [&]() -> auto& {
 		return locate_processing_interval_params().main;
 	};
 
-	nodegraph::Text* text_before_lmin = new nodegraph::Text(before_lmin, this);
+	auto* text_before_lmin = new nodegraph::Text(before_lmin, this);
 	text_before_lmin->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_before_lmin->setAcceptedMouseButtons(Qt::NoButton);
 	text_before_lmin->locate_text_params = [&]() -> auto& {
 		return locate_processing_interval_params().main;
 	};
 
-	nodegraph::Text* text_before_lambda = new nodegraph::Text(before_lambda, this);
+	auto* text_before_lambda = new nodegraph::Text(before_lambda, this);
 	text_before_lambda->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_before_lambda->setAcceptedMouseButtons(Qt::NoButton);
 	text_before_lambda->locate_text_params = [&]() -> auto& {
 		return locate_processing_interval_params().main;
 	};
 
-	nodegraph::Text* text_after_lmin = new nodegraph::Text(after_lmin, this);
+	auto* text_after_lmin = new nodegraph::Text(after_lmin, this);
 	text_after_lmin->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_after_lmin->setAcceptedMouseButtons(Qt::NoButton);
 	text_after_lmin->locate_text_params = [&]() -> auto& {
 		return locate_processing_interval_params().main;
 	};
 
-	nodegraph::Text* text_after_lambda = new nodegraph::Text(after_lambda, this);
+	auto* text_after_lambda = new nodegraph::Text(after_lambda, this);
 	text_after_lambda->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_after_lambda->setAcceptedMouseButtons(Qt::NoButton);
 	text_after_lambda->locate_text_params = [&]() -> auto& {
@@ -133,12 +133,9 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 	setData(DataKeys::TYPE, "Interval");
 	setData(DataKeys::ID, (qulonglong) interval->id);
 	setData(DataKeys::ENTITY, DataKeys::set_entity(interval));
-	setData(DataKeys::TO_WIRE, std::move(to_wire));
+	setData(DataKeys::TO_WIRE, to_wire);
 	retrieve_highlightable_children();
 }
-
-//******************************************************************************
-ProcessingInterval::~ProcessingInterval() = default;
 
 //******************************************************************************
 int ProcessingInterval::type() const {

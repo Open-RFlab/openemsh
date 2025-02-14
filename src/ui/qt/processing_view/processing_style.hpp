@@ -220,7 +220,7 @@ public:
 	GETTER(conflict_tcmlp)
 
 	ProcessingStyleSelector();
-	ProcessingStyleSelector(ProcessingStyle style);
+	explicit ProcessingStyleSelector(ProcessingStyle style);
 
 	ProcessingStyleSelector& operator=(ProcessingStyle const& style);
 	ProcessingStyleSelector& operator=(ProcessingStyle&& style);

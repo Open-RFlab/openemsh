@@ -32,9 +32,6 @@ Rect::Rect(qreal x, qreal y, qreal width, qreal height, QGraphicsItem* parent)
 }
 
 //******************************************************************************
-Rect::~Rect() = default;
-
-//******************************************************************************
 void Rect::setGeometry(QRectF const& geom) {
 	prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(geom);

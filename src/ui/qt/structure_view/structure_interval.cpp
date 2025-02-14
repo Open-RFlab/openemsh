@@ -43,7 +43,7 @@ static QRectF convert(domain::ViewAxis axis, domain::Interval const* interval, Q
 }
 
 //******************************************************************************
-StructureInterval::StructureInterval(domain::ViewAxis axis, domain::Interval const* interval, QRectF scene_rect, QGraphicsItem* parent)
+StructureInterval::StructureInterval(domain::ViewAxis axis, domain::Interval const* interval, QRectF const& scene_rect, QGraphicsItem* parent)
 : QGraphicsRectItem(convert(axis, interval, scene_rect), parent)
 , locate_structure_interval_params(default_locator<Params>)
 , axis(axis)

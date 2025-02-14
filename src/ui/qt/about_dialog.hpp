@@ -28,7 +28,7 @@ private slots:
 
 public:
 	explicit AboutDialog(QWidget* parent = nullptr);
-	~AboutDialog();
+	~AboutDialog() override;
 };
 
 } // namespace ui::qt

@@ -113,9 +113,9 @@ QRectF ProcessingScene::visible_items_bounding_rect() const {
 		}
 	};
 
-	for(auto* container : planes)
+	for(auto const* container : planes)
 		collect_bounding_rect(container);
-	for(auto* container : axes)
+	for(auto const* container : axes)
 		collect_bounding_rect(container);
 
 	return bounding;
@@ -124,7 +124,7 @@ QRectF ProcessingScene::visible_items_bounding_rect() const {
 //******************************************************************************
 template<std::derived_from<nodegraph::Node> Node, Enum Space>
 Node* ProcessingScene::add_node(Space space) {
-	Node* node = new Node(space);
+	auto* node = new Node(space);
 	addItem(node);
 	nodes.push_back(node);
 	return node;
@@ -133,7 +133,7 @@ Node* ProcessingScene::add_node(Space space) {
 //******************************************************************************
 template<std::derived_from<nodegraph::Node> Node, std::derived_from<::Entity> Entity>
 Node* ProcessingScene::add_node(Entity* entity) {
-	Node* node = new Node(entity);
+	auto* node = new Node(entity);
 	addItem(node);
 	nodes.push_back(node);
 	index[entity] = node;
@@ -143,7 +143,7 @@ Node* ProcessingScene::add_node(Entity* entity) {
 //******************************************************************************
 template<std::derived_from<nodegraph::Node> Node, std::derived_from<::Entity> Entity>
 Node* ProcessingScene::add_node(Entity* entity, nodegraph::Container* to_container) {
-	Node* node = new Node(entity);
+	auto* node = new Node(entity);
 	to_container->add(node);
 	nodes.push_back(node);
 	index[entity] = node;
@@ -260,7 +260,7 @@ ProcessingMeshline* ProcessingScene::add(domain::Meshline* meshline, ProcessingA
 
 //******************************************************************************
 nodegraph::Wire* ProcessingScene::wire_together(nodegraph::Port* begin, nodegraph::Port* end) {
-	nodegraph::Wire* wire = new nodegraph::Wire(begin, end);
+	auto* wire = new nodegraph::Wire(begin, end);
 	addItem(wire);
 	wires.append(wire);
 	wire->locate_wire_params = [&]() -> auto& {
@@ -413,7 +413,7 @@ void ProcessingScene::on_selectionChanged() {
 void ProcessingScene::select_counterparts(QList<QGraphicsItem*> foreign_items) {
 	if(!is_select_counterparts_locked) {
 		clearSelection();
-		for(auto* foreign_item : foreign_items) {
+		for(auto const* foreign_item : foreign_items) {
 			auto const* entity = DataKeys::get_entity(foreign_item->data(DataKeys::ENTITY));
 			if(index.contains(entity)) {
 				auto* node = index.at(entity);

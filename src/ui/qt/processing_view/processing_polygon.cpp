@@ -40,7 +40,7 @@ ProcessingPolygon::ProcessingPolygon(domain::Polygon const* polygon, QGraphicsIt
 		return locate_processing_polygon_params().port;
 	};
 
-	QGraphicsLinearLayout* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
+	auto* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
 	layout()->addItem(h_box);
 	h_box->addStretch();
 	h_box->addItem(output_port);
@@ -53,9 +53,6 @@ ProcessingPolygon::ProcessingPolygon(domain::Polygon const* polygon, QGraphicsIt
 	setData(DataKeys::ENTITY, DataKeys::set_entity(polygon));
 	retrieve_highlightable_children();
 }
-
-//******************************************************************************
-ProcessingPolygon::~ProcessingPolygon() = default;
 
 //******************************************************************************
 int ProcessingPolygon::type() const {

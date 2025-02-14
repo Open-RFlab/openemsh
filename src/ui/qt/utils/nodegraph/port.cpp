@@ -129,7 +129,7 @@ bool Port::is_wired() const {
 
 //******************************************************************************
 bool Port::is_wired_to(Port const* port) const {
-	return std::any_of(wires.cbegin(), wires.cend(), [port](Wire* wire)-> bool {
+	return std::ranges::any_of(wires, [port](Wire const* wire)-> bool {
 		return wire->traverse(port);
 	});
 }

@@ -36,7 +36,7 @@ static QLineF convert(domain::ViewAxis axis, domain::Meshline const* meshline, Q
 }
 
 //******************************************************************************
-StructureMeshline::StructureMeshline(domain::ViewAxis axis, domain::Meshline const* meshline, QRectF scene_rect, QGraphicsItem* parent)
+StructureMeshline::StructureMeshline(domain::ViewAxis axis, domain::Meshline const* meshline, QRectF const& scene_rect, QGraphicsItem* parent)
 : QGraphicsLineItem(convert(axis, meshline, scene_rect), parent)
 , locate_structure_meshline_params(default_locator<Params>)
 , axis(axis)

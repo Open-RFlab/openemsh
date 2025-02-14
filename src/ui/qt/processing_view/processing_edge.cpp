@@ -58,14 +58,14 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 		to_mesh += (edge->to_mesh ? "true" : "false");
 	}
 
-	nodegraph::Text* text_normal = new nodegraph::Text(normal, this);
+	auto* text_normal = new nodegraph::Text(normal, this);
 	text_normal->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_normal->setAcceptedMouseButtons(Qt::NoButton);
 	text_normal->locate_text_params = [&]() -> auto& {
 		return locate_processing_edge_params().main;
 	};
 
-	nodegraph::Text* text_to_mesh = new nodegraph::Text(to_mesh, this);
+	auto* text_to_mesh = new nodegraph::Text(to_mesh, this);
 	text_to_mesh->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_to_mesh->setAcceptedMouseButtons(Qt::NoButton);
 	if(edge) {
@@ -83,10 +83,10 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 		};
 	}
 
-	QGraphicsLinearLayout* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
-	QGraphicsLinearLayout* v_box1 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
-	QGraphicsLinearLayout* v_box2 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
-	QGraphicsLinearLayout* v_box3 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	auto* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
+	auto* v_box1 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	auto* v_box2 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	auto* v_box3 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
 	layout()->addItem(h_box);
 	h_box->addItem(v_box1);
 	h_box->addItem(v_box2);
@@ -104,12 +104,9 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 	setData(DataKeys::TYPE, "Edge");
 	setData(DataKeys::ID, (qulonglong) edge->id);
 	setData(DataKeys::ENTITY, DataKeys::set_entity(edge));
-	setData(DataKeys::TO_WIRE, std::move(to_wire));
+	setData(DataKeys::TO_WIRE, to_wire);
 	retrieve_highlightable_children();
 }
-
-//******************************************************************************
-ProcessingEdge::~ProcessingEdge() = default;
 
 //******************************************************************************
 int ProcessingEdge::type() const {

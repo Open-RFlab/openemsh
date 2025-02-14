@@ -33,7 +33,6 @@ public:
 	std::function<Params const& ()> locate_processing_conflict_ce_params;
 
 	explicit ProcessingConflictColinearEdges(domain::ConflictColinearEdges const* conflict, QGraphicsItem* parent = nullptr);
-	~ProcessingConflictColinearEdges();
 
 	int type() const override;
 

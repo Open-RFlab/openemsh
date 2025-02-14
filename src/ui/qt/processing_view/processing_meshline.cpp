@@ -34,9 +34,9 @@ ProcessingMeshline::ProcessingMeshline(domain::Meshline const* meshline, QGraphi
 		return locate_processing_meshline_params().title;
 	};
 
-	QGraphicsLinearLayout* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
-	QGraphicsLinearLayout* v_box1 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
-	QGraphicsLinearLayout* v_box2 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	auto* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
+	auto* v_box1 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	auto* v_box2 = new QGraphicsLinearLayout(Qt::Vertical, h_box);
 	layout()->addItem(h_box);
 	h_box->addItem(v_box1);
 	h_box->addItem(v_box2);
@@ -66,7 +66,7 @@ ProcessingMeshline::ProcessingMeshline(domain::Meshline const* meshline, QGraphi
 			to_wire.emplace_back(DataKeys::set_to_wire(meshline->policy, policy_port));
 	}
 
-	nodegraph::Text* text_coord = new nodegraph::Text(coord, this);
+	auto* text_coord = new nodegraph::Text(coord, this);
 	text_coord->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_coord->setAcceptedMouseButtons(Qt::NoButton);
 	text_coord->locate_text_params = [&]() -> auto& {
@@ -80,12 +80,9 @@ ProcessingMeshline::ProcessingMeshline(domain::Meshline const* meshline, QGraphi
 	setData(DataKeys::TYPE, "Meshline");
 	setData(DataKeys::ID, (qulonglong) meshline->id);
 	setData(DataKeys::ENTITY, DataKeys::set_entity(meshline));
-	setData(DataKeys::TO_WIRE, std::move(to_wire));
+	setData(DataKeys::TO_WIRE, to_wire);
 	retrieve_highlightable_children();
 }
-
-//******************************************************************************
-ProcessingMeshline::~ProcessingMeshline() = default;
 
 //******************************************************************************
 int ProcessingMeshline::type() const {

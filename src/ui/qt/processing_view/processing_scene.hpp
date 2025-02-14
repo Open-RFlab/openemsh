@@ -44,7 +44,7 @@ public:
 	};
 
 	explicit ProcessingScene(QObject* parent = nullptr);
-	~ProcessingScene();
+	~ProcessingScene() override;
 
 	void set_wire_style(nodegraph::Wire::Style style);
 	void fit_containers();

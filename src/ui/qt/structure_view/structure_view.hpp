@@ -10,6 +10,8 @@
 #include <QObject>
 #include <QRectF>
 
+#include <memory>
+
 #include "domain/geometrics/space.hpp"
 #include "structure_scene.hpp"
 #include "structure_style.hpp"
@@ -27,7 +29,7 @@ class StructureView : public QGraphicsView {
 	Q_OBJECT
 public:
 	explicit StructureView(QWidget* parent = nullptr);
-	~StructureView();
+	~StructureView() override;
 
 	void populate(domain::Board const* board);
 	void reset_view();
@@ -54,7 +56,7 @@ private:
 	// + public set_scene() that wrap axis QStrings or repair
 
 //	qreal scale_max;
-	QGraphicsPathItem const* const repair;
+	std::unique_ptr<QGraphicsPathItem const> const repair;
 
 	using QGraphicsView::rotate;
 	qreal rotation;

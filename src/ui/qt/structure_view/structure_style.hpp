@@ -168,7 +168,7 @@ public:
 	GETTER(conflict_tcmlp)
 
 	StructureStyleSelector();
-	StructureStyleSelector(StructureStyle style);
+	explicit StructureStyleSelector(StructureStyle style);
 
 	StructureStyleSelector& operator=(StructureStyle const& style);
 	StructureStyleSelector& operator=(StructureStyle&& style);

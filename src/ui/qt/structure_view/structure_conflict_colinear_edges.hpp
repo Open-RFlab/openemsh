@@ -34,7 +34,7 @@ public:
 
 	std::function<Params const& ()> locate_structure_conflict_ce_params;
 
-	StructureConflictColinearEdges(domain::ViewAxis axis, domain::ConflictColinearEdges const* conflict, QRectF scene_rect, QGraphicsItem* parent = nullptr);
+	StructureConflictColinearEdges(domain::ViewAxis axis, domain::ConflictColinearEdges const* conflict, QRectF const& scene_rect, QGraphicsItem* parent = nullptr);
 
 	int type() const override;
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;

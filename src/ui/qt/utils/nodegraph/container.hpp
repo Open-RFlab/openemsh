@@ -23,7 +23,6 @@ public:
 
 	explicit Container(QSizeF margins, QGraphicsItem* parent = nullptr);
 	Container(QString title, QSizeF margins, QGraphicsItem* parent = nullptr);
-	~Container();
 
 	void expand();
 	void collapse();

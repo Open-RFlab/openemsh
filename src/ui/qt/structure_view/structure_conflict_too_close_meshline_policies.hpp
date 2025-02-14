@@ -39,7 +39,7 @@ public:
 
 	std::function<Params const& ()> locate_structure_conflict_tcmlp_params;
 
-	StructureConflictTooCloseMeshlinePolicies(domain::ViewAxis axis, domain::ConflictTooCloseMeshlinePolicies const* conflict, QRectF scene_rect, QGraphicsItem* parent = nullptr);
+	StructureConflictTooCloseMeshlinePolicies(domain::ViewAxis axis, domain::ConflictTooCloseMeshlinePolicies const* conflict, QRectF const& scene_rect, QGraphicsItem* parent = nullptr);
 
 	int type() const override;
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;

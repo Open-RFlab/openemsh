@@ -22,7 +22,6 @@ class ProcessingView : public QGraphicsView {
 	Q_OBJECT
 public:
 	explicit ProcessingView(QWidget* parent = nullptr);
-	~ProcessingView();
 
 	void populate(domain::Board const* board);
 

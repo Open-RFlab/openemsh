@@ -39,7 +39,7 @@ public:
 
 	std::function<Params const& ()> locate_structure_meshline_policy_params;
 
-	StructureMeshlinePolicy(domain::ViewAxis axis, domain::MeshlinePolicy const* meshline_policy, QRectF scene_rect, QGraphicsItem* parent = nullptr);
+	StructureMeshlinePolicy(domain::ViewAxis axis, domain::MeshlinePolicy const* meshline_policy, QRectF const& scene_rect, QGraphicsItem* parent = nullptr);
 
 	int type() const override;
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;

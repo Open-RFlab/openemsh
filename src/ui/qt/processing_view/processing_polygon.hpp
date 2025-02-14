@@ -40,7 +40,6 @@ public:
 	std::function<Params const& ()> locate_processing_polygon_params;
 
 	explicit ProcessingPolygon(domain::Polygon const* polygon, QGraphicsItem* parent = nullptr);
-	~ProcessingPolygon();
 
 	int type() const override;
 

@@ -37,7 +37,7 @@ static QLineF convert(domain::ViewAxis axis, domain::MeshlinePolicy const* meshl
 }
 
 //******************************************************************************
-StructureConflictTooCloseMeshlinePolicies::StructureConflictTooCloseMeshlinePolicies(domain::ViewAxis axis, domain::ConflictTooCloseMeshlinePolicies const* conflict, QRectF scene_rect, QGraphicsItem* parent)
+StructureConflictTooCloseMeshlinePolicies::StructureConflictTooCloseMeshlinePolicies(domain::ViewAxis axis, domain::ConflictTooCloseMeshlinePolicies const* conflict, QRectF const& scene_rect, QGraphicsItem* parent)
 : QGraphicsLineItem(convert(axis, dynamic_cast<domain::MeshlinePolicy*>(conflict->solution), scene_rect), parent)
 , locate_structure_conflict_tcmlp_params(default_locator<Params>)
 , axis(axis)
