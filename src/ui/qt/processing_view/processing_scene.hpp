@@ -46,9 +46,9 @@ public:
 	explicit ProcessingScene(QObject* parent = nullptr);
 	~ProcessingScene() override;
 
-	void set_wire_style(nodegraph::Wire::Style style);
-	void fit_containers();
-	void fit_scene();
+	void set_wire_style(nodegraph::Wire::Style style) const;
+	void fit_containers() const;
+	void fit_scene() const;
 	void fit(QMarginsF margins = QMarginsF());
 	QRectF visible_items_bounding_rect() const;
 
@@ -67,9 +67,9 @@ public:
 
 	void wire_to_destination_first_output_port(nodegraph::Node* node);
 
-	QList<nodegraph::Node*> selected_nodes();
-	QList<nodegraph::Node*> highlighted_nodes();
-	void reset_visibility(bool are_visible = true);
+	QList<nodegraph::Node*> selected_nodes() const;
+	QList<nodegraph::Node*> highlighted_nodes() const;
+	void reset_visibility(bool are_visible = true) const;
 	void set_display(DisplayMode mode);
 	void set_display_view_axes(domain::ViewAxisSpace<bool> const& axes);
 	void set_display_plane(domain::Plane plane);

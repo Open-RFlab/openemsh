@@ -52,7 +52,7 @@ ProcessingScene::~ProcessingScene() {
 }
 
 //******************************************************************************
-void ProcessingScene::set_wire_style(nodegraph::Wire::Style style) {
+void ProcessingScene::set_wire_style(nodegraph::Wire::Style style) const {
 	for(auto* wire : wires) {
 		wire->style = style;
 		wire->update_path();
@@ -60,7 +60,7 @@ void ProcessingScene::set_wire_style(nodegraph::Wire::Style style) {
 }
 
 //******************************************************************************
-void ProcessingScene::fit_containers() {
+void ProcessingScene::fit_containers() const {
 	for(auto* container : polygons)
 		container->fit();
 	for(auto* container : planes)
@@ -70,7 +70,7 @@ void ProcessingScene::fit_containers() {
 }
 
 //******************************************************************************
-void ProcessingScene::fit_scene() {
+void ProcessingScene::fit_scene() const {
 	qreal const margin_x = 1000;
 	qreal const margin_y = 100;
 	qreal x = 0;
@@ -154,7 +154,7 @@ Node* ProcessingScene::add_node(Entity* entity, nodegraph::Container* to_contain
 ProcessingPlane* ProcessingScene::add(domain::Plane plane) {
 	auto* processing_plane = add_node<ProcessingPlane>(plane);
 	planes[plane] = processing_plane;
-	processing_plane->locate_processing_plane_params = [&]() -> auto& {
+	processing_plane->locate_processing_plane_params = [this]() -> auto& {
 		return style_selector.get_plane();
 	};
 	return processing_plane;
@@ -164,7 +164,7 @@ ProcessingPlane* ProcessingScene::add(domain::Plane plane) {
 ProcessingAxis* ProcessingScene::add(domain::Axis axis) {
 	auto* processing_axis = add_node<ProcessingAxis>(axis);
 	axes[axis] = processing_axis;
-	processing_axis->locate_processing_axis_params = [&]() -> auto& {
+	processing_axis->locate_processing_axis_params = [this]() -> auto& {
 		return style_selector.get_axis();
 	};
 	return processing_axis;
@@ -174,7 +174,7 @@ ProcessingAxis* ProcessingScene::add(domain::Axis axis) {
 ProcessingPolygon* ProcessingScene::add(domain::Polygon* polygon, ProcessingPlane* to_plane) {
 	auto* processing_polygon = add_node<ProcessingPolygon>(polygon, to_plane);
 	polygons.append(processing_polygon);
-	processing_polygon->locate_processing_polygon_params = [&]() -> auto& {
+	processing_polygon->locate_processing_polygon_params = [this]() -> auto& {
 		return style_selector.get_polygon();
 	};
 	return processing_polygon;
@@ -184,7 +184,7 @@ ProcessingPolygon* ProcessingScene::add(domain::Polygon* polygon, ProcessingPlan
 ProcessingEdge* ProcessingScene::add(domain::Edge* edge, ProcessingPolygon* to_polygon) {
 	auto* processing_edge = add_node<ProcessingEdge>(edge, to_polygon);
 	edges.append(processing_edge);
-	processing_edge->locate_processing_edge_params = [&]() -> auto& {
+	processing_edge->locate_processing_edge_params = [this]() -> auto& {
 		return style_selector.get_edge();
 	};
 	processing_edge->updateGeometry();
@@ -195,7 +195,7 @@ ProcessingEdge* ProcessingScene::add(domain::Edge* edge, ProcessingPolygon* to_p
 ProcessingConflictColinearEdges* ProcessingScene::add(domain::ConflictColinearEdges* conflict, ProcessingAxis* to_axis) {
 	auto* processing_conflict = add_node<ProcessingConflictColinearEdges>(conflict, to_axis);
 	conflict_colinear_edges.append(processing_conflict);
-	processing_conflict->locate_processing_conflict_ce_params = [&]() -> auto& {
+	processing_conflict->locate_processing_conflict_ce_params = [this]() -> auto& {
 		return style_selector.get_conflict_ce();
 	};
 	processing_conflict->updateGeometry();
@@ -206,7 +206,7 @@ ProcessingConflictColinearEdges* ProcessingScene::add(domain::ConflictColinearEd
 ProcessingConflictEdgeInPolygon* ProcessingScene::add(domain::ConflictEdgeInPolygon* conflict, ProcessingPlane* to_plane) {
 	auto* processing_conflict = add_node<ProcessingConflictEdgeInPolygon>(conflict, to_plane);
 	conflict_edge_in_polygons.append(processing_conflict);
-	processing_conflict->locate_processing_conflict_eip_params = [&]() -> auto& {
+	processing_conflict->locate_processing_conflict_eip_params = [this]() -> auto& {
 		return style_selector.get_conflict_eip();
 	};
 	processing_conflict->updateGeometry();
@@ -218,7 +218,7 @@ ProcessingConflictEdgeInPolygon* ProcessingScene::add(domain::ConflictEdgeInPoly
 ProcessingConflictTooCloseMeshlinePolicies* ProcessingScene::add(domain::ConflictTooCloseMeshlinePolicies* conflict, ProcessingAxis* to_axis) {
 	auto* processing_conflict = add_node<ProcessingConflictTooCloseMeshlinePolicies>(conflict, to_axis);
 	conflict_too_close_meshline_policies.append(processing_conflict);
-	processing_conflict->locate_processing_conflict_tcmlp_params = [&]() -> auto& {
+	processing_conflict->locate_processing_conflict_tcmlp_params = [this]() -> auto& {
 		return style_selector.get_conflict_tcmlp();
 	};
 	processing_conflict->updateGeometry();
@@ -229,7 +229,7 @@ ProcessingConflictTooCloseMeshlinePolicies* ProcessingScene::add(domain::Conflic
 ProcessingMeshlinePolicy* ProcessingScene::add(domain::MeshlinePolicy* policy, ProcessingAxis* to_axis) {
 	auto* processing_policy = add_node<ProcessingMeshlinePolicy>(policy, to_axis);
 	meshline_policies.append(processing_policy);
-	processing_policy->locate_processing_meshline_policy_params = [&]() -> auto& {
+	processing_policy->locate_processing_meshline_policy_params = [this]() -> auto& {
 		return style_selector.get_meshline_policy();
 	};
 	processing_policy->updateGeometry();
@@ -240,7 +240,7 @@ ProcessingMeshlinePolicy* ProcessingScene::add(domain::MeshlinePolicy* policy, P
 ProcessingInterval* ProcessingScene::add(domain::Interval* interval, ProcessingAxis* to_axis) {
 	auto* processing_interval = add_node<ProcessingInterval>(interval, to_axis);
 	intervals.append(processing_interval);
-	processing_interval->locate_processing_interval_params = [&]() -> auto& {
+	processing_interval->locate_processing_interval_params = [this]() -> auto& {
 		return style_selector.get_interval();
 	};
 	processing_interval->updateGeometry();
@@ -251,7 +251,7 @@ ProcessingInterval* ProcessingScene::add(domain::Interval* interval, ProcessingA
 ProcessingMeshline* ProcessingScene::add(domain::Meshline* meshline, ProcessingAxis* to_axis) {
 	auto* processing_meshline = add_node<ProcessingMeshline>(meshline, to_axis);
 	meshlines.append(processing_meshline);
-	processing_meshline->locate_processing_meshline_params = [&]() -> auto& {
+	processing_meshline->locate_processing_meshline_params = [this]() -> auto& {
 		return style_selector.get_meshline();
 	};
 	processing_meshline->updateGeometry();
@@ -263,7 +263,7 @@ nodegraph::Wire* ProcessingScene::wire_together(nodegraph::Port* begin, nodegrap
 	auto* wire = new nodegraph::Wire(begin, end);
 	addItem(wire);
 	wires.append(wire);
-	wire->locate_wire_params = [&]() -> auto& {
+	wire->locate_wire_params = [this]() -> auto& {
 		return style_selector.get_wire();
 	};
 	return wire;
@@ -284,7 +284,7 @@ void ProcessingScene::wire_to_destination_first_output_port(nodegraph::Node* nod
 }
 
 //******************************************************************************
-QList<nodegraph::Node*> ProcessingScene::selected_nodes() {
+QList<nodegraph::Node*> ProcessingScene::selected_nodes() const {
 	QList<nodegraph::Node*> ret;
 	for(auto* node : nodes) {
 		if(node && node->isSelected())
@@ -294,7 +294,7 @@ QList<nodegraph::Node*> ProcessingScene::selected_nodes() {
 }
 
 //******************************************************************************
-QList<nodegraph::Node*> ProcessingScene::highlighted_nodes() {
+QList<nodegraph::Node*> ProcessingScene::highlighted_nodes() const {
 	QList<nodegraph::Node*> ret;
 	for(auto* node : nodes) {
 		if(node && node->is_highlighted())
@@ -304,7 +304,7 @@ QList<nodegraph::Node*> ProcessingScene::highlighted_nodes() {
 }
 
 //******************************************************************************
-void ProcessingScene::reset_visibility(bool are_visible) {
+void ProcessingScene::reset_visibility(bool are_visible) const {
 	for(auto* node : nodes) {
 		if(node) {
 			if(are_visible)

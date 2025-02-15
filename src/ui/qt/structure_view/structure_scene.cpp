@@ -104,7 +104,7 @@ StructureScene::~StructureScene() {
 StructureEdge* StructureScene::add(domain::Edge const* edge) {
 	auto* item = new StructureEdge(edge, edges);
 	index[edge] = item;
-	item->locate_structure_edge_params = [&]() -> auto& {
+	item->locate_structure_edge_params = [this]() -> auto& {
 		return style_selector.get_edge();
 	};
 	return item;
@@ -116,22 +116,22 @@ StructurePolygon* StructureScene::add(domain::Polygon const* polygon) {
 	index[polygon] = item;
 	switch(polygon->type) {
 	case domain::Polygon::Type::SHAPE:
-		item->locate_structure_polygon_params = [&]() -> auto& {
+		item->locate_structure_polygon_params = [this]() -> auto& {
 			return style_selector.get_polygon_shape();
 		};
 		break;
 	case domain::Polygon::Type::PORT:
-		item->locate_structure_polygon_params = [&]() -> auto& {
+		item->locate_structure_polygon_params = [this]() -> auto& {
 			return style_selector.get_polygon_port();
 		};
 		break;
 	case domain::Polygon::Type::GROUND:
-		item->locate_structure_polygon_params = [&]() -> auto& {
+		item->locate_structure_polygon_params = [this]() -> auto& {
 			return style_selector.get_polygon_ground();
 		};
 		break;
 	case domain::Polygon::Type::SUBSTRATE:
-		item->locate_structure_polygon_params = [&]() -> auto& {
+		item->locate_structure_polygon_params = [this]() -> auto& {
 			return style_selector.get_polygon_substrate();
 		};
 		break;
@@ -146,7 +146,7 @@ StructureConflictColinearEdges* StructureScene::add(domain::ConflictColinearEdge
 	auto const meshline_axis = reverse(view_axis); // Let stick to meshline axis definition.
 	auto* item = new StructureConflictColinearEdges(meshline_axis, conflict, scene_rect, conflict_colinear_edges[meshline_axis]);
 	index[conflict] = item;
-	item->locate_structure_conflict_ce_params = [&]() ->auto& {
+	item->locate_structure_conflict_ce_params = [this]() ->auto& {
 		return style_selector.get_conflict_ce();
 	};
 	return item;
@@ -157,7 +157,7 @@ StructureConflictTooCloseMeshlinePolicies* StructureScene::add(domain::ConflictT
 	auto const meshline_axis = reverse(view_axis); // Let stick to meshline axis definition.
 	auto* item = new StructureConflictTooCloseMeshlinePolicies(meshline_axis, conflict, scene_rect, conflict_too_close_meshline_policies[meshline_axis]);
 	index[conflict] = item;
-	item->locate_structure_conflict_tcmlp_params = [&]() ->auto& {
+	item->locate_structure_conflict_tcmlp_params = [this]() ->auto& {
 		return style_selector.get_conflict_tcmlp();
 	};
 	return item;
@@ -168,7 +168,7 @@ StructureInterval* StructureScene::add(domain::Interval const* interval, domain:
 	auto const meshline_axis = reverse(view_axis); // Let stick to meshline axis definition.
 	auto* item = new StructureInterval(meshline_axis, interval, scene_rect, intervals[meshline_axis]);
 	index[interval] = item;
-	item->locate_structure_interval_params = [&]() ->auto& {
+	item->locate_structure_interval_params = [this]() ->auto& {
 		return style_selector.get_interval();
 	};
 	return item;
@@ -179,7 +179,7 @@ StructureMeshline* StructureScene::add(domain::Meshline const* meshline, domain:
 	auto const meshline_axis = reverse(view_axis);
 	auto* item = new StructureMeshline(meshline_axis, meshline, scene_rect, meshlines[meshline_axis]);
 	index[meshline] = item;
-	item->locate_structure_meshline_params = [&]() ->auto& {
+	item->locate_structure_meshline_params = [this]() ->auto& {
 		return style_selector.get_meshline();
 	};
 	return item;
@@ -191,11 +191,11 @@ StructureMeshlinePolicy* StructureScene::add(domain::MeshlinePolicy const* polic
 	auto* item = new StructureMeshlinePolicy(meshline_axis, policy, scene_rect, meshline_policies[meshline_axis]);
 	index[policy] = item;
 	if(policy->is_enabled) {
-		item->locate_structure_meshline_policy_params = [&]() ->auto& {
+		item->locate_structure_meshline_policy_params = [this]() ->auto& {
 			return style_selector.get_meshline_policy_enabled();
 		};
 	} else {
-		item->locate_structure_meshline_policy_params = [&]() ->auto& {
+		item->locate_structure_meshline_policy_params = [this]() ->auto& {
 			return style_selector.get_meshline_policy_disabled();
 		};
 	}
@@ -249,7 +249,7 @@ void StructureScene::clear_meshlines() {
 }
 
 //******************************************************************************
-void StructureScene::clear() {
+void StructureScene::clear_all() {
 	index.clear();
 	clear_edges();
 	clear_polygons();
@@ -295,7 +295,7 @@ void StructureScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 	items.removeIf([](auto const it) { return it->type() <= QGraphicsItem::UserType; });
 //	items.removeIf([](auto const it) { return !ordered_type_index.contains(it->type()); });
 
-	std::ranges::sort(items, [&](auto const* a, auto const* b) {
+	std::ranges::sort(items, [](auto const* a, auto const* b) {
 		static auto constexpr index_of = [&](int const type) {
 			for(qsizetype i = 0; i < ordered_type_index.size(); ++i)
 				if(type == ordered_type_index[i])

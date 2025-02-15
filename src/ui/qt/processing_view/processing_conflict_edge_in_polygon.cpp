@@ -24,11 +24,11 @@ ProcessingConflictEdgeInPolygon::ProcessingConflictEdgeInPolygon(domain::Conflic
 {
 	QList<QVariant> to_wire;
 
-	locate_node_params = [&]() -> auto& {
+	locate_node_params = [this]() -> auto& {
 		return locate_processing_conflict_eip_params().node;
 	};
 
-	title->locate_text_params = [&]() -> auto& {
+	title->locate_text_params = [this]() -> auto& {
 		return locate_processing_conflict_eip_params().title;
 	};
 
@@ -42,7 +42,7 @@ ProcessingConflictEdgeInPolygon::ProcessingConflictEdgeInPolygon(domain::Conflic
 	nodegraph::Port* in = add_input_port(" ");
 	in->setFlag(QGraphicsItem::ItemIsSelectable);
 	in->setAcceptedMouseButtons(Qt::NoButton);
-	in->locate_port_params = [&]() -> auto& {
+	in->locate_port_params = [this]() -> auto& {
 		return locate_processing_conflict_eip_params().port;
 	};
 	to_wire.emplace_back(DataKeys::set_to_wire(conflict->edge, in));
@@ -53,7 +53,7 @@ ProcessingConflictEdgeInPolygon::ProcessingConflictEdgeInPolygon(domain::Conflic
 		nodegraph::Port* port = add_input_port(" ");
 		port->setFlag(QGraphicsItem::ItemIsSelectable);
 		port->setAcceptedMouseButtons(Qt::NoButton);
-		port->locate_port_params = [&]() -> auto& {
+		port->locate_port_params = [this]() -> auto& {
 			return locate_processing_conflict_eip_params().port;
 		};
 		v_box1->addItem(port);
@@ -65,7 +65,7 @@ ProcessingConflictEdgeInPolygon::ProcessingConflictEdgeInPolygon(domain::Conflic
 	nodegraph::Port* out = add_output_port();
 	out->setFlag(QGraphicsItem::ItemIsSelectable);
 	out->setAcceptedMouseButtons(Qt::NoButton);
-	out->locate_port_params = [&]() -> auto& {
+	out->locate_port_params = [this]() -> auto& {
 		return locate_processing_conflict_eip_params().port;
 	};
 

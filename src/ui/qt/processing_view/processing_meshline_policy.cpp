@@ -30,11 +30,11 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 {
 	QList<QVariant> to_wire;
 
-	locate_node_params = [&]() -> auto& {
+	locate_node_params = [this]() -> auto& {
 		return locate_processing_meshline_policy_params().node;
 	};
 
-	title->locate_text_params = [&]() -> auto& {
+	title->locate_text_params = [this]() -> auto& {
 		return locate_processing_meshline_policy_params().title;
 	};
 
@@ -52,7 +52,7 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 		nodegraph::Port* port = add_input_port();
 		port->setFlag(QGraphicsItem::ItemIsSelectable);
 		port->setAcceptedMouseButtons(Qt::NoButton);
-		port->locate_port_params = [&]() -> auto& {
+		port->locate_port_params = [this]() -> auto& {
 			return locate_processing_meshline_policy_params().port;
 		};
 		v_box1->addItem(port);
@@ -70,7 +70,7 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 	nodegraph::Port* output_port = add_output_port();
 	output_port->setFlag(QGraphicsItem::ItemIsSelectable);
 	output_port->setAcceptedMouseButtons(Qt::NoButton);
-	output_port->locate_port_params = [&]() -> auto& {
+	output_port->locate_port_params = [this]() -> auto& {
 		return locate_processing_meshline_policy_params().port;
 	};
 
@@ -88,7 +88,7 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 	auto* text_normal = new nodegraph::Text(normal, this);
 	text_normal->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_normal->setAcceptedMouseButtons(Qt::NoButton);
-	text_normal->locate_text_params = [&]() -> auto& {
+	text_normal->locate_text_params = [this]() -> auto& {
 		return locate_processing_meshline_policy_params().main;
 	};
 
@@ -97,15 +97,15 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 	text_is_enabled->setAcceptedMouseButtons(Qt::NoButton);
 	if(meshline_policy) {
 		if(meshline_policy->is_enabled)
-			text_is_enabled->locate_text_params = [&]() -> auto& {
+			text_is_enabled->locate_text_params = [this]() -> auto& {
 				return locate_processing_meshline_policy_params().enabled;
 			};
 		else
-			text_is_enabled->locate_text_params = [&]() -> auto& {
+			text_is_enabled->locate_text_params = [this]() -> auto& {
 				return locate_processing_meshline_policy_params().disabled;
 			};
 	} else {
-		text_is_enabled->locate_text_params = [&]() -> auto& {
+		text_is_enabled->locate_text_params = [this]() -> auto& {
 			return locate_processing_meshline_policy_params().main;
 		};
 	}
@@ -113,14 +113,14 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 	auto* text_policy = new nodegraph::Text(policy, this);
 	text_policy->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_policy->setAcceptedMouseButtons(Qt::NoButton);
-	text_policy->locate_text_params = [&]() -> auto& {
+	text_policy->locate_text_params = [this]() -> auto& {
 		return locate_processing_meshline_policy_params().main;
 	};
 
 	auto* text_d = new nodegraph::Text(d, this);
 	text_d->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_d->setAcceptedMouseButtons(Qt::NoButton);
-	text_d->locate_text_params = [&]() -> auto& {
+	text_d->locate_text_params = [this]() -> auto& {
 		return locate_processing_meshline_policy_params().main;
 	};
 

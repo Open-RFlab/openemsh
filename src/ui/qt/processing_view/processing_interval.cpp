@@ -25,11 +25,11 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 {
 	QList<QVariant> to_wire;
 
-	locate_node_params = [&]() -> auto& {
+	locate_node_params = [this]() -> auto& {
 		return locate_processing_interval_params().node;
 	};
 
-	title->locate_text_params = [&]() -> auto& {
+	title->locate_text_params = [this]() -> auto& {
 		return locate_processing_interval_params().title;
 	};
 
@@ -46,7 +46,7 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 	nodegraph::Port* before_port = add_input_port(" ");
 	before_port->setFlag(QGraphicsItem::ItemIsSelectable);
 	before_port->setAcceptedMouseButtons(Qt::NoButton);
-	before_port->locate_port_params = [&]() -> auto& {
+	before_port->locate_port_params = [this]() -> auto& {
 		return locate_processing_interval_params().port;
 	};
 	v_box1->addItem(before_port);
@@ -55,7 +55,7 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 	nodegraph::Port* after_port = add_input_port(" ");
 	after_port->setFlag(QGraphicsItem::ItemIsSelectable);
 	after_port->setAcceptedMouseButtons(Qt::NoButton);
-	after_port->locate_port_params = [&]() -> auto& {
+	after_port->locate_port_params = [this]() -> auto& {
 		return locate_processing_interval_params().port;
 	};
 	v_box1->addItem(after_port);
@@ -64,7 +64,7 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 	nodegraph::Port* output_port = add_output_port();
 	output_port->setFlag(QGraphicsItem::ItemIsSelectable);
 	output_port->setAcceptedMouseButtons(Qt::NoButton);
-	output_port->locate_port_params = [&]() -> auto& {
+	output_port->locate_port_params = [this]() -> auto& {
 		return locate_processing_interval_params().port;
 	};
 
@@ -88,35 +88,35 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 	auto* text_dmax = new nodegraph::Text(dmax, this);
 	text_dmax->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_dmax->setAcceptedMouseButtons(Qt::NoButton);
-	text_dmax->locate_text_params = [&]() -> auto& {
+	text_dmax->locate_text_params = [this]() -> auto& {
 		return locate_processing_interval_params().main;
 	};
 
 	auto* text_before_lmin = new nodegraph::Text(before_lmin, this);
 	text_before_lmin->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_before_lmin->setAcceptedMouseButtons(Qt::NoButton);
-	text_before_lmin->locate_text_params = [&]() -> auto& {
+	text_before_lmin->locate_text_params = [this]() -> auto& {
 		return locate_processing_interval_params().main;
 	};
 
 	auto* text_before_lambda = new nodegraph::Text(before_lambda, this);
 	text_before_lambda->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_before_lambda->setAcceptedMouseButtons(Qt::NoButton);
-	text_before_lambda->locate_text_params = [&]() -> auto& {
+	text_before_lambda->locate_text_params = [this]() -> auto& {
 		return locate_processing_interval_params().main;
 	};
 
 	auto* text_after_lmin = new nodegraph::Text(after_lmin, this);
 	text_after_lmin->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_after_lmin->setAcceptedMouseButtons(Qt::NoButton);
-	text_after_lmin->locate_text_params = [&]() -> auto& {
+	text_after_lmin->locate_text_params = [this]() -> auto& {
 		return locate_processing_interval_params().main;
 	};
 
 	auto* text_after_lambda = new nodegraph::Text(after_lambda, this);
 	text_after_lambda->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_after_lambda->setAcceptedMouseButtons(Qt::NoButton);
-	text_after_lambda->locate_text_params = [&]() -> auto& {
+	text_after_lambda->locate_text_params = [this]() -> auto& {
 		return locate_processing_interval_params().main;
 	};
 

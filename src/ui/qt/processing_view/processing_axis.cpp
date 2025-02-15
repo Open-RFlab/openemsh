@@ -35,15 +35,15 @@ ProcessingAxis::ProcessingAxis(domain::Axis axis, QGraphicsItem* parent)
 		}
 	};
 
-	locate_node_params = [&]() -> auto& {
+	locate_node_params = [this]() -> auto& {
 		return locate_processing_axis_params().node;
 	};
 
-	title->locate_text_params = [&]() -> auto& {
+	title->locate_text_params = [this]() -> auto& {
 		return locate_processing_axis_params().title;
 	};
 
-	nested_zone->locate_rect_params = [&]() -> auto& {
+	nested_zone->locate_rect_params = [this]() -> auto& {
 		return locate_processing_axis_params().nested_zone;
 	};
 

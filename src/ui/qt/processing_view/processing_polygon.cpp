@@ -21,22 +21,22 @@ ProcessingPolygon::ProcessingPolygon(domain::Polygon const* polygon, QGraphicsIt
 , locate_processing_polygon_params(default_locator<Params>)
 , polygon(polygon)
 {
-	locate_node_params = [&]() -> auto& {
+	locate_node_params = [this]() -> auto& {
 		return locate_processing_polygon_params().node;
 	};
 
-	title->locate_text_params = [&]() -> auto& {
+	title->locate_text_params = [this]() -> auto& {
 		return locate_processing_polygon_params().title;
 	};
 
-	nested_zone->locate_rect_params = [&]() -> auto& {
+	nested_zone->locate_rect_params = [this]() -> auto& {
 		return locate_processing_polygon_params().nested_zone;
 	};
 
 	nodegraph::Port* output_port = add_output_port("", nodegraph::Port::AnchorPoint::BOTTOM);
 	output_port->setFlag(QGraphicsItem::ItemIsSelectable);
 	output_port->setAcceptedMouseButtons(Qt::NoButton);
-	output_port->locate_port_params = [&]() -> auto& {
+	output_port->locate_port_params = [this]() -> auto& {
 		return locate_processing_polygon_params().port;
 	};
 
@@ -60,12 +60,12 @@ int ProcessingPolygon::type() const {
 }
 
 //******************************************************************************
-QList<ProcessingEdge*> ProcessingPolygon::edges() {
+QList<ProcessingEdge*> ProcessingPolygon::edges() const {
 	// TODO better
 	QList<QGraphicsItem*> const children = nested_zone->childItems();
 	QList<ProcessingEdge*> edges(children.size());
 	for(qsizetype i = 0; i < children.size(); ++i)
-		edges[i] = dynamic_cast<ProcessingEdge*>(children[i]);
+		edges[i] = qgraphicsitem_cast<ProcessingEdge*>(children[i]);
 	return edges;
 }
 

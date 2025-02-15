@@ -70,7 +70,7 @@ public:
 	void clear_edges();
 	void clear_polygons();
 	void clear_meshlines();
-	void clear();
+	void clear_all();
 
 	void set_mesh_visibility(MeshVisibility mesh_visibility);
 

@@ -85,13 +85,13 @@ void StructureView::drawForeground(QPainter* painter, QRectF const& rect) {
 	box_y.moveCenter(matrix.map(QPointF(0 * unit, 1.5 * unit)));
 
 	// TODO wrap switch in set_scene()
-	painter->drawText(box_x, Qt::AlignHCenter | Qt::AlignVCenter, [&]() {
+	painter->drawText(box_x, Qt::AlignHCenter | Qt::AlignVCenter, [this]() {
 		if(scene() == scenes[domain::Plane::YZ]) return "y";
 		if(scene() == scenes[domain::Plane::ZX]) return "z";
 		if(scene() == scenes[domain::Plane::XY]) return "x";
 		return "?";
 	} ());
-	painter->drawText(box_y, Qt::AlignHCenter | Qt::AlignVCenter, [&]() {
+	painter->drawText(box_y, Qt::AlignHCenter | Qt::AlignVCenter, [this]() {
 		if(scene() == scenes[domain::Plane::YZ]) return "z";
 		if(scene() == scenes[domain::Plane::ZX]) return "x";
 		if(scene() == scenes[domain::Plane::XY]) return "y";
@@ -154,7 +154,7 @@ qreal StructureView::get_rotation() const {
 //******************************************************************************
 void StructureView::populate(domain::Board const* board) {
 	for(domain::Plane const plane : domain::AllPlane) {
-		scenes[plane]->clear();
+		scenes[plane]->clear_all();
 
 		for(auto const& polygon : board->get_polygons(plane)) {
 			scenes[plane]->add(polygon.get());

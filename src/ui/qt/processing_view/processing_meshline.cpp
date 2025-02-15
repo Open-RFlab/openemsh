@@ -26,11 +26,11 @@ ProcessingMeshline::ProcessingMeshline(domain::Meshline const* meshline, QGraphi
 {
 	QList<QVariant> to_wire;
 
-	locate_node_params = [&]() -> auto& {
+	locate_node_params = [this]() -> auto& {
 		return locate_processing_meshline_params().node;
 	};
 
-	title->locate_text_params = [&]() -> auto& {
+	title->locate_text_params = [this]() -> auto& {
 		return locate_processing_meshline_params().title;
 	};
 
@@ -44,7 +44,7 @@ ProcessingMeshline::ProcessingMeshline(domain::Meshline const* meshline, QGraphi
 	nodegraph::Port* interval_port = add_input_port(" ");
 	interval_port->setFlag(QGraphicsItem::ItemIsSelectable);
 	interval_port->setAcceptedMouseButtons(Qt::NoButton);
-	interval_port->locate_port_params = [&]() -> auto& {
+	interval_port->locate_port_params = [this]() -> auto& {
 		return locate_processing_meshline_params().port;
 	};
 	v_box1->addItem(interval_port);
@@ -52,7 +52,7 @@ ProcessingMeshline::ProcessingMeshline(domain::Meshline const* meshline, QGraphi
 	nodegraph::Port* policy_port = add_input_port(" ");
 	policy_port->setFlag(QGraphicsItem::ItemIsSelectable);
 	policy_port->setAcceptedMouseButtons(Qt::NoButton);
-	policy_port->locate_port_params = [&]() -> auto& {
+	policy_port->locate_port_params = [this]() -> auto& {
 		return locate_processing_meshline_params().port;
 	};
 	v_box1->addItem(policy_port);
@@ -69,7 +69,7 @@ ProcessingMeshline::ProcessingMeshline(domain::Meshline const* meshline, QGraphi
 	auto* text_coord = new nodegraph::Text(coord, this);
 	text_coord->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_coord->setAcceptedMouseButtons(Qt::NoButton);
-	text_coord->locate_text_params = [&]() -> auto& {
+	text_coord->locate_text_params = [this]() -> auto& {
 		return locate_processing_meshline_params().main;
 	};
 

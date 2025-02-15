@@ -27,15 +27,15 @@ ProcessingPlane::ProcessingPlane(domain::Plane plane, QGraphicsItem* parent)
 		}
 	};
 
-	locate_node_params = [&]() -> auto& {
+	locate_node_params = [this]() -> auto& {
 		return locate_processing_plane_params().node;
 	};
 
-	title->locate_text_params = [&]() -> auto& {
+	title->locate_text_params = [this]() -> auto& {
 		return locate_processing_plane_params().title;
 	};
 
-	nested_zone->locate_rect_params = [&]() -> auto& {
+	nested_zone->locate_rect_params = [this]() -> auto& {
 		return locate_processing_plane_params().nested_zone;
 	};
 

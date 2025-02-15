@@ -26,18 +26,18 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 {
 	QList<QVariant> to_wire;
 
-	locate_node_params = [&]() -> auto& {
+	locate_node_params = [this]() -> auto& {
 		return locate_processing_edge_params().node;
 	};
 
-	title->locate_text_params = [&]() -> auto& {
+	title->locate_text_params = [this]() -> auto& {
 		return locate_processing_edge_params().title;
 	};
 
 	nodegraph::Port* input_port = add_input_port();
 	input_port->setFlag(QGraphicsItem::ItemIsSelectable);
 	input_port->setAcceptedMouseButtons(Qt::NoButton);
-	input_port->locate_port_params = [&]() -> auto& {
+	input_port->locate_port_params = [this]() -> auto& {
 		return locate_processing_edge_params().port;
 	};
 	if(edge->conflict) {
@@ -47,7 +47,7 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 	nodegraph::Port* output_port = add_output_port();
 	output_port->setFlag(QGraphicsItem::ItemIsSelectable);
 	output_port->setAcceptedMouseButtons(Qt::NoButton);
-	output_port->locate_port_params = [&]() -> auto& {
+	output_port->locate_port_params = [this]() -> auto& {
 		return locate_processing_edge_params().port;
 	};
 
@@ -61,7 +61,7 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 	auto* text_normal = new nodegraph::Text(normal, this);
 	text_normal->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_normal->setAcceptedMouseButtons(Qt::NoButton);
-	text_normal->locate_text_params = [&]() -> auto& {
+	text_normal->locate_text_params = [this]() -> auto& {
 		return locate_processing_edge_params().main;
 	};
 
@@ -70,15 +70,15 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 	text_to_mesh->setAcceptedMouseButtons(Qt::NoButton);
 	if(edge) {
 		if(edge->to_mesh)
-			text_to_mesh->locate_text_params = [&]() -> auto& {
+			text_to_mesh->locate_text_params = [this]() -> auto& {
 				return locate_processing_edge_params().enabled;
 			};
 		else
-			text_to_mesh->locate_text_params = [&]() -> auto& {
+			text_to_mesh->locate_text_params = [this]() -> auto& {
 				return locate_processing_edge_params().disabled;
 			};
 	} else {
-		text_to_mesh->locate_text_params = [&]() -> auto& {
+		text_to_mesh->locate_text_params = [this]() -> auto& {
 			return locate_processing_edge_params().main;
 		};
 	}

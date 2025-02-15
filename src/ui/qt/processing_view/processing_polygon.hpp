@@ -43,7 +43,7 @@ public:
 
 	int type() const override;
 
-	QList<ProcessingEdge*> edges();
+	QList<ProcessingEdge*> edges() const;
 
 private:
 	domain::Polygon const* const polygon;

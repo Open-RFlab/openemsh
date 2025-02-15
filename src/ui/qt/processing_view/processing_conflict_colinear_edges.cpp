@@ -23,11 +23,11 @@ ProcessingConflictColinearEdges::ProcessingConflictColinearEdges(domain::Conflic
 {
 	QList<QVariant> to_wire;
 
-	locate_node_params = [&]() -> auto& {
+	locate_node_params = [this]() -> auto& {
 		return locate_processing_conflict_ce_params().node;
 	};
 
-	title->locate_text_params = [&]() -> auto& {
+	title->locate_text_params = [this]() -> auto& {
 		return locate_processing_conflict_ce_params().title;
 	};
 
@@ -43,11 +43,11 @@ ProcessingConflictColinearEdges::ProcessingConflictColinearEdges(domain::Conflic
 		port->setFlag(QGraphicsItem::ItemIsSelectable);
 		port->setAcceptedMouseButtons(Qt::NoButton);
 		if(edge->to_mesh)
-			port->locate_port_params = [&]() -> auto& {
+			port->locate_port_params = [this]() -> auto& {
 				return locate_processing_conflict_ce_params().port_enabled;
 			};
 		else
-			port->locate_port_params = [&]() -> auto& {
+			port->locate_port_params = [this]() -> auto& {
 				return locate_processing_conflict_ce_params().port_disabled;
 			};
 		v_box1->addItem(port);
@@ -57,7 +57,7 @@ ProcessingConflictColinearEdges::ProcessingConflictColinearEdges(domain::Conflic
 	nodegraph::Port* out = add_output_port();
 	out->setFlag(QGraphicsItem::ItemIsSelectable);
 	out->setAcceptedMouseButtons(Qt::NoButton);
-	out->locate_port_params = [&]() -> auto& {
+	out->locate_port_params = [this]() -> auto& {
 		return locate_processing_conflict_ce_params().port_normal;
 	};
 
