@@ -15,6 +15,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+
+    nixGL = {
+      url = "github:nix-community/nixGL";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
   };
 
   outputs = { self
@@ -22,6 +28,7 @@
   , nix-filter
   , cmake-utils
   , flake-utils
+  , nixGL
   , ...
   }@inputs:
   let
@@ -41,10 +48,14 @@
           pkgs.openemsh
           pkgs.cmake-utils-full
         ];
+      };
+
+      openems = pkgs.mkShell {
         packages = [
+          nixGL.packages.${system}.nixGLDefault
           pkgs.openems
           pkgs.appcsxcad
-          (pkgs.octave.withPackages (p: [
+          (pkgs.octaveFull.withPackages (p: [
             pkgs.octave-openems
             pkgs.octave-csxcad
             pkgs.octave-openems-hll
@@ -233,12 +244,12 @@
 
         octave-openems-hll = prev.octavePackages.buildOctavePackage rec {
           pname = "openems-hll";
-          version = "ec5e1c1";
+          version = "5783fd4";
           src = prev.fetchFromGitHub {
             owner = "Open-RFlab";
             repo = "octave-openems-hll";
             rev = version;
-            hash = "sha256-/RITOhGOwVjUuttDdiYQ7IaDhD7j9NB24PRI1tZRFJY=";
+            hash = "sha256-CIcWWAQ/bxo7DAZj1m5ekkUweY0gdebzbGvChVJgx4Y=";
           };
           requiredOctavePackages = [
             final.octave-openems
