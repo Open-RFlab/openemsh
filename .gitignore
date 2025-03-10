@@ -2,4 +2,3 @@ CMakeUserPresets.json
 *build*/
 .vscode/
 result/
-flake.lock
