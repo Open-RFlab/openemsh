@@ -28,6 +28,8 @@ if( Catch2_FOUND )
 		"${CMAKE_CURRENT_SOURCE_DIR}/utils/test_down_up_cast.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/utils/test_signum.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/utils/test_vector_utils.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/utils/test_tree_node.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/utils/test_state_management.cpp"
 		)
 
 	target_compile_definitions( openemsh_unittest

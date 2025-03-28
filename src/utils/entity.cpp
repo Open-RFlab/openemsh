@@ -6,28 +6,19 @@
 
 #pragma once
 
-#include <cstddef>
-//#include <type_traits>
+#include "id_generator.hpp"
+
+#include "entity.hpp"
 
 //******************************************************************************
-class Entity {
-public:
-	std::size_t const id;
-
-protected:
-	Entity();
-	explicit Entity(std::size_t id);
-	virtual ~Entity() = default;
-};
+static IdGenerator id_generator;
 
 //******************************************************************************
-template<typename T, typename Visitor>
-class Visitable {
-public:
-//	static_assert(std::is_base_of<Entity, T>::value);
-	virtual void accept(Visitor& visitor) final {
-		visitor.visit(dynamic_cast<T&>(*this));
-	}
+Entity::Entity()
+: id(id_generator())
+{}
 
-	virtual ~Visitable() = default;
-};
+//******************************************************************************
+Entity::Entity(std::size_t id)
+: id(id)
+{}

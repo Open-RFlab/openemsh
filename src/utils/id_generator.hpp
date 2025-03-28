@@ -7,27 +7,24 @@
 #pragma once
 
 #include <cstddef>
-//#include <type_traits>
 
 //******************************************************************************
-class Entity {
-public:
-	std::size_t const id;
-
-protected:
-	Entity();
-	explicit Entity(std::size_t id);
-	virtual ~Entity() = default;
-};
+inline std::size_t generate_id() {
+	static std::size_t i = 0;
+	return i++;
+}
 
 //******************************************************************************
-template<typename T, typename Visitor>
-class Visitable {
+class IdGenerator {
+private:
+	std::size_t i = 0;
+
 public:
-//	static_assert(std::is_base_of<Entity, T>::value);
-	virtual void accept(Visitor& visitor) final {
-		visitor.visit(dynamic_cast<T&>(*this));
+	std::size_t generate_id() {
+		return i++;
 	}
 
-	virtual ~Visitable() = default;
+	std::size_t operator()() {
+		return generate_id();
+	}
 };
