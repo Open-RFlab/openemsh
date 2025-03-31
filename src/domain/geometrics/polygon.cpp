@@ -78,10 +78,10 @@ template Polygon::Rotation detect_rotation(std::vector<Point const*> const&) noe
 //******************************************************************************
 Bounding2D detect_bounding(vector<unique_ptr<Point const>> const& points) noexcept {
 	Bounding2D bounding({
-		(*begin(points))->x,
-		(*begin(points))->x,
-		(*begin(points))->y,
-		(*begin(points))->y });
+		points.front()->x,
+		points.front()->x,
+		points.front()->y,
+		points.front()->y });
 
 	for(auto const& point : points) {
 		if(point->x < bounding[XMIN]) bounding[XMIN] = point->x;

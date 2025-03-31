@@ -60,14 +60,13 @@ optional<array<MeshlinePolicy*, 2>> detect_closest_meshline_policies(
 		vector<MeshlinePolicy*> dimension,
 		Coord proximity_limit) {
 
-	dimension.erase(remove_if(begin(dimension), end(dimension),
+	erase_if(dimension,
 		[](MeshlinePolicy const* a) {
 			return (!a->is_enabled)
 			    || a->policy == MeshlinePolicy::Policy::ONELINE;
-		}),
-		end(dimension));
+		});
 
-	sort(begin(dimension), end(dimension),
+	ranges::sort(dimension,
 		[](MeshlinePolicy const* a, MeshlinePolicy const* b) {
 			return a->coord < b->coord;
 		});
@@ -106,13 +105,12 @@ void MeshlinePolicyManager::detect_and_solve_too_close_meshline_policies(Axis co
 void MeshlinePolicyManager::detect_intervals(Axis const axis) {
 	auto dimension = create_view(line_policies[axis]);
 
-	dimension.erase(remove_if(begin(dimension), end(dimension),
+	erase_if(dimension,
 		[](MeshlinePolicy const* a) {
 			return (!a->is_enabled);
-		}),
-		end(dimension));
+		});
 
-	sort(begin(dimension), end(dimension),
+	ranges::sort(dimension,
 		[](MeshlinePolicy const* a, MeshlinePolicy const* b) {
 			return a->coord < b->coord;
 		});
@@ -128,7 +126,7 @@ void MeshlinePolicyManager::detect_intervals(Axis const axis) {
 void MeshlinePolicyManager::mesh(Axis const axis) {
 	auto dimension_view = create_view(intervals[axis]);
 
-	sort(begin(dimension_view), end(dimension_view),
+	ranges::sort(dimension_view,
 		[](Interval const* a, Interval const* b) {
 			return a->h < b->h;
 		});
@@ -158,10 +156,10 @@ void MeshlinePolicyManager::mesh(Axis const axis) {
 
 	meshlines[axis].reserve(new_size);
 	for(auto& it : interval_meshlines) {
-		std::move(begin(it), end(it), back_inserter(meshlines[axis]));
+		ranges::move(it, back_inserter(meshlines[axis]));
 	}
 
-	sort(begin(meshlines[axis]), end(meshlines[axis]),
+	ranges::sort(meshlines[axis],
 		[](unique_ptr<Meshline> const& a, unique_ptr<Meshline> const& b) {
 			return *a < *b;
 		});

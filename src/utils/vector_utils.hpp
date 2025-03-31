@@ -38,12 +38,12 @@ std::vector<std::unique_ptr<T const>> from_init_list(std::initializer_list<T> co
 //******************************************************************************
 template<typename T>
 bool contains(std::vector<T> const& vector, T const& value) noexcept {
-	return std::find(std::begin(vector), std::end(vector), value) != std::end(vector);
+	return std::ranges::find(vector, value) != std::end(vector);
 }
 
 //******************************************************************************
 template<typename T, typename P>
 bool contains_that(std::vector<T> const& vector, P&& predicate) noexcept {
-	return std::find_if(std::begin(vector), std::end(vector), std::forward<decltype(predicate)>(predicate))
+	return std::ranges::find_if(vector, std::forward<decltype(predicate)>(predicate))
 	    != std::end(vector);
 }
