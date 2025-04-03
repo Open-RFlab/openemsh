@@ -18,43 +18,43 @@
 /// Originator
 ///*****************************************************************************
 /// @test template<typename State> Originator<State>::Originator(Timepoint* init_timepoint, T state, Caretaker& caretaker) noexcept
-/// @test template<typename State> Caretaker& Originator<State>::get_caretaker() const
-/// @test template<typename State> Timepoint* Originator<State>::get_init_timepoint() const
-/// @test template<typename State> Timepoint* Originator<State>::get_current_timepoint() const
+/// @test template<typename State> Caretaker& Originator<State>::get_caretaker() const noexcept
+/// @test template<typename State> Timepoint* Originator<State>::get_init_timepoint() const noexcept
+/// @test template<typename State> Timepoint* Originator<State>::get_current_timepoint() const noexcept
 /// @test template<typename State> void Originator<State>::go(Timepoint* t) noexcept
-/// @test template<typename State> void Originator<State>::erase(Timepoint* t)
+/// @test template<typename State> void Originator<State>::erase(Timepoint* t) noexcept
 /// @test template<typename State> void Originator<State>::erase(std::set<Timepoint*> const& ts) noexcept
 /// @test template<typename State> std::vector<std::tuple<Timepoint*, State>> Originator<State>::get_available_states() const noexcept
-/// @test template<typename State> State const& Originator<State>::get_current_state() const
-/// @test template<typename State> Timepoint* Originator<State>::next_timepoint() const
-/// @test template<typename State> void Originator<State>::set_state(Timepoint* t, State const& state)
-/// @test template<typename State> void Originator<State>::set_next_state(State const& state)
-/// @test template<typename State> void Originator<State>::set_given_or_next_state(State const& state, Timepoint* t)
+/// @test template<typename State> State const& Originator<State>::get_current_state() const noexcept
+/// @test template<typename State> Timepoint* Originator<State>::next_timepoint() const noexcept
+/// @test template<typename State> void Originator<State>::set_state(Timepoint* t, State const& state) noexcept
+/// @test template<typename State> void Originator<State>::set_next_state(State const& state) noexcept
+/// @test template<typename State> void Originator<State>::set_given_or_next_state(State const& state, Timepoint* t) noexcept
 /// @test template<typename State> std::tuple<Timepoint*, State> Originator<State>::make_next_state() const noexcept
 ///*****************************************************************************
 
 /// Caretaker
 //******************************************************************************
-/// @test static Caretaker& Caretaker::singleton()
-/// @test Caretaker::Caretaker()
-/// @test void Caretaker::garbage_collector()
-/// @test void Caretaker::stop_browsing_user_history()
-/// @test Timepoint* Caretaker::get_history_root()
-/// @test Timepoint* Caretaker::get_current_timepoint()
-/// @test vector<Timepoint*> const& Caretaker::get_pinned_timepoints() const
-/// @test Timepoint* Caretaker::make_next_timepoint()
-/// @test void Caretaker::take_care_of(shared_ptr<IOriginator> const& originator)
-/// @test void Caretaker::undo(size_t remembered_timepoints)
-/// @test void Caretaker::redo(size_t remembered_timepoints)
-/// @test bool Caretaker::can_undo() const
-/// @test bool Caretaker::can_redo() const
-/// @test void Caretaker::unpin(Timepoint* t)
-/// @test void Caretaker::pin_current_timepoint()
-/// @test void Caretaker::remember_current_timepoint()
-/// @test bool Caretaker::go_without_remembering(Timepoint* t)
-/// @test bool Caretaker::go_and_remember(Timepoint* t)
-/// @test bool Caretaker::get_auto_gc() const
-/// @test void Caretaker::set_auto_gc(bool auto_gc)
+/// @test static Caretaker& Caretaker::singleton() noexcept
+/// @test Caretaker::Caretaker() noexcept
+/// @test void Caretaker::garbage_collector() noexcept
+/// @test void Caretaker::stop_browsing_user_history() noexcept
+/// @test Timepoint* Caretaker::get_history_root() noexcept
+/// @test Timepoint* Caretaker::get_current_timepoint() noexcept
+/// @test vector<Timepoint*> const& Caretaker::get_pinned_timepoints() const noexcept
+/// @test Timepoint* Caretaker::make_next_timepoint() noexcept
+/// @test void Caretaker::take_care_of(shared_ptr<IOriginator> const& originator) noexcept
+/// @test void Caretaker::undo(size_t remembered_timepoints) noexcept
+/// @test void Caretaker::redo(size_t remembered_timepoints) noexcept
+/// @test bool Caretaker::can_undo() const noexcept
+/// @test bool Caretaker::can_redo() const noexcept
+/// @test void Caretaker::unpin(Timepoint* t) noexcept
+/// @test void Caretaker::pin_current_timepoint() noexcept
+/// @test void Caretaker::remember_current_timepoint() noexcept
+/// @test bool Caretaker::go_without_remembering(Timepoint* t) noexcept
+/// @test bool Caretaker::go_and_remember(Timepoint* t) noexcept
+/// @test bool Caretaker::get_auto_gc() const noexcept
+/// @test void Caretaker::set_auto_gc(bool auto_gc) noexcept
 ///*****************************************************************************
 
 //******************************************************************************
@@ -176,7 +176,7 @@ SCENARIO("template<typename State> Originator<State>::Originator(Timepoint* init
 }
 
 //******************************************************************************
-SCENARIO("template<typename State> Caretaker& Originator<State>::get_caretaker() const", "[utils][state_management]") {
+SCENARIO("template<typename State> Caretaker& Originator<State>::get_caretaker() const noexcept", "[utils][state_management]") {
 	GIVEN("An Originator") {
 		Caretaker c;
 		Timepoint t;
@@ -189,7 +189,7 @@ SCENARIO("template<typename State> Caretaker& Originator<State>::get_caretaker()
 }
 
 //******************************************************************************
-SCENARIO("template<typename State> Timepoint* Originator<State>::get_init_timepoint() const", "[utils][state_management]") {
+SCENARIO("template<typename State> Timepoint* Originator<State>::get_init_timepoint() const noexcept", "[utils][state_management]") {
 	GIVEN("An Originator") {
 		Timepoint t;
 		Originator<StateA> a(&t, { .str = "ac", .num = 56 });
@@ -209,7 +209,7 @@ SCENARIO("template<typename State> Timepoint* Originator<State>::get_init_timepo
 }
 
 //******************************************************************************
-SCENARIO("template<typename State> Timepoint* Originator<State>::get_current_timepoint() const", "[utils][state_management]") {
+SCENARIO("template<typename State> Timepoint* Originator<State>::get_current_timepoint() const noexcept", "[utils][state_management]") {
 	GIVEN("An Originator") {
 		Timepoint t;
 		Originator<StateA> a(&t, { .str = "ac", .num = 56 });
@@ -302,7 +302,7 @@ SCENARIO("template<typename State> void Originator<State>::go(Timepoint* t) noex
 }
 
 //******************************************************************************
-SCENARIO("template<typename State> void Originator<State>::erase(Timepoint* t)", "[utils][state_management]") {
+SCENARIO("template<typename State> void Originator<State>::erase(Timepoint* t) noexcept", "[utils][state_management]") {
 	GIVEN("An Originator having multiple states") {
 		Timepoint t0;
 		Timepoint& t1 = t0.add_child();
@@ -592,7 +592,7 @@ SCENARIO("template<typename State> std::vector<std::tuple<Timepoint*, State cons
 }
 
 //******************************************************************************
-SCENARIO("template<typename State> State const& Originator<State>::get_current_state() const", "[utils][state_management]") {
+SCENARIO("template<typename State> State const& Originator<State>::get_current_state() const noexcept", "[utils][state_management]") {
 	GIVEN("An Originator") {
 		Timepoint t;
 		Originator<StateA> a(&t, { .str = "ac", .num = 56 });
@@ -614,7 +614,7 @@ SCENARIO("template<typename State> State const& Originator<State>::get_current_s
 }
 
 //******************************************************************************
-SCENARIO("template<typename State> Timepoint* Originator<State>::next_timepoint() const", "[utils][state_management]") {
+SCENARIO("template<typename State> Timepoint* Originator<State>::next_timepoint() const noexcept", "[utils][state_management]") {
 	GIVEN("An Originator which init timepoint is part of the history tree of its Caretaker") {
 		Caretaker c;
 		Timepoint* t = c.get_history_root();
@@ -645,7 +645,7 @@ SCENARIO("template<typename State> Timepoint* Originator<State>::next_timepoint(
 }
 
 //******************************************************************************
-SCENARIO("template<typename State> void Originator<State>::set_state(Timepoint* t, State const& state)", "[utils][state_management]") {
+SCENARIO("template<typename State> void Originator<State>::set_state(Timepoint* t, State const& state) noexcept", "[utils][state_management]") {
 	GIVEN("An Originator") {
 		Timepoint t0;
 		Originator<StateA> a(&t0, { .str = "ac", .num = 56 });
@@ -702,7 +702,7 @@ SCENARIO("template<typename State> void Originator<State>::set_state(Timepoint* 
 }
 
 //******************************************************************************
-SCENARIO("template<typename State> void Originator<State>::set_next_state(State const& state)", "[utils][state_management]") {
+SCENARIO("template<typename State> void Originator<State>::set_next_state(State const& state) noexcept", "[utils][state_management]") {
 	GIVEN("An Originator which init state is part of the history tree of its Caretaker") {
 		Caretaker c;
 		Timepoint* t0 = c.get_history_root();
@@ -730,7 +730,7 @@ SCENARIO("template<typename State> void Originator<State>::set_next_state(State 
 }
 
 //******************************************************************************
-SCENARIO("template<typename State> void Originator<State>::set_given_or_next_state(State const& state, Timepoint* t)", "[utils][state_management]") {
+SCENARIO("template<typename State> void Originator<State>::set_given_or_next_state(State const& state, Timepoint* t) noexcept", "[utils][state_management]") {
 	GIVEN("An Originator which init state is part of the history tree of its Caretaker") {
 		Caretaker c;
 		Timepoint* t0 = c.get_history_root();
@@ -799,7 +799,7 @@ SCENARIO("template<typename State> std::tuple<Timepoint*, State> Originator<Stat
 ////////////////////////////////////////////////////////////////////////////////
 
 //******************************************************************************
-SCENARIO("static Caretaker& Caretaker::singleton()", "[utils][state_management]") {
+SCENARIO("static Caretaker& Caretaker::singleton() noexcept", "[utils][state_management]") {
 	WHEN("Running a first time") {
 		Caretaker& c = Caretaker::singleton();
 
@@ -817,7 +817,7 @@ SCENARIO("static Caretaker& Caretaker::singleton()", "[utils][state_management]"
 }
 
 //******************************************************************************
-SCENARIO("Caretaker::Caretaker()", "[utils][state_management]") {
+SCENARIO("Caretaker::Caretaker() noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
 
@@ -833,7 +833,7 @@ SCENARIO("Caretaker::Caretaker()", "[utils][state_management]") {
 }
 
 //******************************************************************************
-SCENARIO("void Caretaker::garbage_collector()", "[utils][state_management]") {
+SCENARIO("void Caretaker::garbage_collector() noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker with an history tree and managing some Originators") {
 		// + a <---------- root, init
 		//   + b
@@ -984,7 +984,7 @@ SCENARIO("void Caretaker::garbage_collector()", "[utils][state_management]") {
 }
 
 //******************************************************************************
-SCENARIO("void Caretaker::stop_browsing_user_history()", "[utils][state_management]") {
+SCENARIO("void Caretaker::stop_browsing_user_history() noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker with some remembered timepoints") {
 		Caretaker c;
 		[[maybe_unused]] Timepoint* t0 = c.get_current_timepoint();
@@ -1069,7 +1069,7 @@ SCENARIO("void Caretaker::stop_browsing_user_history()", "[utils][state_manageme
 }
 
 //******************************************************************************
-SCENARIO("Timepoint* Caretaker::get_history_root()", "[utils][state_management]") {
+SCENARIO("Timepoint* Caretaker::get_history_root() noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
 
@@ -1090,7 +1090,7 @@ SCENARIO("Timepoint* Caretaker::get_history_root()", "[utils][state_management]"
 }
 
 //******************************************************************************
-SCENARIO("Timepoint* Caretaker::get_current_timepoint()", "[utils][state_management]") {
+SCENARIO("Timepoint* Caretaker::get_current_timepoint() noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
 
@@ -1111,7 +1111,7 @@ SCENARIO("Timepoint* Caretaker::get_current_timepoint()", "[utils][state_managem
 }
 
 //******************************************************************************
-SCENARIO("vector<Timepoint*> const& Caretaker::get_pinned_timepoints() const", "[utils][state_management]") {
+SCENARIO("vector<Timepoint*> const& Caretaker::get_pinned_timepoints() const noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker with some pinned timepoints") {
 		Caretaker c;
 		[[maybe_unused]] Timepoint* t0 = c.get_current_timepoint();
@@ -1134,7 +1134,7 @@ SCENARIO("vector<Timepoint*> const& Caretaker::get_pinned_timepoints() const", "
 }
 
 //******************************************************************************
-SCENARIO("Timepoint* Caretaker::make_next_timepoint()", "[utils][state_management]") {
+SCENARIO("Timepoint* Caretaker::make_next_timepoint() noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker with some remembered timepoints") {
 		Caretaker c;
 		[[maybe_unused]] Timepoint* t0 = c.get_current_timepoint();
@@ -1200,7 +1200,7 @@ SCENARIO("Timepoint* Caretaker::make_next_timepoint()", "[utils][state_managemen
 }
 
 //******************************************************************************
-SCENARIO("void Caretaker::take_care_of(shared_ptr<IOriginator> const& originator)", "[utils][state_management]") {
+SCENARIO("void Caretaker::take_care_of(shared_ptr<IOriginator> const& originator) noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
 
@@ -1244,7 +1244,7 @@ SCENARIO("void Caretaker::take_care_of(shared_ptr<IOriginator> const& originator
 }
 
 //******************************************************************************
-SCENARIO("void Caretaker::undo(size_t remembered_timepoints)", "[utils][state_management]") {
+SCENARIO("void Caretaker::undo(size_t remembered_timepoints) noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
 
@@ -1348,7 +1348,7 @@ SCENARIO("void Caretaker::undo(size_t remembered_timepoints)", "[utils][state_ma
 }
 
 //******************************************************************************
-SCENARIO("void Caretaker::redo(size_t remembered_timepoints)", "[utils][state_management]") {
+SCENARIO("void Caretaker::redo(size_t remembered_timepoints) noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
 
@@ -1412,7 +1412,7 @@ SCENARIO("void Caretaker::redo(size_t remembered_timepoints)", "[utils][state_ma
 }
 
 //******************************************************************************
-SCENARIO("bool Caretaker::can_undo() const", "[utils][state_management]") {
+SCENARIO("bool Caretaker::can_undo() const noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker with history root as current timepoint and only remembered timepoint") {
 		Caretaker c;
 
@@ -1491,7 +1491,7 @@ SCENARIO("bool Caretaker::can_undo() const", "[utils][state_management]") {
 }
 
 //******************************************************************************
-SCENARIO("bool Caretaker::can_redo() const", "[utils][state_management]") {
+SCENARIO("bool Caretaker::can_redo() const noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker with some remembered timepoints") {
 		Caretaker c;
 		[[maybe_unused]] Timepoint* t0 = c.get_current_timepoint();
@@ -1560,7 +1560,7 @@ SCENARIO("bool Caretaker::can_redo() const", "[utils][state_management]") {
 }
 
 //******************************************************************************
-SCENARIO("void Caretaker::unpin(Timepoint* t)", "[utils][state_management]") {
+SCENARIO("void Caretaker::unpin(Timepoint* t) noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker with some pinned timepoints") {
 		Caretaker c;
 		[[maybe_unused]] Timepoint* t0 = c.get_current_timepoint();
@@ -1633,7 +1633,7 @@ SCENARIO("void Caretaker::unpin(Timepoint* t)", "[utils][state_management]") {
 }
 
 //******************************************************************************
-SCENARIO("void Caretaker::pin_current_timepoint()", "[utils][state_management]") {
+SCENARIO("void Caretaker::pin_current_timepoint() noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
 		Timepoint* t0 = c.get_current_timepoint();
@@ -1698,7 +1698,7 @@ SCENARIO("void Caretaker::pin_current_timepoint()", "[utils][state_management]")
 }
 
 //******************************************************************************
-SCENARIO("void Caretaker::remember_current_timepoint()", "[utils][state_management]") {
+SCENARIO("void Caretaker::remember_current_timepoint() noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
 		Timepoint* t0 = c.get_current_timepoint();
@@ -1743,7 +1743,7 @@ SCENARIO("void Caretaker::remember_current_timepoint()", "[utils][state_manageme
 }
 
 //******************************************************************************
-SCENARIO("bool Caretaker::go_without_remembering(Timepoint* t)", "[utils][state_management]") {
+SCENARIO("bool Caretaker::go_without_remembering(Timepoint* t) noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker with an history tree and managing some Originators") {
 		// + a <---------- root, init
 		//   + b
@@ -1822,7 +1822,7 @@ SCENARIO("bool Caretaker::go_without_remembering(Timepoint* t)", "[utils][state_
 }
 
 //******************************************************************************
-SCENARIO("bool Caretaker::go_and_remember(Timepoint* t)", "[utils][state_management]") {
+SCENARIO("bool Caretaker::go_and_remember(Timepoint* t) noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker with an history tree and managing some Originators") {
 		// + a <---------- root, init
 		//   + b
@@ -1912,7 +1912,7 @@ SCENARIO("bool Caretaker::go_and_remember(Timepoint* t)", "[utils][state_managem
 }
 
 //******************************************************************************
-SCENARIO("bool Caretaker::get_auto_gc() const", "[utils][state_management]") {
+SCENARIO("bool Caretaker::get_auto_gc() const noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
 
@@ -1935,7 +1935,7 @@ SCENARIO("bool Caretaker::get_auto_gc() const", "[utils][state_management]") {
 }
 
 //******************************************************************************
-SCENARIO("void Caretaker::set_auto_gc(bool auto_gc)", "[utils][state_management]") {
+SCENARIO("void Caretaker::set_auto_gc(bool auto_gc) noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
 

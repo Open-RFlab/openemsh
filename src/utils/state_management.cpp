@@ -26,7 +26,7 @@ Caretaker::Caretaker() noexcept
 {}
 
 //******************************************************************************
-void Caretaker::garbage_collector() {
+void Caretaker::garbage_collector() noexcept {
 	// Step 1: fill a set with all pinned/visited/current + ancestors : to keep.
 	set<Timepoint*> to_keep;
 	for(auto const& list : { pinned_timepoints, user_history, { current_timepoint } })
@@ -57,7 +57,7 @@ void Caretaker::garbage_collector() {
 }
 
 //******************************************************************************
-void Caretaker::stop_browsing_user_history() {
+void Caretaker::stop_browsing_user_history() noexcept {
 	if(user_history_browser.has_value()) {
 		// Erase from browser iterator to end.
 		user_history.erase(user_history_browser->base(), user_history.end());
@@ -69,29 +69,29 @@ void Caretaker::stop_browsing_user_history() {
 }
 
 //******************************************************************************
-Timepoint* Caretaker::get_history_root() {
+Timepoint* Caretaker::get_history_root() noexcept {
 	return history_root.get();
 }
 
 //******************************************************************************
-Timepoint* Caretaker::get_current_timepoint() {
+Timepoint* Caretaker::get_current_timepoint() noexcept {
 	return current_timepoint;
 }
 
 //******************************************************************************
-vector<Timepoint*> const& Caretaker::get_pinned_timepoints() const {
+vector<Timepoint*> const& Caretaker::get_pinned_timepoints() const noexcept {
 	return pinned_timepoints;
 }
 
 //******************************************************************************
-Timepoint* Caretaker::make_next_timepoint() {
+Timepoint* Caretaker::make_next_timepoint() noexcept {
 	stop_browsing_user_history();
 	current_timepoint = &current_timepoint->add_child();
 	return current_timepoint;
 }
 
 //******************************************************************************
-void Caretaker::take_care_of(shared_ptr<IOriginator> const& originator) {
+void Caretaker::take_care_of(shared_ptr<IOriginator> const& originator) noexcept {
 	// TODO Are all those checks really useful?
 	if(originator
 	&& &originator->get_caretaker() == this
@@ -100,7 +100,7 @@ void Caretaker::take_care_of(shared_ptr<IOriginator> const& originator) {
 }
 
 //******************************************************************************
-void Caretaker::undo(size_t remembered_timepoints) {
+void Caretaker::undo(size_t remembered_timepoints) noexcept {
 	if(!remembered_timepoints || !can_undo())
 		return;
 
@@ -120,7 +120,7 @@ void Caretaker::undo(size_t remembered_timepoints) {
 }
 
 //******************************************************************************
-void Caretaker::redo(size_t remembered_timepoints) {
+void Caretaker::redo(size_t remembered_timepoints) noexcept {
 	if(!remembered_timepoints || !can_redo())
 		return;
 
@@ -134,7 +134,7 @@ void Caretaker::redo(size_t remembered_timepoints) {
 }
 
 //******************************************************************************
-bool Caretaker::can_undo() const {
+bool Caretaker::can_undo() const noexcept {
 	if(user_history_browser.has_value()) {
 		return *user_history_browser != prev(user_history.rend());
 	} else {
@@ -143,19 +143,19 @@ bool Caretaker::can_undo() const {
 }
 
 //******************************************************************************
-bool Caretaker::can_redo() const {
+bool Caretaker::can_redo() const noexcept {
 	return user_history_browser.has_value();
 }
 
 //******************************************************************************
-void Caretaker::unpin(Timepoint* t) {
+void Caretaker::unpin(Timepoint* t) noexcept {
 	erase(pinned_timepoints, t);
 	if(auto_gc)
 		garbage_collector();
 }
 
 //******************************************************************************
-void Caretaker::pin_current_timepoint() {
+void Caretaker::pin_current_timepoint() noexcept {
 	if(ranges::none_of(pinned_timepoints,
 		[this](auto const* item) {
 			return item == current_timepoint;
@@ -166,13 +166,13 @@ void Caretaker::pin_current_timepoint() {
 }
 
 //******************************************************************************
-void Caretaker::remember_current_timepoint() {
+void Caretaker::remember_current_timepoint() noexcept {
 	if(user_history.back() != current_timepoint)
 		user_history.emplace_back(current_timepoint);
 }
 
 //******************************************************************************
-bool Caretaker::go_without_remembering(Timepoint* t) {
+bool Caretaker::go_without_remembering(Timepoint* t) noexcept {
 	if(t && t->root() == history_root.get()) {
 		current_timepoint = t;
 		for(auto& it : originators)
@@ -185,7 +185,7 @@ bool Caretaker::go_without_remembering(Timepoint* t) {
 }
 
 //******************************************************************************
-bool Caretaker::go_and_remember(Timepoint* t) {
+bool Caretaker::go_and_remember(Timepoint* t) noexcept {
 	bool does_succeed = go_without_remembering(t);
 	if(does_succeed)
 		remember_current_timepoint();
@@ -193,11 +193,11 @@ bool Caretaker::go_and_remember(Timepoint* t) {
 }
 
 //******************************************************************************
-bool Caretaker::get_auto_gc() const {
+bool Caretaker::get_auto_gc() const noexcept {
 	return auto_gc;
 }
 
 //******************************************************************************
-void Caretaker::set_auto_gc(bool auto_gc) {
+void Caretaker::set_auto_gc(bool auto_gc) noexcept {
 	this->auto_gc = auto_gc;
 }

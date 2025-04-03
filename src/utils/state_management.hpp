@@ -26,8 +26,6 @@ class IOriginator;
 #define protected public
 #endif // UNITTEST
 
-// TODO noexcept everything
-
 //******************************************************************************
 class Caretaker {
 private:
@@ -39,37 +37,37 @@ private:
 	std::vector<Timepoint*> user_history;
 	std::optional<decltype(user_history)::reverse_iterator> user_history_browser;
 
-	bool go_without_remembering(Timepoint* t);
-	void stop_browsing_user_history();
+	bool go_without_remembering(Timepoint* t) noexcept;
+	void stop_browsing_user_history() noexcept;
 
 public:
-	void garbage_collector();
+	void garbage_collector() noexcept;
 	static Caretaker& singleton() noexcept;
 
 	Caretaker() noexcept;
 
-	Timepoint* get_history_root();
-	Timepoint* get_current_timepoint();
-	Timepoint* make_next_timepoint();
-	std::vector<Timepoint*> const& get_pinned_timepoints() const;
+	Timepoint* get_history_root() noexcept;
+	Timepoint* get_current_timepoint() noexcept;
+	Timepoint* make_next_timepoint() noexcept;
+	std::vector<Timepoint*> const& get_pinned_timepoints() const noexcept;
 
-	void take_care_of(std::shared_ptr<IOriginator> const& originator);
+	void take_care_of(std::shared_ptr<IOriginator> const& originator) noexcept;
 
-	void undo(std::size_t remembered_timepoints = 1);
-	void redo(std::size_t remembered_timepoints = 1);
+	void undo(std::size_t remembered_timepoints = 1) noexcept;
+	void redo(std::size_t remembered_timepoints = 1) noexcept;
 
-//	bool go_and_remember(Timepoint* t, bool overwrite_redoable_history = false); // TODO
-	bool go_and_remember(Timepoint* t);
-	void remember_current_timepoint();
+//	bool go_and_remember(Timepoint* t, bool overwrite_redoable_history = false) noexcept; // TODO
+	bool go_and_remember(Timepoint* t) noexcept;
+	void remember_current_timepoint() noexcept;
 
-	void pin_current_timepoint();
-	void unpin(Timepoint* t);
+	void pin_current_timepoint() noexcept;
+	void unpin(Timepoint* t) noexcept;
 
-	bool can_undo() const;
-	bool can_redo() const;
+	bool can_undo() const noexcept;
+	bool can_redo() const noexcept;
 
-	bool get_auto_gc() const;
-	void set_auto_gc(bool auto_gc);
+	bool get_auto_gc() const noexcept;
+	void set_auto_gc(bool auto_gc) noexcept;
 };
 
 //******************************************************************************
@@ -77,14 +75,14 @@ class IOriginator {
 private:
 protected:
 	friend class Caretaker;
-	virtual Caretaker& get_caretaker() const = 0;
+	virtual Caretaker& get_caretaker() const noexcept = 0;
 
 public:
 	virtual ~IOriginator() = default;
-	virtual void go(Timepoint* t) = 0;
-	virtual void erase(Timepoint* t) = 0;
-	virtual void erase(std::set<Timepoint*> const& ts) = 0;
-	virtual Timepoint* get_init_timepoint() const = 0;
+	virtual void go(Timepoint* t) noexcept = 0;
+	virtual void erase(Timepoint* t) noexcept = 0;
+	virtual void erase(std::set<Timepoint*> const& ts) noexcept = 0;
+	virtual Timepoint* get_init_timepoint() const noexcept = 0;
 };
 
 //******************************************************************************
@@ -100,27 +98,27 @@ private:
 	std::vector<Timepoint*> ordered_timepoints; // Keep Timepoint insertion order.
 
 protected:
-	Caretaker& get_caretaker() const final;
+	Caretaker& get_caretaker() const noexcept final;
 
 public:
 	Originator(Timepoint* init_timepoint, State state, Caretaker& caretaker = Caretaker::singleton()) noexcept;
 
-	Timepoint* get_init_timepoint() const final;
-	Timepoint* get_current_timepoint() const;
+	Timepoint* get_init_timepoint() const noexcept final;
+	Timepoint* get_current_timepoint() const noexcept;
 
-	State const& get_current_state() const;
+	State const& get_current_state() const noexcept;
 
 	void go(Timepoint* t) noexcept final;
 
-	void erase(Timepoint* t) final;
+	void erase(Timepoint* t) noexcept final;
 	void erase(std::set<Timepoint*> const& ts) noexcept final;
 
 	std::vector<std::pair<Timepoint*, State const&>> get_available_states() const noexcept;
 
-	Timepoint* next_timepoint() const;
-	void set_state(Timepoint* t, State const& state);
-	void set_next_state(State const& state);
-	void set_given_or_next_state(State const& state, Timepoint* t = nullptr);
+	Timepoint* next_timepoint() const noexcept;
+	void set_state(Timepoint* t, State const& state) noexcept;
+	void set_next_state(State const& state) noexcept;
+	void set_given_or_next_state(State const& state, Timepoint* t = nullptr) noexcept;
 	std::tuple<Timepoint*, State> make_next_state() const noexcept;
 };
 
@@ -141,25 +139,25 @@ Originator<State>::Originator(Timepoint* init_timepoint, State state, Caretaker&
 
 //******************************************************************************
 template<typename State>
-Caretaker& Originator<State>::get_caretaker() const {
+Caretaker& Originator<State>::get_caretaker() const noexcept {
 	return caretaker;
 }
 
 //******************************************************************************
 template<typename State>
-Timepoint* Originator<State>::get_init_timepoint() const {
+Timepoint* Originator<State>::get_init_timepoint() const noexcept {
 	return init_timepoint;
 }
 
 //******************************************************************************
 template<typename State>
-Timepoint* Originator<State>::get_current_timepoint() const {
+Timepoint* Originator<State>::get_current_timepoint() const noexcept {
 	return current_timepoint;
 }
 
 //******************************************************************************
 template<typename State>
-State const& Originator<State>::get_current_state() const {
+State const& Originator<State>::get_current_state() const noexcept {
 	return states.at(current_timepoint);
 }
 
@@ -180,7 +178,7 @@ void Originator<State>::go(Timepoint* t) noexcept {
 
 //******************************************************************************
 template<typename State>
-void Originator<State>::erase(Timepoint* t) {
+void Originator<State>::erase(Timepoint* t) noexcept {
 	if(t == init_timepoint || t == current_timepoint) {
 		// Nothing to do:
 		// - The object must not exist with an invalid state
@@ -222,14 +220,14 @@ std::vector<std::pair<Timepoint*, State const&>> Originator<State>::get_availabl
 // Asks the Caretaker to create the next state and return it.
 //******************************************************************************
 template<typename State>
-Timepoint* Originator<State>::next_timepoint() const {
+Timepoint* Originator<State>::next_timepoint() const noexcept {
 	return caretaker.make_next_timepoint();
 }
 
 // TODO Should it be allowed to update existing state?
 //******************************************************************************
 template<typename State>
-void Originator<State>::set_state(Timepoint* t, State const& state) {
+void Originator<State>::set_state(Timepoint* t, State const& state) noexcept {
 	states[t] = state;
 	if(std::ranges::none_of(ordered_timepoints, [&](auto const& it) { return it == t; })) {
 		ordered_timepoints.push_back(t);
@@ -239,13 +237,13 @@ void Originator<State>::set_state(Timepoint* t, State const& state) {
 
 //******************************************************************************
 template<typename State>
-void Originator<State>::set_next_state(State const& state) {
+void Originator<State>::set_next_state(State const& state) noexcept {
 	set_state(next_timepoint(), state);
 }
 
 //******************************************************************************
 template<typename State>
-void Originator<State>::set_given_or_next_state(State const& state, Timepoint* t) {
+void Originator<State>::set_given_or_next_state(State const& state, Timepoint* t) noexcept {
 	set_state(t ? t : next_timepoint(), state);
 }
 
