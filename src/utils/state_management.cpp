@@ -5,9 +5,7 @@
 ///*****************************************************************************
 
 #include <cmath>
-#include <algorithm>
 #include <iterator>
-#include <iostream>
 
 #include "state_management.hpp"
 
@@ -23,7 +21,7 @@ Caretaker& Caretaker::singleton() noexcept {
 Caretaker::Caretaker() noexcept
 : auto_gc(true)
 , history_root(make_unique<Timepoint>())
-, current_state(history_root.get())
+, current_timepoint(history_root.get())
 , user_history{{ history_root.get() }}
 {}
 
@@ -31,7 +29,7 @@ Caretaker::Caretaker() noexcept
 void Caretaker::garbage_collector() {
 	// Step 1: fill a set with all pinned/visited/current + ancestors : to keep.
 	set<Timepoint*> to_keep;
-	for(auto const& list : { pinned_states, user_history, { current_state } })
+	for(auto const& list : { pinned_timepoints, user_history, { current_timepoint } })
 		for(auto* t : list) {
 //			to_keep.insert_range(t->ancestors()); // TODO C++23 unsupported yet feature
 			auto ancestors = t->ancestors(true);
@@ -76,63 +74,63 @@ Timepoint* Caretaker::get_history_root() {
 }
 
 //******************************************************************************
-Timepoint* Caretaker::get_current_state() {
-	return current_state;
+Timepoint* Caretaker::get_current_timepoint() {
+	return current_timepoint;
 }
 
 //******************************************************************************
-vector<Timepoint*> const& Caretaker::get_pinned_states() const {
-	return pinned_states;
+vector<Timepoint*> const& Caretaker::get_pinned_timepoints() const {
+	return pinned_timepoints;
 }
 
 //******************************************************************************
-Timepoint* Caretaker::get_next_state() {
+Timepoint* Caretaker::make_next_timepoint() {
 	stop_browsing_user_history();
-	current_state = &current_state->add_child();
-	return current_state;
+	current_timepoint = &current_timepoint->add_child();
+	return current_timepoint;
 }
 
 //******************************************************************************
-void Caretaker::add(shared_ptr<IOriginator> const& originator) {
+void Caretaker::take_care_of(shared_ptr<IOriginator> const& originator) {
 	// TODO Are all those checks really useful?
 	if(originator
 	&& &originator->get_caretaker() == this
-	&& originator->get_init_state()->root() == history_root.get())
+	&& originator->get_init_timepoint()->root() == history_root.get())
 		originators.emplace_back(originator);
 }
 
 //******************************************************************************
-void Caretaker::undo(size_t states) {
-	if(!states || !can_undo())
+void Caretaker::undo(size_t remembered_timepoints) {
+	if(!remembered_timepoints || !can_undo())
 		return;
 
 	if(!user_history_browser.has_value()) {
 		user_history_browser = user_history.rbegin();
-		if(user_history.back() != current_state) // Means current_state -> user_history.back() is the first undo step.
-			--states;
+		if(user_history.back() != current_timepoint) // Means current_timepoint -> user_history.back() is the first undo step.
+			--remembered_timepoints;
 	}
 
-	advance(*user_history_browser, min(states, (size_t) abs(distance(*user_history_browser, user_history.rend()))));
-	current_state = **user_history_browser;
+	advance(*user_history_browser, min(remembered_timepoints, (size_t) abs(distance(*user_history_browser, user_history.rend()))));
+	current_timepoint = **user_history_browser;
 
 	if(user_history_browser == user_history.rbegin())
 		user_history_browser = nullopt;
 
-	go_without_remembering(current_state);
+	go_without_remembering(current_timepoint);
 }
 
 //******************************************************************************
-void Caretaker::redo(size_t states) {
-	if(!states || !can_redo())
+void Caretaker::redo(size_t remembered_timepoints) {
+	if(!remembered_timepoints || !can_redo())
 		return;
 
-	advance(*user_history_browser, - min(states, (size_t) abs(distance(user_history.rbegin(), *user_history_browser))));
-	current_state = **user_history_browser;
+	advance(*user_history_browser, - min(remembered_timepoints, (size_t) abs(distance(user_history.rbegin(), *user_history_browser))));
+	current_timepoint = **user_history_browser;
 
 	if(user_history_browser == user_history.rbegin())
 		user_history_browser = nullopt;
 
-	go_without_remembering(current_state);
+	go_without_remembering(current_timepoint);
 }
 
 //******************************************************************************
@@ -150,33 +148,33 @@ bool Caretaker::can_redo() const {
 }
 
 //******************************************************************************
-void Caretaker::unpin(Timepoint* state) {
-	erase(pinned_states, state);
+void Caretaker::unpin(Timepoint* t) {
+	erase(pinned_timepoints, t);
 	if(auto_gc)
 		garbage_collector();
 }
 
 //******************************************************************************
-void Caretaker::pin_current_state() {
-	if(ranges::none_of(pinned_states,
+void Caretaker::pin_current_timepoint() {
+	if(ranges::none_of(pinned_timepoints,
 		[this](auto const* item) {
-			return item == current_state;
+			return item == current_timepoint;
 		}
 	))
-		pinned_states.emplace_back(current_state);
-	remember_current_state();
+		pinned_timepoints.emplace_back(current_timepoint);
+	remember_current_timepoint();
 }
 
 //******************************************************************************
-void Caretaker::remember_current_state() {
-	if(user_history.back() != current_state)
-		user_history.emplace_back(current_state);
+void Caretaker::remember_current_timepoint() {
+	if(user_history.back() != current_timepoint)
+		user_history.emplace_back(current_timepoint);
 }
 
 //******************************************************************************
 bool Caretaker::go_without_remembering(Timepoint* t) {
 	if(t && t->root() == history_root.get()) {
-		current_state = t;
+		current_timepoint = t;
 		for(auto& it : originators)
 			if(auto ptr = it.lock(); ptr)
 				ptr->go(t);
@@ -190,7 +188,7 @@ bool Caretaker::go_without_remembering(Timepoint* t) {
 bool Caretaker::go_and_remember(Timepoint* t) {
 	bool does_succeed = go_without_remembering(t);
 	if(does_succeed)
-		remember_current_state();
+		remember_current_timepoint();
 	return does_succeed;
 }
 

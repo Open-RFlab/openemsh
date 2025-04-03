@@ -15,22 +15,22 @@
 
 #include "utils/state_management.hpp"
 
-
 /// Originator
-/// @test template<typename T> Originator<T>::Originator(Timepoint* init_state, T value, Caretaker& caretaker) noexcept
-/// @test template<typename T> Caretaker& Originator<T>::get_caretaker() const
-/// @test template<typename T> Timepoint* Originator<T>::get_init_state() const
-/// @test template<typename T> Timepoint* Originator<T>::get_current_state() const
-/// @test template<typename T> void Originator<T>::go(Timepoint* state) noexcept
-/// @test template<typename T> void Originator<T>::erase(Timepoint* t)
-/// @test template<typename T> void Originator<T>::erase(std::set<Timepoint*> const& ts) noexcept
-/// @test template<typename T> std::vector<std::tuple<Timepoint*, T>> Originator<T>::get_available_states() const noexcept
-/// @test template<typename T> T const& Originator<T>::value() const
-/// @test template<typename T> Timepoint* Originator<T>::next_state() const
-/// @test template<typename T> void Originator<T>::set_state(Timepoint* k, T const& v)
-/// @test template<typename T> void Originator<T>::set_next_state(T const& v)
-/// @test template<typename T> void Originator<T>::set_given_or_next_state(T const& v, Timepoint* t)
-/// @test template<typename T> std::tuple<Timepoint*, T> Originator<T>::make_next_state() const noexcept
+///*****************************************************************************
+/// @test template<typename State> Originator<State>::Originator(Timepoint* init_timepoint, T state, Caretaker& caretaker) noexcept
+/// @test template<typename State> Caretaker& Originator<State>::get_caretaker() const
+/// @test template<typename State> Timepoint* Originator<State>::get_init_timepoint() const
+/// @test template<typename State> Timepoint* Originator<State>::get_current_timepoint() const
+/// @test template<typename State> void Originator<State>::go(Timepoint* t) noexcept
+/// @test template<typename State> void Originator<State>::erase(Timepoint* t)
+/// @test template<typename State> void Originator<State>::erase(std::set<Timepoint*> const& ts) noexcept
+/// @test template<typename State> std::vector<std::tuple<Timepoint*, State>> Originator<State>::get_available_states() const noexcept
+/// @test template<typename State> State const& Originator<State>::get_current_state() const
+/// @test template<typename State> Timepoint* Originator<State>::next_timepoint() const
+/// @test template<typename State> void Originator<State>::set_state(Timepoint* t, State const& state)
+/// @test template<typename State> void Originator<State>::set_next_state(State const& state)
+/// @test template<typename State> void Originator<State>::set_given_or_next_state(State const& state, Timepoint* t)
+/// @test template<typename State> std::tuple<Timepoint*, State> Originator<State>::make_next_state() const noexcept
 ///*****************************************************************************
 
 /// Caretaker
@@ -40,17 +40,17 @@
 /// @test void Caretaker::garbage_collector()
 /// @test void Caretaker::stop_browsing_user_history()
 /// @test Timepoint* Caretaker::get_history_root()
-/// @test Timepoint* Caretaker::get_current_state()
-/// @test vector<Timepoint*> const& Caretaker::get_pinned_states() const
-/// @test Timepoint* Caretaker::get_next_state()
-/// @test void Caretaker::add(shared_ptr<IOriginator> const& originator)
-/// @test void Caretaker::undo(size_t states)
-/// @test void Caretaker::redo(size_t states)
+/// @test Timepoint* Caretaker::get_current_timepoint()
+/// @test vector<Timepoint*> const& Caretaker::get_pinned_timepoints() const
+/// @test Timepoint* Caretaker::make_next_timepoint()
+/// @test void Caretaker::take_care_of(shared_ptr<IOriginator> const& originator)
+/// @test void Caretaker::undo(size_t remembered_timepoints)
+/// @test void Caretaker::redo(size_t remembered_timepoints)
 /// @test bool Caretaker::can_undo() const
 /// @test bool Caretaker::can_redo() const
-/// @test void Caretaker::unpin(Timepoint* state)
-/// @test void Caretaker::pin_current_state()
-/// @test void Caretaker::remember_current_state()
+/// @test void Caretaker::unpin(Timepoint* t)
+/// @test void Caretaker::pin_current_timepoint()
+/// @test void Caretaker::remember_current_timepoint()
 /// @test bool Caretaker::go_without_remembering(Timepoint* t)
 /// @test bool Caretaker::go_and_remember(Timepoint* t)
 /// @test bool Caretaker::get_auto_gc() const
@@ -66,28 +66,28 @@ struct StateA {
 //******************************************************************************
 class A : public Originator<StateA> {
 public:
-	A(std::string const& str, int num, Timepoint* init_state)
-	: Originator(init_state, { .str = str, .num = num })
+	A(std::string const& str, int num, Timepoint* init_timepoint)
+	: Originator(init_timepoint, { .str = str, .num = num })
 	{}
 
 	void set_str(std::string const& str, Timepoint* t = nullptr) {
-		auto new_state = value();
+		auto new_state = get_current_state();
 		new_state.str = str;
 		set_given_or_next_state(new_state, t);
 	}
 
 	void set_num(int num, Timepoint* t = nullptr) {
-		auto new_state = value();
+		auto new_state = get_current_state();
 		new_state.num = num;
 		set_given_or_next_state(new_state, t);
 	}
 
 	std::string const& get_str() const {
-		return value().str;
+		return get_current_state().str;
 	}
 
 	int get_num() const {
-		return value().num;
+		return get_current_state().num;
 	}
 };
 
@@ -101,12 +101,12 @@ struct StateManager {
 //******************************************************************************
 class Manager : public Originator<StateManager> {
 public:
-	Manager(int id, Timepoint* init_state)
-	: Originator(init_state, { .id = id })
+	Manager(int id, Timepoint* init_timepoint)
+	: Originator(init_timepoint, { .id = id })
 	{}
 
 	void set_id(int id) {
-		auto new_state = value();
+		auto new_state = get_current_state();
 		new_state.id = id;
 		set_next_state(new_state);
 	}
@@ -114,13 +114,13 @@ public:
 	A* make_a(std::string const& str, int num) {
 		auto [new_timepoint, new_state] = make_next_state();
 		auto ret = new_state.all_a.emplace_back(std::make_shared<A>(str, num, new_timepoint));
-		get_caretaker().add(ret);
+		get_caretaker().take_care_of(ret);
 		set_state(new_timepoint, new_state);
 		return ret.get();
 	}
 
 	void remove_a(A* a) {
-		auto new_state = value();
+		auto new_state = get_current_state();
 		std::erase_if(new_state.all_a, [&](auto const& item) {
 			return item.get() == a;
 		});
@@ -128,9 +128,9 @@ public:
 	}
 
 	void increment_num_of_once_a_in_two() {
-		auto* new_state = next_state();
+		auto* new_state = next_timepoint();
 		bool alternate = true;
-		for(auto a : value().all_a) {
+		for(auto a : get_current_state().all_a) {
 			if(alternate) {
 				a->set_num(a->get_num() + 1, new_state);
 			}
@@ -140,7 +140,7 @@ public:
 
 	// Make one B per A.
 //	void sync_b() {
-//		auto new_state = value();
+//		auto new_state = get_current_state();
 //		for(auto a : new_state.all_a) {
 //		}
 //		set_next_state(new_state);
@@ -148,19 +148,19 @@ public:
 };
 
 //******************************************************************************
-SCENARIO("template<typename T> Originator<T>::Originator(Timepoint* init_state, T value, Caretaker& caretaker) noexcept", "[utils][state_management]") {
+SCENARIO("template<typename State> Originator<State>::Originator(Timepoint* init_timepoint, T state, Caretaker& caretaker) noexcept", "[utils][state_management]") {
 	GIVEN("An Originator") {
 		Caretaker c;
 		Timepoint t;
 		Originator<StateA> a(&t, { .str = "ac", .num = 56 });
 		Originator<StateA> b(&t, { .str = "ac", .num = 56 }, c);
 
-		THEN("Init state and its associated value should be set as current state") {
-			REQUIRE(a.init_state == &t);
-			REQUIRE(a.current_state == &t);
+		THEN("Init Timepoint and its associated state should be set as current Timepoint") {
+			REQUIRE(a.init_timepoint == &t);
+			REQUIRE(a.current_timepoint == &t);
 
-			REQUIRE(a.states_ordered.size() == 1);
-			REQUIRE(a.states_ordered[0] == &t);
+			REQUIRE(a.ordered_timepoints.size() == 1);
+			REQUIRE(a.ordered_timepoints[0] == &t);
 
 			REQUIRE(a.states.contains(&t));
 			REQUIRE(a.states.at(&t).str == "ac");
@@ -176,7 +176,7 @@ SCENARIO("template<typename T> Originator<T>::Originator(Timepoint* init_state, 
 }
 
 //******************************************************************************
-SCENARIO("template<typename T> Caretaker& Originator<T>::get_caretaker() const", "[utils][state_management]") {
+SCENARIO("template<typename State> Caretaker& Originator<State>::get_caretaker() const", "[utils][state_management]") {
 	GIVEN("An Originator") {
 		Caretaker c;
 		Timepoint t;
@@ -189,47 +189,47 @@ SCENARIO("template<typename T> Caretaker& Originator<T>::get_caretaker() const",
 }
 
 //******************************************************************************
-SCENARIO("template<typename T> Timepoint* Originator<T>::get_init_state() const", "[utils][state_management]") {
+SCENARIO("template<typename State> Timepoint* Originator<State>::get_init_timepoint() const", "[utils][state_management]") {
 	GIVEN("An Originator") {
 		Timepoint t;
 		Originator<StateA> a(&t, { .str = "ac", .num = 56 });
 
 		THEN("Should return the specified Timepoint") {
-			REQUIRE(a.get_init_state() == &t);
+			REQUIRE(a.get_init_timepoint() == &t);
 		}
 
 		WHEN("Going to the next state") {
 			a.set_next_state({ .str = "lp", .num = 8 });
 
 			THEN("Should still return the specified Timepoint") {
-				REQUIRE(a.get_init_state() == &t);
+				REQUIRE(a.get_init_timepoint() == &t);
 			}
 		}
 	}
 }
 
 //******************************************************************************
-SCENARIO("template<typename T> Timepoint* Originator<T>::get_current_state() const", "[utils][state_management]") {
+SCENARIO("template<typename State> Timepoint* Originator<State>::get_current_timepoint() const", "[utils][state_management]") {
 	GIVEN("An Originator") {
 		Timepoint t;
 		Originator<StateA> a(&t, { .str = "ac", .num = 56 });
 
 		THEN("Should return the specified Timepoint") {
-			REQUIRE(a.get_current_state() == &t);
+			REQUIRE(a.get_current_timepoint() == &t);
 		}
 
 		WHEN("Going to the next state") {
 			a.set_next_state({ .str = "lp", .num = 8 });
 
 			THEN("Should return another Timepoint") {
-				REQUIRE_FALSE(a.get_current_state() == &t);
+				REQUIRE_FALSE(a.get_current_timepoint() == &t);
 			}
 		}
 	}
 }
 
 //******************************************************************************
-SCENARIO("template<typename T> void Originator<T>::go(Timepoint* state) noexcept", "[utils][state_management]") {
+SCENARIO("template<typename State> void Originator<State>::go(Timepoint* t) noexcept", "[utils][state_management]") {
 	GIVEN("An Originator having multiple states, corresponding to an history tree") {
 		// + a
 		//   + b <---------- 0 init
@@ -256,53 +256,53 @@ SCENARIO("template<typename T> void Originator<T>::go(Timepoint* state) noexcept
 		x.set_state(&d1, { .str = "gh", .num = 444 });
 		x.set_state(&e1, { .str = "lo", .num = 69 });
 
-		WHEN("Trying to go to an existing state") {
+		WHEN("Trying to go to an existing timepoint") {
 			x.go(&d2);
 
-			THEN("Current state should be updated to this timepoint") {
-				REQUIRE(x.get_current_state() == &d2);
+			THEN("Current timepoint should be updated to this timepoint") {
+				REQUIRE(x.get_current_timepoint() == &d2);
 			}
 		}
 
-		WHEN("Trying to go to an unknown state that is a descendant of an existing state") {
+		WHEN("Trying to go to an unknown timepoint that is a descendant of an existing timepoint") {
 			x.go(&d3);
 
-			THEN("Current state should be updated to the first known parent of this timepoint") {
-				REQUIRE(x.get_current_state() == &b);
+			THEN("Current timepoint should be updated to the first known parent of this timepoint") {
+				REQUIRE(x.get_current_timepoint() == &b);
 			}
 		}
 
-		WHEN("Trying to go to an unknown state that is both an ancestor and a descendant of some existing states") {
+		WHEN("Trying to go to an unknown timepoint that is both an ancestor and a descendant of some existing timepoints") {
 			x.go(&c1);
 
-			THEN("Current state should be updated to the first known parent of this timepoint") {
-				REQUIRE(x.get_current_state() == &b);
+			THEN("Current timepoint should be updated to the first known parent of this timepoint") {
+				REQUIRE(x.get_current_timepoint() == &b);
 			}
 		}
 
-		WHEN("Trying to go to an unrelated state") {
+		WHEN("Trying to go to an unrelated timepoint") {
 			Timepoint t;
 			x.go(&t);
 
-			THEN("Current state should be updated to the init state") {
-				REQUIRE(x.get_current_state() == &b);
-				REQUIRE(x.get_init_state() == &b);
+			THEN("Current timepoint should be updated to the init timepoint") {
+				REQUIRE(x.get_current_timepoint() == &b);
+				REQUIRE(x.get_init_timepoint() == &b);
 			}
 		}
 
-		WHEN("Trying to go to a null state") {
+		WHEN("Trying to go to a null timepoint") {
 			x.go(nullptr);
 
-			THEN("Current state should be updated to the init state") {
-				REQUIRE(x.get_current_state() == &b);
-				REQUIRE(x.get_init_state() == &b);
+			THEN("Current timepoint should be updated to the init timepoint") {
+				REQUIRE(x.get_current_timepoint() == &b);
+				REQUIRE(x.get_init_timepoint() == &b);
 			}
 		}
 	}
 }
 
 //******************************************************************************
-SCENARIO("template<typename T> void Originator<T>::erase(Timepoint* t)", "[utils][state_management]") {
+SCENARIO("template<typename State> void Originator<State>::erase(Timepoint* t)", "[utils][state_management]") {
 	GIVEN("An Originator having multiple states") {
 		Timepoint t0;
 		Timepoint& t1 = t0.add_child();
@@ -321,15 +321,15 @@ SCENARIO("template<typename T> void Originator<T>::erase(Timepoint* t)", "[utils
 			a.erase(&t0);
 
 			THEN("Should not do anything") {
-				REQUIRE(a.get_init_state() == &t0);
-				REQUIRE(a.get_current_state() == &t5);
-				REQUIRE(a.states_ordered.size() == 6);
-				REQUIRE(a.states_ordered[0] == &t0);
-				REQUIRE(a.states_ordered[1] == &t1);
-				REQUIRE(a.states_ordered[2] == &t2);
-				REQUIRE(a.states_ordered[3] == &t3);
-				REQUIRE(a.states_ordered[4] == &t4);
-				REQUIRE(a.states_ordered[5] == &t5);
+				REQUIRE(a.get_init_timepoint() == &t0);
+				REQUIRE(a.get_current_timepoint() == &t5);
+				REQUIRE(a.ordered_timepoints.size() == 6);
+				REQUIRE(a.ordered_timepoints[0] == &t0);
+				REQUIRE(a.ordered_timepoints[1] == &t1);
+				REQUIRE(a.ordered_timepoints[2] == &t2);
+				REQUIRE(a.ordered_timepoints[3] == &t3);
+				REQUIRE(a.ordered_timepoints[4] == &t4);
+				REQUIRE(a.ordered_timepoints[5] == &t5);
 				REQUIRE(a.states.contains(&t0));
 				REQUIRE(a.states.contains(&t1));
 				REQUIRE(a.states.contains(&t2));
@@ -352,19 +352,19 @@ SCENARIO("template<typename T> void Originator<T>::erase(Timepoint* t)", "[utils
 		}
 
 		WHEN("Trying to erase the current state") {
-			REQUIRE(a.get_current_state() == &t5);
+			REQUIRE(a.get_current_timepoint() == &t5);
 			a.erase(&t5);
 
 			THEN("Should not do anything") {
-				REQUIRE(a.get_init_state() == &t0);
-				REQUIRE(a.get_current_state() == &t5);
-				REQUIRE(a.states_ordered.size() == 6);
-				REQUIRE(a.states_ordered[0] == &t0);
-				REQUIRE(a.states_ordered[1] == &t1);
-				REQUIRE(a.states_ordered[2] == &t2);
-				REQUIRE(a.states_ordered[3] == &t3);
-				REQUIRE(a.states_ordered[4] == &t4);
-				REQUIRE(a.states_ordered[5] == &t5);
+				REQUIRE(a.get_init_timepoint() == &t0);
+				REQUIRE(a.get_current_timepoint() == &t5);
+				REQUIRE(a.ordered_timepoints.size() == 6);
+				REQUIRE(a.ordered_timepoints[0] == &t0);
+				REQUIRE(a.ordered_timepoints[1] == &t1);
+				REQUIRE(a.ordered_timepoints[2] == &t2);
+				REQUIRE(a.ordered_timepoints[3] == &t3);
+				REQUIRE(a.ordered_timepoints[4] == &t4);
+				REQUIRE(a.ordered_timepoints[5] == &t5);
 				REQUIRE(a.states.contains(&t0));
 				REQUIRE(a.states.contains(&t1));
 				REQUIRE(a.states.contains(&t2));
@@ -390,14 +390,14 @@ SCENARIO("template<typename T> void Originator<T>::erase(Timepoint* t)", "[utils
 			a.erase(&t2);
 
 			THEN("Should success") {
-				REQUIRE(a.get_init_state() == &t0);
-				REQUIRE(a.get_current_state() == &t5);
-				REQUIRE(a.states_ordered.size() == 5);
-				REQUIRE(a.states_ordered[0] == &t0);
-				REQUIRE(a.states_ordered[1] == &t1);
-				REQUIRE(a.states_ordered[2] == &t3);
-				REQUIRE(a.states_ordered[3] == &t4);
-				REQUIRE(a.states_ordered[4] == &t5);
+				REQUIRE(a.get_init_timepoint() == &t0);
+				REQUIRE(a.get_current_timepoint() == &t5);
+				REQUIRE(a.ordered_timepoints.size() == 5);
+				REQUIRE(a.ordered_timepoints[0] == &t0);
+				REQUIRE(a.ordered_timepoints[1] == &t1);
+				REQUIRE(a.ordered_timepoints[2] == &t3);
+				REQUIRE(a.ordered_timepoints[3] == &t4);
+				REQUIRE(a.ordered_timepoints[4] == &t5);
 				REQUIRE(a.states.contains(&t0));
 				REQUIRE(a.states.contains(&t1));
 				REQUIRE_FALSE(a.states.contains(&t2));
@@ -422,15 +422,15 @@ SCENARIO("template<typename T> void Originator<T>::erase(Timepoint* t)", "[utils
 			a.erase(&t);
 
 			THEN("Should not do anything") {
-				REQUIRE(a.get_init_state() == &t0);
-				REQUIRE(a.get_current_state() == &t5);
-				REQUIRE(a.states_ordered.size() == 6);
-				REQUIRE(a.states_ordered[0] == &t0);
-				REQUIRE(a.states_ordered[1] == &t1);
-				REQUIRE(a.states_ordered[2] == &t2);
-				REQUIRE(a.states_ordered[3] == &t3);
-				REQUIRE(a.states_ordered[4] == &t4);
-				REQUIRE(a.states_ordered[5] == &t5);
+				REQUIRE(a.get_init_timepoint() == &t0);
+				REQUIRE(a.get_current_timepoint() == &t5);
+				REQUIRE(a.ordered_timepoints.size() == 6);
+				REQUIRE(a.ordered_timepoints[0] == &t0);
+				REQUIRE(a.ordered_timepoints[1] == &t1);
+				REQUIRE(a.ordered_timepoints[2] == &t2);
+				REQUIRE(a.ordered_timepoints[3] == &t3);
+				REQUIRE(a.ordered_timepoints[4] == &t4);
+				REQUIRE(a.ordered_timepoints[5] == &t5);
 				REQUIRE(a.states.contains(&t0));
 				REQUIRE(a.states.contains(&t1));
 				REQUIRE(a.states.contains(&t2));
@@ -455,7 +455,7 @@ SCENARIO("template<typename T> void Originator<T>::erase(Timepoint* t)", "[utils
 }
 
 //******************************************************************************
-SCENARIO("template<typename T> void Originator<T>::erase(std::set<Timepoint*> const& ts) noexcept", "[utils][state_management]") {
+SCENARIO("template<typename State> void Originator<State>::erase(std::set<Timepoint*> const& ts) noexcept", "[utils][state_management]") {
 	GIVEN("An Originator having multiple states") {
 		Timepoint t0;
 		Timepoint& t1 = t0.add_child();
@@ -475,13 +475,13 @@ SCENARIO("template<typename T> void Originator<T>::erase(std::set<Timepoint*> co
 			a.erase({ &t0, &t5, &t2, &t3, &t });
 
 			THEN("Should only erase the two other states") {
-				REQUIRE(a.get_init_state() == &t0);
-				REQUIRE(a.get_current_state() == &t5);
-				REQUIRE(a.states_ordered.size() == 4);
-				REQUIRE(a.states_ordered[0] == &t0);
-				REQUIRE(a.states_ordered[1] == &t1);
-				REQUIRE(a.states_ordered[2] == &t4);
-				REQUIRE(a.states_ordered[3] == &t5);
+				REQUIRE(a.get_init_timepoint() == &t0);
+				REQUIRE(a.get_current_timepoint() == &t5);
+				REQUIRE(a.ordered_timepoints.size() == 4);
+				REQUIRE(a.ordered_timepoints[0] == &t0);
+				REQUIRE(a.ordered_timepoints[1] == &t1);
+				REQUIRE(a.ordered_timepoints[2] == &t4);
+				REQUIRE(a.ordered_timepoints[3] == &t5);
 				REQUIRE(a.states.contains(&t0));
 				REQUIRE(a.states.contains(&t1));
 				REQUIRE_FALSE(a.states.contains(&t2));
@@ -503,15 +503,15 @@ SCENARIO("template<typename T> void Originator<T>::erase(std::set<Timepoint*> co
 			a.erase({});
 
 			THEN("Should not do anything") {
-				REQUIRE(a.get_init_state() == &t0);
-				REQUIRE(a.get_current_state() == &t5);
-				REQUIRE(a.states_ordered.size() == 6);
-				REQUIRE(a.states_ordered[0] == &t0);
-				REQUIRE(a.states_ordered[1] == &t1);
-				REQUIRE(a.states_ordered[2] == &t2);
-				REQUIRE(a.states_ordered[3] == &t3);
-				REQUIRE(a.states_ordered[4] == &t4);
-				REQUIRE(a.states_ordered[5] == &t5);
+				REQUIRE(a.get_init_timepoint() == &t0);
+				REQUIRE(a.get_current_timepoint() == &t5);
+				REQUIRE(a.ordered_timepoints.size() == 6);
+				REQUIRE(a.ordered_timepoints[0] == &t0);
+				REQUIRE(a.ordered_timepoints[1] == &t1);
+				REQUIRE(a.ordered_timepoints[2] == &t2);
+				REQUIRE(a.ordered_timepoints[3] == &t3);
+				REQUIRE(a.ordered_timepoints[4] == &t4);
+				REQUIRE(a.ordered_timepoints[5] == &t5);
 				REQUIRE(a.states.contains(&t0));
 				REQUIRE(a.states.contains(&t1));
 				REQUIRE(a.states.contains(&t2));
@@ -536,7 +536,7 @@ SCENARIO("template<typename T> void Originator<T>::erase(std::set<Timepoint*> co
 }
 
 //******************************************************************************
-SCENARIO("template<typename T> std::vector<std::tuple<Timepoint*, T const&>> Originator<T>::get_available_states() const noexcept", "[utils][state_management]") {
+SCENARIO("template<typename State> std::vector<std::tuple<Timepoint*, State const&>> Originator<State>::get_available_states() const noexcept", "[utils][state_management]") {
 	GIVEN("An Originator having multiple states, corresponding to an history tree") {
 		// + a
 		//   + b <---------- 0 init
@@ -592,52 +592,52 @@ SCENARIO("template<typename T> std::vector<std::tuple<Timepoint*, T const&>> Ori
 }
 
 //******************************************************************************
-SCENARIO("template<typename T> T const& Originator<T>::value() const", "[utils][state_management]") {
+SCENARIO("template<typename State> State const& Originator<State>::get_current_state() const", "[utils][state_management]") {
 	GIVEN("An Originator") {
 		Timepoint t;
 		Originator<StateA> a(&t, { .str = "ac", .num = 56 });
 
 		THEN("Should return the init state object") {
-			REQUIRE(a.value().str == "ac");
-			REQUIRE(a.value().num == 56);
+			REQUIRE(a.get_current_state().str == "ac");
+			REQUIRE(a.get_current_state().num == 56);
 		}
 
 		WHEN("Going to the next state") {
 			a.set_next_state({ .str = "lp", .num = 8 });
 
 			THEN("Should return the next state object") {
-				REQUIRE(a.value().str == "lp");
-				REQUIRE(a.value().num == 8);
+				REQUIRE(a.get_current_state().str == "lp");
+				REQUIRE(a.get_current_state().num == 8);
 			}
 		}
 	}
 }
 
 //******************************************************************************
-SCENARIO("template<typename T> Timepoint* Originator<T>::next_state() const", "[utils][state_management]") {
-	GIVEN("An Originator which init state is part of the history tree of its Caretaker") {
+SCENARIO("template<typename State> Timepoint* Originator<State>::next_timepoint() const", "[utils][state_management]") {
+	GIVEN("An Originator which init timepoint is part of the history tree of its Caretaker") {
 		Caretaker c;
 		Timepoint* t = c.get_history_root();
 		Originator<StateA> a(t, { .str = "ac", .num = 56 }, c);
 
-		THEN("Its current state must be the same as the Caretaker current state") {
-			REQUIRE(a.get_current_state() == t);
-			REQUIRE(a.get_current_state() == c.get_current_state());
+		THEN("Its current timepoint must be the same as the Caretaker current timepoint") {
+			REQUIRE(a.get_current_timepoint() == t);
+			REQUIRE(a.get_current_timepoint() == c.get_current_timepoint());
 		}
 
-		WHEN("Running next_state") {
-			Timepoint* n = a.next_state();
+		WHEN("Running next_timepoint") {
+			Timepoint* n = a.next_timepoint();
 
-			THEN("Should not update its current state") {
-				REQUIRE(a.get_current_state() == t);
+			THEN("Should not update its current timepoint") {
+				REQUIRE(a.get_current_timepoint() == t);
 			}
 
-			THEN("Should return a new Timepoint that is a child of the init state Timepoint") {
+			THEN("Should return a new Timepoint that is a child of the init Timepoint") {
 				REQUIRE(n != t);
 				REQUIRE(n->parent() == t);
 
-				AND_THEN("Caretaker current state should be updated to this new Timepoint") {
-					REQUIRE(c.get_current_state() == n);
+				AND_THEN("Caretaker current timepoint should be updated to this new Timepoint") {
+					REQUIRE(c.get_current_timepoint() == n);
 				}
 			}
 		}
@@ -645,7 +645,7 @@ SCENARIO("template<typename T> Timepoint* Originator<T>::next_state() const", "[
 }
 
 //******************************************************************************
-SCENARIO("template<typename T> void Originator<T>::set_state(Timepoint* k, T const& v)", "[utils][state_management]") {
+SCENARIO("template<typename State> void Originator<State>::set_state(Timepoint* t, State const& state)", "[utils][state_management]") {
 	GIVEN("An Originator") {
 		Timepoint t0;
 		Originator<StateA> a(&t0, { .str = "ac", .num = 56 });
@@ -660,18 +660,18 @@ SCENARIO("template<typename T> void Originator<T>::set_state(Timepoint* k, T con
 				REQUIRE(a.states.at(&t1).num == 8);
 			}
 
-			THEN("The given Timepoint should be appended to states order tracking") {
-				REQUIRE(a.states_ordered.size() == 2);
-				REQUIRE(a.states_ordered[0] == &t0);
-				REQUIRE(a.states_ordered[1] == &t1);
+			THEN("The given Timepoint should be appended to timepoints order tracking") {
+				REQUIRE(a.ordered_timepoints.size() == 2);
+				REQUIRE(a.ordered_timepoints[0] == &t0);
+				REQUIRE(a.ordered_timepoints[1] == &t1);
 			}
 
-			THEN("The current state should be updated to the given Timepoint") {
-				REQUIRE(a.get_current_state() == &t1);
+			THEN("The current timepoint should be updated to the given Timepoint") {
+				REQUIRE(a.get_current_timepoint() == &t1);
 			}
 
-			THEN("The init state should not change") {
-				REQUIRE(a.get_init_state() == &t0);
+			THEN("The init timepoint should not change") {
+				REQUIRE(a.get_init_timepoint() == &t0);
 			}
 
 			AND_WHEN("Setting an existing state") {
@@ -683,18 +683,18 @@ SCENARIO("template<typename T> void Originator<T>::set_state(Timepoint* k, T con
 					REQUIRE(a.states.at(&t0).num == 444);
 				}
 
-				THEN("The given Timepoint should not be appended to states order tracking") {
-					REQUIRE(a.states_ordered.size() == 2);
-					REQUIRE(a.states_ordered[0] == &t0);
-					REQUIRE(a.states_ordered[1] == &t1);
+				THEN("The given Timepoint should not be appended to timepoints order tracking") {
+					REQUIRE(a.ordered_timepoints.size() == 2);
+					REQUIRE(a.ordered_timepoints[0] == &t0);
+					REQUIRE(a.ordered_timepoints[1] == &t1);
 				}
 
-				THEN("The current state should not be updated to the given Timepoint") {
-					REQUIRE(a.get_current_state() == &t1);
+				THEN("The current timepoint should not be updated to the given Timepoint") {
+					REQUIRE(a.get_current_timepoint() == &t1);
 				}
 
-				THEN("The init state should not change") {
-					REQUIRE(a.get_init_state() == &t0);
+				THEN("The init timepoint should not change") {
+					REQUIRE(a.get_init_timepoint() == &t0);
 				}
 			}
 		}
@@ -702,7 +702,7 @@ SCENARIO("template<typename T> void Originator<T>::set_state(Timepoint* k, T con
 }
 
 //******************************************************************************
-SCENARIO("template<typename T> void Originator<T>::set_next_state(T const& v)", "[utils][state_management]") {
+SCENARIO("template<typename State> void Originator<State>::set_next_state(State const& state)", "[utils][state_management]") {
 	GIVEN("An Originator which init state is part of the history tree of its Caretaker") {
 		Caretaker c;
 		Timepoint* t0 = c.get_history_root();
@@ -711,8 +711,8 @@ SCENARIO("template<typename T> void Originator<T>::set_next_state(T const& v)", 
 		WHEN("Setting the next state") {
 			a.set_next_state({ .str = "lp", .num = 8 });
 
-			THEN("Current state should be updated to a new Timepoint that is a child of the init state Timepoint") {
-				Timepoint* t1 = a.get_current_state();
+			THEN("Current timepoint should be updated to a new Timepoint that is a child of the init Timepoint") {
+				Timepoint* t1 = a.get_current_timepoint();
 				REQUIRE(t1->parent() == t0);
 
 				AND_THEN("The new state should be registered to this new Timepoint") {
@@ -721,8 +721,8 @@ SCENARIO("template<typename T> void Originator<T>::set_next_state(T const& v)", 
 					REQUIRE(a.states.at(t1).num == 8);
 				}
 
-				AND_THEN("Caretaker current state should be updated to this new Timepoint") {
-					REQUIRE(c.get_current_state() == t1);
+				AND_THEN("Caretaker current timepoint should be updated to this new Timepoint") {
+					REQUIRE(c.get_current_timepoint() == t1);
 				}
 			}
 		}
@@ -730,7 +730,7 @@ SCENARIO("template<typename T> void Originator<T>::set_next_state(T const& v)", 
 }
 
 //******************************************************************************
-SCENARIO("template<typename T> void Originator<T>::set_given_or_next_state(T const& v, Timepoint* t)", "[utils][state_management]") {
+SCENARIO("template<typename State> void Originator<State>::set_given_or_next_state(State const& state, Timepoint* t)", "[utils][state_management]") {
 	GIVEN("An Originator which init state is part of the history tree of its Caretaker") {
 		Caretaker c;
 		Timepoint* t0 = c.get_history_root();
@@ -739,8 +739,8 @@ SCENARIO("template<typename T> void Originator<T>::set_given_or_next_state(T con
 		WHEN("Setting the next state without specifying a Timepoint") {
 			a.set_given_or_next_state({ .str = "lp", .num = 8 }, nullptr);
 
-			THEN("Current state should be updated to a new Timepoint that is a child of the init state Timepoint") {
-				Timepoint* t1 = a.get_current_state();
+			THEN("Current timepoint should be updated to a new Timepoint that is a child of the init Timepoint") {
+				Timepoint* t1 = a.get_current_timepoint();
 				REQUIRE(t1->parent() == t0);
 
 				AND_THEN("The new state should be registered to this new Timepoint") {
@@ -749,8 +749,8 @@ SCENARIO("template<typename T> void Originator<T>::set_given_or_next_state(T con
 					REQUIRE(a.states.at(t1).num == 8);
 				}
 
-				AND_THEN("Caretaker current state should be updated to this new Timepoint") {
-					REQUIRE(c.get_current_state() == t1);
+				AND_THEN("Caretaker current timepoint should be updated to this new Timepoint") {
+					REQUIRE(c.get_current_timepoint() == t1);
 				}
 			}
 		}
@@ -759,8 +759,8 @@ SCENARIO("template<typename T> void Originator<T>::set_given_or_next_state(T con
 			Timepoint n;
 			a.set_given_or_next_state({ .str = "lp", .num = 8 }, &n);
 
-			THEN("Current state should be updated to the given Timepoint") {
-				Timepoint* t1 = a.get_current_state();
+			THEN("Current timepoint should be updated to the given Timepoint") {
+				Timepoint* t1 = a.get_current_timepoint();
 				REQUIRE(t1 == &n);
 
 				AND_THEN("The new state should be registered to this given Timepoint") {
@@ -769,8 +769,8 @@ SCENARIO("template<typename T> void Originator<T>::set_given_or_next_state(T con
 					REQUIRE(a.states.at(t1).num == 8);
 				}
 
-				AND_THEN("Caretaker current state should not be updated to this given Timepoint") {
-					REQUIRE(c.get_current_state() == t0);
+				AND_THEN("Caretaker current timepoint should not be updated to this given Timepoint") {
+					REQUIRE(c.get_current_timepoint() == t0);
 				}
 			}
 		}
@@ -778,7 +778,7 @@ SCENARIO("template<typename T> void Originator<T>::set_given_or_next_state(T con
 }
 
 //******************************************************************************
-SCENARIO("template<typename T> std::tuple<Timepoint*, T> Originator<T>::make_next_state() const noexcept", "[utils][state_management]") {
+SCENARIO("template<typename State> std::tuple<Timepoint*, State> Originator<State>::make_next_state() const noexcept", "[utils][state_management]") {
 	GIVEN("An Originator which init state is part of the history tree of its Caretaker") {
 		Caretaker c;
 		Timepoint* t0 = c.get_history_root();
@@ -787,7 +787,7 @@ SCENARIO("template<typename T> std::tuple<Timepoint*, T> Originator<T>::make_nex
 		WHEN("Making the next state") {
 			auto [t1, s] = a.make_next_state();
 
-			THEN("Should return a new Timepoint that is a child of the init state Timepoint and a copy of the current state") {
+			THEN("Should return a new Timepoint that is a child of the init Timepoint and a copy of the current state") {
 				REQUIRE(t1->parent() == t0);
 				REQUIRE(s.str == "ac");
 				REQUIRE(s.num == 56);
@@ -821,8 +821,8 @@ SCENARIO("Caretaker::Caretaker()", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
 
-		THEN("Current state should be set to the history tree root") {
-			REQUIRE(c.current_state == c.history_root.get());
+		THEN("Current timepoint should be set to the history tree root") {
+			REQUIRE(c.current_timepoint == c.history_root.get());
 		}
 
 		THEN("User history should contain to the history tree root") {
@@ -873,14 +873,14 @@ SCENARIO("void Caretaker::garbage_collector()", "[utils][state_management]") {
 		y->set_state(d4, { .str = "dk", .num = 15 });
 		y->set_state(g1, { .str = "dk", .num = 16 });
 		z->set_state(c2, { .str = "ws", .num = 6 });
-		c.add(x);
-		c.add(y);
-		c.add(z);
+		c.take_care_of(x);
+		c.take_care_of(y);
+		c.take_care_of(z);
 		z.reset();
 
 		c.set_auto_gc(false);
 		c.go_without_remembering(f1);
-		c.pin_current_state();
+		c.pin_current_timepoint();
 		c.undo();
 		c.stop_browsing_user_history();
 		c.go_and_remember(g1);
@@ -898,9 +898,9 @@ SCENARIO("void Caretaker::garbage_collector()", "[utils][state_management]") {
 		};
 
 		REQUIRE(c.history_root.get() == a);
-		REQUIRE(c.current_state == e1);
-		REQUIRE(c.pinned_states.size() == 1);
-		REQUIRE(contains(c.pinned_states, f1));
+		REQUIRE(c.current_timepoint == e1);
+		REQUIRE(c.pinned_timepoints.size() == 1);
+		REQUIRE(contains(c.pinned_timepoints, f1));
 		REQUIRE(c.user_history.size() == 2);
 		REQUIRE(c.user_history[0] == a);
 		REQUIRE(c.user_history[1] == g1);
@@ -934,7 +934,7 @@ SCENARIO("void Caretaker::garbage_collector()", "[utils][state_management]") {
 		WHEN("Running") {
 			c.garbage_collector();
 
-			THEN("Should erase Originator states that does not correspond to Timepoints located between the history root and either the current state, any pinned or remembered state") {
+			THEN("Should erase Originator states that does not correspond to Timepoints located between the history root and either the current timepoint, any pinned or remembered timepoint") {
 				REQUIRE(x->states.size() == 2);
 				REQUIRE(x->states[a].str == "ac");
 				REQUIRE(x->states[a].num == 56);
@@ -956,7 +956,7 @@ SCENARIO("void Caretaker::garbage_collector()", "[utils][state_management]") {
 				REQUIRE(y->states[g1].num == 16);
 			}
 
-			THEN("Should erase Timepoints that are not located between the history root and either the current state, any pinned or remembered state") {
+			THEN("Should erase Timepoints that are not located between the history root and either the current timepoint, any pinned or remembered timepoint") {
 				auto h = a->cluster(true);
 				REQUIRE(h.size() == 9);
 				REQUIRE(contains(h, a));
@@ -985,15 +985,15 @@ SCENARIO("void Caretaker::garbage_collector()", "[utils][state_management]") {
 
 //******************************************************************************
 SCENARIO("void Caretaker::stop_browsing_user_history()", "[utils][state_management]") {
-	GIVEN("A Caretaker with some remembered states") {
+	GIVEN("A Caretaker with some remembered timepoints") {
 		Caretaker c;
-		[[maybe_unused]] Timepoint* t0 = c.get_current_state();
-		[[maybe_unused]] Timepoint* t1 = c.get_next_state();
-		c.remember_current_state();
-		[[maybe_unused]] Timepoint* t2 = c.get_next_state();
-		c.remember_current_state();
-		[[maybe_unused]] Timepoint* t3 = c.get_next_state();
-		c.remember_current_state();
+		[[maybe_unused]] Timepoint* t0 = c.get_current_timepoint();
+		[[maybe_unused]] Timepoint* t1 = c.make_next_timepoint();
+		c.remember_current_timepoint();
+		[[maybe_unused]] Timepoint* t2 = c.make_next_timepoint();
+		c.remember_current_timepoint();
+		[[maybe_unused]] Timepoint* t3 = c.make_next_timepoint();
+		c.remember_current_timepoint();
 
 		WHEN("Not browsing user history") {
 			REQUIRE(c.user_history.size() == 4);
@@ -1001,7 +1001,7 @@ SCENARIO("void Caretaker::stop_browsing_user_history()", "[utils][state_manageme
 			REQUIRE(c.user_history[1] == t1);
 			REQUIRE(c.user_history[2] == t2);
 			REQUIRE(c.user_history[3] == t3);
-			REQUIRE(c.get_current_state() == t3);
+			REQUIRE(c.get_current_timepoint() == t3);
 
 			THEN("Should not do anything") {
 				c.stop_browsing_user_history();
@@ -1010,7 +1010,7 @@ SCENARIO("void Caretaker::stop_browsing_user_history()", "[utils][state_manageme
 				REQUIRE(c.user_history[1] == t1);
 				REQUIRE(c.user_history[2] == t2);
 				REQUIRE(c.user_history[3] == t3);
-				REQUIRE(c.get_current_state() == t3);
+				REQUIRE(c.get_current_timepoint() == t3);
 			}
 		}
 
@@ -1021,17 +1021,17 @@ SCENARIO("void Caretaker::stop_browsing_user_history()", "[utils][state_manageme
 			REQUIRE(c.user_history[1] == t1);
 			REQUIRE(c.user_history[2] == t2);
 			REQUIRE(c.user_history[3] == t3);
-			REQUIRE(c.get_current_state() == t1);
+			REQUIRE(c.get_current_timepoint() == t1);
 
 			WHEN("Auto garbage collector is enabled") {
 				c.set_auto_gc(true);
 				c.stop_browsing_user_history();
 
-				THEN("Should remove undoed states from user history") {
+				THEN("Should remove undoed timepoints from user history") {
 					REQUIRE(c.user_history.size() == 2);
 					REQUIRE(c.user_history[0] == t0);
 					REQUIRE(c.user_history[1] == t1);
-					REQUIRE(c.get_current_state() == t1);
+					REQUIRE(c.get_current_timepoint() == t1);
 				}
 
 				THEN("Should delete unreferenced Timepoints from history tree") {
@@ -1048,11 +1048,11 @@ SCENARIO("void Caretaker::stop_browsing_user_history()", "[utils][state_manageme
 				c.set_auto_gc(false);
 				c.stop_browsing_user_history();
 
-				THEN("Should remove undoed states from user history") {
+				THEN("Should remove undoed timepoints from user history") {
 					REQUIRE(c.user_history.size() == 2);
 					REQUIRE(c.user_history[0] == t0);
 					REQUIRE(c.user_history[1] == t1);
-					REQUIRE(c.get_current_state() == t1);
+					REQUIRE(c.get_current_timepoint() == t1);
 				}
 
 				THEN("Should keep unreferenced Timepoints in history tree") {
@@ -1077,8 +1077,8 @@ SCENARIO("Timepoint* Caretaker::get_history_root()", "[utils][state_management]"
 			Timepoint* t0 = c.get_history_root();
 			REQUIRE(t0 != nullptr);
 
-			AND_WHEN("Going to the next state") {
-				Timepoint* t1 = c.get_next_state();
+			AND_WHEN("Going to the next timepoint") {
+				Timepoint* t1 = c.make_next_timepoint();
 
 				THEN("Should still return the history tree root") {
 					REQUIRE(c.get_history_root() == t0);
@@ -1090,20 +1090,20 @@ SCENARIO("Timepoint* Caretaker::get_history_root()", "[utils][state_management]"
 }
 
 //******************************************************************************
-SCENARIO("Timepoint* Caretaker::get_current_state()", "[utils][state_management]") {
+SCENARIO("Timepoint* Caretaker::get_current_timepoint()", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
 
 		THEN("Should return its history tree root") {
 			Timepoint* t0 = c.get_history_root();
-			REQUIRE(c.get_current_state() == t0);
+			REQUIRE(c.get_current_timepoint() == t0);
 
-			AND_WHEN("Going to the next state") {
-				Timepoint* t1 = c.get_next_state();
+			AND_WHEN("Going to the next timepoint") {
+				Timepoint* t1 = c.make_next_timepoint();
 
-				THEN("Should return the next state") {
-					REQUIRE(c.get_current_state() != t0);
-					REQUIRE(c.get_current_state() == t1);
+				THEN("Should return the next timepoint") {
+					REQUIRE(c.get_current_timepoint() != t0);
+					REQUIRE(c.get_current_timepoint() == t1);
 				}
 			}
 		}
@@ -1111,20 +1111,20 @@ SCENARIO("Timepoint* Caretaker::get_current_state()", "[utils][state_management]
 }
 
 //******************************************************************************
-SCENARIO("vector<Timepoint*> const& Caretaker::get_pinned_states() const", "[utils][state_management]") {
-	GIVEN("A Caretaker with some pinned states") {
+SCENARIO("vector<Timepoint*> const& Caretaker::get_pinned_timepoints() const", "[utils][state_management]") {
+	GIVEN("A Caretaker with some pinned timepoints") {
 		Caretaker c;
-		[[maybe_unused]] Timepoint* t0 = c.get_current_state();
-		c.pin_current_state();
-		[[maybe_unused]] Timepoint* t1 = c.get_next_state();
-		[[maybe_unused]] Timepoint* t2 = c.get_next_state();
-		c.pin_current_state();
-		[[maybe_unused]] Timepoint* t3 = c.get_next_state();
-		c.pin_current_state();
-		[[maybe_unused]] Timepoint* t4 = c.get_next_state();
+		[[maybe_unused]] Timepoint* t0 = c.get_current_timepoint();
+		c.pin_current_timepoint();
+		[[maybe_unused]] Timepoint* t1 = c.make_next_timepoint();
+		[[maybe_unused]] Timepoint* t2 = c.make_next_timepoint();
+		c.pin_current_timepoint();
+		[[maybe_unused]] Timepoint* t3 = c.make_next_timepoint();
+		c.pin_current_timepoint();
+		[[maybe_unused]] Timepoint* t4 = c.make_next_timepoint();
 
-		THEN("Should return pinned states") {
-			auto a = c.get_pinned_states();
+		THEN("Should return pinned timepoints") {
+			auto a = c.get_pinned_timepoints();
 			REQUIRE(a.size() == 3);
 			REQUIRE(contains(a, t0));
 			REQUIRE(contains(a, t2));
@@ -1134,16 +1134,16 @@ SCENARIO("vector<Timepoint*> const& Caretaker::get_pinned_states() const", "[uti
 }
 
 //******************************************************************************
-SCENARIO("Timepoint* Caretaker::get_next_state()", "[utils][state_management]") {
-	GIVEN("A Caretaker with some remembered states") {
+SCENARIO("Timepoint* Caretaker::make_next_timepoint()", "[utils][state_management]") {
+	GIVEN("A Caretaker with some remembered timepoints") {
 		Caretaker c;
-		[[maybe_unused]] Timepoint* t0 = c.get_current_state();
-		[[maybe_unused]] Timepoint* t1 = c.get_next_state();
-		c.remember_current_state();
-		[[maybe_unused]] Timepoint* t2 = c.get_next_state();
-		c.remember_current_state();
-		[[maybe_unused]] Timepoint* t3 = c.get_next_state();
-		c.remember_current_state();
+		[[maybe_unused]] Timepoint* t0 = c.get_current_timepoint();
+		[[maybe_unused]] Timepoint* t1 = c.make_next_timepoint();
+		c.remember_current_timepoint();
+		[[maybe_unused]] Timepoint* t2 = c.make_next_timepoint();
+		c.remember_current_timepoint();
+		[[maybe_unused]] Timepoint* t3 = c.make_next_timepoint();
+		c.remember_current_timepoint();
 
 		WHEN("Not browsing user history") {
 			REQUIRE(c.user_history.size() == 4);
@@ -1151,17 +1151,17 @@ SCENARIO("Timepoint* Caretaker::get_next_state()", "[utils][state_management]") 
 			REQUIRE(c.user_history[1] == t1);
 			REQUIRE(c.user_history[2] == t2);
 			REQUIRE(c.user_history[3] == t3);
-			REQUIRE(c.get_current_state() == t3);
+			REQUIRE(c.get_current_timepoint() == t3);
 			REQUIRE_FALSE(c.can_redo());
 
 			WHEN("Running") {
-				Timepoint* t4 = c.get_next_state();
+				Timepoint* t4 = c.make_next_timepoint();
 
-				THEN("Should return a new Timepoint that is a child of the current state Timepoint") {
+				THEN("Should return a new Timepoint that is a child of the current Timepoint") {
 					REQUIRE(t4->parent() == t3);
 
-					AND_THEN("Current state should be updated to this new Timepoint") {
-						REQUIRE(c.get_current_state() == t4);
+					AND_THEN("Current timepoint should be updated to this new Timepoint") {
+						REQUIRE(c.get_current_timepoint() == t4);
 					}
 				}
 			}
@@ -1174,17 +1174,17 @@ SCENARIO("Timepoint* Caretaker::get_next_state()", "[utils][state_management]") 
 			REQUIRE(c.user_history[1] == t1);
 			REQUIRE(c.user_history[2] == t2);
 			REQUIRE(c.user_history[3] == t3);
-			REQUIRE(c.get_current_state() == t1);
+			REQUIRE(c.get_current_timepoint() == t1);
 			REQUIRE(c.can_redo());
 
 			WHEN("Running") {
-				Timepoint* t4 = c.get_next_state();
+				Timepoint* t4 = c.make_next_timepoint();
 
-				THEN("Should return a new Timepoint that is a child of the current state Timepoint") {
+				THEN("Should return a new Timepoint that is a child of the current Timepoint") {
 					REQUIRE(t4->parent() == t1);
 
-					AND_THEN("Current state should be updated to this new Timepoint") {
-						REQUIRE(c.get_current_state() == t4);
+					AND_THEN("Current timepoint should be updated to this new Timepoint") {
+						REQUIRE(c.get_current_timepoint() == t4);
 					}
 				}
 
@@ -1200,40 +1200,40 @@ SCENARIO("Timepoint* Caretaker::get_next_state()", "[utils][state_management]") 
 }
 
 //******************************************************************************
-SCENARIO("void Caretaker::add(shared_ptr<IOriginator> const& originator)", "[utils][state_management]") {
+SCENARIO("void Caretaker::take_care_of(shared_ptr<IOriginator> const& originator)", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
 
-		WHEN("Trying to add a null Originator") {
-			c.add(nullptr);
+		WHEN("Trying to take_care_of a null Originator") {
+			c.take_care_of(nullptr);
 
 			THEN("Should not do anything") {
 				REQUIRE(c.originators.empty());
 			}
 		}
 
-		WHEN("Trying to add an Originator affiliated with another Caretaker") {
+		WHEN("Trying to take_care_of an Originator affiliated with another Caretaker") {
 			auto a = std::make_shared<Originator<StateA>>(c.get_history_root(), StateA { .str = "ac", .num = 56 });
-			c.add(a);
+			c.take_care_of(a);
 
 			THEN("Should not do anything") {
 				REQUIRE(c.originators.empty());
 			}
 		}
 
-		WHEN("Trying to add an Originator which init state is unrelated to the history tree") {
+		WHEN("Trying to take_care_of an Originator which init timepoint is unrelated to the history tree") {
 			Timepoint t;
 			auto a = std::make_shared<Originator<StateA>>(&t, StateA { .str = "ac", .num = 56 }, c);
-			c.add(a);
+			c.take_care_of(a);
 
 			THEN("Should not do anything") {
 				REQUIRE(c.originators.empty());
 			}
 		}
 
-		WHEN("Trying to add an Originator affiliated with this Caretaker and which init state is part of the history tree") {
+		WHEN("Trying to take_care_of an Originator affiliated with this Caretaker and which init timepoint is part of the history tree") {
 			auto a = std::make_shared<Originator<StateA>>(c.get_history_root(), StateA { .str = "ac", .num = 56 }, c);
-			c.add(a);
+			c.take_care_of(a);
 
 			THEN("Should register it") {
 				REQUIRE(c.originators.size() == 1);
@@ -1244,53 +1244,53 @@ SCENARIO("void Caretaker::add(shared_ptr<IOriginator> const& originator)", "[uti
 }
 
 //******************************************************************************
-SCENARIO("void Caretaker::undo(size_t states)", "[utils][state_management]") {
+SCENARIO("void Caretaker::undo(size_t remembered_timepoints)", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
 
 		WHEN("Can undo") {
-			[[maybe_unused]] Timepoint* t0 = c.get_current_state();
-			[[maybe_unused]] Timepoint* t1 = c.get_next_state();
-			c.remember_current_state();
-			[[maybe_unused]] Timepoint* t2 = c.get_next_state();
-			c.remember_current_state();
-			[[maybe_unused]] Timepoint* t3 = c.get_next_state();
+			[[maybe_unused]] Timepoint* t0 = c.get_current_timepoint();
+			[[maybe_unused]] Timepoint* t1 = c.make_next_timepoint();
+			c.remember_current_timepoint();
+			[[maybe_unused]] Timepoint* t2 = c.make_next_timepoint();
+			c.remember_current_timepoint();
+			[[maybe_unused]] Timepoint* t3 = c.make_next_timepoint();
 
 			REQUIRE(c.can_undo());
 
-			WHEN("Undoing 0 states") {
+			WHEN("Undoing 0 timepoints") {
 				c.undo(0);
 
 				THEN("Should not do anything") {
-					REQUIRE(c.get_current_state() == t3);
+					REQUIRE(c.get_current_timepoint() == t3);
 				}
 			}
 
-			WHEN("Current state is a remembered state") {
-				c.remember_current_state();
+			WHEN("Current timepoint is a remembered timepoint") {
+				c.remember_current_timepoint();
 				REQUIRE(c.user_history.size() == 4);
 				REQUIRE(c.user_history[0] == t0);
 				REQUIRE(c.user_history[1] == t1);
 				REQUIRE(c.user_history[2] == t2);
 				REQUIRE(c.user_history[3] == t3);
-				REQUIRE(c.get_current_state() == t3);
+				REQUIRE(c.get_current_timepoint() == t3);
 
-				WHEN("Undoing one state") {
+				WHEN("Undoing one timepoint") {
 					c.undo();
 
-					THEN("Current state should be the second last remembered state") {
-						REQUIRE(c.get_current_state() == t2);
+					THEN("Current timepoint should be the second last remembered timepoint") {
+						REQUIRE(c.get_current_timepoint() == t2);
 					}
 
 					THEN("Redoing should be possible") {
 						REQUIRE(c.can_redo());
 					}
 
-					AND_WHEN("Undoing some more states") {
+					AND_WHEN("Undoing some more timepoints") {
 						c.undo(2);
 
-						THEN("Current state should be updated") {
-							REQUIRE(c.get_current_state() == t0);
+						THEN("Current timepoint should be updated") {
+							REQUIRE(c.get_current_timepoint() == t0);
 						}
 
 						THEN("Redoing should be possible") {
@@ -1300,29 +1300,29 @@ SCENARIO("void Caretaker::undo(size_t states)", "[utils][state_management]") {
 				}
 			}
 
-			WHEN("Current state is not a remembered state") {
+			WHEN("Current timepoint is not a remembered timepoint") {
 				REQUIRE(c.user_history.size() == 3);
 				REQUIRE(c.user_history[0] == t0);
 				REQUIRE(c.user_history[1] == t1);
 				REQUIRE(c.user_history[2] == t2);
-				REQUIRE(c.get_current_state() == t3);
+				REQUIRE(c.get_current_timepoint() == t3);
 
-				WHEN("Undoing one state") {
+				WHEN("Undoing one timepoint") {
 					c.undo();
 
-					THEN("Current state should be the last remembered state") {
-						REQUIRE(c.get_current_state() == t2);
+					THEN("Current timepoint should be the last remembered timepoint") {
+						REQUIRE(c.get_current_timepoint() == t2);
 					}
 
 					THEN("Redoing should not be possible") {
 						REQUIRE_FALSE(c.can_redo());
 					}
 
-					AND_WHEN("Undoing some more states") {
+					AND_WHEN("Undoing some more timepoints") {
 						c.undo(2);
 
-						THEN("Current state should be updated") {
-							REQUIRE(c.get_current_state() == t0);
+						THEN("Current timepoint should be updated") {
+							REQUIRE(c.get_current_timepoint() == t0);
 						}
 
 						THEN("Redoing should be possible") {
@@ -1336,59 +1336,59 @@ SCENARIO("void Caretaker::undo(size_t states)", "[utils][state_management]") {
 		WHEN("Cannot undo") {
 			REQUIRE(c.user_history.size() == 1);
 			REQUIRE(c.user_history[0] == c.get_history_root());
-			REQUIRE(c.get_current_state() == c.get_history_root());
+			REQUIRE(c.get_current_timepoint() == c.get_history_root());
 			REQUIRE_FALSE(c.can_undo());
 
 			THEN("Should not do anything") {
 				c.undo();
-				REQUIRE(c.get_current_state() == c.get_history_root());
+				REQUIRE(c.get_current_timepoint() == c.get_history_root());
 			}
 		}
 	}
 }
 
 //******************************************************************************
-SCENARIO("void Caretaker::redo(size_t states)", "[utils][state_management]") {
+SCENARIO("void Caretaker::redo(size_t remembered_timepoints)", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
 
 		WHEN("Can redo") {
-			[[maybe_unused]] Timepoint* t0 = c.get_current_state();
-			[[maybe_unused]] Timepoint* t1 = c.get_next_state();
-			c.remember_current_state();
-			[[maybe_unused]] Timepoint* t2 = c.get_next_state();
-			c.remember_current_state();
-			[[maybe_unused]] Timepoint* t3 = c.get_next_state();
-			c.remember_current_state();
+			[[maybe_unused]] Timepoint* t0 = c.get_current_timepoint();
+			[[maybe_unused]] Timepoint* t1 = c.make_next_timepoint();
+			c.remember_current_timepoint();
+			[[maybe_unused]] Timepoint* t2 = c.make_next_timepoint();
+			c.remember_current_timepoint();
+			[[maybe_unused]] Timepoint* t3 = c.make_next_timepoint();
+			c.remember_current_timepoint();
 			c.undo(3);
 
 			REQUIRE(c.can_redo());
 
-			WHEN("Redoing 0 states") {
+			WHEN("Redoing 0 timepoints") {
 				c.redo(0);
 
 				THEN("Should not do anything") {
-					REQUIRE(c.get_current_state() == t0);
+					REQUIRE(c.get_current_timepoint() == t0);
 				}
 			}
 
-			WHEN("Redoing some but not all the redoable states") {
+			WHEN("Redoing some but not all the redoable timepoints") {
 				c.redo(2);
 
-				THEN("Current state should be updated") {
-					REQUIRE(c.get_current_state() == t2);
+				THEN("Current timepoint should be updated") {
+					REQUIRE(c.get_current_timepoint() == t2);
 				}
 
 				THEN("Redoing should be possible") {
 					REQUIRE(c.can_redo());
 				}
 
-				AND_WHEN("Redoing the last redoable state") {
+				AND_WHEN("Redoing the last redoable timepoint") {
 					c.redo();
 
-					THEN("Current state should be the last remembered state") {
-						REQUIRE(c.get_current_state() == c.user_history.back());
-						REQUIRE(c.get_current_state() == t3);
+					THEN("Current timepoint should be the last remembered timepoint") {
+						REQUIRE(c.get_current_timepoint() == c.user_history.back());
+						REQUIRE(c.get_current_timepoint() == t3);
 					}
 
 					THEN("Redoing should not be possible") {
@@ -1399,13 +1399,13 @@ SCENARIO("void Caretaker::redo(size_t states)", "[utils][state_management]") {
 		}
 
 		WHEN("Cannot redo") {
-			REQUIRE(c.get_current_state() == c.get_history_root());
-			REQUIRE(c.get_current_state() == c.user_history.back());
+			REQUIRE(c.get_current_timepoint() == c.get_history_root());
+			REQUIRE(c.get_current_timepoint() == c.user_history.back());
 			REQUIRE_FALSE(c.can_redo());
 
 			THEN("Should not do anything") {
 				c.redo();
-				REQUIRE(c.get_current_state() == c.get_history_root());
+				REQUIRE(c.get_current_timepoint() == c.get_history_root());
 			}
 		}
 	}
@@ -1413,25 +1413,25 @@ SCENARIO("void Caretaker::redo(size_t states)", "[utils][state_management]") {
 
 //******************************************************************************
 SCENARIO("bool Caretaker::can_undo() const", "[utils][state_management]") {
-	GIVEN("A Caretaker with history root as current state and only remembered state") {
+	GIVEN("A Caretaker with history root as current timepoint and only remembered timepoint") {
 		Caretaker c;
 
 		THEN("Should return false") {
-			REQUIRE(c.user_history[0] == c.get_current_state());
+			REQUIRE(c.user_history[0] == c.get_current_timepoint());
 			REQUIRE(c.user_history[0] == c.get_history_root());
 			REQUIRE_FALSE(c.can_undo());
 		}
 	}
 
-	GIVEN("A Caretaker with some remembered states") {
+	GIVEN("A Caretaker with some remembered timepoints") {
 		Caretaker c;
-		[[maybe_unused]] Timepoint* t0 = c.get_current_state();
-		[[maybe_unused]] Timepoint* t1 = c.get_next_state();
-		c.remember_current_state();
-		[[maybe_unused]] Timepoint* t2 = c.get_next_state();
-		c.remember_current_state();
-		[[maybe_unused]] Timepoint* t3 = c.get_next_state();
-		c.remember_current_state();
+		[[maybe_unused]] Timepoint* t0 = c.get_current_timepoint();
+		[[maybe_unused]] Timepoint* t1 = c.make_next_timepoint();
+		c.remember_current_timepoint();
+		[[maybe_unused]] Timepoint* t2 = c.make_next_timepoint();
+		c.remember_current_timepoint();
+		[[maybe_unused]] Timepoint* t3 = c.make_next_timepoint();
+		c.remember_current_timepoint();
 
 		WHEN("Not browsing user history") {
 			REQUIRE(c.user_history.size() == 4);
@@ -1439,7 +1439,7 @@ SCENARIO("bool Caretaker::can_undo() const", "[utils][state_management]") {
 			REQUIRE(c.user_history[1] == t1);
 			REQUIRE(c.user_history[2] == t2);
 			REQUIRE(c.user_history[3] == t3);
-			REQUIRE(c.get_current_state() == t3);
+			REQUIRE(c.get_current_timepoint() == t3);
 
 			THEN("Should return true") {
 				REQUIRE(c.can_undo());
@@ -1453,20 +1453,20 @@ SCENARIO("bool Caretaker::can_undo() const", "[utils][state_management]") {
 			REQUIRE(c.user_history[1] == t1);
 			REQUIRE(c.user_history[2] == t2);
 			REQUIRE(c.user_history[3] == t3);
-			REQUIRE(c.get_current_state() == t0);
+			REQUIRE(c.get_current_timepoint() == t0);
 
 			THEN("Should return false") {
 				REQUIRE_FALSE(c.can_undo());
 			}
 
-			AND_WHEN("Redoing some but not all of the undoed states") {
+			AND_WHEN("Redoing some but not all of the undoed timepoints") {
 				c.redo(2);
 				REQUIRE(c.user_history.size() == 4);
 				REQUIRE(c.user_history[0] == t0);
 				REQUIRE(c.user_history[1] == t1);
 				REQUIRE(c.user_history[2] == t2);
 				REQUIRE(c.user_history[3] == t3);
-				REQUIRE(c.get_current_state() == t2);
+				REQUIRE(c.get_current_timepoint() == t2);
 
 				THEN("Should return true") {
 					REQUIRE(c.can_undo());
@@ -1474,14 +1474,14 @@ SCENARIO("bool Caretaker::can_undo() const", "[utils][state_management]") {
 			}
 		}
 
-		WHEN("Browsing user history by undoing to an intermediate state") {
+		WHEN("Browsing user history by undoing to an intermediate timepoint") {
 			c.undo(2);
 			REQUIRE(c.user_history.size() == 4);
 			REQUIRE(c.user_history[0] == t0);
 			REQUIRE(c.user_history[1] == t1);
 			REQUIRE(c.user_history[2] == t2);
 			REQUIRE(c.user_history[3] == t3);
-			REQUIRE(c.get_current_state() == t1);
+			REQUIRE(c.get_current_timepoint() == t1);
 
 			THEN("Should return true") {
 				REQUIRE(c.can_undo());
@@ -1492,15 +1492,15 @@ SCENARIO("bool Caretaker::can_undo() const", "[utils][state_management]") {
 
 //******************************************************************************
 SCENARIO("bool Caretaker::can_redo() const", "[utils][state_management]") {
-	GIVEN("A Caretaker with some remembered states") {
+	GIVEN("A Caretaker with some remembered timepoints") {
 		Caretaker c;
-		[[maybe_unused]] Timepoint* t0 = c.get_current_state();
-		[[maybe_unused]] Timepoint* t1 = c.get_next_state();
-		c.remember_current_state();
-		[[maybe_unused]] Timepoint* t2 = c.get_next_state();
-		c.remember_current_state();
-		[[maybe_unused]] Timepoint* t3 = c.get_next_state();
-		c.remember_current_state();
+		[[maybe_unused]] Timepoint* t0 = c.get_current_timepoint();
+		[[maybe_unused]] Timepoint* t1 = c.make_next_timepoint();
+		c.remember_current_timepoint();
+		[[maybe_unused]] Timepoint* t2 = c.make_next_timepoint();
+		c.remember_current_timepoint();
+		[[maybe_unused]] Timepoint* t3 = c.make_next_timepoint();
+		c.remember_current_timepoint();
 
 		WHEN("Not browsing user history") {
 			REQUIRE(c.user_history.size() == 4);
@@ -1508,7 +1508,7 @@ SCENARIO("bool Caretaker::can_redo() const", "[utils][state_management]") {
 			REQUIRE(c.user_history[1] == t1);
 			REQUIRE(c.user_history[2] == t2);
 			REQUIRE(c.user_history[3] == t3);
-			REQUIRE(c.get_current_state() == t3);
+			REQUIRE(c.get_current_timepoint() == t3);
 
 			THEN("Should return false") {
 				REQUIRE_FALSE(c.can_redo());
@@ -1522,25 +1522,25 @@ SCENARIO("bool Caretaker::can_redo() const", "[utils][state_management]") {
 			REQUIRE(c.user_history[1] == t1);
 			REQUIRE(c.user_history[2] == t2);
 			REQUIRE(c.user_history[3] == t3);
-			REQUIRE(c.get_current_state() == t1);
+			REQUIRE(c.get_current_timepoint() == t1);
 
 			THEN("Should return true") {
 				REQUIRE(c.can_redo());
 			}
 
-			AND_WHEN("Stopping browsing user history by creating a next state") {
-				Timepoint* t4 = c.get_next_state();
+			AND_WHEN("Stopping browsing user history by creating a next timepoint") {
+				Timepoint* t4 = c.make_next_timepoint();
 				REQUIRE(c.user_history.size() == 2);
 				REQUIRE(c.user_history[0] == t0);
 				REQUIRE(c.user_history[1] == t1);
-				REQUIRE(c.get_current_state() == t4);
+				REQUIRE(c.get_current_timepoint() == t4);
 
 				THEN("Should return false") {
 					REQUIRE_FALSE(c.can_redo());
 				}
 			}
 
-			AND_WHEN("Stopping browsing user history by redoing all undoed states") {
+			AND_WHEN("Stopping browsing user history by redoing all undoed timepoints") {
 				c.redo();
 				REQUIRE(c.can_redo());
 				c.redo();
@@ -1549,7 +1549,7 @@ SCENARIO("bool Caretaker::can_redo() const", "[utils][state_management]") {
 				REQUIRE(c.user_history[1] == t1);
 				REQUIRE(c.user_history[2] == t2);
 				REQUIRE(c.user_history[3] == t3);
-				REQUIRE(c.get_current_state() == t3);
+				REQUIRE(c.get_current_timepoint() == t3);
 
 				THEN("Should return false") {
 					REQUIRE_FALSE(c.can_redo());
@@ -1560,35 +1560,35 @@ SCENARIO("bool Caretaker::can_redo() const", "[utils][state_management]") {
 }
 
 //******************************************************************************
-SCENARIO("void Caretaker::unpin(Timepoint* state)", "[utils][state_management]") {
-	GIVEN("A Caretaker with some pinned states") {
+SCENARIO("void Caretaker::unpin(Timepoint* t)", "[utils][state_management]") {
+	GIVEN("A Caretaker with some pinned timepoints") {
 		Caretaker c;
-		[[maybe_unused]] Timepoint* t0 = c.get_current_state();
-		[[maybe_unused]] Timepoint* t1 = c.get_next_state();
-		c.pin_current_state();
-		[[maybe_unused]] Timepoint* t2 = c.get_next_state();
-		c.pin_current_state();
-		[[maybe_unused]] Timepoint* t3 = c.get_next_state();
+		[[maybe_unused]] Timepoint* t0 = c.get_current_timepoint();
+		[[maybe_unused]] Timepoint* t1 = c.make_next_timepoint();
+		c.pin_current_timepoint();
+		[[maybe_unused]] Timepoint* t2 = c.make_next_timepoint();
+		c.pin_current_timepoint();
+		[[maybe_unused]] Timepoint* t3 = c.make_next_timepoint();
 		c.go_without_remembering(t0);
 
 		REQUIRE(c.user_history.size() == 3);
 		REQUIRE(c.user_history[0] == t0);
 		REQUIRE(c.user_history[1] == t1);
 		REQUIRE(c.user_history[2] == t2);
-		REQUIRE(c.pinned_states.size() == 2);
-		REQUIRE(contains(c.pinned_states, t1));
-		REQUIRE(contains(c.pinned_states, t2));
-		REQUIRE(c.get_current_state() == t0);
+		REQUIRE(c.pinned_timepoints.size() == 2);
+		REQUIRE(contains(c.pinned_timepoints, t1));
+		REQUIRE(contains(c.pinned_timepoints, t2));
+		REQUIRE(c.get_current_timepoint() == t0);
 
 		WHEN("Auto garbage collector is enabled") {
 			c.set_auto_gc(true);
 			c.unpin(t2);
 
-			THEN("Should remove unpined state from pinned states") {
-				REQUIRE(c.pinned_states.size() == 1);
-				REQUIRE(contains(c.pinned_states, t1));
-				REQUIRE_FALSE(contains(c.pinned_states, t2));
-				REQUIRE(c.get_current_state() == t0);
+			THEN("Should remove unpined timepoint from pinned timepoints") {
+				REQUIRE(c.pinned_timepoints.size() == 1);
+				REQUIRE(contains(c.pinned_timepoints, t1));
+				REQUIRE_FALSE(contains(c.pinned_timepoints, t2));
+				REQUIRE(c.get_current_timepoint() == t0);
 			}
 
 			THEN("Should delete unreferenced Timepoints from history tree") {
@@ -1609,11 +1609,11 @@ SCENARIO("void Caretaker::unpin(Timepoint* state)", "[utils][state_management]")
 			c.set_auto_gc(false);
 			c.unpin(t2);
 
-			THEN("Should remove unpined state from pinned states") {
-				REQUIRE(c.pinned_states.size() == 1);
-				REQUIRE(contains(c.pinned_states, t1));
-				REQUIRE_FALSE(contains(c.pinned_states, t2));
-				REQUIRE(c.get_current_state() == t0);
+			THEN("Should remove unpined timepoint from pinned timepoints") {
+				REQUIRE(c.pinned_timepoints.size() == 1);
+				REQUIRE(contains(c.pinned_timepoints, t1));
+				REQUIRE_FALSE(contains(c.pinned_timepoints, t2));
+				REQUIRE(c.get_current_timepoint() == t0);
 			}
 
 			THEN("Should keep unreferenced Timepoints in history tree") {
@@ -1633,59 +1633,59 @@ SCENARIO("void Caretaker::unpin(Timepoint* state)", "[utils][state_management]")
 }
 
 //******************************************************************************
-SCENARIO("void Caretaker::pin_current_state()", "[utils][state_management]") {
+SCENARIO("void Caretaker::pin_current_timepoint()", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
-		Timepoint* t0 = c.get_current_state();
+		Timepoint* t0 = c.get_current_timepoint();
 
-		THEN("No state should be pinned but root history should be in user history") {
-			REQUIRE(c.pinned_states.empty());
+		THEN("No timepoint should be pinned but root history should be in user history") {
+			REQUIRE(c.pinned_timepoints.empty());
 			REQUIRE(c.user_history.size() == 1);
 			REQUIRE(c.user_history[0] == t0);
 		}
 
-		WHEN("Trying to pin current state") {
-			c.pin_current_state();
+		WHEN("Trying to pin current timepoint") {
+			c.pin_current_timepoint();
 
-			THEN("Current state should be pinned but not appended again to user history") {
-				REQUIRE(c.pinned_states.size() == 1);
-				REQUIRE(contains(c.pinned_states, t0));
+			THEN("Current timepoint should be pinned but not appended again to user history") {
+				REQUIRE(c.pinned_timepoints.size() == 1);
+				REQUIRE(contains(c.pinned_timepoints, t0));
 				REQUIRE(c.user_history.size() == 1);
 				REQUIRE(c.user_history[0] == t0);
 			}
 
-			AND_WHEN("Trying to pin current state again") {
-				c.pin_current_state();
+			AND_WHEN("Trying to pin current timepoint again") {
+				c.pin_current_timepoint();
 
 				THEN("Should not do anything") {
-					REQUIRE(c.pinned_states.size() == 1);
-					REQUIRE(contains(c.pinned_states, t0));
+					REQUIRE(c.pinned_timepoints.size() == 1);
+					REQUIRE(contains(c.pinned_timepoints, t0));
 					REQUIRE(c.user_history.size() == 1);
 					REQUIRE(c.user_history[0] == t0);
 				}
 			}
 
-			AND_WHEN("Trying to pin current state after going to the next state") {
-				Timepoint* t1 = c.get_next_state();
-				c.pin_current_state();
+			AND_WHEN("Trying to pin current timepoint after going to the next timepoint") {
+				Timepoint* t1 = c.make_next_timepoint();
+				c.pin_current_timepoint();
 
-				THEN("Next state should be pinned and appended to user history") {
-					REQUIRE(c.pinned_states.size() == 2);
-					REQUIRE(contains(c.pinned_states, t0));
-					REQUIRE(contains(c.pinned_states, t1));
+				THEN("Next timepoint should be pinned and appended to user history") {
+					REQUIRE(c.pinned_timepoints.size() == 2);
+					REQUIRE(contains(c.pinned_timepoints, t0));
+					REQUIRE(contains(c.pinned_timepoints, t1));
 					REQUIRE(c.user_history.size() == 2);
 					REQUIRE(c.user_history[0] == t0);
 					REQUIRE(c.user_history[1] == t1);
 				}
 
-				AND_WHEN("Trying to pin current state after going_without_remembering to the previous state") {
+				AND_WHEN("Trying to pin current timepoint after going_without_remembering to the previous timepoint") {
 					c.go_without_remembering(t0);
-					c.pin_current_state();
+					c.pin_current_timepoint();
 
-					THEN("Previous state should be appended to user history but not added again to pinned states") {
-						REQUIRE(c.pinned_states.size() == 2);
-						REQUIRE(contains(c.pinned_states, t0));
-						REQUIRE(contains(c.pinned_states, t1));
+					THEN("Previous timepoint should be appended to user history but not added again to pinned timepoints") {
+						REQUIRE(c.pinned_timepoints.size() == 2);
+						REQUIRE(contains(c.pinned_timepoints, t0));
+						REQUIRE(contains(c.pinned_timepoints, t1));
 						REQUIRE(c.user_history.size() == 3);
 						REQUIRE(c.user_history[0] == t0);
 						REQUIRE(c.user_history[1] == t1);
@@ -1698,39 +1698,39 @@ SCENARIO("void Caretaker::pin_current_state()", "[utils][state_management]") {
 }
 
 //******************************************************************************
-SCENARIO("void Caretaker::remember_current_state()", "[utils][state_management]") {
+SCENARIO("void Caretaker::remember_current_timepoint()", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
-		Timepoint* t0 = c.get_current_state();
+		Timepoint* t0 = c.get_current_timepoint();
 
 		THEN("Root history should be in user history") {
 			REQUIRE(c.user_history.size() == 1);
 			REQUIRE(c.user_history[0] == t0);
 		}
 
-		WHEN("Trying to remember current state") {
-			c.remember_current_state();
+		WHEN("Trying to remember current timepoint") {
+			c.remember_current_timepoint();
 
-			THEN("Current state should not be appended again to user history") {
+			THEN("Current timepoint should not be appended again to user history") {
 				REQUIRE(c.user_history.size() == 1);
 				REQUIRE(c.user_history[0] == t0);
 			}
 
-			AND_WHEN("Trying to remember current state after going to the next state") {
-				Timepoint* t1 = c.get_next_state();
-				c.remember_current_state();
+			AND_WHEN("Trying to remember current timepoint after going to the next timepoint") {
+				Timepoint* t1 = c.make_next_timepoint();
+				c.remember_current_timepoint();
 
-				THEN("Next state should be appended to user history") {
+				THEN("Next timepoint should be appended to user history") {
 					REQUIRE(c.user_history.size() == 2);
 					REQUIRE(c.user_history[0] == t0);
 					REQUIRE(c.user_history[1] == t1);
 				}
 
-				AND_WHEN("Trying to remember current state after going_without_remembering to the previous state") {
+				AND_WHEN("Trying to remember current timepoint after going_without_remembering to the previous timepoint") {
 					c.go_without_remembering(t0);
-					c.remember_current_state();
+					c.remember_current_timepoint();
 
-					THEN("Previous state should be appended to user history") {
+					THEN("Previous timepoint should be appended to user history") {
 						REQUIRE(c.user_history.size() == 3);
 						REQUIRE(c.user_history[0] == t0);
 						REQUIRE(c.user_history[1] == t1);
@@ -1772,50 +1772,50 @@ SCENARIO("bool Caretaker::go_without_remembering(Timepoint* t)", "[utils][state_
 		x->set_state(d2, { .str = "lo", .num = 69 });
 		y->set_state(c1, { .str = "dk", .num = 12 });
 		z->set_state(c2, { .str = "ws", .num = 6 });
-		c.add(x);
-		c.add(y);
-		c.add(z);
+		c.take_care_of(x);
+		c.take_care_of(y);
+		c.take_care_of(z);
 		z.reset();
 
 		WHEN("Trying to go to a Timepoint that is part of the history tree") {
 			bool r = c.go_without_remembering(d1);
 
-			THEN("Should update current state and return true") {
+			THEN("Should update current timepoint and return true") {
 				REQUIRE(r);
-				REQUIRE(c.get_current_state() == d1);
+				REQUIRE(c.get_current_timepoint() == d1);
 			}
 
-			THEN("Current state should be propagated to valid Originators") {
-				AND_THEN("Originators current state should be the given Timepoint or its first known parent or Originator init state") {
-					REQUIRE(x->get_current_state() == a);
-					REQUIRE(y->get_current_state() == c1);
+			THEN("Current timepoint should be propagated to valid Originators") {
+				AND_THEN("Originators current timepoint should be the given Timepoint or its first known parent or Originator init timepoint") {
+					REQUIRE(x->get_current_timepoint() == a);
+					REQUIRE(y->get_current_timepoint() == c1);
 				}
 			}
 		}
 
 		WHEN("Trying to go to a Timepoint that is not part of the history tree") {
 			Timepoint f;
-			Timepoint* t = c.get_current_state();
+			Timepoint* t = c.get_current_timepoint();
 			bool r = c.go_without_remembering(&f);
 
 			THEN("Should not do anything and return false") {
 				REQUIRE_FALSE(r);
-				REQUIRE(c.get_current_state() == t);
-				REQUIRE(x->get_current_state() == d2);
-				REQUIRE(y->get_current_state() == c1);
+				REQUIRE(c.get_current_timepoint() == t);
+				REQUIRE(x->get_current_timepoint() == d2);
+				REQUIRE(y->get_current_timepoint() == c1);
 
 			}
 		}
 
 		WHEN("Trying to go to a null Timepoint") {
-			Timepoint* t = c.get_current_state();
+			Timepoint* t = c.get_current_timepoint();
 			bool r = c.go_without_remembering(nullptr);
 
 			THEN("Should not do anything and return false") {
 				REQUIRE_FALSE(r);
-				REQUIRE(c.get_current_state() == t);
-				REQUIRE(x->get_current_state() == d2);
-				REQUIRE(y->get_current_state() == c1);
+				REQUIRE(c.get_current_timepoint() == t);
+				REQUIRE(x->get_current_timepoint() == d2);
+				REQUIRE(y->get_current_timepoint() == c1);
 			}
 		}
 	}
@@ -1851,9 +1851,9 @@ SCENARIO("bool Caretaker::go_and_remember(Timepoint* t)", "[utils][state_managem
 		x->set_state(d2, { .str = "lo", .num = 69 });
 		y->set_state(c1, { .str = "dk", .num = 12 });
 		z->set_state(c2, { .str = "ws", .num = 6 });
-		c.add(x);
-		c.add(y);
-		c.add(z);
+		c.take_care_of(x);
+		c.take_care_of(y);
+		c.take_care_of(z);
 		z.reset();
 
 		THEN("Root history should be in user history") {
@@ -1864,46 +1864,46 @@ SCENARIO("bool Caretaker::go_and_remember(Timepoint* t)", "[utils][state_managem
 		WHEN("Trying to go to a Timepoint that is part of the history tree") {
 			bool r = c.go_and_remember(d1);
 
-			THEN("Should update current state, user history and return true") {
+			THEN("Should update current timepoint, user history and return true") {
 				REQUIRE(r);
-				REQUIRE(c.get_current_state() == d1);
+				REQUIRE(c.get_current_timepoint() == d1);
 				REQUIRE(c.user_history.size() == 2);
 				REQUIRE(c.user_history[0] == a);
 				REQUIRE(c.user_history[1] == d1);
 			}
 
-			THEN("Current state should be propagated to valid Originators") {
-				AND_THEN("Originators current state should be the given Timepoint or its first known parent or Originator init state") {
-					REQUIRE(x->get_current_state() == a);
-					REQUIRE(y->get_current_state() == c1);
+			THEN("Current timepoint should be propagated to valid Originators") {
+				AND_THEN("Originators current timepoint should be the given Timepoint or its first known parent or Originator init timepoint") {
+					REQUIRE(x->get_current_timepoint() == a);
+					REQUIRE(y->get_current_timepoint() == c1);
 				}
 			}
 		}
 
 		WHEN("Trying to go to a Timepoint that is not part of the history tree") {
 			Timepoint f;
-			Timepoint* t = c.get_current_state();
+			Timepoint* t = c.get_current_timepoint();
 			bool r = c.go_and_remember(&f);
 
 			THEN("Should not do anything and return false") {
 				REQUIRE_FALSE(r);
-				REQUIRE(c.get_current_state() == t);
-				REQUIRE(x->get_current_state() == d2);
-				REQUIRE(y->get_current_state() == c1);
+				REQUIRE(c.get_current_timepoint() == t);
+				REQUIRE(x->get_current_timepoint() == d2);
+				REQUIRE(y->get_current_timepoint() == c1);
 				REQUIRE(c.user_history.size() == 1);
 				REQUIRE(c.user_history[0] == a);
 			}
 		}
 
 		WHEN("Trying to go to a null Timepoint") {
-			Timepoint* t = c.get_current_state();
+			Timepoint* t = c.get_current_timepoint();
 			bool r = c.go_and_remember(nullptr);
 
 			THEN("Should not do anything and return false") {
 				REQUIRE_FALSE(r);
-				REQUIRE(c.get_current_state() == t);
-				REQUIRE(x->get_current_state() == d2);
-				REQUIRE(y->get_current_state() == c1);
+				REQUIRE(c.get_current_timepoint() == t);
+				REQUIRE(x->get_current_timepoint() == d2);
+				REQUIRE(y->get_current_timepoint() == c1);
 				REQUIRE(c.user_history.size() == 1);
 				REQUIRE(c.user_history[0] == a);
 			}
