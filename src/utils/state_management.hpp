@@ -80,7 +80,6 @@ protected:
 public:
 	virtual ~IOriginator() = default;
 	virtual void go(Timepoint* t) noexcept = 0;
-	virtual void erase(Timepoint* t) noexcept = 0;
 	virtual void erase(std::set<Timepoint*> const& ts) noexcept = 0;
 	virtual Timepoint* get_init_timepoint() const noexcept = 0;
 };
@@ -110,7 +109,6 @@ public:
 
 	void go(Timepoint* t) noexcept final;
 
-	void erase(Timepoint* t) noexcept final;
 	void erase(std::set<Timepoint*> const& ts) noexcept final;
 
 	std::vector<std::pair<Timepoint*, State const&>> get_available_states() const noexcept;
@@ -174,19 +172,6 @@ void Originator<State>::go(Timepoint* t) noexcept {
 			}
 		}
 	current_timepoint = init_timepoint;
-}
-
-//******************************************************************************
-template<typename State>
-void Originator<State>::erase(Timepoint* t) noexcept {
-	if(t == init_timepoint || t == current_timepoint) {
-		// Nothing to do:
-		// - The object must not exist with an invalid state
-		// - The object will likely be garbage collected completely during the pass
-	} else {
-		states.erase(t);
-		std::erase(ordered_timepoints, t);
-	}
 }
 
 //******************************************************************************
