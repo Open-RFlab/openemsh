@@ -11,8 +11,9 @@
 
 #include "utils/vector_utils.hpp"
 
-/// @test template<typename T> std::vector<T*> create_view(
-///       	std::vector<std::unique_ptr<T>> const& original) noexcept
+/// @test template<PointerLike T>
+///       std::vector<std::add_pointer_t<typename T::element_type>>
+///       	create_view(std::vector<T> const& original) noexcept
 /// @test template<typename T> std::vector<std::unique_ptr<T const>> from_init_list(
 ///       	std::initializer_list<T> const& original) noexcept
 /// @test template<typename T> bool contains(
@@ -24,15 +25,31 @@
 ///*****************************************************************************
 
 //******************************************************************************
-SCENARIO("template<typename T> std::vector<T*> create_view( \
-std::vector<std::unique_ptr<T>> \
-const& original)", "[utils][vector_utils]") {
+SCENARIO("template<PointerLike T> \
+std::vector<std::add_pointer_t<typename T::element_type>> \
+create_view(std::vector<T> const& original) noexcept"), "[utils][vector_utils]") {
 	GIVEN("A vector of unique_ptr to string with members") {
 		std::vector<std::unique_ptr<std::string>> a;
 		a.emplace_back(std::make_unique<std::string>("aa"));
 		a.emplace_back(std::make_unique<std::string>("b"));
 		a.emplace_back(std::make_unique<std::string>("333"));
 		a.emplace_back(std::make_unique<std::string>("dd"));
+		THEN("Should return an equivalent vector of raw pointers to the strings") {
+			std::vector<std::string *> b = create_view(a);
+			REQUIRE(b.size() == a.size());
+			for(std::size_t i = 0; i < b.size(); ++i) {
+				REQUIRE(b[i] == a[i].get());
+				REQUIRE(*b[i] == *a[i]);
+			}
+		}
+	}
+
+	GIVEN("A vector of shared_ptr to string with members") {
+		std::vector<std::shared_ptr<std::string>> a;
+		a.emplace_back(std::make_shared<std::string>("aa"));
+		a.emplace_back(std::make_shared<std::string>("b"));
+		a.emplace_back(std::make_shared<std::string>("333"));
+		a.emplace_back(std::make_shared<std::string>("dd"));
 		THEN("Should return an equivalent vector of raw pointers to the strings") {
 			std::vector<std::string *> b = create_view(a);
 			REQUIRE(b.size() == a.size());

@@ -11,10 +11,12 @@
 #include <memory>
 #include <vector>
 
+#include "concepts.hpp"
+
 //******************************************************************************
-template<typename T>
-std::vector<T*> create_view(std::vector<std::unique_ptr<T>> const& original) noexcept {
-	std::vector<T*> view(original.size());
+template<PointerLike T>
+std::vector<std::add_pointer_t<typename T::element_type>> create_view(std::vector<T> const& original) noexcept {
+	std::vector<std::add_pointer_t<typename T::element_type>> view(original.size());
 
 	for(size_t i = 0, size = original.size(); i < size; ++i) {
 		view[i] = original[i].get();
