@@ -59,6 +59,7 @@ if( Catch2_FOUND )
 		)
 
 	target_link_libraries( openemsh_unittest
+		PRIVATE
 		Catch2::Catch2WithMain
 		openemsh
 		)

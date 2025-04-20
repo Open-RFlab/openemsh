@@ -27,7 +27,7 @@
 //******************************************************************************
 SCENARIO("template<PointerLike T> \
 std::vector<std::add_pointer_t<typename T::element_type>> \
-create_view(std::vector<T> const& original) noexcept"), "[utils][vector_utils]") {
+create_view(std::vector<T> const& original) noexcept", "[utils][vector_utils]") {
 	GIVEN("A vector of unique_ptr to string with members") {
 		std::vector<std::unique_ptr<std::string>> a;
 		a.emplace_back(std::make_unique<std::string>("aa"));

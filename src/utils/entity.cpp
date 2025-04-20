@@ -4,8 +4,6 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#pragma once
-
 #include "id_generator.hpp"
 
 #include "entity.hpp"
