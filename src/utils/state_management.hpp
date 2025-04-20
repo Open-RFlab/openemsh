@@ -101,6 +101,7 @@ protected:
 
 public:
 	Originator(Timepoint* init_timepoint, State state, Caretaker& caretaker = Caretaker::singleton()) noexcept;
+	Originator(Timepoint* init_timepoint, Caretaker& caretaker = Caretaker::singleton()) noexcept;
 
 	Timepoint* get_init_timepoint() const noexcept final;
 	Timepoint* get_current_timepoint() const noexcept;
@@ -132,6 +133,16 @@ Originator<State>::Originator(Timepoint* init_timepoint, State state, Caretaker&
 , init_timepoint(init_timepoint)
 , current_timepoint(init_timepoint)
 , states{{ init_timepoint, state }}
+, ordered_timepoints{{ init_timepoint }}
+{}
+
+//******************************************************************************
+template<typename State>
+Originator<State>::Originator(Timepoint* init_timepoint, Caretaker& caretaker) noexcept
+: caretaker(caretaker)
+, init_timepoint(init_timepoint)
+, current_timepoint(init_timepoint)
+, states{{ init_timepoint, State() }}
 , ordered_timepoints{{ init_timepoint }}
 {}
 
