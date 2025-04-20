@@ -256,12 +256,12 @@ void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, s
 }
 
 //******************************************************************************
-unique_ptr<Board> ParserFromCsx::run(std::filesystem::path const& input) {
+shared_ptr<Board> ParserFromCsx::run(std::filesystem::path const& input) {
 	return ParserFromCsx::run(input, {});
 }
 
 //******************************************************************************
-unique_ptr<Board> ParserFromCsx::run(std::filesystem::path const& input, Params params) {
+shared_ptr<Board> ParserFromCsx::run(std::filesystem::path const& input, Params params) {
 	ParserFromCsx parser(input, std::move(params));
 	parser.parse();
 	return parser.output();
@@ -318,7 +318,7 @@ void ParserFromCsx::parse() {
 }
 
 //******************************************************************************
-unique_ptr<Board> ParserFromCsx::output() {
+shared_ptr<Board> ParserFromCsx::output() {
 	pimpl->primitives_ids.clear();
 	return pimpl->board.build();
 }

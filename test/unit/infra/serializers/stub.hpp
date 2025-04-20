@@ -7,7 +7,7 @@
 #include "domain/board.hpp"
 
 //******************************************************************************
-std::unique_ptr<domain::Board> create_stub() {
+std::shared_ptr<domain::Board> create_stub() {
 	using namespace domain;
 	using Type = Polygon::Type;
 

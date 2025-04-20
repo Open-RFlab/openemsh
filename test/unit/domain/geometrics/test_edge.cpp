@@ -23,12 +23,13 @@ using namespace domain;
 
 //******************************************************************************
 SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) const", "[edge][segment]") {
+	Timepoint t;
 	GIVEN("Two edges") {
 		WHEN("A vertical edge and an horizontal edge are crossing") {
 			Point a0(1, 2), a1(3, 2);
 			Point b0(2, 1), b1(2, 3);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
-			Edge c(XY, &a1, &a0), d(XY, &b1, &b0);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
+			Edge c(XY, &a1, &a0, &t), d(XY, &b1, &b0, &t);
 			THEN("Should be detected as CROSSING") {
 				REQUIRE(a.axis == Segment::Axis::H);
 				REQUIRE(b.axis == Segment::Axis::V);
@@ -44,8 +45,8 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 		WHEN("Two diagonal edges are crossing") {
 			Point a0(1, 1), a1(3, 3);
 			Point b0(3, 1), b1(1, 3);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
-			Edge c(XY, &a1, &a0), d(XY, &b1, &b0);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
+			Edge c(XY, &a1, &a0, &t), d(XY, &b1, &b0, &t);
 			THEN("Should be detected as CROSSING") {
 				REQUIRE(a.axis == Segment::Axis::DIAGONAL);
 				REQUIRE(b.axis == Segment::Axis::DIAGONAL);
@@ -61,8 +62,8 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 		WHEN("Two vertical edges are colinear") {
 			Point a0(1, 1), a1(1, 2);
 			Point b0(1, 3), b1(1, 4);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
-			Edge c(XY, &a1, &a0), d(XY, &b1, &b0);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
+			Edge c(XY, &a1, &a0, &t), d(XY, &b1, &b0, &t);
 			THEN("Should be detected as COLINEAR") {
 				REQUIRE(a.axis == Segment::Axis::V);
 				REQUIRE(b.axis == Segment::Axis::V);
@@ -78,8 +79,8 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 		WHEN("Two horizontal edges are colinear") {
 			Point a0(1, 1), a1(2, 1);
 			Point b0(3, 1), b1(4, 1);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
-			Edge c(XY, &a1, &a0), d(XY, &b1, &b0);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
+			Edge c(XY, &a1, &a0, &t), d(XY, &b1, &b0, &t);
 			THEN("Should be detected as COLINEAR") {
 				REQUIRE(a.axis == Segment::Axis::H);
 				REQUIRE(b.axis == Segment::Axis::H);
@@ -95,8 +96,8 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 		WHEN("Two diagonal edges are colinear") {
 			Point a0(1, 1), a1(2, 2);
 			Point b0(3, 3), b1(4, 4);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
-			Edge c(XY, &a1, &a0), d(XY, &b1, &b0);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
+			Edge c(XY, &a1, &a0, &t), d(XY, &b1, &b0, &t);
 			THEN("Should be detected as COLINEAR") {
 				REQUIRE(a.axis == Segment::Axis::DIAGONAL);
 				REQUIRE(b.axis == Segment::Axis::DIAGONAL);
@@ -112,8 +113,8 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 		WHEN("Two vertical edges are overlapping") {
 			Point a0(1, 1), a1(1, 3);
 			Point b0(1, 2), b1(1, 4);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
-			Edge c(XY, &a1, &a0), d(XY, &b1, &b0);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
+			Edge c(XY, &a1, &a0, &t), d(XY, &b1, &b0, &t);
 			THEN("Should be detected as OVERLAPPING") {
 				REQUIRE(a.axis == Segment::Axis::V);
 				REQUIRE(b.axis == Segment::Axis::V);
@@ -129,8 +130,8 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 		WHEN("Two horizontal edges are overlapping") {
 			Point a0(1, 1), a1(3, 1);
 			Point b0(2, 1), b1(4, 1);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
-			Edge c(XY, &a1, &a0), d(XY, &b1, &b0);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
+			Edge c(XY, &a1, &a0, &t), d(XY, &b1, &b0, &t);
 			THEN("Should be detected as OVERLAPPING") {
 				REQUIRE(a.axis == Segment::Axis::H);
 				REQUIRE(b.axis == Segment::Axis::H);
@@ -146,8 +147,8 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 		WHEN("Two diagonal edges are overlapping") {
 			Point a0(1, 1), a1(3, 3);
 			Point b0(2, 2), b1(4, 4);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
-			Edge c(XY, &a1, &a0), d(XY, &b1, &b0);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
+			Edge c(XY, &a1, &a0, &t), d(XY, &b1, &b0, &t);
 			THEN("Should be detected as OVERLAPPING") {
 				REQUIRE(a.axis == Segment::Axis::DIAGONAL);
 				REQUIRE(b.axis == Segment::Axis::DIAGONAL);
@@ -163,8 +164,8 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 		WHEN("Two vertical edges are colinear and touching by just an extremity") {
 			Point a0(1, 1), a1(1, 2);
 			Point b0(1, 2), b1(1, 3);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
-			Edge c(XY, &a1, &a0), d(XY, &b1, &b0);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
+			Edge c(XY, &a1, &a0, &t), d(XY, &b1, &b0, &t);
 			THEN("Should be detected as OVERLAPPING") {
 				REQUIRE(a.axis == Segment::Axis::V);
 				REQUIRE(b.axis == Segment::Axis::V);
@@ -180,8 +181,8 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 		WHEN("Two horizontal edges are colinear and touching by just an extremity") {
 			Point a0(1, 1), a1(2, 1);
 			Point b0(2, 1), b1(3, 1);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
-			Edge c(XY, &a1, &a0), d(XY, &b1, &b0);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
+			Edge c(XY, &a1, &a0, &t), d(XY, &b1, &b0, &t);
 			THEN("Should be detected as OVERLAPPING") {
 				REQUIRE(a.axis == Segment::Axis::H);
 				REQUIRE(b.axis == Segment::Axis::H);
@@ -197,8 +198,8 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 		WHEN("Two diagonal edges are colinear and touching by just an extremity") {
 			Point a0(1, 1), a1(2, 2);
 			Point b0(2, 2), b1(3, 3);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
-			Edge c(XY, &a1, &a0), d(XY, &b1, &b0);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
+			Edge c(XY, &a1, &a0, &t), d(XY, &b1, &b0, &t);
 			THEN("Should be detected as OVERLAPPING") {
 				REQUIRE(a.axis == Segment::Axis::DIAGONAL);
 				REQUIRE(b.axis == Segment::Axis::DIAGONAL);
@@ -214,8 +215,8 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 		WHEN("A vertical edge is totally inside an other vertical edge") {
 			Point a0(1, 1), a1(1, 4);
 			Point b0(1, 2), b1(1, 3);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
-			Edge c(XY, &a1, &a0), d(XY, &b1, &b0);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
+			Edge c(XY, &a1, &a0, &t), d(XY, &b1, &b0, &t);
 			THEN("Should be detected as OVERLAPPING") {
 				REQUIRE(a.axis == Segment::Axis::V);
 				REQUIRE(b.axis == Segment::Axis::V);
@@ -231,8 +232,8 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 		WHEN("An horizontal edge is totally inside an other horizontal edge") {
 			Point a0(1, 1), a1(4, 1);
 			Point b0(2, 1), b1(3, 1);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
-			Edge c(XY, &a1, &a0), d(XY, &b1, &b0);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
+			Edge c(XY, &a1, &a0, &t), d(XY, &b1, &b0, &t);
 			THEN("Should be detected as OVERLAPPING") {
 				REQUIRE(a.axis == Segment::Axis::H);
 				REQUIRE(b.axis == Segment::Axis::H);
@@ -248,8 +249,8 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 		WHEN("A diagonal edge is totally inside an other diagonal edge") {
 			Point a0(1, 1), a1(4, 4);
 			Point b0(2, 2), b1(3, 3);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
-			Edge c(XY, &a1, &a0), d(XY, &b1, &b0);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
+			Edge c(XY, &a1, &a0, &t), d(XY, &b1, &b0, &t);
 			THEN("Should be detected as OVERLAPPING") {
 				REQUIRE(a.axis == Segment::Axis::DIAGONAL);
 				REQUIRE(b.axis == Segment::Axis::DIAGONAL);
@@ -265,8 +266,8 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 		WHEN("Two diagonal edges are apart") {
 			Point a0(1, 1), a1(2, 2);
 			Point b0(3, 3), b1(4, 5);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
-			Edge c(XY, &a1, &a0), d(XY, &b1, &b0);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
+			Edge c(XY, &a1, &a0, &t), d(XY, &b1, &b0, &t);
 			THEN("Should be detected as APART") {
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::APART);
 				REQUIRE(b.relation_to(a) == relation::SegmentSegment::APART);
@@ -279,9 +280,10 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 
 //******************************************************************************
 SCENARIO("relation::SegmentPoint Segment::relation_to(Point const* point) const", "[edge][segment]") {
+	Timepoint t;
 	GIVEN("An edge") {
 		Point e0(1, 1), e1(3, 3);
-		Edge e(XY, &e0, &e1);
+		Edge e(XY, &e0, &e1, &t);
 		WHEN("A point is on the edge") {
 			Point p(2, 2);
 			THEN("Should be detected as ON") {
@@ -307,11 +309,12 @@ SCENARIO("relation::SegmentPoint Segment::relation_to(Point const* point) const"
 
 //******************************************************************************
 SCENARIO("std::optional<Point> intersection(Segment const* a, Segment const* b)", "[edge][segment]") {
+	Timepoint t;
 	GIVEN("Two edges") {
 		WHEN("A vertical edge and an horizontal edge are crossing") {
 			Point a0(1, 2), a1(3, 2); // Horizontal
 			Point b0(2, 1), b1(2, 3); // Vertical
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Point> p_hv(intersection(a, b));
 			std::optional<Point> p_vh(intersection(b, a));
 			Point x(2, 2);
@@ -329,7 +332,7 @@ SCENARIO("std::optional<Point> intersection(Segment const* a, Segment const* b)"
 		WHEN("A diagonal edge and a random edge are crossing") {
 			Point a0(1, 1), a1(3, 3);
 			Point b0(3, 1), b1(1, 3);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Point> p_hv(intersection(a, b));
 			std::optional<Point> p_vh(intersection(b, a));
 			Point x(2, 2);
@@ -347,7 +350,7 @@ SCENARIO("std::optional<Point> intersection(Segment const* a, Segment const* b)"
 		WHEN("Two edges are colinear") {
 			Point a0(1, 1), a1(1, 2);
 			Point b0(1, 3), b1(1, 4);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Point> p(intersection(a, b));
 			THEN("There should not be any intersection point") {
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::COLINEAR);
@@ -358,7 +361,7 @@ SCENARIO("std::optional<Point> intersection(Segment const* a, Segment const* b)"
 		WHEN("Two edges are overlapping") {
 			Point a0(1, 1), a1(1, 3);
 			Point b0(1, 2), b1(1, 4);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Point> p(intersection(a, b));
 			THEN("There should not be any intersection point") {
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
@@ -369,7 +372,7 @@ SCENARIO("std::optional<Point> intersection(Segment const* a, Segment const* b)"
 		WHEN("Two edges are colinear and touching by just an extremity") {
 			Point a0(1, 1), a1(1, 2);
 			Point b0(1, 2), b1(1, 3);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Point> p(intersection(a, b));
 			THEN("") {
 				REQUIRE(a.relation_to(b) == relation::SegmentSegment::OVERLAPPING);
@@ -380,7 +383,7 @@ SCENARIO("std::optional<Point> intersection(Segment const* a, Segment const* b)"
 		WHEN("Two edges are apart") {
 			Point a0(1, 1), a1(2, 2);
 			Point b0(3, 3), b1(4, 5);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Point> p(intersection(a, b));
 			THEN("There should not be any intersection point") {
 // TODO
@@ -394,11 +397,12 @@ SCENARIO("std::optional<Point> intersection(Segment const* a, Segment const* b)"
 
 //******************************************************************************
 SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[edge][segment]") {
+	Timepoint t;
 	GIVEN("Two edges") {
 		WHEN("Two horizontal edges are overlapping") {
 			Point a0(1, 1), a1(3, 1);
 			Point b0(2, 1), b1(4, 1);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Range> r(overlap(a, b));
 			std::optional<Range> s(overlap(b, a));
 			THEN("Should calcul overlap range") {
@@ -421,7 +425,7 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 		WHEN("An horizontal edge is totally inside another horizontal edge") {
 			Point a0(1, 1), a1(4, 1);
 			Point b0(3, 1), b1(2, 1);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Range> r(overlap(a, b));
 			std::optional<Range> s(overlap(b, a));
 			THEN("Should calcul overlap range") {
@@ -444,7 +448,7 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 		WHEN("Two horizontal edges are colinear and touching by just an extremity") {
 			Point a0(1, 1), a1(2, 1);
 			Point b0(2, 1), b1(3, 1);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Range> r(overlap(a, b));
 			std::optional<Range> s(overlap(a, b));
 			THEN("Should calcul overlap range that should be made of two equal points") {
@@ -469,7 +473,7 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 		WHEN("Two horizontal edges are colinear") {
 			Point a0(1, 1), a1(2, 1);
 			Point b0(3, 1), b1(4, 1);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Range> r(overlap(a, b));
 			std::optional<Range> s(overlap(b, a));
 			THEN("There should not be any overlap range") {
@@ -482,7 +486,7 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 		WHEN("Two horizontal edges are parallels") {
 			Point a0(1, 1), a1(2, 1);
 			Point b0(3, 2), b1(4, 2);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Range> r(overlap(a, b));
 			std::optional<Range> s(overlap(b, a));
 			THEN("There should not be any overlap range") {
@@ -495,7 +499,7 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 		WHEN("Two vertical edges are overlapping") {
 			Point a0(1, 1), a1(1, 3);
 			Point b0(1, 2), b1(1, 4);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Range> r(overlap(a, b));
 			std::optional<Range> s(overlap(b, a));
 			THEN("Should calcul overlap range") {
@@ -518,7 +522,7 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 		WHEN("A vertical edge is totally inside another vertical edge") {
 			Point a0(1, 1), a1(1, 4);
 			Point b0(1, 2), b1(1, 3);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Range> r(overlap(a, b));
 			std::optional<Range> s(overlap(b, a));
 			THEN("Should calcul overlap range") {
@@ -541,7 +545,7 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 		WHEN("Two vertical edges are colinear and touching by just an extremity") {
 			Point a0(1, 1), a1(1, 2);
 			Point b0(1, 2), b1(1, 3);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Range> r(overlap(a, b));
 			std::optional<Range> s(overlap(a, b));
 			THEN("Should calcul overlap range that should be made of two equal points") {
@@ -566,7 +570,7 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 		WHEN("Two vertical edges are colinear") {
 			Point a0(1, 1), a1(1, 2);
 			Point b0(1, 3), b1(1, 4);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Range> r(overlap(a, b));
 			std::optional<Range> s(overlap(b, a));
 			THEN("There should not be any overlap range") {
@@ -579,7 +583,7 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 		WHEN("Two vertical edges are parallels") {
 			Point a0(1, 1), a1(1, 2);
 			Point b0(2, 3), b1(2, 4);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Range> r(overlap(a, b));
 			std::optional<Range> s(overlap(b, a));
 			THEN("There should not be any overlap range") {
@@ -592,7 +596,7 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 		WHEN("Two diagonal edges are overlapping") {
 			Point a0(1, 1), a1(3, 5);
 			Point b0(2, 3), b1(4, 7);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1), c(XY, &b1, &b0);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t), c(XY, &b1, &b0, &t);
 			std::optional<Range> r(overlap(a, b));
 			std::optional<Range> s(overlap(b, a));
 			std::optional<Range> t(overlap(a, c));
@@ -623,7 +627,7 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 		WHEN("Two diagonal edges are colinear and touching by just an extremity") {
 			Point a0(1, 1), a1(2, 2);
 			Point b0(2, 2), b1(3, 3);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Range> r(overlap(a, b));
 			std::optional<Range> s(overlap(a, b));
 			THEN("Should calcul overlap range that should be made of two equal points") {
@@ -648,7 +652,7 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 		WHEN("Two edges are crossing") {
 			Point a0(1, 1), a1(3, 3);
 			Point b0(1, 3), b1(3, 1);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Range> r(overlap(a, b));
 			std::optional<Range> s(overlap(b, a));
 			THEN("There should not be any overlap range") {
@@ -661,7 +665,7 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 		WHEN("Two edges are apart") {
 			Point a0(1, 1), a1(1, 2);
 			Point b0(2, 2), b1(4, 4);
-			Edge a(XY, &a0, &a1), b(XY, &b0, &b1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
 			std::optional<Range> r(overlap(a, b));
 			std::optional<Range> s(overlap(b, a));
 			THEN("There should not be any overlap range") {
@@ -675,9 +679,10 @@ SCENARIO("std::optional<Range> overlap(Segment const* a, Segment const* b)", "[e
 
 //******************************************************************************
 SCENARIO("bool operator==(Range const& a, Edge const& b)", "[edge]") {
+	Timepoint t;
 	GIVEN("An edge and a range that are equals") {
 		Point a0(1, 1), a1(1, 2);
-		Edge e(XY, &a0, &a1);
+		Edge e(XY, &a0, &a1, &t);
 		Range r(a0, a1);
 		THEN("Should be equal") {
 			REQUIRE(r == e);
@@ -687,7 +692,7 @@ SCENARIO("bool operator==(Range const& a, Edge const& b)", "[edge]") {
 
 	GIVEN("An edge and a range that are equals but in the opposite direction") {
 		Point a0(1, 1), a1(1, 2);
-		Edge e(XY, &a0, &a1);
+		Edge e(XY, &a0, &a1, &t);
 		Range r(a1, a0);
 		THEN("Should be equal") {
 			REQUIRE(r == e);
@@ -698,7 +703,7 @@ SCENARIO("bool operator==(Range const& a, Edge const& b)", "[edge]") {
 	GIVEN("An edge and a range that are not equals") {
 		Point a0(1, 1), a1(1, 2);
 		Point b0(2, 2), b1(4, 4);
-		Edge e(XY, &a0, &a1);
+		Edge e(XY, &a0, &a1, &t);
 		Range r(b0, b1);
 		THEN("Should not be equal") {
 			REQUIRE_FALSE(r == e);
@@ -709,9 +714,10 @@ SCENARIO("bool operator==(Range const& a, Edge const& b)", "[edge]") {
 
 //******************************************************************************
 SCENARIO("Edge::Edge(Plane plane, Point const* p0, Point const* p1)", "[edge]") {
+	Timepoint t;
 	GIVEN("A vertical edge that grow up to the Y") {
 		Point a0(0, 0), a1(0, 2);
-		Edge e(XY, &a0, &a1);
+		Edge e(XY, &a0, &a1, &t);
 		THEN("Direction should be Edge::Direction::YMAX") {
 			REQUIRE(e.direction == Edge::Direction::YMAX);
 		}
@@ -719,7 +725,7 @@ SCENARIO("Edge::Edge(Plane plane, Point const* p0, Point const* p1)", "[edge]") 
 
 	GIVEN("A vertical edge that grow down to the Y") {
 		Point a0(0, 0), a1(0, 2);
-		Edge e(XY, &a1, &a0);
+		Edge e(XY, &a1, &a0, &t);
 		THEN("Direction should be Edge::Direction::YMIN") {
 			REQUIRE(e.direction == Edge::Direction::YMIN);
 		}
@@ -727,7 +733,7 @@ SCENARIO("Edge::Edge(Plane plane, Point const* p0, Point const* p1)", "[edge]") 
 
 	GIVEN("An horizontal edge that grow up to the X") {
 		Point a0(0, 0), a1(2, 0);
-		Edge e(XY, &a0, &a1);
+		Edge e(XY, &a0, &a1, &t);
 		THEN("Direction should be Edge::Direction::XMAX") {
 			REQUIRE(e.direction == Edge::Direction::XMAX);
 		}
@@ -735,7 +741,7 @@ SCENARIO("Edge::Edge(Plane plane, Point const* p0, Point const* p1)", "[edge]") 
 
 	GIVEN("An horizontal edge that grow down to the X") {
 		Point a0(0, 0), a1(2, 0);
-		Edge e(XY, &a1, &a0);
+		Edge e(XY, &a1, &a0, &t);
 		THEN("Direction should be Edge::Direction::XMIN") {
 			REQUIRE(e.direction == Edge::Direction::XMIN);
 		}
@@ -743,7 +749,7 @@ SCENARIO("Edge::Edge(Plane plane, Point const* p0, Point const* p1)", "[edge]") 
 
 	GIVEN("A point edge") {
 		Point a0(0, 0), a1(0, 0);
-		Edge e(XY, &a0, &a1);
+		Edge e(XY, &a0, &a1, &t);
 		THEN("Direction should be Edge::Direction::NONE") {
 			REQUIRE(e.direction == Edge::Direction::NONE);
 		}
@@ -751,7 +757,7 @@ SCENARIO("Edge::Edge(Plane plane, Point const* p0, Point const* p1)", "[edge]") 
 
 	GIVEN("A diagonal edge that grow up to the X and up to the Y") {
 		Point a0(0, 0), a1(1, 1);
-		Edge e(XY, &a0, &a1);
+		Edge e(XY, &a0, &a1, &t);
 		THEN("Direction should be Edge::Direction::NONE") {
 			REQUIRE(e.direction == Edge::Direction::NONE);
 		}
@@ -759,7 +765,7 @@ SCENARIO("Edge::Edge(Plane plane, Point const* p0, Point const* p1)", "[edge]") 
 
 	GIVEN("A diagonal edge that grow down to the X and up to the Y") {
 		Point a0(0, 0), a1(-1, 1);
-		Edge e(XY, &a0, &a1);
+		Edge e(XY, &a0, &a1, &t);
 		THEN("Direction should be Edge::Direction::NONE") {
 			REQUIRE(e.direction == Edge::Direction::NONE);
 		}
@@ -767,7 +773,7 @@ SCENARIO("Edge::Edge(Plane plane, Point const* p0, Point const* p1)", "[edge]") 
 
 	GIVEN("A diagonal edge that grow down to the X and down to the Y") {
 		Point a0(0, 0), a1(-1, -1);
-		Edge e(XY, &a0, &a1);
+		Edge e(XY, &a0, &a1, &t);
 		THEN("Direction should be Edge::Direction::NONE") {
 			REQUIRE(e.direction == Edge::Direction::NONE);
 		}
@@ -775,7 +781,7 @@ SCENARIO("Edge::Edge(Plane plane, Point const* p0, Point const* p1)", "[edge]") 
 
 	GIVEN("A diagonal edge that grow up to the X and down to the Y") {
 		Point a0(0, 0), a1(1, -1);
-		Edge e(XY, &a0, &a1);
+		Edge e(XY, &a0, &a1, &t);
 		THEN("Direction should be Edge::Direction::NONE") {
 			REQUIRE(e.direction == Edge::Direction::NONE);
 		}

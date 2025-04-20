@@ -15,6 +15,7 @@
 #include "mesh/interval.hpp"
 #include "mesh/meshline.hpp"
 #include "mesh/meshline_policy.hpp"
+#include "utils/state_management.hpp"
 
 namespace domain {
 
@@ -25,21 +26,27 @@ class ConflictManager;
 #endif // UNITTEST
 
 //******************************************************************************
-class MeshlinePolicyManager { // TODO MeshlineManager
+struct MeshlinePolicyManagerState final {
+	AxisSpace<std::vector<std::shared_ptr<MeshlinePolicy>>> line_policies;
+	AxisSpace<std::vector<std::shared_ptr<Meshline>>> meshlines;
+	AxisSpace<std::vector<std::shared_ptr<Interval>>> intervals;
+};
+
+//******************************************************************************
+class MeshlinePolicyManager // TODO MeshlineManager
+: public Originator<MeshlinePolicyManagerState> {
 private:
 	Params& params;
-	ConflictManager* const conflict_manager;
-
-	AxisSpace<std::vector<std::unique_ptr<MeshlinePolicy>>> line_policies;
-	AxisSpace<std::vector<std::unique_ptr<Meshline>>> meshlines;
-	AxisSpace<std::vector<std::unique_ptr<Interval>>> intervals;
+	ConflictManager* conflict_manager;
 
 public:
-	MeshlinePolicyManager(Params& params, ConflictManager* conflict_manager);
+	MeshlinePolicyManager(Params& params, Timepoint* t);
 	MeshlinePolicyManager(
 		Params& params,
-		ConflictManager* conflict_manager,
-		AxisSpace<std::vector<std::unique_ptr<MeshlinePolicy>>>&& line_policies);
+		AxisSpace<std::vector<std::shared_ptr<MeshlinePolicy>>>&& line_policies,
+		Timepoint* t);
+
+	void init(ConflictManager* conflict_manager);
 
 	MeshlinePolicy* add_meshline_policy(
 		IMeshLineOrigin* origin,
@@ -47,7 +54,8 @@ public:
 		MeshlinePolicy::Policy const policy,
 		MeshlinePolicy::Normal const normal,
 		Coord const coord,
-		bool const is_enabled = true);
+		bool const is_enabled = true,
+		Timepoint* t = nullptr);
 
 	void detect_and_solve_too_close_meshline_policies(Axis const axis);
 	void detect_intervals(Axis const axis);
@@ -57,10 +65,10 @@ public:
 	void detect_intervals() { for(auto const& axis : AllAxis) detect_intervals(axis); };
 	void mesh() { for(auto const& axis : AllAxis) mesh(axis); };
 
-	std::vector<std::unique_ptr<Meshline>> get_meshline_policies_meshlines(Axis axis) const;
-	std::vector<std::unique_ptr<Meshline>> const& get_meshlines(Axis axis) const;
-	std::vector<std::unique_ptr<MeshlinePolicy>> const& get_meshline_policies(Axis axis) const;
-	std::vector<std::unique_ptr<Interval>> const& get_intervals(Axis axis) const;
+	std::vector<std::shared_ptr<Meshline>> get_meshline_policies_meshlines(Axis axis) const;
+	std::vector<std::shared_ptr<Meshline>> const& get_meshlines(Axis axis) const;
+	std::vector<std::shared_ptr<MeshlinePolicy>> const& get_meshline_policies(Axis axis) const;
+	std::vector<std::shared_ptr<Interval>> const& get_intervals(Axis axis) const;
 };
 
 #ifdef UNITTEST

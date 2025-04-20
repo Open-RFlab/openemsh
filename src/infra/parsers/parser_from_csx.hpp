@@ -32,16 +32,16 @@ public:
 
 	~ParserFromCsx();
 
-	static std::unique_ptr<domain::Board> run(std::filesystem::path const& input);
-	static std::unique_ptr<domain::Board> run(std::filesystem::path const& input, Params params);
-	static std::unique_ptr<domain::Board> run(std::filesystem::path const& input, std::vector<std::string> ground_names, Params params);
+	[[nodiscard]] static std::shared_ptr<domain::Board> run(std::filesystem::path const& input);
+	[[nodiscard]] static std::shared_ptr<domain::Board> run(std::filesystem::path const& input, Params params);
+	[[nodiscard]] static std::shared_ptr<domain::Board> run(std::filesystem::path const& input, std::vector<std::string> ground_names, Params params);
 
 private:
 	ParserFromCsx(std::filesystem::path const& input);
 	ParserFromCsx(std::filesystem::path const& input, Params params);
 
 	void parse();
-	std::unique_ptr<domain::Board> output();
+	[[nodiscard]] std::shared_ptr<domain::Board> output();
 
 	std::filesystem::path const input;
 	Params const parser_params;

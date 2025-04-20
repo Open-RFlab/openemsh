@@ -16,15 +16,17 @@ namespace domain {
 using namespace std;
 
 //******************************************************************************
-ConflictColinearEdges::ConflictColinearEdges(Axis axis, Edge* a, Edge* b)
-: Conflict(Kind::COLINEAR_EDGES)
+ConflictColinearEdges::ConflictColinearEdges(Axis axis, Edge* a, Edge* b, Timepoint* t)
+: Originator(t, { .edges = { a, b } })
+, Conflict(Kind::COLINEAR_EDGES)
 , axis(axis)
-, edges({ a, b })
 {}
 
 //******************************************************************************
-void ConflictColinearEdges::append(Edge* edge) {
-	edges.push_back(edge);
+void ConflictColinearEdges::append(Edge* edge, Timepoint* t) {
+	auto state = get_current_state();
+	state.edges.push_back(edge);
+	set_given_or_next_state(state, t);
 }
 
 //******************************************************************************
@@ -32,8 +34,10 @@ void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manage
 	size_t normal_min = 0;
 	size_t normal_max = 0;
 
-	for(Edge* edge : edges) {
-		if(!edge->to_mesh)
+	auto const& s = get_current_state();
+
+	for(Edge* edge : s.edges) {
+		if(!edge->get_current_state().to_mesh)
 			continue;
 
 		switch(edge->normal) {
@@ -52,36 +56,36 @@ void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manage
 		}
 	}
 
-	optional<Coord> const coord = domain::coord(edges.front()->p0(), edges.front()->axis);
+	optional<Coord> const coord = domain::coord(s.edges.front()->p0(), s.edges.front()->axis);
+
+	auto const add_policy = [&, this](MeshlinePolicy::Policy policy, MeshlinePolicy::Normal normal) {
+		auto [t, state] = this->make_next_state();
+		state.meshline_policy = line_policy_manager.add_meshline_policy(
+			this,
+			axis,
+			policy,
+			normal,
+			coord.value(),
+			true,
+			t);
+		state.solution = state.meshline_policy;
+		state.is_solved = true;
+		this->set_state(t, state);
+	};
 
 	if(coord) {
 		if(normal_min && normal_max) {
-			meshline_policy = line_policy_manager.add_meshline_policy(
-				this,
-				axis,
+			add_policy(
 				MeshlinePolicy::Policy::HALFS,
-				MeshlinePolicy::Normal::NONE,
-				coord.value());
-			solution = meshline_policy;
-			is_solved = true;
+				MeshlinePolicy::Normal::NONE);
 		} else if(normal_min && !normal_max) {
-			meshline_policy = line_policy_manager.add_meshline_policy(
-				this,
-				axis,
+			add_policy(
 				MeshlinePolicy::Policy::THIRDS,
-				MeshlinePolicy::Normal::MIN,
-				coord.value());
-			solution = meshline_policy;
-			is_solved = true;
+				MeshlinePolicy::Normal::MIN);
 		} else if(!normal_min && normal_max) {
-			meshline_policy = line_policy_manager.add_meshline_policy(
-				this,
-				axis,
+			add_policy(
 				MeshlinePolicy::Policy::THIRDS,
-				MeshlinePolicy::Normal::MAX,
-				coord.value());
-			solution = meshline_policy;
-			is_solved = true;
+				MeshlinePolicy::Normal::MAX);
 		}
 	}
 }

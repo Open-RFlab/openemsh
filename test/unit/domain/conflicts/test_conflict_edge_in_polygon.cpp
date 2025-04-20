@@ -160,35 +160,36 @@ SCENARIO("void sort_overlaps_by_p0_by_vector_orientation(vector<Overlap>& overla
 
 //******************************************************************************
 SCENARIO("void ConflictEdgeInPolygon::auto_solve(MeshlinePolicyManager&)", "[conflict_edge_in_polygon]") {
+	Timepoint* t = Caretaker::singleton().get_history_root();
 	Params params;
-	MeshlinePolicyManager mpm(params, nullptr);
+	MeshlinePolicyManager mpm(params, t);
 	GIVEN("A conflict about a vertical edge partially covered by some polygons (with a gap)") {
 		Point e0(1, 1), e1(8, 1);
-		Edge e(XY, &e0, &e1);
+		Edge e(XY, &e0, &e1, t);
 		e.normal = Normal::NONE;
-		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 4, 1 }), std::nullopt);
+		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 4, 1 }), std::nullopt, t);
 		ceip.append(nullptr, Range({ 5, 1 }, { 8, 1 }), std::nullopt);
 		ceip.auto_solve(mpm);
 		THEN("The edge should be eligible to mesh") {
-			REQUIRE(ceip.is_solved);
-			REQUIRE(ceip.solution == &e);
-			REQUIRE(e.to_mesh);
+			REQUIRE(ceip.get_current_state().is_solved);
+			REQUIRE(ceip.get_current_state().solution == &e);
+			REQUIRE(e.get_current_state().to_mesh);
 		}
 	}
 
 	GIVEN("A conflict about a vertical edge totally covered by some polygons") {
 		Point e0(1, 1), e1(8, 1);
-		Edge e(XY, &e0, &e1);
+		Edge e(XY, &e0, &e1, t);
 		e.normal = Normal::NONE;
-		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 4, 1 }), std::nullopt);
+		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 4, 1 }), std::nullopt, t);
 		ceip.append(nullptr, Range({ 3, 1 }, { 6, 1 }), std::nullopt);
 		ceip.append(nullptr, Range({ 2, 1 }, { 7, 1 }), std::nullopt);
 		ceip.append(nullptr, Range({ 5, 1 }, { 8, 1 }), std::nullopt);
 		ceip.auto_solve(mpm);
 		THEN("The edge should not be eligible to mesh") {
-			REQUIRE(ceip.is_solved);
-			REQUIRE(ceip.solution == &e);
-			REQUIRE_FALSE(e.to_mesh);
+			REQUIRE(ceip.get_current_state().is_solved);
+			REQUIRE(ceip.get_current_state().solution == &e);
+			REQUIRE_FALSE(e.get_current_state().to_mesh);
 		}
 	}
 
@@ -196,19 +197,19 @@ SCENARIO("void ConflictEdgeInPolygon::auto_solve(MeshlinePolicyManager&)", "[con
 		Point e0(1, 1), e1(8, 1);
 		Point a0(0, 0), a1(0, 0);
 		Point b0(0, 0), b1(0, 0);
-		Edge e(XY, &e0, &e1), a(XY, &a0, &a1), b(XY, &b0, &b1);
+		Edge e(XY, &e0, &e1, t), a(XY, &a0, &a1, t), b(XY, &b0, &b1, t);
 		e.normal = Normal::XMIN;
 		a.normal = Normal::XMAX;
 		b.normal = Normal::XMAX;
-		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 4, 1 }), std::nullopt);
+		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 4, 1 }), std::nullopt, t);
 		ceip.append(nullptr, Range({ 3, 1 }, { 6, 1 }), std::nullopt);
 		ceip.append(nullptr, Range({ 2, 1 }, { 7, 1 }), &a);
 		ceip.append(nullptr, Range({ 5, 1 }, { 8, 1 }), &b);
 		ceip.auto_solve(mpm);
 		THEN("The edge should not be eligible to mesh") {
-			REQUIRE(ceip.is_solved);
-			REQUIRE(ceip.solution == &e);
-			REQUIRE_FALSE(e.to_mesh);
+			REQUIRE(ceip.get_current_state().is_solved);
+			REQUIRE(ceip.get_current_state().solution == &e);
+			REQUIRE_FALSE(e.get_current_state().to_mesh);
 		}
 	}
 
@@ -216,49 +217,49 @@ SCENARIO("void ConflictEdgeInPolygon::auto_solve(MeshlinePolicyManager&)", "[con
 		Point e0(1, 1), e1(8, 1);
 		Point a0(0, 0), a1(0, 0);
 		Point b0(0, 0), b1(0, 0);
-		Edge e(XY, &e0, &e1), a(XY, &a0, &a1), b(XY, &b0, &b1);
+		Edge e(XY, &e0, &e1, t), a(XY, &a0, &a1, t), b(XY, &b0, &b1, t);
 		e.normal = Normal::XMIN;
 		a.normal = Normal::XMAX;
 		b.normal = Normal::XMIN;
-		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 4, 1 }), std::nullopt);
+		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 4, 1 }), std::nullopt, t);
 		ceip.append(nullptr, Range({ 3, 1 }, { 6, 1 }), std::nullopt);
 		ceip.append(nullptr, Range({ 2, 1 }, { 7, 1 }), &a);
 		ceip.append(nullptr, Range({ 5, 1 }, { 8, 1 }), &b);
 		ceip.auto_solve(mpm);
 		THEN("The edge should be eligible to mesh") {
-			REQUIRE(ceip.is_solved);
-			REQUIRE(ceip.solution == &e);
-			REQUIRE(e.to_mesh);
+			REQUIRE(ceip.get_current_state().is_solved);
+			REQUIRE(ceip.get_current_state().solution == &e);
+			REQUIRE(e.get_current_state().to_mesh);
 		}
 	}
 
 	GIVEN("A conflict about an horizontal edge partially covered by some polygons (with a gap)") {
 		Point e0(1, 1), e1(1, 8);
-		Edge e(XY, &e0, &e1);
+		Edge e(XY, &e0, &e1, t);
 		e.normal = Normal::NONE;
-		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 1, 4 }), std::nullopt);
+		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 1, 4 }), std::nullopt, t);
 		ceip.append(nullptr, Range({ 1, 5 }, { 1, 8 }), std::nullopt);
 		ceip.auto_solve(mpm);
 		THEN("The edge should be eligible to mesh") {
-			REQUIRE(ceip.is_solved);
-			REQUIRE(ceip.solution == &e);
-			REQUIRE(e.to_mesh);
+			REQUIRE(ceip.get_current_state().is_solved);
+			REQUIRE(ceip.get_current_state().solution == &e);
+			REQUIRE(e.get_current_state().to_mesh);
 		}
 	}
 
 	GIVEN("A conflict about an horizontal edge totally covered by some polygons") {
 		Point e0(1, 1), e1(1, 8);
-		Edge e(XY, &e0, &e1);
+		Edge e(XY, &e0, &e1, t);
 		e.normal = Normal::NONE;
-		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 1, 4 }), std::nullopt);
+		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 1, 4 }), std::nullopt, t);
 		ceip.append(nullptr, Range({ 1, 3 }, { 1, 6 }), std::nullopt);
 		ceip.append(nullptr, Range({ 1, 2 }, { 1, 7 }), std::nullopt);
 		ceip.append(nullptr, Range({ 1, 5 }, { 1, 8 }), std::nullopt);
 		ceip.auto_solve(mpm);
 		THEN("The edge should not be eligible to mesh") {
-			REQUIRE(ceip.is_solved);
-			REQUIRE(ceip.solution == &e);
-			REQUIRE_FALSE(e.to_mesh);
+			REQUIRE(ceip.get_current_state().is_solved);
+			REQUIRE(ceip.get_current_state().solution == &e);
+			REQUIRE_FALSE(e.get_current_state().to_mesh);
 		}
 	}
 
@@ -266,19 +267,19 @@ SCENARIO("void ConflictEdgeInPolygon::auto_solve(MeshlinePolicyManager&)", "[con
 		Point e0(1, 1), e1(1, 8);
 		Point a0(0, 0), a1(0, 0);
 		Point b0(0, 0), b1(0, 0);
-		Edge e(XY, &e0, &e1), a(XY, &a0, &a1), b(XY, &b0, &b1);
+		Edge e(XY, &e0, &e1, t), a(XY, &a0, &a1, t), b(XY, &b0, &b1, t);
 		e.normal = Normal::XMIN;
 		a.normal = Normal::XMAX;
 		b.normal = Normal::XMAX;
-		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 1, 4 }), std::nullopt);
+		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 1, 4 }), std::nullopt, t);
 		ceip.append(nullptr, Range({ 1, 3 }, { 1, 6 }), std::nullopt);
 		ceip.append(nullptr, Range({ 1, 2 }, { 1, 7 }), &a);
 		ceip.append(nullptr, Range({ 1, 5 }, { 1, 8 }), &b);
 		ceip.auto_solve(mpm);
 		THEN("The edge should not be eligible to mesh") {
-			REQUIRE(ceip.is_solved);
-			REQUIRE(ceip.solution == &e);
-			REQUIRE_FALSE(e.to_mesh);
+			REQUIRE(ceip.get_current_state().is_solved);
+			REQUIRE(ceip.get_current_state().solution == &e);
+			REQUIRE_FALSE(e.get_current_state().to_mesh);
 		}
 	}
 
@@ -286,49 +287,49 @@ SCENARIO("void ConflictEdgeInPolygon::auto_solve(MeshlinePolicyManager&)", "[con
 		Point e0(1, 1), e1(1, 8);
 		Point a0(0, 0), a1(0, 0);
 		Point b0(0, 0), b1(0, 0);
-		Edge e(XY, &e0, &e1), a(XY, &a0, &a1), b(XY, &b0, &b1);
+		Edge e(XY, &e0, &e1, t), a(XY, &a0, &a1, t), b(XY, &b0, &b1, t);
 		e.normal = Normal::XMIN;
 		a.normal = Normal::XMAX;
 		b.normal = Normal::XMIN;
-		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 1, 4 }), std::nullopt);
+		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 1, 4 }), std::nullopt, t);
 		ceip.append(nullptr, Range({ 1, 3 }, { 1, 6 }), std::nullopt);
 		ceip.append(nullptr, Range({ 1, 2 }, { 1, 7 }), &a);
 		ceip.append(nullptr, Range({ 1, 5 }, { 1, 8 }), &b);
 		ceip.auto_solve(mpm);
 		THEN("The edge should be eligible to mesh") {
-			REQUIRE(ceip.is_solved);
-			REQUIRE(ceip.solution == &e);
-			REQUIRE(e.to_mesh);
+			REQUIRE(ceip.get_current_state().is_solved);
+			REQUIRE(ceip.get_current_state().solution == &e);
+			REQUIRE(e.get_current_state().to_mesh);
 		}
 	}
 
 	GIVEN("A conflict about a diagonal edge partially covered by some polygons (with a gap)") {
 		Point e0(1, 1), e1(8, 8);
-		Edge e(XY, &e0, &e1);
+		Edge e(XY, &e0, &e1, t);
 		e.normal = Normal::NONE;
-		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 4, 4 }), std::nullopt);
+		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 4, 4 }), std::nullopt, t);
 		ceip.append(nullptr, Range({ 5, 5 }, { 8, 8 }), std::nullopt);
 		ceip.auto_solve(mpm);
 		THEN("The edge should be eligible to mesh") {
-			REQUIRE(ceip.is_solved);
-			REQUIRE(ceip.solution == &e);
-			REQUIRE(e.to_mesh);
+			REQUIRE(ceip.get_current_state().is_solved);
+			REQUIRE(ceip.get_current_state().solution == &e);
+			REQUIRE(e.get_current_state().to_mesh);
 		}
 	}
 
 	GIVEN("A conflict about a diagonal edge totally covered by some polygons") {
 		Point e0(1, 1), e1(8, 8);
-		Edge e(XY, &e0, &e1);
+		Edge e(XY, &e0, &e1, t);
 		e.normal = Normal::NONE;
-		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 4, 4 }), std::nullopt);
+		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 4, 4 }), std::nullopt, t);
 		ceip.append(nullptr, Range({ 3, 3 }, { 6, 6 }), std::nullopt);
 		ceip.append(nullptr, Range({ 2, 2 }, { 7, 7 }), std::nullopt);
 		ceip.append(nullptr, Range({ 5, 5 }, { 8, 8 }), std::nullopt);
 		ceip.auto_solve(mpm);
 		THEN("The edge should not be eligible to mesh") {
-			REQUIRE(ceip.is_solved);
-			REQUIRE(ceip.solution == &e);
-			REQUIRE_FALSE(e.to_mesh);
+			REQUIRE(ceip.get_current_state().is_solved);
+			REQUIRE(ceip.get_current_state().solution == &e);
+			REQUIRE_FALSE(e.get_current_state().to_mesh);
 		}
 	}
 
@@ -336,19 +337,19 @@ SCENARIO("void ConflictEdgeInPolygon::auto_solve(MeshlinePolicyManager&)", "[con
 		Point e0(1, 1), e1(8, 8);
 		Point a0(0, 0), a1(0, 0);
 		Point b0(0, 0), b1(0, 0);
-		Edge e(XY, &e0, &e1), a(XY, &a0, &a1), b(XY, &b0, &b1);
+		Edge e(XY, &e0, &e1, t), a(XY, &a0, &a1, t), b(XY, &b0, &b1, t);
 		e.normal = Normal::XMIN;
 		a.normal = Normal::XMAX;
 		b.normal = Normal::XMAX;
-		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 4, 4 }), std::nullopt);
+		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 4, 4 }), std::nullopt, t);
 		ceip.append(nullptr, Range({ 3, 3 }, { 6, 6 }), std::nullopt);
 		ceip.append(nullptr, Range({ 2, 2 }, { 7, 7 }), &a);
 		ceip.append(nullptr, Range({ 5, 5 }, { 8, 8 }), &b);
 		ceip.auto_solve(mpm);
 		THEN("The edge should not be eligible to mesh") {
-			REQUIRE(ceip.is_solved);
-			REQUIRE(ceip.solution == &e);
-			REQUIRE_FALSE(e.to_mesh);
+			REQUIRE(ceip.get_current_state().is_solved);
+			REQUIRE(ceip.get_current_state().solution == &e);
+			REQUIRE_FALSE(e.get_current_state().to_mesh);
 		}
 	}
 
@@ -356,19 +357,19 @@ SCENARIO("void ConflictEdgeInPolygon::auto_solve(MeshlinePolicyManager&)", "[con
 		Point e0(1, 1), e1(8, 8);
 		Point a0(0, 0), a1(0, 0);
 		Point b0(0, 0), b1(0, 0);
-		Edge e(XY, &e0, &e1), a(XY, &a0, &a1), b(XY, &b0, &b1);
+		Edge e(XY, &e0, &e1, t), a(XY, &a0, &a1, t), b(XY, &b0, &b1, t);
 		e.normal = Normal::XMIN;
 		a.normal = Normal::XMAX;
 		b.normal = Normal::XMIN;
-		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 4, 4 }), std::nullopt);
+		ConflictEdgeInPolygon ceip(XY, &e, nullptr, Range({ 1, 1 }, { 4, 4 }), std::nullopt, t);
 		ceip.append(nullptr, Range({ 3, 3 }, { 6, 6 }), std::nullopt);
 		ceip.append(nullptr, Range({ 2, 2 }, { 7, 7 }), &a);
 		ceip.append(nullptr, Range({ 5, 5 }, { 8, 8 }), &b);
 		ceip.auto_solve(mpm);
 		THEN("The edge should be eligible to mesh") {
-			REQUIRE(ceip.is_solved);
-			REQUIRE(ceip.solution == &e);
-			REQUIRE(e.to_mesh);
+			REQUIRE(ceip.get_current_state().is_solved);
+			REQUIRE(ceip.get_current_state().solution == &e);
+			REQUIRE(e.get_current_state().to_mesh);
 		}
 	}
 }

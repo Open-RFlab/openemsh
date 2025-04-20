@@ -16,7 +16,9 @@ class Interval;
 class MeshlinePolicy;
 
 //******************************************************************************
-class Meshline : public Entity, public Visitable<Meshline, EntityVisitor> {
+class Meshline
+: public Visitable<Meshline, EntityVisitor>
+, public Entity {
 public:
 	Coord const coord;
 	Interval const* const interval;

@@ -20,7 +20,15 @@ class IConflictSolution;
 class MeshlinePolicyManager;
 
 //******************************************************************************
-class Conflict : public Entity, public IMeshLineOrigin {
+struct ConflictState : public IMeshLineOriginState {
+	bool is_solved = false;
+	IConflictSolution* solution = nullptr;
+};
+
+//******************************************************************************
+class Conflict
+: public Entity
+, public IMeshLineOrigin {
 public:
 	enum class Kind {
 		USER_WILL, // TODO multiple cases ?
@@ -30,9 +38,7 @@ public:
 		TOO_CLOSE_MESHLINE_POLICIES
 	} kind;
 
-	bool is_solved;
 //	MeshlinePolicy* solution;
-	IConflictSolution* solution;
 //	std::vector<IConflictOrigin*> between;
 
 	explicit Conflict(Kind const kind);

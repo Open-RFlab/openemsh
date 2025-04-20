@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "domain/geometrics/space.hpp"
+#include "utils/state_management.hpp"
 #include "conflict.hpp"
 
 namespace domain {
@@ -16,16 +17,21 @@ namespace domain {
 class Edge;
 
 //******************************************************************************
+struct ConflictColinearEdgesState final : public ConflictState {
+	std::vector<Edge*> edges;
+};
+
+//******************************************************************************
 class ConflictColinearEdges
-: public Conflict
-, public Visitable<ConflictColinearEdges, EntityVisitor> {
+: public Originator<ConflictColinearEdgesState>
+, public Visitable<ConflictColinearEdges, EntityVisitor>
+, public Conflict {
 public:
 	Axis const axis;
-	std::vector<Edge*> edges;
 
-	ConflictColinearEdges(Axis axis, Edge* a, Edge* b);
+	ConflictColinearEdges(Axis axis, Edge* a, Edge* b, Timepoint* t);
 
-	void append(Edge* edge);
+	void append(Edge* edge, Timepoint* t = nullptr);
 
 	void auto_solve(MeshlinePolicyManager& line_policy_manager) override;
 };

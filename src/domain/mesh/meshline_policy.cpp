@@ -21,16 +21,21 @@ MeshlinePolicy::MeshlinePolicy(
 		Normal normal,
 		Params& params,
 		Coord const coord,
+		Timepoint* t,
+		vector<IMeshLineOrigin*> const& origins,
 		bool const is_enabled,
 		double const res_factor)
-: axis(axis)
+: Originator(t, {
+	.is_enabled = is_enabled,
+	.res_factor = res_factor,
+	.d = params.dmax / res_factor,
+	.origins = origins
+})
+, axis(axis)
 , policy(policy)
 , normal(normal)
 , params(params)
 , coord(coord)
-, is_enabled(is_enabled)
-, res_factor(res_factor)
-, d(params.dmax / res_factor)
 {}
 
 //******************************************************************************

@@ -18,67 +18,77 @@ namespace domain {
 using namespace std;
 
 //******************************************************************************
-Interval::Side::Side(MeshlinePolicy* meshline_policy, size_t lmin, double lambda, Coord h, function<double (double)> d_init)
+Interval::Side::Side(MeshlinePolicy* meshline_policy, size_t lmin, double lambda, Coord h, Timepoint* t, function<double (double)> d_init)
 : meshline_policy(meshline_policy)
 , lmin(lmin)
 , lambda(lambda)
 , d_init_(std::move(d_init))
 {
-	if(meshline_policy->d > h)
-		meshline_policy->d = (double) h;
+	if(meshline_policy->get_current_state().d > h) {
+		auto state = meshline_policy->get_current_state();
+		state.d = (double) h;
+		meshline_policy->set_next_state(state);
+	}
 }
 
 //******************************************************************************
 double Interval::Side::d_init() const {
-	return d_init_(meshline_policy->d);
+	return d_init_(meshline_policy->get_current_state().d);
 }
 
 //******************************************************************************
-Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Params& params)
-: params(params)
+Coord calc_h(Coord const& a, Coord const& b) noexcept {
+	return distance(a, b) / 2;
+}
+
+//******************************************************************************
+Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Params& params, Timepoint* t)
+: Originator(t, {
+	.dmax = params.dmax,
+	.before = Side(before, params.lmin, params.lambda, calc_h(before->coord, after->coord), t, [before](double d) noexcept {
+		switch(before->policy) {
+		case MeshlinePolicy::Policy::ONELINE: return 0.0;
+		case MeshlinePolicy::Policy::HALFS: return d / 2.0;
+		case MeshlinePolicy::Policy::THIRDS: return [&] {
+			switch(before->normal) {
+			case MeshlinePolicy::Normal::MAX:
+				return 2.0/3.0 * d;
+			case MeshlinePolicy::Normal::MIN:
+				return 1.0/3.0 * d;
+			default:
+				return d;
+			}
+		} ();
+		default: unreachable();
+		}
+	}),
+	.after = Side(after, params.lmin, params.lambda, calc_h(before->coord, after->coord), t, [after](double d) noexcept {
+		switch(after->policy) {
+		case MeshlinePolicy::Policy::ONELINE: return 0.0;
+		case MeshlinePolicy::Policy::HALFS: return d / 2.0;
+		case MeshlinePolicy::Policy::THIRDS: return [&] {
+			switch(after->normal) {
+			case MeshlinePolicy::Normal::MAX:
+				return 1.0/3.0 * d;
+			case MeshlinePolicy::Normal::MIN:
+				return 2.0/3.0 * d;
+			default:
+				return d;
+			}
+		} ();
+		default: unreachable();
+		}
+	})
+})
+, params(params)
 , axis(axis)
-, h(distance(before->coord, after->coord) / 2)
+, h(calc_h(before->coord, after->coord))
 , m(mid(before->coord, after->coord))
-, dmax(params.dmax)
-, before(before, params.lmin, params.lambda, h, [before](double d) noexcept {
-	switch(before->policy) {
-	case MeshlinePolicy::Policy::ONELINE: return 0.0;
-	case MeshlinePolicy::Policy::HALFS: return d / 2.0;
-	case MeshlinePolicy::Policy::THIRDS: return [&] {
-		switch(before->normal) {
-		case MeshlinePolicy::Normal::MAX:
-			return 2.0/3.0 * d;
-		case MeshlinePolicy::Normal::MIN:
-			return 1.0/3.0 * d;
-		default:
-			return d;
-		}
-	} ();
-	default: unreachable();
-	}
-})
-, after(after, params.lmin, params.lambda, h, [after](double d) noexcept {
-	switch(after->policy) {
-	case MeshlinePolicy::Policy::ONELINE: return 0.0;
-	case MeshlinePolicy::Policy::HALFS: return d / 2.0;
-	case MeshlinePolicy::Policy::THIRDS: return [&] {
-		switch(after->normal) {
-		case MeshlinePolicy::Normal::MAX:
-			return 1.0/3.0 * d;
-		case MeshlinePolicy::Normal::MIN:
-			return 2.0/3.0 * d;
-		default:
-			return d;
-		}
-	} ();
-	default: unreachable();
-	}
-})
 {}
 
 //******************************************************************************
 Coord Interval::s(Interval::Side const& side) const {
-	return h - side.d_init_(side.meshline_policy->d);
+	return h - side.d_init_(side.meshline_policy->get_current_state().d);
 }
 
 //******************************************************************************
@@ -203,28 +213,28 @@ double find_dmax(Interval::Side const& a, Interval::Side const& b, double dmax) 
 }
 
 //******************************************************************************
-void Interval::update_ls() {
-	before.ls = find_ls(before.meshline_policy->d, before.lambda, dmax, s(before));
-	after.ls = find_ls(after.meshline_policy->d, after.lambda, dmax, s(after));
+void Interval::update_ls(IntervalState& state) {
+	update_ls(state.before);
+	update_ls(state.after);
 }
 
 //******************************************************************************
 void Interval::update_ls(Interval::Side& side) {
-	side.ls = find_ls(side.meshline_policy->d, side.lambda, dmax, s(side));
+	side.ls = find_ls(side.meshline_policy->get_current_state().d, side.lambda, get_current_state().dmax, s(side));
 }
 
 //******************************************************************************
 tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Side const& side, size_t iter_limit) const {
 	size_t const step = 1000;
-	double current_d = min(side.meshline_policy->d, dmax);
+	double current_d = min(side.meshline_policy->get_current_state().d, get_current_state().dmax);
 
 	vector<Coord> current_ls = side.ls;
 
 	size_t counter = 0;
 	bool is_limit_reached = false;
-	while(!is_ls_valid_for_dmax_lmin_lambda(current_ls, current_d, side.lambda, dmax, side.lmin)) {
+	while(!is_ls_valid_for_dmax_lmin_lambda(current_ls, current_d, side.lambda, get_current_state().dmax, side.lmin)) {
 		current_d -= current_d / step;
-		current_ls = find_ls(current_d, side.lambda, dmax, s(side, current_d));
+		current_ls = find_ls(current_d, side.lambda, get_current_state().dmax, s(side, current_d));
 
 		if(counter++ >= iter_limit) {
 			is_limit_reached = true;
@@ -249,7 +259,7 @@ tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Side const& side,
 //******************************************************************************
 //tuple<double, bool> Interval::adjust_d_for_s(Interval::Side const& side, size_t iter_limit) const {
 //	size_t step = 10000;
-//	double current_d = side.meshline_policy->d;
+//	double current_d = side.meshline_policy->get_current_state().d;
 //
 //	size_t nlines = side.ls.size();
 //
@@ -304,7 +314,7 @@ tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side const& side, si
 		if(current_lambda < 1)
 			current_lambda = 1;
 
-		current_ls = find_ls(side.meshline_policy->d, current_lambda, dmax, s(side));
+		current_ls = find_ls(side.meshline_policy->get_current_state().d, current_lambda, dmax, s(side));
 
 		++counter;
 		if(counter >= iter_limit) {
@@ -318,7 +328,7 @@ tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side const& side, si
 		if(next_lambda < 1)
 			next_lambda = 1;
 
-		auto next_ls = find_ls(side.meshline_policy->d, next_lambda, dmax, s(side));
+		auto next_ls = find_ls(side.meshline_policy->get_current_state().d, next_lambda, get_current_state().dmax, s(side));
 		if(next_ls.size() > nlines)
 			break;
 
@@ -340,7 +350,7 @@ tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side const& side, si
 		if(current_lambda < 1)
 			current_lambda = 1;
 
-		current_ls = find_ls(a.meshline_policy->d, current_lambda, dmax, s(a));
+		current_ls = find_ls(a.meshline_policy->get_current_state().d, current_lambda, dmax, s(a));
 	}
 
 	if(i >= iter_limit)
@@ -353,59 +363,73 @@ tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side const& side, si
 
 //******************************************************************************
 void Interval::auto_solve_d() {
-	update_ls();
+	auto [t, state] = make_next_state();
 
-	dmax = domain::find_dmax(before, after, dmax);
-	update_ls();
+	update_ls(state);
 
-	before.meshline_policy->d = get<0>(adjust_d_for_dmax_lmin(before/*, 10000*/));
-	update_ls(before);
+	state.dmax = domain::find_dmax(state.before, state.after, state.dmax);
+	update_ls(state);
+
+	auto state_b = state.before.meshline_policy->get_current_state();
+	state_b.d = get<0>(adjust_d_for_dmax_lmin(state.before/*, 10000*/));
+	state.before.meshline_policy->set_state(t, state_b);
+	update_ls(state.before);
 
 
-	after.meshline_policy->d = get<0>(adjust_d_for_dmax_lmin(after/*, 10000*/));
-	update_ls(after);
+	auto state_a = state.after.meshline_policy->get_current_state();
+	state_a.d = get<0>(adjust_d_for_dmax_lmin(state.after/*, 10000*/));
+	state.after.meshline_policy->set_state(t, state_a);
+	update_ls(state.after);
+
+	set_state(t, state);
 }
 
 //******************************************************************************
 void Interval::auto_solve_lambda() {
-	update_ls();
+	auto state = get_current_state();
 
-	before.lambda = get<0>(adjust_lambda_for_s(before));
-	after.lambda = get<0>(adjust_lambda_for_s(after));
-	update_ls();
+	update_ls(state);
+
+	state.before.lambda = get<0>(adjust_lambda_for_s(state.before));
+	state.after.lambda = get<0>(adjust_lambda_for_s(state.after));
+	update_ls(state);
+
+	set_next_state(state);
 }
 
 //******************************************************************************
-vector<unique_ptr<Meshline>> Interval::mesh() const {
-	double const d_init_before = before.d_init();
-	double const d_init_after = after.d_init();
-	vector<unique_ptr<Meshline>> meshlines;
+vector<shared_ptr<Meshline>> Interval::mesh() const {
+	auto const& state = get_current_state();
 
-	if(before.meshline_policy->policy != MeshlinePolicy::Policy::ONELINE)
-		meshlines.push_back(make_unique<Meshline>(
-			before.meshline_policy->coord + d_init_before,
+	double const d_init_before = state.before.d_init();
+	double const d_init_after = state.after.d_init();
+	vector<shared_ptr<Meshline>> meshlines;
+
+	if(state.before.meshline_policy->policy != MeshlinePolicy::Policy::ONELINE)
+		meshlines.push_back(make_shared<Meshline>(
+			state.before.meshline_policy->coord + d_init_before,
 			this,
-			before.meshline_policy));
-	if(before.ls.size())
-		for(auto it = begin(before.ls); it != prev(end(before.ls)); ++it)
-			meshlines.push_back(make_unique<Meshline>(
-				before.meshline_policy->coord + d_init_before + (*it),
+			state.before.meshline_policy));
+	if(state.before.ls.size())
+		for(auto it = begin(state.before.ls); it != prev(end(state.before.ls)); ++it)
+			meshlines.push_back(make_shared<Meshline>(
+				state.before.meshline_policy->coord + d_init_before + (*it),
 				this,
-				before.meshline_policy));
+				state.before.meshline_policy));
 
-	meshlines.push_back(make_unique<Meshline>(m, this));
+	meshlines.push_back(make_shared<Meshline>(m, this));
 
-	if(after.ls.size())
-		for(auto it = next(rbegin(after.ls)); it != rend(after.ls); ++it)
-			meshlines.push_back(make_unique<Meshline>(
-				after.meshline_policy->coord - d_init_after - (*it),
+	if(state.after.ls.size())
+		for(auto it = next(rbegin(state.after.ls)); it != rend(state.after.ls); ++it)
+			meshlines.push_back(make_shared<Meshline>(
+				state.after.meshline_policy->coord - d_init_after - (*it),
 				this,
-				after.meshline_policy));
-	if(after.meshline_policy->policy != MeshlinePolicy::Policy::ONELINE)
-		meshlines.push_back(make_unique<Meshline>(
-			after.meshline_policy->coord - d_init_after,
+				state.after.meshline_policy));
+	if(state.after.meshline_policy->policy != MeshlinePolicy::Policy::ONELINE)
+		meshlines.push_back(make_shared<Meshline>(
+			state.after.meshline_policy->coord - d_init_after,
 			this,
-			after.meshline_policy));
+			state.after.meshline_policy));
 
 	meshlines.shrink_to_fit();
 	return meshlines;

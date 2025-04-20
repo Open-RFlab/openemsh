@@ -20,6 +20,7 @@
 #include "domain/utils/entity_visitor.hpp"
 #include "domain/global.hpp"
 #include "utils/entity.hpp"
+#include "utils/state_management.hpp"
 #include "i_meshline_origin.hpp"
 
 namespace domain {
@@ -27,14 +28,26 @@ namespace domain {
 class Conflict;
 class Meshline;
 
+//******************************************************************************
+struct MeshlinePolicyState final
+: public IConflictOriginState
+, public IConflictSolutionState {
+	bool is_enabled;
+	double res_factor; // TODO useful? d directly? come from params
+	double d; ///< Distance betwen two lines (HALFS and THIRDS only).
+	std::vector<IMeshLineOrigin*> origins;
+	std::vector<Meshline*> meshlines;
+};
+
 /// This class is an interface between a mesh line and its origin because
 /// multiples edges can be responsible for the same lines and some lines can
 /// be produced by other entities than edges, like a whole polygon (port) or
 /// a conflict between lines that can require a modification of other lines.
 ///*****************************************************************************
 class MeshlinePolicy
-: public Entity
+: public Originator<MeshlinePolicyState>
 , public Visitable<MeshlinePolicy, EntityVisitor>
+, public Entity
 , public IConflictOrigin
 , public IConflictSolution {
 public:
@@ -58,13 +71,6 @@ public:
 
 	Params& params;
 	Coord const coord;
-	bool is_enabled;
-	double res_factor; // TODO useful? d directly? come from params
-
-	double d; ///< Distance betwen two lines (HALFS and THIRDS only).
-
-	std::vector<IMeshLineOrigin*> origins;
-	std::vector<Meshline*> meshlines; // TODO unique_ptr or ptr?
 //	std::vector<Conflict*> conflicts;
 
 	MeshlinePolicy(
@@ -73,6 +79,8 @@ public:
 		Normal normal,
 		Params& params,
 		Coord const coord,
+		Timepoint* t,
+		std::vector<IMeshLineOrigin*> const& origins = {},
 		bool const is_enabled = true,
 		double const res_factor = 2);
 

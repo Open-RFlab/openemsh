@@ -18,6 +18,7 @@
 #include "domain/mesh/i_meshline_origin.hpp"
 #include "domain/utils/entity_visitor.hpp"
 #include "utils/entity.hpp"
+#include "utils/state_management.hpp"
 #include "bounding.hpp"
 #include "range.hpp"
 #include "relation.hpp"
@@ -36,9 +37,18 @@ class Point;
 #endif // UNITTEST
 
 //******************************************************************************
+struct EdgeState final
+: public IConflictOriginState
+, public IConflictSolutionState
+, public IMeshLineOriginState {
+	bool to_mesh = true;
+};
+
+//******************************************************************************
 class Edge
-: public Entity
+: public Originator<EdgeState>
 , public Visitable<Edge, EntityVisitor>
+, public Entity
 , public Segment
 , public IConflictOrigin
 , public IConflictSolution
@@ -69,11 +79,10 @@ public:
 	} direction;
 
 	Normal normal;
-	bool to_mesh;
 
 //	Bounding2D bounding;
 
-	Edge(Plane plane, Point const* p0, Point const* p1);
+	Edge(Plane plane, Point const* p0, Point const* p1, Timepoint* t);
 
 	Point const& p0() const noexcept override;
 	Point const& p1() const noexcept override;

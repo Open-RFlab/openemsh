@@ -21,8 +21,10 @@ using namespace std;
 ConflictTooCloseMeshlinePolicies::ConflictTooCloseMeshlinePolicies(
 		Axis axis,
 		MeshlinePolicy* a,
-		MeshlinePolicy* b)
-: Conflict(Kind::TOO_CLOSE_MESHLINE_POLICIES)
+		MeshlinePolicy* b,
+		Timepoint* t)
+: Originator(t)
+, Conflict(Kind::TOO_CLOSE_MESHLINE_POLICIES)
 , axis(axis)
 , meshline_policies({ a, b })
 {}
@@ -58,14 +60,18 @@ void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManager& line_po
 	} ();
 
 	if(policy && normal) {
-		meshline_policy = line_policy_manager.add_meshline_policy(
+		auto [t, state] = make_next_state();
+		state.meshline_policy = line_policy_manager.add_meshline_policy(
 			this,
 			axis,
 			policy.value(),
 			normal.value(),
-			mid(a->coord, b->coord));
-		solution = meshline_policy;
-		is_solved = true;
+			mid(a->coord, b->coord),
+			true,
+			t);
+		state.solution = state.meshline_policy;
+		state.is_solved = true;
+		set_state(t, state);
 	}
 
 	// TODO detect axis

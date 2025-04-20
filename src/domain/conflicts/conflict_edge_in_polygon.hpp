@@ -13,6 +13,7 @@
 
 #include "domain/geometrics/range.hpp"
 #include "domain/geometrics/space.hpp"
+#include "utils/state_management.hpp"
 #include "conflict.hpp"
 
 namespace domain {
@@ -31,18 +32,22 @@ enum OverlapIndex {
 };
 
 //******************************************************************************
+struct ConflictEdgeInPolygonState final : public ConflictState {
+	std::vector<Overlap> overlaps;
+};
+
+//******************************************************************************
 class ConflictEdgeInPolygon
-: public Conflict
-, public Visitable<ConflictEdgeInPolygon, EntityVisitor> {
+: public Originator<ConflictEdgeInPolygonState>
+, public Visitable<ConflictEdgeInPolygon, EntityVisitor>
+, public Conflict {
 public:
 	Plane const plane;
 	Edge* const edge;
 
-	std::vector<Overlap> overlaps;
+	ConflictEdgeInPolygon(Plane plane, Edge* a, Polygon const* polygon, Range const range, std::optional<Edge const*> b, Timepoint* t);
 
-	ConflictEdgeInPolygon(Plane plane, Edge* a, Polygon const* polygon, Range const range, std::optional<Edge const*> b);
-
-	void append(Polygon const* polygon, Range const range, std::optional<Edge const*> edge);
+	void append(Polygon const* polygon, Range const range, std::optional<Edge const*> edge, Timepoint* t = nullptr);
 
 	void auto_solve(MeshlinePolicyManager& line_policy_manager) override;
 };

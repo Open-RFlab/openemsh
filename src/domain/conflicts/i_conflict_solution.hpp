@@ -11,10 +11,13 @@ namespace domain {
 class Conflict;
 
 //******************************************************************************
+struct IConflictSolutionState {
+	Conflict const* conflict = nullptr; // TODO rename like conflict_from
+};
+
+//******************************************************************************
 class IConflictSolution {
 public:
-	Conflict const* conflict; // TODO rename like conflict_from
-
 	virtual ~IConflictSolution() = default;
 };
 

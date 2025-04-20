@@ -9,7 +9,7 @@
 #include "domain/board.hpp"
 
 //******************************************************************************
-std::unique_ptr<domain::Board> create_lpf() {
+std::shared_ptr<domain::Board> create_lpf() {
 	using namespace domain;
 	using Type = Polygon::Type;
 

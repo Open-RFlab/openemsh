@@ -65,10 +65,10 @@ void SerializerToPlantuml::visit(Board& board) {
 		for(auto const axis : AllAxis) {
 			out += "state \"Axis " + to_string(axis) + "\" as " + to_string(axis) + " {\n";
 
-			auto policies = create_view(board.get_meshline_policies(axis));
+			auto policies = board.get_meshline_policies(axis);
 
-			sort(begin(policies), end(policies),
-				[](MeshlinePolicy const* a, MeshlinePolicy const* b) {
+			ranges::sort(policies,
+				[](auto const& a, auto const& b) {
 					return a->coord < b->coord;
 				});
 
@@ -101,9 +101,9 @@ void SerializerToPlantuml::visit(Edge& edge) {
 	auto id = to_string(edge.id);
 
 	out +=
-		"state \"Edge\" as " + id + (edge.to_mesh ? (edge.conflicts.empty() ? " #chartreuse" : " #green") : " #red") + " {\n" +
+		"state \"Edge\" as " + id + (edge.get_current_state().to_mesh ? (edge.get_current_state().conflicts.empty() ? " #chartreuse" : " #green") : " #red") + " {\n" +
 		id + " : Normal = " + to_string(edge.normal) + "\n" +
-		id + " : To mesh = " + (edge.to_mesh ? "true" : "false") + "\n"
+		id + " : To mesh = " + (edge.get_current_state().to_mesh ? "true" : "false") + "\n"
 		"}\n";
 }
 
@@ -125,16 +125,16 @@ void SerializerToPlantuml::visit(Polygon& polygon) {
 //******************************************************************************
 void SerializerToPlantuml::visit(ConflictColinearEdges& conflict) {
 	auto id = to_string(conflict.id);
-	auto solution = dynamic_cast<MeshlinePolicy*>(conflict.solution);
+	auto solution = dynamic_cast<MeshlinePolicy*>(conflict.get_current_state().solution);
 
 	out +=
 		"state \"Conflict ColinearEdges\" as " + id + " {\n"
 		"state \" \" as " + id + "_in <<inputPin>>\n"
 		"state \" \" as " + id + "_out <<outputPin>>\n";
 
-	for(auto const& edge : conflict.edges) {
+	for(auto const& edge : conflict.get_current_state().edges) {
 		out +=
-			id + " : Normal = " + to_string(edge->normal) + (edge->to_mesh ? " enabled" : " disabled") + "\n" +
+			id + " : Normal = " + to_string(edge->normal) + (edge->get_current_state().to_mesh ? " enabled" : " disabled") + "\n" +
 			to_string(edge->id) + " ------> " + id + "_in \n";
 	}
 
@@ -153,13 +153,13 @@ void SerializerToPlantuml::visit(ConflictEdgeInPolygon& conflict) {
 	auto id = to_string(conflict.id);
 
 	out +=
-		"state \"Conflict EdgeInPolygon\" as " + id + (conflict.edge->to_mesh ? " #green" : " #red") + " {\n"
+		"state \"Conflict EdgeInPolygon\" as " + id + (conflict.edge->get_current_state().to_mesh ? " #green" : " #red") + " {\n"
 		"state \" \" as " + id + "_out <<outputPin>>\n" +
-//		to_string(conflict.edge->id) + " ------> " + id + "\n";// +
-		id + "_out -----[bold," + (conflict.edge->to_mesh ? "#green" : "#red") + "]-> " + to_string(conflict.edge->id) + "\n";
+		to_string(conflict.edge->id) + " ------> " + id + "\n" +
+		id + "_out -----[bold," + (conflict.edge->get_current_state().to_mesh ? "#green" : "#red") + "]-> " + to_string(conflict.edge->id) + "\n";
 
 	size_t i = 0;
-	for(auto const& [polygon, range, overlapping_edge] : conflict.overlaps) {
+	for(auto const& [polygon, range, overlapping_edge] : conflict.get_current_state().overlaps) {
 		out += "state \" \" as " + id + "_in" + to_string(i) + " <<inputPin>>\n" +
 			to_string(polygon->id) + "_out ------> " + id + "_in" + to_string(i) + "\n";
 		if(overlapping_edge)
@@ -173,7 +173,7 @@ void SerializerToPlantuml::visit(ConflictEdgeInPolygon& conflict) {
 //******************************************************************************
 void SerializerToPlantuml::visit(ConflictTooCloseMeshlinePolicies& conflict) {
 	auto id = to_string(conflict.id);
-	auto solution = dynamic_cast<MeshlinePolicy*>(conflict.solution);
+	auto solution = dynamic_cast<MeshlinePolicy*>(conflict.get_current_state().solution);
 
 	out +=
 		"state \"Conflict TooCloseMeshlinePolicies\" as " + id + " {\n"
@@ -192,18 +192,18 @@ void SerializerToPlantuml::visit(ConflictTooCloseMeshlinePolicies& conflict) {
 //******************************************************************************
 void SerializerToPlantuml::visit(MeshlinePolicy& policy) {
 	auto id = to_string(policy.id);
-	auto origin = policy.origins.size() == 1
-	            ? dynamic_cast<Edge*>(policy.origins.front())
+	auto origin = policy.get_current_state().origins.size() == 1
+	            ? dynamic_cast<Edge*>(policy.get_current_state().origins.front())
 	            : nullptr;
 
 	out +=
-		"state \"MeshlinePolicy\" as " + id + (policy.is_enabled ? " #green" : " #red") + " {\n"
+		"state \"MeshlinePolicy\" as " + id + (policy.get_current_state().is_enabled ? " #green" : " #red") + " {\n"
 		"state \" \" as " + id + "_in <<inputPin>>\n"
 		"state \" \" as " + id + "_out <<outputPin>>\n" +
 		id + " : Normal = " + to_string(policy.normal) + "\n" +
-		id + " : Is enabled = " + (policy.is_enabled ? "true" : "false") + "\n" +
+		id + " : Is enabled = " + (policy.get_current_state().is_enabled ? "true" : "false") + "\n" +
 		id + " : Policy = " + to_string(policy.policy) + "\n" +
-		id + " : d = " + to_string(policy.d) + "\n";
+		id + " : d = " + to_string(policy.get_current_state().d) + "\n";
 
 	if(origin)
 		out += to_string(origin->id) + " -----[#chartreuse]-> " + id + "_in\n";
@@ -220,13 +220,13 @@ void SerializerToPlantuml::visit(Interval& interval) {
 		"state \" \" as " + id + "_in1 <<inputPin>>\n"
 		"state \" \" as " + id + "_in2 <<inputPin>>\n"
 		"state \" \" as " + id + "_out <<outputPin>>\n" +
-		id + " : dmax = " + to_string(interval.dmax) + "\n" +
-		id + " : before.lmin = " + to_string(interval.before.lmin) + "\n" +
-		id + " : before.lambda = " + to_string(interval.before.lambda) + "\n" +
-		id + " : after.lmin = " + to_string(interval.after.lmin) + "\n" +
-		id + " : after.lambda = " + to_string(interval.after.lambda) + "\n" +
-		to_string(interval.before.meshline_policy->id) + "_out ------> " + id + "_in1 \n" +
-		to_string(interval.after.meshline_policy->id) + "_out ------> " + id + "_in2 \n"
+		id + " : dmax = " + to_string(interval.get_current_state().dmax) + "\n" +
+		id + " : before.lmin = " + to_string(interval.get_current_state().before.lmin) + "\n" +
+		id + " : before.lambda = " + to_string(interval.get_current_state().before.lambda) + "\n" +
+		id + " : after.lmin = " + to_string(interval.get_current_state().after.lmin) + "\n" +
+		id + " : after.lambda = " + to_string(interval.get_current_state().after.lambda) + "\n" +
+		to_string(interval.get_current_state().before.meshline_policy->id) + "_out ------> " + id + "_in1 \n" +
+		to_string(interval.get_current_state().after.meshline_policy->id) + "_out ------> " + id + "_in2 \n"
 		"}\n";
 }
 

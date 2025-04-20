@@ -19,6 +19,7 @@
 #include "domain/utils/entity_visitor.hpp"
 #include "domain/global.hpp"
 #include "utils/entity.hpp"
+#include "utils/state_management.hpp"
 #include "bounding.hpp"
 #include "relation.hpp"
 #include "space.hpp"
@@ -30,9 +31,14 @@ class Edge;
 class Point;
 
 //******************************************************************************
+struct PolygonState final : public IConflictOriginState {
+};
+
+//******************************************************************************
 class Polygon
-: public Entity
+: public Originator<PolygonState>
 , public Visitable<Polygon, EntityVisitor>
+, public Entity
 , public IConflictOrigin
 /*, public IMeshLineOrigin*/ {
 private:
@@ -64,7 +70,8 @@ public:
 	///*************************************************************************
 	std::vector<std::unique_ptr<Edge>> const edges;
 
-	Polygon(Plane plane, Type type, std::string const& name, std::vector<std::unique_ptr<Point const>>&& points);
+	Polygon(Plane plane, Type type, std::string const& name, std::vector<std::unique_ptr<Point const>>&& points, Timepoint* t);
+	~Polygon();
 
 //	relation::PolygonEdge relation_to(Edge const* edge);
 	relation::PolygonPoint relation_to(Point const& point) const noexcept;
@@ -80,6 +87,6 @@ extern template Polygon::Rotation detect_rotation(std::vector<Point const*> cons
 Bounding2D detect_bounding(std::vector<std::unique_ptr<Point const>> const& points) noexcept;
 
 //******************************************************************************
-std::vector<std::unique_ptr<Edge>> detect_edges(std::vector<std::unique_ptr<Point const>> const& points, Plane plane);
+std::vector<std::unique_ptr<Edge>> detect_edges(std::vector<std::unique_ptr<Point const>> const& points, Plane plane, Timepoint* t);
 
 } // namespace domain

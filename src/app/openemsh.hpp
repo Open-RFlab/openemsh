@@ -61,7 +61,7 @@ public:
 
 private:
 	Params params;
-	std::unique_ptr<domain::Board> board;
+	std::shared_ptr<domain::Board> board;
 };
 
 } // namespace app

@@ -15,14 +15,17 @@ class ConflictColinearEdges;
 class ConflictEdgeInPolygon;
 
 //******************************************************************************
+struct IConflictOriginState {
+	std::vector<Conflict*> conflicts; //TODO rename like resulting_conflict
+};
+
+//******************************************************************************
 class IConflictOrigin {
 public:
-	std::vector<Conflict*> conflicts; //TODO rename like resulting_conflict
-
 	virtual ~IConflictOrigin() = default;
 
-	std::vector<ConflictColinearEdges*> look_for_conflict_colinear_edges();
-	ConflictEdgeInPolygon* look_for_conflict_edge_in_polygon();
+//	std::vector<ConflictColinearEdges*> look_for_conflict_colinear_edges();
+//	ConflictEdgeInPolygon* look_for_conflict_edge_in_polygon();
 };
 
 } // namespace domain

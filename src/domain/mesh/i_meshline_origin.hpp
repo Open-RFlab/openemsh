@@ -11,11 +11,13 @@ namespace domain {
 class MeshlinePolicy;
 
 //******************************************************************************
+struct IMeshLineOriginState {
+	MeshlinePolicy* meshline_policy = nullptr;
+};
+
+//******************************************************************************
 class IMeshLineOrigin {
 public:
-	MeshlinePolicy* meshline_policy;
-
-	IMeshLineOrigin();
 	virtual ~IMeshLineOrigin() = default;
 };
 

@@ -18,15 +18,15 @@ namespace domain {
 using namespace std;
 
 //******************************************************************************
-Edge::Edge(Plane const plane, Point const* p0, Point const* p1)
-: Segment(domain::axis(*p0, *p1))
+Edge::Edge(Plane const plane, Point const* p0, Point const* p1, Timepoint* t)
+: Originator(t)
+, Segment(domain::axis(*p0, *p1))
 , IMeshLineOrigin()
 , _p0(p0)
 , _p1(p1)
 , vec(*p1 - *p0)
 , plane(plane)
 , normal(Normal::NONE)
-, to_mesh(true)
 //, bounding(bounding(*this))
 {
 	if(axis == Axis::H) {

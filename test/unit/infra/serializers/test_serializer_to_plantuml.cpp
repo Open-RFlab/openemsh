@@ -21,7 +21,7 @@ using namespace domain;
 SCENARIO("string SerializerToPlantuml::run(Board& board)", "[serializer_to_plantuml]") {
 	// TODO This part might be better as 'e2e test' than 'unit test'.
 	GIVEN("The Lpf complex structure") {
-		std::unique_ptr<Board> lpf = create_lpf();
+		std::shared_ptr<Board> lpf = create_lpf();
 		lpf->params.lmin = 1;
 		lpf->params.proximity_limit = 0;
 //		lpf->params.dmax = 2;
@@ -46,7 +46,7 @@ SCENARIO("string SerializerToPlantuml::run(Board& board)", "[serializer_to_plant
 
 	// TODO This part might be better as 'e2e test' than 'unit test'.
 	GIVEN("The Stub complex structure") {
-		std::unique_ptr<Board> stub = create_stub();
+		std::shared_ptr<Board> stub = create_stub();
 		stub->params.lmin = 0;
 		stub->params.proximity_limit = 0.1;
 //		stub->params.dmax = 2;

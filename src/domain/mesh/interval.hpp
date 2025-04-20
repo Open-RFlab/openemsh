@@ -17,6 +17,7 @@
 #include "domain/utils/entity_visitor.hpp"
 #include "domain/global.hpp"
 #include "utils/entity.hpp"
+#include "utils/state_management.hpp"
 
 namespace domain {
 
@@ -27,8 +28,13 @@ class MeshlinePolicy;
 #define private public
 #endif // UNITTEST
 
+struct IntervalState;
+
 //******************************************************************************
-class Interval : public Entity, public Visitable<Interval, EntityVisitor> {
+class Interval
+: public Originator<IntervalState>
+, public Visitable<Interval, EntityVisitor>
+, public Entity {
 private:
 	Params& params;
 
@@ -42,29 +48,26 @@ public:
 		std::function<double (double)> const d_init_;
 		std::vector<Coord> ls; // TODO avoid Coord::operator= -> double
 
-		Side(MeshlinePolicy* meshline_policy, size_t lmin, double lambda, Coord h, std::function<double (double)> d_init);
+		Side(MeshlinePolicy* meshline_policy, size_t lmin, double lambda, Coord h, Timepoint* t, std::function<double (double)> d_init);
 
 		double d_init() const;
 	};
 
 	Coord const h;    ///< Distance between a side's coord and the middle m.
 	Coord const m;    ///< Middle between both sides' coord.
-	double dmax;      ///< Maximum distance between two adjacent meshlines.
-	Side before;
-	Side after;
 
-	Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Params& params);
+	Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Params& params, Timepoint* t);
 
 	void auto_solve_d();
 	void auto_solve_lambda();
-	std::vector<std::unique_ptr<Meshline>> mesh() const;
+	std::vector<std::shared_ptr<Meshline>> mesh() const;
 
 private:
 	/// Distance between a side's policy line and the middle m. limit = h - d_init
 	Coord s(Side const& side) const;
 	Coord s(Side const& side, double d) const;
 
-	void update_ls();
+	void update_ls(IntervalState& state);
 	void update_ls(Side& side);
 
 	std::tuple<double, bool> adjust_d_for_dmax_lmin(
@@ -73,6 +76,13 @@ private:
 	std::tuple<double, bool> adjust_lambda_for_s(
 		Side const& side,
 		size_t iter_limit=std::numeric_limits<std::size_t>::max()) const;
+};
+
+//******************************************************************************
+struct IntervalState final {
+	double dmax;      ///< Maximum distance between two adjacent meshlines.
+	Interval::Side before;
+	Interval::Side after;
 };
 
 #ifdef UNITTEST

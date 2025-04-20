@@ -15,25 +15,25 @@ namespace domain {
 using namespace std;
 
 //******************************************************************************
-vector<ConflictColinearEdges*> IConflictOrigin::look_for_conflict_colinear_edges() {
-	vector<ConflictColinearEdges*> ret;
-	for(Conflict* conflict : conflicts)
-//		if(conflict->kind == Conflict::Kind::COLINEAR_EDGES)
-//			ret.push_back(dynamic_cast<ConflictColinearEdges*>(conflict));
-		if(auto c = dynamic_cast<ConflictColinearEdges*>(conflict))
-			ret.push_back(c);
-	return ret;
-}
+//vector<ConflictColinearEdges*> IConflictOrigin::look_for_conflict_colinear_edges() {
+//	vector<ConflictColinearEdges*> ret;
+//	for(Conflict* conflict : conflicts)
+////		if(conflict->kind == Conflict::Kind::COLINEAR_EDGES)
+////			ret.push_back(dynamic_cast<ConflictColinearEdges*>(conflict));
+//		if(auto c = dynamic_cast<ConflictColinearEdges*>(conflict))
+//			ret.push_back(c);
+//	return ret;
+//}
 
 //******************************************************************************
-ConflictEdgeInPolygon* IConflictOrigin::look_for_conflict_edge_in_polygon() {
-	for(Conflict* conflict : conflicts)
-//		if(conflict->kind == Conflict::Kind::EDGE_IN_POLYGON)
-//		if(typeid(conflict) == typeid(ConflictEdgeInPolygon))
-//			return dynamic_cast<ConflictEdgeInPolygon*>(conflict);
-		if(auto c = dynamic_cast<ConflictEdgeInPolygon*>(conflict))
-			return c;
-	return nullptr;
-}
+//ConflictEdgeInPolygon* IConflictOrigin::look_for_conflict_edge_in_polygon() {
+//	for(Conflict* conflict : conflicts)
+////		if(conflict->kind == Conflict::Kind::EDGE_IN_POLYGON)
+////		if(typeid(conflict) == typeid(ConflictEdgeInPolygon))
+////			return dynamic_cast<ConflictEdgeInPolygon*>(conflict);
+//		if(auto c = dynamic_cast<ConflictEdgeInPolygon*>(conflict))
+//			return c;
+//	return nullptr;
+//}
 
 } // namespace domain

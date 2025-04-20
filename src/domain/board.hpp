@@ -18,6 +18,7 @@
 #include "geometrics/space.hpp"
 #include "utils/entity.hpp"
 #include "utils/entity_visitor.hpp"
+#include "utils/state_management.hpp"
 #include "conflict_manager.hpp"
 #include "global.hpp"
 #include "meshline_policy_manager.hpp"
@@ -31,13 +32,21 @@ namespace domain {
 #endif // UNITTEST
 
 //******************************************************************************
-class Board : public Entity, public Visitable<Board, EntityVisitor> {
-private:
-	ConflictManager conflict_manager;
-	MeshlinePolicyManager line_policy_manager;
-
-	PlaneSpace<std::vector<std::unique_ptr<Polygon>>> polygons;
+struct BoardState final {
+	PlaneSpace<std::vector<std::shared_ptr<Polygon>>> polygons;
 	PlaneSpace<std::vector<Edge*>> edges;
+
+	BoardState(PlaneSpace<std::vector<std::shared_ptr<Polygon>>>&& polygons);
+};
+
+//******************************************************************************
+class Board
+: public Originator<BoardState>
+, public Visitable<Board, EntityVisitor>
+, public Entity {
+private:
+	std::shared_ptr<ConflictManager> conflict_manager;
+	std::shared_ptr<MeshlinePolicyManager> line_policy_manager;
 
 public:
 	//**************************************************************************
@@ -49,20 +58,21 @@ public:
 		void add_polygon(Plane plane, Polygon::Type type, std::string const& name, std::vector<std::unique_ptr<Point const>>&& points);
 		void add_polygon_from_box(Plane plane, Polygon::Type type, std::string const& name, Point const p1, Point const p3);
 
-		[[nodiscard]] std::unique_ptr<Board> build();
+		[[nodiscard]] std::shared_ptr<Board> build();
 
 	private:
 		Params params;
-		PlaneSpace<std::vector<std::unique_ptr<Polygon>>> polygons;
-		AxisSpace<std::vector<std::unique_ptr<MeshlinePolicy>>> line_policies;
+		PlaneSpace<std::vector<std::shared_ptr<Polygon>>> polygons;
+		AxisSpace<std::vector<std::shared_ptr<MeshlinePolicy>>> line_policies;
 	};
 
 	Params params;
 
-	explicit Board(PlaneSpace<std::vector<std::unique_ptr<Polygon>>>&& polygons);
+	Board(PlaneSpace<std::vector<std::shared_ptr<Polygon>>>&& polygons, Timepoint* t);
 	Board(
-		PlaneSpace<std::vector<std::unique_ptr<Polygon>>>&& polygons,
-		AxisSpace<std::vector<std::unique_ptr<MeshlinePolicy>>>&& line_policies);
+		PlaneSpace<std::vector<std::shared_ptr<Polygon>>>&& polygons,
+		AxisSpace<std::vector<std::shared_ptr<MeshlinePolicy>>>&& line_policies,
+		Timepoint* t);
 
 	/// Mesh resolution independant detection tasks
 	///*************************************************************************
@@ -81,14 +91,14 @@ public:
 
 	void auto_mesh(); // TODO
 
-	std::vector<std::unique_ptr<Meshline>> get_meshline_policies_meshlines(Axis axis) const;
-	std::vector<std::unique_ptr<Meshline>> const& get_meshlines(Axis axis) const;
-	std::vector<std::unique_ptr<MeshlinePolicy>> const& get_meshline_policies(Axis axis) const;
-	std::vector<std::unique_ptr<Interval>> const& get_intervals(Axis axis) const;
-	std::vector<std::unique_ptr<Polygon>> const& get_polygons(Plane plane) const;
-	std::vector<std::unique_ptr<ConflictEdgeInPolygon>> const& get_conflicts_edge_in_polygons(Plane const plane) const;
-	std::vector<std::unique_ptr<ConflictColinearEdges>> const& get_conflicts_colinear_edges(Axis const axis) const;
-	std::vector<std::unique_ptr<ConflictTooCloseMeshlinePolicies>> const& get_conflicts_too_close_meshline_policies(Axis const axis) const;
+	std::vector<std::shared_ptr<Meshline>> get_meshline_policies_meshlines(Axis axis) const;
+	std::vector<std::shared_ptr<Meshline>> const& get_meshlines(Axis axis) const;
+	std::vector<std::shared_ptr<MeshlinePolicy>> const& get_meshline_policies(Axis axis) const;
+	std::vector<std::shared_ptr<Interval>> const& get_intervals(Axis axis) const;
+	std::vector<std::shared_ptr<Polygon>> const& get_polygons(Plane plane) const;
+	std::vector<std::shared_ptr<ConflictEdgeInPolygon>> const& get_conflicts_edge_in_polygons(Plane const plane) const;
+	std::vector<std::shared_ptr<ConflictColinearEdges>> const& get_conflicts_colinear_edges(Axis const axis) const;
+	std::vector<std::shared_ptr<ConflictTooCloseMeshlinePolicies>> const& get_conflicts_too_close_meshline_policies(Axis const axis) const;
 };
 
 #ifdef UNITTEST

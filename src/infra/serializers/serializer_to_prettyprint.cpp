@@ -63,10 +63,10 @@ void SerializerToPrettyprint::visit(Board& board) {
 			conflict->accept(*this);
 
 	for(auto const axis : AllAxis) {
-		auto policies = create_view(board.get_meshline_policies(axis));
+		auto policies = board.get_meshline_policies(axis);
 
-		sort(begin(policies), end(policies),
-			[](MeshlinePolicy const* a, MeshlinePolicy const* b) {
+		ranges::sort(policies,
+			[](auto const& a, auto const& b) {
 				return a->coord < b->coord;
 			});
 
@@ -90,7 +90,7 @@ void SerializerToPrettyprint::visit(Board& board) {
 
 //******************************************************************************
 void SerializerToPrettyprint::visit(Edge& edge) {
-	out += to_string(edge.p0()) + " -> " + to_string(edge.p1()) + " " + to_string(edge.axis) + " " + to_string(edge.direction) + " " + to_string(edge.normal) + (edge.to_mesh ? " O" : " X") + "\n";
+	out += to_string(edge.p0()) + " -> " + to_string(edge.p1()) + " " + to_string(edge.axis) + " " + to_string(edge.direction) + " " + to_string(edge.normal) + (edge.get_current_state().to_mesh ? " O" : " X") + "\n";
 }
 
 //******************************************************************************
@@ -107,13 +107,13 @@ void SerializerToPrettyprint::visit(Polygon& polygon) {
 
 //******************************************************************************
 void SerializerToPrettyprint::visit(ConflictColinearEdges& conflict) {
-	auto solution = dynamic_cast<MeshlinePolicy*>(conflict.solution);
+	auto solution = dynamic_cast<MeshlinePolicy*>(conflict.get_current_state().solution);
 
 	out +=
 		F_ORANGE + "Conflict ColinearEdges between:\n" + S_RESET +
 		"\tAxis: " + to_string(conflict.axis) + "\n";
 
-	for(auto const& edge : conflict.edges) {
+	for(auto const& edge : conflict.get_current_state().edges) {
 		out += "\tEdge: ";
 		edge->accept(*this);
 	}
@@ -134,7 +134,7 @@ void SerializerToPrettyprint::visit(ConflictEdgeInPolygon& conflict) {
 	conflict.edge->accept(*this);
 
 	indent += 2;
-	for(auto& [polygon, range, overlapping_edge] : conflict.overlaps) {
+	for(auto& [polygon, range, overlapping_edge] : conflict.get_current_state().overlaps) {
 		out += "\tPolygon: ";
 		const_cast<Polygon*>(polygon)->accept(*this);
 
@@ -147,8 +147,8 @@ void SerializerToPrettyprint::visit(ConflictEdgeInPolygon& conflict) {
 	}
 	indent -= 2;
 
-	if(conflict.solution)
-		out += "\tSolution: " + (conflict.edge->to_mesh ? F_D_GREEN + "to mesh" : F_D_RED + "don't mesh") + S_RESET;
+	if(conflict.get_current_state().solution)
+		out += "\tSolution: " + (conflict.edge->get_current_state().to_mesh ? F_D_GREEN + "to mesh" : F_D_RED + "don't mesh") + S_RESET;
 
 	out += "\n";
 }

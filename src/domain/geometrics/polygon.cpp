@@ -15,25 +15,29 @@ namespace domain {
 using namespace std;
 
 //******************************************************************************
-Polygon::Polygon(Plane const plane, Type const type, string const& name, vector<unique_ptr<Point const>>&& points)
-: rotation(detect_rotation(points))
+Polygon::Polygon(Plane const plane, Type const type, string const& name, vector<unique_ptr<Point const>>&& points, Timepoint* t)
+: Originator(t)
+, rotation(detect_rotation(points))
 , type(type)
 , plane(plane)
 , bounding(detect_bounding(points))
 , name(name)
 , points(std::move(points))
-, edges(detect_edges(this->points, plane))
+, edges(detect_edges(this->points, plane, t))
 {
 	detect_edge_normal();
 }
 
 //******************************************************************************
-vector<unique_ptr<Edge>> detect_edges(vector<unique_ptr<Point const>> const& points, Plane const plane) {
+Polygon::~Polygon() = default;
+
+//******************************************************************************
+vector<unique_ptr<Edge>> detect_edges(vector<unique_ptr<Point const>> const& points, Plane const plane, Timepoint* t) {
 	vector<unique_ptr<Edge>> edges;
 
 	Point const* prev = points.back().get();
 	for(auto const & point : points) {
-		edges.push_back(make_unique<Edge>(plane, prev, point.get()));
+		edges.push_back(make_unique<Edge>(plane, prev, point.get(), t));
 		prev = point.get();
 	}
 	edges.shrink_to_fit();
@@ -157,7 +161,7 @@ relation::PolygonPoint Polygon::relation_to(Point const& point) const noexcept {
 		count = 0;
 		if(to_try.size() <= n)
 			to_try.emplace_back(bounding[XMAX] + 1, point.y + n);
-		Edge ray(plane, &point, &to_try[n++]);
+		Edge ray(plane, &point, &to_try[n++], nullptr);
 
 		// Detect vertices on the ray.
 		for(auto const& p : points) {

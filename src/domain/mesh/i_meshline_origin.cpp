@@ -9,8 +9,8 @@
 namespace domain {
 
 //******************************************************************************
-IMeshLineOrigin::IMeshLineOrigin()
-: meshline_policy(nullptr)
-{}
+//IMeshLineOrigin::IMeshLineOrigin()
+//: meshline_policy(nullptr)
+//{}
 
 } // namespace domain
