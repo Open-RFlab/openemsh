@@ -133,7 +133,7 @@ Originator<State>::Originator(Timepoint* init_timepoint, State state, Caretaker&
 , init_timepoint(init_timepoint)
 , current_timepoint(init_timepoint)
 , states{{ init_timepoint, state }}
-, ordered_timepoints{{ init_timepoint }}
+, ordered_timepoints{ init_timepoint }
 {}
 
 //******************************************************************************
@@ -143,7 +143,7 @@ Originator<State>::Originator(Timepoint* init_timepoint, Caretaker& caretaker) n
 , init_timepoint(init_timepoint)
 , current_timepoint(init_timepoint)
 , states{{ init_timepoint, State() }}
-, ordered_timepoints{{ init_timepoint }}
+, ordered_timepoints{ init_timepoint }
 {}
 
 //******************************************************************************

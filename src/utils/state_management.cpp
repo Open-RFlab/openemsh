@@ -22,7 +22,7 @@ Caretaker::Caretaker() noexcept
 : auto_gc(true)
 , history_root(make_unique<Timepoint>())
 , current_timepoint(history_root.get())
-, user_history{{ history_root.get() }}
+, user_history{ history_root.get() }
 {}
 
 //******************************************************************************

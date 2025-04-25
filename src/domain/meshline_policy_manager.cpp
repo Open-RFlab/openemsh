@@ -61,7 +61,7 @@ MeshlinePolicy* MeshlinePolicyManager::add_meshline_policy(
 	auto state = get_current_state();
 
 	auto const& line_policy = state.line_policies[axis].emplace_back(make_shared<MeshlinePolicy>(
-		axis, policy, normal, params, coord, t, vector<IMeshLineOrigin*> {{ origin }}, is_enabled));
+		axis, policy, normal, params, coord, t, vector<IMeshLineOrigin*> { origin }, is_enabled));
 	Caretaker::singleton().take_care_of(line_policy);
 
 	set_given_or_next_state(state, t);
