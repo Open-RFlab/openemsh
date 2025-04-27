@@ -47,10 +47,15 @@ void Caretaker::garbage_collector() noexcept {
 		if(auto originator = ptr.lock(); originator)
 			originator->erase(to_remove);
 
-	// Step 4: actually remove nodes from history tree.
+	// Step 4: erase annotations related to blacklisted nodes.
+	erase_if(annotations, [&](auto const& item) {
+		return to_remove.contains(item.first);
+	});
+
+	// Step 5: actually remove nodes from history tree.
 	history_root->erase_from_descendants(to_remove);
 
-	// Step 5: gc expired originators.
+	// Step 6: gc expired originators.
 	erase_if(originators, [](auto const& item) {
 		return item.expired();
 	});
@@ -190,6 +195,36 @@ bool Caretaker::go_and_remember(Timepoint* t) noexcept {
 	if(does_succeed)
 		remember_current_timepoint();
 	return does_succeed;
+}
+
+//******************************************************************************
+void Caretaker::annotate_current_timepoint(std::unique_ptr<IAnnotation> annotation) noexcept {
+	annotations.emplace(current_timepoint, std::move(annotation));
+}
+
+//******************************************************************************
+IAnnotation* Caretaker::get_annotation(Timepoint* t) noexcept {
+	if(annotations.contains(t))
+		return annotations.at(t).get();
+	else
+		return nullptr;
+}
+
+// In predicate, you will probably want to downcast to a well-known user-defined
+// type.
+//******************************************************************************
+Timepoint* Caretaker::find_first_ancestor_with_annotation_that(std::function<bool (IAnnotation const*)> const& predicate, bool include_itself) noexcept{
+	for(auto* t : current_timepoint->ancestors(include_itself))
+		if(annotations.contains(t) && predicate(annotations.at(t).get()))
+			return t;
+	return nullptr;
+}
+
+//******************************************************************************
+Timepoint* Caretaker::find_first_ancestor_with_annotation(bool include_itself) noexcept {
+	return find_first_ancestor_with_annotation_that(
+		[](auto) { return true; },
+		include_itself);
 }
 
 //******************************************************************************

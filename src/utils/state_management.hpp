@@ -27,6 +27,12 @@ class IOriginator;
 #endif // UNITTEST
 
 //******************************************************************************
+class IAnnotation {};
+
+// Annotation and history/pining are orthogonal, annotation is for user to attach
+// user defined data to timepoints while history take a role in undo/redo navigation
+// and both history and pinning prevent from garbage collection.
+//******************************************************************************
 class Caretaker {
 private:
 	bool auto_gc;
@@ -36,6 +42,7 @@ private:
 	std::vector<Timepoint*> pinned_timepoints; // TODO use std::set ?
 	std::vector<Timepoint*> user_history;
 	std::optional<decltype(user_history)::reverse_iterator> user_history_browser;
+	std::map<Timepoint*, std::unique_ptr<IAnnotation>> annotations;
 
 	bool go_without_remembering(Timepoint* t) noexcept;
 	void stop_browsing_user_history() noexcept;
@@ -65,6 +72,11 @@ public:
 
 	bool can_undo() const noexcept;
 	bool can_redo() const noexcept;
+
+	void annotate_current_timepoint(std::unique_ptr<IAnnotation> annotation) noexcept;
+	IAnnotation* get_annotation(Timepoint* t) noexcept;
+	Timepoint* find_first_ancestor_with_annotation_that(std::function<bool (IAnnotation const*)> const& predicate, bool include_itself = false) noexcept;
+	Timepoint* find_first_ancestor_with_annotation(bool include_itself = false) noexcept;
 
 	bool get_auto_gc() const noexcept;
 	void set_auto_gc(bool auto_gc) noexcept;

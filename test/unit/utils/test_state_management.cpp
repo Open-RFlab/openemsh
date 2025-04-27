@@ -54,12 +54,23 @@
 /// @test bool Caretaker::go_and_remember(Timepoint* t) noexcept
 /// @test bool Caretaker::get_auto_gc() const noexcept
 /// @test void Caretaker::set_auto_gc(bool auto_gc) noexcept
+/// @test void Caretaker::annotate_current_timepoint(std::unique_ptr<IAnnotation> annotation) noexcept
+/// @test IAnnotation* Caretaker::get_annotation(Timepoint* t) noexcept
+/// @test Timepoint* Caretaker::find_first_ancestor_with_annotation_that(std::function<bool (IAnnotation const*)> const& predicate) noexcept
+/// @test Timepoint* Caretaker::find_first_ancestor_with_annotation() noexcept
 ///*****************************************************************************
 
 //******************************************************************************
 struct StateA {
 	std::string str;
 	int num;
+};
+
+//******************************************************************************
+class Annotation : public IAnnotation {
+public:
+	int const value;
+	explicit Annotation(int value) : value(value) {}
 };
 
 //******************************************************************************
@@ -240,15 +251,15 @@ SCENARIO("template<typename State> void Originator<State>::go(Timepoint* t) noex
 		//     | + d3
 		//     + c2
 
-		[[maybe_unused]] TreeNode a;
-		[[maybe_unused]] TreeNode& b = a.add_child();
-		[[maybe_unused]] TreeNode& c1 = b.add_child();
-		[[maybe_unused]] TreeNode& c2 = b.add_child();
-		[[maybe_unused]] TreeNode& d1 = c1.add_child();
-		[[maybe_unused]] TreeNode& d2 = c1.add_child();
-		[[maybe_unused]] TreeNode& d3 = c1.add_child();
-		[[maybe_unused]] TreeNode& e1 = d2.add_child();
-		[[maybe_unused]] TreeNode& e2 = d2.add_child();
+		[[maybe_unused]] Timepoint a;
+		[[maybe_unused]] Timepoint& b = a.add_child();
+		[[maybe_unused]] Timepoint& c1 = b.add_child();
+		[[maybe_unused]] Timepoint& c2 = b.add_child();
+		[[maybe_unused]] Timepoint& d1 = c1.add_child();
+		[[maybe_unused]] Timepoint& d2 = c1.add_child();
+		[[maybe_unused]] Timepoint& d3 = c1.add_child();
+		[[maybe_unused]] Timepoint& e1 = d2.add_child();
+		[[maybe_unused]] Timepoint& e2 = d2.add_child();
 
 		Originator<StateA> x(&b, { .str = "ac", .num = 56 });
 		x.set_state(&d2, { .str = "lp", .num = 8 });
@@ -394,15 +405,16 @@ SCENARIO("template<typename State> std::vector<std::tuple<Timepoint*, State cons
 		//     | + d3
 		//     + c2 <------- 4
 
-		[[maybe_unused]] TreeNode a;
-		[[maybe_unused]] TreeNode& b = a.add_child();
-		[[maybe_unused]] TreeNode& c1 = b.add_child();
-		[[maybe_unused]] TreeNode& c2 = b.add_child();
-		[[maybe_unused]] TreeNode& d1 = c1.add_child();
-		[[maybe_unused]] TreeNode& d2 = c1.add_child();
-		[[maybe_unused]] TreeNode& d3 = c1.add_child();
-		[[maybe_unused]] TreeNode& e1 = d2.add_child();
-		[[maybe_unused]] TreeNode& e2 = d2.add_child();
+
+		[[maybe_unused]] Timepoint a;
+		[[maybe_unused]] Timepoint& b = a.add_child();
+		[[maybe_unused]] Timepoint& c1 = b.add_child();
+		[[maybe_unused]] Timepoint& c2 = b.add_child();
+		[[maybe_unused]] Timepoint& d1 = c1.add_child();
+		[[maybe_unused]] Timepoint& d2 = c1.add_child();
+		[[maybe_unused]] Timepoint& d3 = c1.add_child();
+		[[maybe_unused]] Timepoint& e1 = d2.add_child();
+		[[maybe_unused]] Timepoint& e2 = d2.add_child();
 
 		Originator<StateA> x(&b, { .str = "ac", .num = 56 });
 		x.set_state(&d2, { .str = "lp", .num = 8 });
@@ -687,9 +699,9 @@ SCENARIO("void Caretaker::garbage_collector() noexcept", "[utils][state_manageme
 		//     | + d1
 		//     | + d2 <----- x1
 		//     | | + e1 <--- current
-		//     | | + e2 <--- x2
+		//     | | + e2 <--- x2, annotated
 		//     | + d3 <----- y2
-		//     | | + f1 <--- y3, pinned
+		//     | | + f1 <--- y3, pinned, annotated
 		//     | + d4 <----- y4
 		//     |   + g1 <--- y5, remembered
 		//     + c2 <------- z1
@@ -725,8 +737,11 @@ SCENARIO("void Caretaker::garbage_collector() noexcept", "[utils][state_manageme
 		z.reset();
 
 		c.set_auto_gc(false);
+		c.go_without_remembering(e2);
+		c.annotate_current_timepoint(std::make_unique<Annotation>(5));
 		c.go_without_remembering(f1);
 		c.pin_current_timepoint();
+		c.annotate_current_timepoint(std::make_unique<Annotation>(6));
 		c.undo();
 		c.stop_browsing_user_history();
 		c.go_and_remember(g1);
@@ -802,7 +817,7 @@ SCENARIO("void Caretaker::garbage_collector() noexcept", "[utils][state_manageme
 				REQUIRE(y->states[g1].num == 16);
 			}
 
-			THEN("Should erase Timepoints that are not located between the history root and either the current timepoint, any pinned or remembered timepoint") {
+			THEN("Should erase Timepoints that are not located between the history root and either the current timepoint, any pinned or remembered timepoint; even if annotated") {
 				auto h = a->cluster(true);
 				REQUIRE(h.size() == 9);
 				REQUIRE(contains(h, a));
@@ -817,6 +832,12 @@ SCENARIO("void Caretaker::garbage_collector() noexcept", "[utils][state_manageme
 				REQUIRE_FALSE(contains(h, e2));
 				REQUIRE(contains(h, f1));
 				REQUIRE(contains(h, g1));
+			}
+
+			THEN("Should erase Annotations of erased Timepoints") {
+				REQUIRE(c.annotations.size() == 1);
+				REQUIRE_FALSE(c.annotations.contains(e2));
+				REQUIRE(static_cast<Annotation*>(c.annotations[f1].get())->value == 6);
 			}
 
 			THEN("Should unregister expired Originators") {
@@ -1798,6 +1819,214 @@ SCENARIO("void Caretaker::set_auto_gc(bool auto_gc) noexcept", "[utils][state_ma
 
 			THEN("Auto garbage collector should be disabled") {
 				REQUIRE_FALSE(c.auto_gc);
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("void Caretaker::annotate_current_timepoint(std::unique_ptr<IAnnotation> annotation) noexcept", "[utils][state_management]") {
+	GIVEN("A Caretaker") {
+		Caretaker c;
+		Timepoint* t0 = c.get_history_root();
+		Timepoint* t1 = &t0->add_child();
+		c.go_without_remembering(t1);
+
+		THEN("No timepoint should be annotated") {
+			REQUIRE(c.annotations.empty());
+		}
+
+		WHEN("Trying to annotate current timepoint") {
+			c.annotate_current_timepoint(std::make_unique<Annotation>(5));
+
+			THEN("Current timepoint should be annotated") {
+				REQUIRE(c.annotations.size() == 1);
+				REQUIRE(c.annotations.contains(t1));
+				REQUIRE(static_cast<Annotation*>(c.annotations.at(t1).get())->value == 5);
+			}
+
+			THEN("Current timepoint should not be pinned nor appended to user history") {
+				REQUIRE(c.pinned_timepoints.empty());
+				REQUIRE(c.user_history.size() == 1);
+				REQUIRE(c.user_history[0] == c.history_root.get());
+			}
+
+			AND_WHEN("Trying to annotate current timepoint again") {
+				c.annotate_current_timepoint(std::make_unique<Annotation>(7));
+
+				THEN("Annotation should be updated") {
+					REQUIRE(c.annotations.size() == 1);
+					REQUIRE(c.annotations.contains(t1));
+					REQUIRE(static_cast<Annotation*>(c.annotations.at(t1).get())->value == 5);
+				}
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("IAnnotation* Caretaker::get_annotation(Timepoint* t) noexcept", "[utils][state_management]") {
+	GIVEN("A Caretaker with some annotated timepoints") {
+		Caretaker c;
+		[[maybe_unused]] Timepoint* t0 = c.get_current_timepoint();
+		[[maybe_unused]] Timepoint* t1 = c.make_next_timepoint();
+		c.annotate_current_timepoint(std::make_unique<Annotation>(5));
+		[[maybe_unused]] Timepoint* t2 = c.make_next_timepoint();
+		c.annotate_current_timepoint(std::make_unique<Annotation>(6));
+		[[maybe_unused]] Timepoint* t3 = c.make_next_timepoint();
+		[[maybe_unused]] Timepoint t4;
+
+		WHEN("Running for an annotated timepoint") {
+			THEN("Should return its annotation") {
+				REQUIRE(static_cast<Annotation*>(c.get_annotation(t1))->value == 5);
+				REQUIRE(static_cast<Annotation*>(c.get_annotation(t2))->value == 6);
+			}
+		}
+
+		WHEN("Running for an unannotated timepoint") {
+			THEN("Should return nullptr") {
+				REQUIRE(c.get_annotation(t0) == nullptr);
+				REQUIRE(c.get_annotation(t3) == nullptr);
+			}
+		}
+
+		WHEN("Running for an unrelated timepoint") {
+			THEN("Should return nullptr") {
+				REQUIRE(c.get_annotation(&t4) == nullptr);
+			}
+		}
+
+		WHEN("Running for nullptr") {
+			THEN("Should return nullptr") {
+				REQUIRE(c.get_annotation(nullptr) == nullptr);
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("Timepoint* Caretaker::find_first_ancestor_with_annotation_that(std::function<bool (IAnnotation const*)> const& predicate) noexcept", "[utils][state_management]") {
+	GIVEN("A Caretaker") {
+		// + a <------------ root
+		//   + b <---------- 0
+		//     + c1
+		//     | + d1 <----- 2
+		//     | + d2 <----- 1
+		//     | | + e1 <--- 3
+		//     | | + e2 <--- 5 current
+		//     | + d3
+		//     + c2 <------- 4
+
+		Caretaker c;
+		[[maybe_unused]] Timepoint* a = c.get_history_root();
+		[[maybe_unused]] Timepoint* b = &a->add_child();
+		[[maybe_unused]] Timepoint* c1 = &b->add_child();
+		[[maybe_unused]] Timepoint* c2 = &b->add_child();
+		[[maybe_unused]] Timepoint* d1 = &c1->add_child();
+		[[maybe_unused]] Timepoint* d2 = &c1->add_child();
+		[[maybe_unused]] Timepoint* d3 = &c1->add_child();
+		[[maybe_unused]] Timepoint* e1 = &d2->add_child();
+		[[maybe_unused]] Timepoint* e2 = &d2->add_child();
+
+		WHEN("There is some annotated timepoints, including current timepoint, in the history") {
+			c.go_without_remembering(b); c.annotate_current_timepoint(std::make_unique<Annotation>(0));
+			c.go_without_remembering(d2); c.annotate_current_timepoint(std::make_unique<Annotation>(1));
+			c.go_without_remembering(d1); c.annotate_current_timepoint(std::make_unique<Annotation>(2));
+			c.go_without_remembering(e1); c.annotate_current_timepoint(std::make_unique<Annotation>(3));
+			c.go_without_remembering(c2); c.annotate_current_timepoint(std::make_unique<Annotation>(4));
+			c.go_without_remembering(e2); c.annotate_current_timepoint(std::make_unique<Annotation>(5));
+
+			WHEN("Looking for a predicate that match the current timepoint and an older one") {
+				auto const pred = [](IAnnotation const* annotation) {
+					auto* a = static_cast<Annotation const*>(annotation);
+					return a->value == 0
+					    || a->value == 5;
+				};
+
+				AND_WHEN("including_itself") {
+					THEN("Should return current timepoint") {
+						REQUIRE(c.current_timepoint == e2);
+						REQUIRE(c.find_first_ancestor_with_annotation_that(pred, true) == e2);
+					}
+				}
+
+				AND_WHEN("not including_itself") {
+					THEN("Should return the first annotated ancestor timepoint of the current state") {
+						REQUIRE(c.current_timepoint == e2);
+						REQUIRE(c.find_first_ancestor_with_annotation_that(pred, false) == b);
+					}
+				}
+			}
+
+			WHEN("Looking for a predicate that match no timepoint in the history") {
+				THEN("Should return nullptr") {
+					REQUIRE(c.find_first_ancestor_with_annotation_that([](auto) { return false; }) == nullptr);
+				}
+			}
+		}
+
+		WHEN("No ancestor is annotated") {
+			REQUIRE(c.annotations.empty());
+
+			THEN("Should return nullptr") {
+				REQUIRE(c.find_first_ancestor_with_annotation_that([](auto) { return true; }) == nullptr);
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("Timepoint* Caretaker::find_first_ancestor_with_annotation() noexcept", "[utils][state_management]") {
+	GIVEN("A Caretaker") {
+		// + a <------------ root
+		//   + b <---------- 0
+		//     + c1
+		//     | + d1 <----- 2
+		//     | + d2 <----- 1
+		//     | | + e1 <--- 3
+		//     | | + e2 <--- 5 current
+		//     | + d3
+		//     + c2 <------- 4
+
+		Caretaker c;
+		[[maybe_unused]] Timepoint* a = c.get_history_root();
+		[[maybe_unused]] Timepoint* b = &a->add_child();
+		[[maybe_unused]] Timepoint* c1 = &b->add_child();
+		[[maybe_unused]] Timepoint* c2 = &b->add_child();
+		[[maybe_unused]] Timepoint* d1 = &c1->add_child();
+		[[maybe_unused]] Timepoint* d2 = &c1->add_child();
+		[[maybe_unused]] Timepoint* d3 = &c1->add_child();
+		[[maybe_unused]] Timepoint* e1 = &d2->add_child();
+		[[maybe_unused]] Timepoint* e2 = &d2->add_child();
+
+		WHEN("There is some annotated timepoints, including current timepoint, in the history") {
+			c.go_without_remembering(b); c.annotate_current_timepoint(std::make_unique<Annotation>(0));
+			c.go_without_remembering(d2); c.annotate_current_timepoint(std::make_unique<Annotation>(1));
+			c.go_without_remembering(d1); c.annotate_current_timepoint(std::make_unique<Annotation>(2));
+			c.go_without_remembering(e1); c.annotate_current_timepoint(std::make_unique<Annotation>(3));
+			c.go_without_remembering(c2); c.annotate_current_timepoint(std::make_unique<Annotation>(4));
+			c.go_without_remembering(e2); c.annotate_current_timepoint(std::make_unique<Annotation>(5));
+
+			AND_WHEN("including_itself") {
+				THEN("Should return current timepoint") {
+					REQUIRE(c.current_timepoint == e2);
+					REQUIRE(c.find_first_ancestor_with_annotation(true) == e2);
+				}
+			}
+
+			AND_WHEN("not including_itself") {
+				THEN("Should return the first annotated ancestor timepoint of the current state") {
+					REQUIRE(c.current_timepoint == e2);
+					REQUIRE(c.find_first_ancestor_with_annotation(false) == d2);
+				}
+			}
+		}
+
+		WHEN("No ancestor is annotated") {
+			REQUIRE(c.annotations.empty());
+
+			THEN("Should return nullptr") {
+				REQUIRE(c.find_first_ancestor_with_annotation() == nullptr);
 			}
 		}
 	}
