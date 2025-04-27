@@ -313,32 +313,52 @@ void Board::detect_non_conflicting_edges(Plane const plane) {
 }
 
 //******************************************************************************
-void Board::auto_mesh() {
+void Board::detect_edges_in_polygons() {
 	for(auto const& plane : AllPlane)
 		detect_edges_in_polygons(plane);
+}
 
+//******************************************************************************
+void Board::detect_colinear_edges() {
 	for(auto const& plane : AllPlane)
 		detect_colinear_edges(plane);
+}
 
+//******************************************************************************
+void Board::detect_non_conflicting_edges() {
 	for(auto const& plane : AllPlane)
 		detect_non_conflicting_edges(plane);
+}
 
+//******************************************************************************
+void Board::auto_solve_all_edge_in_polygon() {
 	for(auto const& plane : AllPlane)
 		conflict_manager->auto_solve_all_edge_in_polygon(plane);
+}
 
+//******************************************************************************
+void Board::auto_solve_all_colinear_edges() {
 	for(auto const& axis : AllAxis)
 		conflict_manager->auto_solve_all_colinear_edges(axis);
+}
 
+//******************************************************************************
+void Board::detect_and_solve_too_close_meshline_policies() {
 	for(auto const& axis : AllAxis)
 		line_policy_manager->detect_and_solve_too_close_meshline_policies(axis);
+}
 
+//******************************************************************************
+void Board::detect_intervals() {
 	for(auto const& axis : AllAxis)
 		line_policy_manager->detect_intervals(axis);
+}
 
+//******************************************************************************
+void Board::mesh() {
 	for(auto const& axis : AllAxis)
 		line_policy_manager->mesh(axis);
 }
-
 
 //******************************************************************************
 vector<shared_ptr<Meshline>> Board::get_meshline_policies_meshlines(Axis axis) const {

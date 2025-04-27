@@ -20,12 +20,23 @@ using namespace domain;
 //******************************************************************************
 SCENARIO("string SerializerToPlantuml::run(Board& board)", "[serializer_to_plantuml]") {
 	// TODO This part might be better as 'e2e test' than 'unit test'.
+	auto const auto_mesh = [](auto& board) {
+		board->detect_edges_in_polygons();
+		board->detect_colinear_edges();
+		board->detect_non_conflicting_edges();
+		board->auto_solve_all_edge_in_polygon();
+		board->auto_solve_all_colinear_edges();
+		board->detect_and_solve_too_close_meshline_policies();
+		board->detect_intervals();
+		board->mesh();
+	};
+
 	GIVEN("The Lpf complex structure") {
 		std::shared_ptr<Board> lpf = create_lpf();
 		lpf->params.lmin = 1;
 		lpf->params.proximity_limit = 0;
 //		lpf->params.dmax = 2;
-		lpf->auto_mesh();
+		auto_mesh(lpf);
 
 		WHEN("Serializing to Plantuml") {
 			std::string puml = SerializerToPlantuml::run(*lpf);
@@ -50,7 +61,7 @@ SCENARIO("string SerializerToPlantuml::run(Board& board)", "[serializer_to_plant
 		stub->params.lmin = 0;
 		stub->params.proximity_limit = 0.1;
 //		stub->params.dmax = 2;
-		stub->auto_mesh();
+		auto_mesh(stub);
 
 		WHEN("Serializing to Plantuml") {
 			std::string puml = SerializerToPlantuml::run(*stub);

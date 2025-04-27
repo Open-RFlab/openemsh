@@ -18,6 +18,30 @@ namespace app {
 using namespace std;
 
 //******************************************************************************
+optional<Step> next(Step step) {
+	switch(step) {
+	case Step::DETECT_CONFLICT_EIP:
+		return Step::DETECT_CONFLICT_CE;
+	case Step::DETECT_CONFLICT_CE:
+		return Step::DETECT_NON_CONFLICTING_EDGES;
+	case Step::DETECT_NON_CONFLICTING_EDGES:
+		return Step::SOLVE_ALL_EIP;
+	case Step::SOLVE_ALL_EIP:
+		return Step::SOLVE_ALL_CE;
+	case Step::SOLVE_ALL_CE:
+		return Step::DETECT_AND_SOLVE_TCMLP;
+	case Step::DETECT_AND_SOLVE_TCMLP:
+		return Step::DETECT_INTERVALS;
+	case Step::DETECT_INTERVALS:
+		return Step::MESH;
+	case Step::MESH:
+		return nullopt;
+	default:
+		unreachable();
+	}
+}
+
+//******************************************************************************
 OpenEMSH::OpenEMSH(Params params)
 : params(std::move(params))
 {}
@@ -34,27 +58,18 @@ domain::Board const& OpenEMSH::get_board() const {
 
 //******************************************************************************
 void OpenEMSH::parse() {
-	board = ParserFromCsx::run(params.input, dynamic_cast<ParserFromCsx::Params const&>(params));
-	board->params = dynamic_cast<domain::Params const&>(params);
-}
-
-//******************************************************************************
-void OpenEMSH::do_all_step() {
-	board->auto_mesh();
-}
-
-//******************************************************************************
-void OpenEMSH::do_x_step() {
+	board = ParserFromCsx::run(params.input, static_cast<ParserFromCsx::Params const&>(params));
+	board->params = static_cast<domain::Params const&>(params);
 }
 
 //******************************************************************************
 void OpenEMSH::write() const {
 	switch(params.output_format) {
 	case Params::OutputFormat::CSX:
-		SerializerToCsx::run(*board, params.input, params.output, dynamic_cast<SerializerToCsx::Params const&>(params));
+		SerializerToCsx::run(*board, params.input, params.output, static_cast<SerializerToCsx::Params const&>(params));
 		break;
 	case Params::OutputFormat::PLANTUML: {
-//		SerializerToPlantuml::run(*board, dynamic_cast<SerializerToPlantuml::Params const&>(params));
+//		SerializerToPlantuml::run(*board, static_cast<SerializerToPlantuml::Params const&>(params));
 		ofstream out(params.output);
 		out << SerializerToPlantuml::run(*board);
 	} break;
@@ -65,5 +80,90 @@ void OpenEMSH::write() const {
 		unreachable();
 	};
 }
+
+//******************************************************************************
+void OpenEMSH::run(std::set<Step> const& steps) {
+	auto const annotate = [](Step step) {
+		Caretaker::singleton().annotate_current_timepoint(make_unique<Annotation>(step));
+	};
+
+	if(steps.contains(Step::DETECT_CONFLICT_EIP)) {
+		annotate(Step::DETECT_CONFLICT_EIP);
+		board->detect_edges_in_polygons();
+	}
+	if(steps.contains(Step::DETECT_CONFLICT_CE)) {
+		annotate(Step::DETECT_CONFLICT_CE);
+		board->detect_colinear_edges();
+	}
+	if(steps.contains(Step::DETECT_NON_CONFLICTING_EDGES)) {
+		annotate(Step::DETECT_NON_CONFLICTING_EDGES);
+		board->detect_non_conflicting_edges();
+	}
+	if(steps.contains(Step::SOLVE_ALL_EIP)) {
+		annotate(Step::SOLVE_ALL_EIP);
+		board->auto_solve_all_edge_in_polygon();
+	}
+	if(steps.contains(Step::SOLVE_ALL_CE)) {
+		annotate(Step::SOLVE_ALL_CE);
+		board->auto_solve_all_colinear_edges();
+	}
+	if(steps.contains(Step::DETECT_AND_SOLVE_TCMLP)) {
+		annotate(Step::DETECT_AND_SOLVE_TCMLP);
+		board->detect_and_solve_too_close_meshline_policies();
+	}
+	if(steps.contains(Step::DETECT_INTERVALS)) {
+		annotate(Step::DETECT_INTERVALS);
+		board->detect_intervals();
+	}
+	if(steps.contains(Step::MESH)) {
+		annotate(Step::MESH);
+		board->mesh();
+	}
+}
+
+//******************************************************************************
+void OpenEMSH::run_all_steps() {
+	run({
+		Step::DETECT_CONFLICT_EIP,
+		Step::DETECT_CONFLICT_CE,
+		Step::DETECT_NON_CONFLICTING_EDGES,
+		Step::SOLVE_ALL_EIP,
+		Step::SOLVE_ALL_CE,
+		Step::DETECT_AND_SOLVE_TCMLP,
+		Step::DETECT_INTERVALS,
+		Step::MESH
+	});
+}
+
+//******************************************************************************
+void OpenEMSH::run_next_step() {
+	auto& c = Caretaker::singleton();
+	auto* t = c.find_first_ancestor_with_annotation();
+	if(auto* a = c.get_annotation(t); a)
+		if(optional<Step> step = next(static_cast<Annotation const*>(a)->before_step)
+		; step)
+			run({ step.value() });
+}
+
+//******************************************************************************
+void OpenEMSH::go_before(Step step) const {
+	auto& c = Caretaker::singleton();
+	c.go_without_remembering(
+		c.find_first_ancestor_with_annotation_that(
+			[&](IAnnotation const* annotation) {
+				return static_cast<Annotation const*>(annotation)->before_step == step;
+			}));
+}
+
+//******************************************************************************
+void OpenEMSH::go_before_previous_step() const {
+	auto& c = Caretaker::singleton();
+	c.go_without_remembering(c.find_first_ancestor_with_annotation());
+}
+
+//******************************************************************************
+Annotation::Annotation(Step before_step)
+: before_step(before_step)
+{}
 
 } // namespace app

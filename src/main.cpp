@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 
 	if(!oemsh.get_params().gui) {
 		oemsh.parse();
-		oemsh.do_all_step();
+		oemsh.run_all_steps();
 		oemsh.write();
 	} else {
 		QApplication a(argc, argv);

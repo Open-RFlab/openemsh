@@ -48,7 +48,7 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 	}
 
 	oemsh.parse();
-	oemsh.do_all_step();
+	oemsh.run_all_steps();
 
 	ui->structure_view->populate(&oemsh.get_board());
 	ui->processing_view->populate(&oemsh.get_board());

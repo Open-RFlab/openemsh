@@ -1,0 +1,23 @@
+///*****************************************************************************
+/// @date Feb 2021
+/// @copyright GPL-3.0-or-later
+/// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
+///*****************************************************************************
+
+#pragma once
+
+namespace app {
+
+//******************************************************************************
+enum class Step {
+	DETECT_CONFLICT_EIP,
+	DETECT_CONFLICT_CE,
+	DETECT_NON_CONFLICTING_EDGES,
+	SOLVE_ALL_EIP,
+	SOLVE_ALL_CE,
+	DETECT_AND_SOLVE_TCMLP,
+	DETECT_INTERVALS,
+	MESH
+};
+
+} // namespace app

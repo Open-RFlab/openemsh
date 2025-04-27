@@ -8,11 +8,15 @@
 
 #include <filesystem>
 #include <memory>
+#include <optional>
+#include <set>
 
 #include "domain/board.hpp"
 #include "domain/global.hpp"
 #include "infra/parsers/parser_from_csx.hpp"
 #include "infra/serializers/serializer_to_csx.hpp"
+#include "utils/state_management.hpp"
+#include "steps.hpp"
 
 namespace app {
 
@@ -55,13 +59,26 @@ public:
 //	void check_x();
 
 	void parse();
-	void do_all_step();
-	void do_x_step();
+	void run(std::set<Step> const& steps);
+	void run_all_steps();
+	void run_next_step();
+	void go_before(Step step) const;
+	void go_before_previous_step() const;
 	void write() const;
 
 private:
 	Params params;
 	std::shared_ptr<domain::Board> board;
 };
+
+//******************************************************************************
+class Annotation : public IAnnotation {
+public:
+	Step const before_step;
+	explicit Annotation(Step before_step);
+};
+
+//******************************************************************************
+std::optional<Step> next(Step step);
 
 } // namespace app

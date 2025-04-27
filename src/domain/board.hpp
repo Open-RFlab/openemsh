@@ -80,16 +80,17 @@ public:
 	void detect_colinear_edges(Plane plane);
 	void detect_non_conflicting_edges(Plane const plane);
 
-	void detect_edges_in_polygons() { for(auto const& plane : AllPlane) detect_edges_in_polygons(plane); };
-	void detect_colinear_edges() { for(auto const& plane : AllPlane) detect_colinear_edges(plane); };
-	void detect_non_conflicting_edges() { for(auto const& plane : AllPlane) detect_non_conflicting_edges(plane); };
+	void detect_edges_in_polygons();
+	void detect_colinear_edges();
+	void detect_non_conflicting_edges();
 
 	/// Mesh resolution dependant detection tasks
 	///*************************************************************************
-	void detect_too_close_lines() {} // TODO
-	void detect_intervals_between_lines() {} // TODO
-
-	void auto_mesh(); // TODO
+	void auto_solve_all_edge_in_polygon();
+	void auto_solve_all_colinear_edges();
+	void detect_and_solve_too_close_meshline_policies();
+	void detect_intervals();
+	void mesh();
 
 	std::vector<std::shared_ptr<Meshline>> get_meshline_policies_meshlines(Axis axis) const;
 	std::vector<std::shared_ptr<Meshline>> const& get_meshlines(Axis axis) const;
