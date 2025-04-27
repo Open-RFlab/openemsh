@@ -100,6 +100,7 @@ void Caretaker::take_care_of(shared_ptr<IOriginator> const& originator) noexcept
 	// TODO Are all those checks really useful?
 	if(originator
 	&& &originator->get_caretaker() == this
+	&& originator->get_init_timepoint()
 	&& originator->get_init_timepoint()->root() == history_root.get())
 		originators.emplace_back(originator);
 }

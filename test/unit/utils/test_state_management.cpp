@@ -1088,6 +1088,15 @@ SCENARIO("void Caretaker::take_care_of(shared_ptr<IOriginator> const& originator
 			}
 		}
 
+		WHEN("Trying to take_care_of an Originator which init timepoint is null") {
+			auto a = std::make_shared<Originator<StateA>>(nullptr, StateA { .str = "ac", .num = 56 }, c);
+			c.take_care_of(a);
+
+			THEN("Should not do anything") {
+				REQUIRE(c.originators.empty());
+			}
+		}
+
 		WHEN("Trying to take_care_of an Originator which init timepoint is unrelated to the history tree") {
 			Timepoint t;
 			auto a = std::make_shared<Originator<StateA>>(&t, StateA { .str = "ac", .num = 56 }, c);
