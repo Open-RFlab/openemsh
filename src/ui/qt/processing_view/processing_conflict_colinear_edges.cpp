@@ -38,11 +38,11 @@ ProcessingConflictColinearEdges::ProcessingConflictColinearEdges(domain::Conflic
 	h_box->addItem(v_box1);
 	h_box->addItem(v_box2);
 
-	for(auto const* edge : conflict->edges) {
-		nodegraph::Port* port = add_input_port("Normal: " + QString::fromStdString(to_string(edge->normal)) + (edge->to_mesh ? " enabled" : " disabled"));
+	for(auto const* edge : conflict->get_current_state().edges) {
+		nodegraph::Port* port = add_input_port("Normal: " + QString::fromStdString(to_string(edge->normal)) + (edge->get_current_state().to_mesh ? " enabled" : " disabled"));
 		port->setFlag(QGraphicsItem::ItemIsSelectable);
 		port->setAcceptedMouseButtons(Qt::NoButton);
-		if(edge->to_mesh)
+		if(edge->get_current_state().to_mesh)
 			port->locate_port_params = [this]() -> auto& {
 				return locate_processing_conflict_ce_params().port_enabled;
 			};

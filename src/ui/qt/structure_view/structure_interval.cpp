@@ -25,15 +25,15 @@ static QRectF convert(domain::ViewAxis axis, domain::Interval const* interval, Q
 	switch(axis) {
 	case domain::ViewAxis::H:
 		return QRectF(
-			QPointF(scene_rect.left(), interval->before.meshline_policy->coord.value()),
-			QPointF(scene_rect.right(), interval->after.meshline_policy->coord.value()));
+			QPointF(scene_rect.left(), interval->get_current_state().before.meshline_policy->coord.value()),
+			QPointF(scene_rect.right(), interval->get_current_state().after.meshline_policy->coord.value()));
 //		return QLineF(
 //			scene_rect.left(), interval->coord.value(),
 //			scene_rect.right(), interval->coord.value());
 	case domain::ViewAxis::V:
 		return QRectF(
-			QPointF(interval->before.meshline_policy->coord.value(), scene_rect.bottom()),
-			QPointF(interval->after.meshline_policy->coord.value(), scene_rect.top()));
+			QPointF(interval->get_current_state().before.meshline_policy->coord.value(), scene_rect.bottom()),
+			QPointF(interval->get_current_state().after.meshline_policy->coord.value(), scene_rect.top()));
 //		return QLineF(
 //			interval->coord.value(), scene_rect.bottom(),
 //			interval->coord.value(), scene_rect.top());

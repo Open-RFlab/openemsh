@@ -190,7 +190,7 @@ StructureMeshlinePolicy* StructureScene::add(domain::MeshlinePolicy const* polic
 	auto const meshline_axis = reverse(view_axis); // Let stick to meshline axis definition.
 	auto* item = new StructureMeshlinePolicy(meshline_axis, policy, scene_rect, meshline_policies[meshline_axis]);
 	index[policy] = item;
-	if(policy->is_enabled) {
+	if(policy->get_current_state().is_enabled) {
 		item->locate_structure_meshline_policy_params = [this]() ->auto& {
 			return style_selector.get_meshline_policy_enabled();
 		};

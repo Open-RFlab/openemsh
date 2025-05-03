@@ -48,7 +48,7 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 	h_box->addItem(v_box3);
 	v_box1->addStretch();
 
-	for(auto const* origin : meshline_policy->origins) {
+	for(auto const* origin : meshline_policy->get_current_state().origins) {
 		nodegraph::Port* port = add_input_port();
 		port->setFlag(QGraphicsItem::ItemIsSelectable);
 		port->setAcceptedMouseButtons(Qt::NoButton);
@@ -80,9 +80,9 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 	QString d("d: ");
 	if(meshline_policy) {
 		normal += QString::fromStdString(to_string(meshline_policy->normal));
-		is_enabled += (meshline_policy->is_enabled ? "true" : "false");
+		is_enabled += (meshline_policy->get_current_state().is_enabled ? "true" : "false");
 		policy += QString::fromStdString(to_string(meshline_policy->policy));
-		d += QString::number(meshline_policy->d);
+		d += QString::number(meshline_policy->get_current_state().d);
 	}
 
 	auto* text_normal = new nodegraph::Text(normal, this);
@@ -96,7 +96,7 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 	text_is_enabled->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_is_enabled->setAcceptedMouseButtons(Qt::NoButton);
 	if(meshline_policy) {
-		if(meshline_policy->is_enabled)
+		if(meshline_policy->get_current_state().is_enabled)
 			text_is_enabled->locate_text_params = [this]() -> auto& {
 				return locate_processing_meshline_policy_params().enabled;
 			};

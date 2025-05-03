@@ -25,12 +25,12 @@ static QLineF convert(domain::ViewAxis axis, domain::ConflictColinearEdges const
 	switch(axis) {
 	case domain::ViewAxis::H:
 		return QLineF(
-			scene_rect.left(), conflict->edges[0]->p0().y.value(),
-			scene_rect.right(), conflict->edges[0]->p0().y.value());
+			scene_rect.left(), conflict->get_current_state().edges[0]->p0().y.value(),
+			scene_rect.right(), conflict->get_current_state().edges[0]->p0().y.value());
 	case domain::ViewAxis::V:
 		return QLineF(
-			conflict->edges[0]->p0().x.value(), scene_rect.bottom(),
-			conflict->edges[0]->p0().x.value(), scene_rect.top());
+			conflict->get_current_state().edges[0]->p0().x.value(), scene_rect.bottom(),
+			conflict->get_current_state().edges[0]->p0().x.value(), scene_rect.top());
 	default:
 		unreachable();
 	}

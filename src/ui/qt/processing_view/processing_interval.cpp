@@ -74,15 +74,16 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 	QString after_lmin("after.lmin: ");
 	QString after_lambda("after.lambda: ");
 	if(interval) {
-		dmax += QString::number(interval->dmax);
-		before_lmin += QString::number(interval->before.lmin);
-		before_lambda += QString::number(interval->before.lambda);
-		after_lmin += QString::number(interval->after.lmin);
-		after_lambda += QString::number(interval->after.lambda);
-		if(interval->before.meshline_policy)
-			to_wire.emplace_back(DataKeys::set_to_wire(interval->before.meshline_policy, before_port));
-		if(interval->after.meshline_policy)
-			to_wire.emplace_back(DataKeys::set_to_wire(interval->after.meshline_policy, after_port));
+		auto const& state = interval->get_current_state();
+		dmax += QString::number(state.dmax);
+		before_lmin += QString::number(state.before.lmin);
+		before_lambda += QString::number(state.before.lambda);
+		after_lmin += QString::number(state.after.lmin);
+		after_lambda += QString::number(state.after.lambda);
+		if(state.before.meshline_policy)
+			to_wire.emplace_back(DataKeys::set_to_wire(state.before.meshline_policy, before_port));
+		if(state.after.meshline_policy)
+			to_wire.emplace_back(DataKeys::set_to_wire(state.after.meshline_policy, after_port));
 	}
 
 	auto* text_dmax = new nodegraph::Text(dmax, this);

@@ -49,7 +49,7 @@ ProcessingConflictEdgeInPolygon::ProcessingConflictEdgeInPolygon(domain::Conflic
 
 	v_box1->addItem(in);
 
-	for(auto const& [polygon, range, overlapping_edge] : conflict->overlaps) {
+	for(auto const& [polygon, range, overlapping_edge] : conflict->get_current_state().overlaps) {
 		nodegraph::Port* port = add_input_port(" ");
 		port->setFlag(QGraphicsItem::ItemIsSelectable);
 		port->setAcceptedMouseButtons(Qt::NoButton);

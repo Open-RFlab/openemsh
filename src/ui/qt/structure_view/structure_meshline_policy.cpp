@@ -42,7 +42,7 @@ static std::array<QLineF, 2> convert_policy_lines(domain::ViewAxis axis, domain:
 	scene_rect += QMarginsF(side, side, side, side) * 2;
 
 	auto const offset = [&]() -> std::array<double, 2> {
-		auto const d = meshline_policy->d;
+		auto const d = meshline_policy->get_current_state().d;
 		switch(meshline_policy->policy) {
 		case domain::MeshlinePolicy::Policy::ONELINE: return { 0.0, 0.0 };
 		case domain::MeshlinePolicy::Policy::HALFS: return { d / 2.0, -d / 2.0 };

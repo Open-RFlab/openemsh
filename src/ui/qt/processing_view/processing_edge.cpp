@@ -40,8 +40,8 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 	input_port->locate_port_params = [this]() -> auto& {
 		return locate_processing_edge_params().port;
 	};
-	if(edge->conflict) {
-		to_wire.emplace_back(DataKeys::set_to_wire(edge->conflict, input_port));
+	if(edge->get_current_state().conflict) {
+		to_wire.emplace_back(DataKeys::set_to_wire(edge->get_current_state().conflict, input_port));
 	}
 
 	nodegraph::Port* output_port = add_output_port();
@@ -55,7 +55,7 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 	QString to_mesh("To mesh: ");
 	if(edge) {
 		normal += QString::fromStdString(to_string(edge->normal));
-		to_mesh += (edge->to_mesh ? "true" : "false");
+		to_mesh += (edge->get_current_state().to_mesh ? "true" : "false");
 	}
 
 	auto* text_normal = new nodegraph::Text(normal, this);
@@ -69,7 +69,7 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 	text_to_mesh->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_to_mesh->setAcceptedMouseButtons(Qt::NoButton);
 	if(edge) {
-		if(edge->to_mesh)
+		if(edge->get_current_state().to_mesh)
 			text_to_mesh->locate_text_params = [this]() -> auto& {
 				return locate_processing_edge_params().enabled;
 			};
