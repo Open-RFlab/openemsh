@@ -11,6 +11,7 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <optional>
 #include <ranges>
 #include <set>
 #include <vector>
@@ -103,10 +104,13 @@ private:
 	Caretaker& caretaker;
 	Timepoint* const init_timepoint;
 	Timepoint* current_timepoint;
+	std::optional<Timepoint*> lazy_go; // Here nullptr != nullopt.
 	// TODO An ordered map would fit better.
 	// TODO https://github.com/Tessil/ordered-map
 	std::map<Timepoint*, State> states; // Keep Timepoint -- State association.
 	std::vector<Timepoint*> ordered_timepoints; // Keep Timepoint insertion order.
+
+	void actually_go() noexcept;
 
 protected:
 	Caretaker& get_caretaker() const noexcept final;
@@ -173,33 +177,51 @@ Timepoint* Originator<State>::get_init_timepoint() const noexcept {
 //******************************************************************************
 template<typename State>
 Timepoint* Originator<State>::get_current_timepoint() const noexcept {
+	const_cast<Originator*>(this)->actually_go();
 	return current_timepoint;
 }
 
 //******************************************************************************
 template<typename State>
 State const& Originator<State>::get_current_state() const noexcept {
-	return states.at(current_timepoint);
+	return states.at(get_current_timepoint());
 }
 
 // Go to t or its last ancestor. If desired timepoint is older than init_timepoint, go nullptr
 //******************************************************************************
 template<typename State>
 void Originator<State>::go(Timepoint* t) noexcept {
-	if(t)
-		for(auto* it : std::ranges::reverse_view(ordered_timepoints)) {
-			if(auto* common_ancestor = it->common_ancestor(*t, true)
-			; common_ancestor == it) {
-				current_timepoint = it;
-				return;
+	lazy_go = t;
+}
+
+// Actually executing go appears to be both computation costly, especially for
+// Originators that share an old common ancestor with the destination Timepoint,
+// and unneeded since those are likely stored just in case but not currently
+// in use, and moreover grow worse with Originators and States quantity.
+// Going just in time when necessary drastically improves CPU usage.
+//******************************************************************************
+template<typename State>
+void Originator<State>::actually_go() noexcept {
+	if(lazy_go.has_value()) {
+		auto* const t = lazy_go.value();
+		lazy_go.reset();
+		if(t)
+			for(auto* it : std::ranges::reverse_view(ordered_timepoints)) {
+				if(auto* common_ancestor = it->common_ancestor(*t, true)
+				; common_ancestor == it) {
+					current_timepoint = it;
+					return;
+				}
 			}
-		}
-	current_timepoint = init_timepoint;
+		current_timepoint = init_timepoint;
+	}
 }
 
 //******************************************************************************
 template<typename State>
 void Originator<State>::erase(std::set<Timepoint*> const& ts) noexcept {
+	actually_go();
+
 	auto const is_erasable = [&](Timepoint* t) {
 		if(t == init_timepoint || t == current_timepoint)
 			return false;
@@ -238,6 +260,7 @@ template<typename State>
 void Originator<State>::set_state(Timepoint* t, State const& state) noexcept {
 	states[t] = state;
 	if(std::ranges::none_of(ordered_timepoints, [&](auto const& it) { return it == t; })) {
+		lazy_go.reset();
 		ordered_timepoints.push_back(t);
 		current_timepoint = t;
 	}
