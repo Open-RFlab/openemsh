@@ -17,6 +17,7 @@
 #include <vector>
 
 #include "tree_node.hpp"
+#include "unconst.hpp"
 
 using Timepoint = TreeNode;
 
@@ -177,7 +178,7 @@ Timepoint* Originator<State>::get_init_timepoint() const noexcept {
 //******************************************************************************
 template<typename State>
 Timepoint* Originator<State>::get_current_timepoint() const noexcept {
-	const_cast<Originator*>(this)->actually_go();
+	unconst(this)->actually_go();
 	return current_timepoint;
 }
 
