@@ -69,7 +69,7 @@ public:
 		MAX
 	} const normal;
 
-	Params& params;
+	GlobalParams* global_params;
 	Coord const coord;
 //	std::vector<Conflict*> conflicts;
 
@@ -77,7 +77,7 @@ public:
 		Axis const axis,
 		Policy const policy,
 		Normal normal,
-		Params& params,
+		GlobalParams* global_params,
 		Coord const coord,
 		Timepoint* t,
 		std::vector<IMeshLineOrigin*> const& origins = {},

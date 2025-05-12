@@ -62,7 +62,7 @@ void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManager& line_po
 	if(policy && normal) {
 		auto [t, state] = make_next_state();
 		state.meshline_policy = line_policy_manager.add_meshline_policy(
-			this,
+			{ this },
 			axis,
 			policy.value(),
 			normal.value(),

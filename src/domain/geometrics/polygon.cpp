@@ -26,18 +26,20 @@ Polygon::Polygon(Plane const plane, Type const type, string const& name, vector<
 , edges(detect_edges(this->points, plane, t))
 {
 	detect_edge_normal();
+	for(auto const& edge : edges)
+		get_caretaker().take_care_of(edge);
 }
 
 //******************************************************************************
 Polygon::~Polygon() = default;
 
 //******************************************************************************
-vector<unique_ptr<Edge>> detect_edges(vector<unique_ptr<Point const>> const& points, Plane const plane, Timepoint* t) {
-	vector<unique_ptr<Edge>> edges;
+vector<shared_ptr<Edge>> detect_edges(vector<unique_ptr<Point const>> const& points, Plane const plane, Timepoint* t) {
+	vector<shared_ptr<Edge>> edges;
 
 	Point const* prev = points.back().get();
 	for(auto const & point : points) {
-		edges.push_back(make_unique<Edge>(plane, prev, point.get(), t));
+		edges.push_back(make_shared<Edge>(plane, prev, point.get(), t));
 		prev = point.get();
 	}
 	edges.shrink_to_fit();

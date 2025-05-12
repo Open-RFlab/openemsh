@@ -36,19 +36,19 @@ using namespace domain;
 SCENARIO("Interval::Side::Side(MeshlinePolicy* meshline_policy, size_t lmin, double lambda, Coord h, function<double (double)> d_init)", "[interval]") {
 	Timepoint* t = Caretaker::singleton().get_history_root();
 	GIVEN("Two meshline policies") {
-		Params p;
+		GlobalParams p(t);
 		MeshlinePolicy a(
 			Y,
 			MeshlinePolicy::Policy::ONELINE,
 			MeshlinePolicy::Normal::NONE,
-			p,
+			&p,
 			10,
 			t);
 		MeshlinePolicy b(
 			Y,
 			MeshlinePolicy::Policy::ONELINE,
 			MeshlinePolicy::Normal::NONE,
-			p,
+			&p,
 			20,
 			t);
 		auto state_a = a.get_current_state();
@@ -58,7 +58,7 @@ SCENARIO("Interval::Side::Side(MeshlinePolicy* meshline_policy, size_t lmin, dou
 		a.set_next_state(state_a);
 		b.set_next_state(state_b);
 		WHEN("Creating an Interval's sides") {
-			Interval i(&a, &b, Y, p, t);
+			Interval i(&a, &b, Y, &p, t);
 			THEN("d should be limited to the half of the distance between both policies") {
 				REQUIRE(a.get_current_state().d == 2);
 				REQUIRE(b.get_current_state().d == 5);
@@ -70,7 +70,7 @@ SCENARIO("Interval::Side::Side(MeshlinePolicy* meshline_policy, size_t lmin, dou
 //******************************************************************************
 SCENARIO("double Interval::Side::d_init_(double d)", "[interval]") {
 	Timepoint* t = Caretaker::singleton().get_history_root();
-	Params p;
+	GlobalParams p(t);
 	double d = 1;
 
 	GIVEN("An Interval between two MeshlinePolicy") {
@@ -79,17 +79,17 @@ SCENARIO("double Interval::Side::d_init_(double d)", "[interval]") {
 				Y,
 				MeshlinePolicy::Policy::ONELINE,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				10,
 				t);
 			MeshlinePolicy b(
 				Y,
 				MeshlinePolicy::Policy::ONELINE,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				20,
 				t);
-			Interval i(&a, &b, Y, p, t);
+			Interval i(&a, &b, Y, &p, t);
 			THEN("d_init should be 0") {
 				REQUIRE(i.get_current_state().before.d_init_(d) == 0);
 				REQUIRE(i.get_current_state().after.d_init_(d) == 0);
@@ -101,17 +101,17 @@ SCENARIO("double Interval::Side::d_init_(double d)", "[interval]") {
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				10,
 				t);
 			MeshlinePolicy b(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				20,
 				t);
-			Interval i(&a, &b, Y, p, t);
+			Interval i(&a, &b, Y, &p, t);
 			THEN("d_init should be d/2") {
 				REQUIRE(i.get_current_state().before.d_init_(d) == d/2);
 				REQUIRE(i.get_current_state().after.d_init_(d) == d/2);
@@ -124,17 +124,17 @@ SCENARIO("double Interval::Side::d_init_(double d)", "[interval]") {
 					Y,
 					MeshlinePolicy::Policy::THIRDS,
 					MeshlinePolicy::Normal::MIN,
-					p,
+					&p,
 					10,
 					t);
 				MeshlinePolicy b(
 					Y,
 					MeshlinePolicy::Policy::THIRDS,
 					MeshlinePolicy::Normal::MIN,
-					p,
+					&p,
 					20,
 					t);
-				Interval i(&a, &b, Y, p, t);
+				Interval i(&a, &b, Y, &p, t);
 				THEN("d_init should be d/3 inside and 2d/3 outside") {
 					REQUIRE(i.get_current_state().before.d_init_(d) == 1.0/3.0 * d);
 					REQUIRE(i.get_current_state().after.d_init_(d) == 2.0/3.0 * d);
@@ -146,17 +146,17 @@ SCENARIO("double Interval::Side::d_init_(double d)", "[interval]") {
 					Y,
 					MeshlinePolicy::Policy::THIRDS,
 					MeshlinePolicy::Normal::MAX,
-					p,
+					&p,
 					10,
 					t);
 				MeshlinePolicy b(
 					Y,
 					MeshlinePolicy::Policy::THIRDS,
 					MeshlinePolicy::Normal::MAX,
-					p,
+					&p,
 					20,
 					t);
-				Interval i(&a, &b, Y, p, t);
+				Interval i(&a, &b, Y, &p, t);
 				THEN("d_init should be d/3 inside and 2d/3 outside") {
 					REQUIRE(i.get_current_state().before.d_init_(d) == 2.0/3.0 * d);
 					REQUIRE(i.get_current_state().after.d_init_(d) == 1.0/3.0 * d);
@@ -168,17 +168,17 @@ SCENARIO("double Interval::Side::d_init_(double d)", "[interval]") {
 					Y,
 					MeshlinePolicy::Policy::THIRDS,
 					MeshlinePolicy::Normal::NONE,
-					p,
+					&p,
 					10,
 					t);
 				MeshlinePolicy b(
 					Y,
 					MeshlinePolicy::Policy::THIRDS,
 					MeshlinePolicy::Normal::NONE,
-					p,
+					&p,
 					20,
 					t);
-				Interval i(&a, &b, Y, p, t);
+				Interval i(&a, &b, Y, &p, t);
 				THEN("d_init should be d") {
 					REQUIRE(i.get_current_state().before.d_init_(d) == d);
 					REQUIRE(i.get_current_state().after.d_init_(d) == d);
@@ -331,26 +331,28 @@ SCENARIO("bool is_ls_valid_for_dmax_lmin_lambda(std::vector<Coord> ls, double d,
 SCENARIO("double find_dmax(Interval::Side const& side, double dmax)", "[interval]") {
 	Timepoint* t = Caretaker::singleton().get_history_root();
 	GIVEN("A Side of an Interval with previously computed ls") {
-		Params p;
+		GlobalParams p(t);
 		MeshlinePolicy a(
 			Y,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::NONE,
-			p,
+			&p,
 			10,
 			t);
 		MeshlinePolicy b(
 			Y,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::NONE,
-			p,
+			&p,
 			20,
 			t);
+		auto state_p = p.get_current_state();
 		auto state_a = a.get_current_state();
+		state_p.lambda = 2;
 		state_a.d = 1;
+		p.set_next_state(state_p);
 		a.set_next_state(state_a);
-		p.lambda = 2;
-		Interval i(&a, &b, Y, p, t);
+		Interval i(&a, &b, Y, &p, t);
 		WHEN("ls contains no lines") {
 			THEN("Should return dmax") {
 				REQUIRE_FALSE(i.get_current_state().before.ls.size());
@@ -402,26 +404,28 @@ SCENARIO("double find_dmax(Interval::Side const& side, double dmax)", "[interval
 SCENARIO("double find_dmax(Interval::Side const& side, Interval::Side const& b, double dmax)", "[interval]") {
 	Timepoint* t = Caretaker::singleton().get_history_root();
 	GIVEN("Two Sides of an Interval with previously computed ls") {
-		Params p;
+		GlobalParams p(t);
 		MeshlinePolicy a(
 			Y,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::NONE,
-			p,
+			&p,
 			10,
 			t);
 		MeshlinePolicy b(
 			Y,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::NONE,
-			p,
+			&p,
 			20,
 			t);
+		auto state_p = p.get_current_state();
 		auto state_a = a.get_current_state();
+		state_p.lambda = 2;
 		state_a.d = 1;
+		p.set_next_state(state_p);
 		a.set_next_state(state_a);
-		p.lambda = 2;
-		Interval i(&a, &b, Y, p, t);
+		Interval i(&a, &b, Y, &p, t);
 		auto state_i = i.get_current_state();
 		state_i.before.ls = { 2.0 };
 		state_i.after.ls = { 1.0, 3.0, 6.0 };
@@ -440,32 +444,39 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 	Timepoint* t = Caretaker::singleton().get_history_root();
 	GIVEN("A Side of an Interval with previously computed ls") {
 		WHEN("dmax and lmin end criteras are already respected") {
-			Params p;
+			GlobalParams p(t);
 			MeshlinePolicy a(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				10,
 				t);
 			MeshlinePolicy b(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				20,
 				t);
-			p.dmax = 1.2;
-			p.lmin = 2;
+			auto state_p = p.get_current_state();
 			auto state_a = a.get_current_state();
+			state_p.dmax = 1.2;
+			state_p.lmin = 2;
 			state_a.d = 1.0;
+			p.set_next_state(state_p);
 			a.set_next_state(state_a);
-			Interval i(&a, &b, Y, p, t);
+			Interval i(&a, &b, Y, &p, t);
 			auto state_i = i.get_current_state();
 			i.update_ls(state_i);
 			i.set_next_state(state_i);
 			THEN("Initial ls should be conform") {
-				REQUIRE(is_ls_valid_for_dmax_lmin_lambda(i.get_current_state().before.ls, a.get_current_state().d, i.get_current_state().before.lambda, p.dmax, p.lmin));
+				REQUIRE(is_ls_valid_for_dmax_lmin_lambda(
+					i.get_current_state().before.ls,
+					a.get_current_state().d,
+					i.get_current_state().before.lambda,
+					p.get_current_state().dmax,
+					p.get_current_state().lmin));
 			}
 
 			THEN("Side's d should be unchanged") {
@@ -475,32 +486,39 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 		}
 
 		WHEN("dmax end critera is already respected but not lmin one") {
-			Params p;
+			GlobalParams p(t);
 			MeshlinePolicy a(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				10,
 				t);
 			MeshlinePolicy b(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				20,
 				t);
-			p.dmax = 2.0;
-			p.lmin = 10;
+			auto state_p = p.get_current_state();
 			auto state_a = a.get_current_state();
+			state_p.dmax = 2.0;
+			state_p.lmin = 10;
 			state_a.d = 1.0;
+			p.set_next_state(state_p);
 			a.set_next_state(state_a);
-			Interval i(&a, &b, Y, p, t);
+			Interval i(&a, &b, Y, &p, t);
 			auto state_i = i.get_current_state();
 			i.update_ls(state_i);
 			i.set_next_state(state_i);
 			THEN("Initial ls should not be conform") {
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(i.get_current_state().before.ls, a.get_current_state().d, i.get_current_state().before.lambda, p.dmax, p.lmin));
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(
+					i.get_current_state().before.ls,
+					a.get_current_state().d,
+					i.get_current_state().before.lambda,
+					p.get_current_state().dmax,
+					p.get_current_state().lmin));
 			}
 
 			THEN("Side's d should be reduced") {
@@ -512,38 +530,50 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 					auto state_i = i.get_current_state();
 					i.update_ls(state_i);
 					i.set_next_state(state_i);
-					REQUIRE(is_ls_valid_for_dmax_lmin_lambda(i.get_current_state().before.ls, a.get_current_state().d, i.get_current_state().before.lambda, p.dmax, p.lmin));
+					REQUIRE(is_ls_valid_for_dmax_lmin_lambda(
+						i.get_current_state().before.ls,
+						a.get_current_state().d,
+						i.get_current_state().before.lambda,
+						p.get_current_state().dmax,
+						p.get_current_state().lmin));
 				}
 			}
 		}
 
 		WHEN("lmin end critera is already respected but not dmax one") {
-			Params p;
+			GlobalParams p(t);
 			MeshlinePolicy a(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				10,
 				t);
 			MeshlinePolicy b(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				20,
 				t);
-			p.dmax = 0.8;
-			p.lmin = 2;
+			auto state_p = p.get_current_state();
 			auto state_a = a.get_current_state();
+			state_p.dmax = 0.8;
+			state_p.lmin = 2;
 			state_a.d = 1.0;
+			p.set_next_state(state_p);
 			a.set_next_state(state_a);
-			Interval i(&a, &b, Y, p, t);
+			Interval i(&a, &b, Y, &p, t);
 			auto state_i = i.get_current_state();
 			i.update_ls(state_i);
 			i.set_next_state(state_i);
 			THEN("Initial ls should not be conform") {
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(i.get_current_state().before.ls, a.get_current_state().d, i.get_current_state().before.lambda, p.dmax, p.lmin));
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(
+					i.get_current_state().before.ls,
+					a.get_current_state().d,
+					i.get_current_state().before.lambda,
+					p.get_current_state().dmax,
+					p.get_current_state().lmin));
 			}
 
 			THEN("Side's d should be reduced") {
@@ -555,38 +585,50 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 					auto state_i = i.get_current_state();
 					i.update_ls(state_i);
 					i.set_next_state(state_i);
-					REQUIRE(is_ls_valid_for_dmax_lmin_lambda(i.get_current_state().before.ls, a.get_current_state().d, i.get_current_state().before.lambda, p.dmax, p.lmin));
+					REQUIRE(is_ls_valid_for_dmax_lmin_lambda(
+						i.get_current_state().before.ls,
+						a.get_current_state().d,
+						i.get_current_state().before.lambda,
+						p.get_current_state().dmax,
+						p.get_current_state().lmin));
 				}
 			}
 		}
 
 		WHEN("dmax and lmin end criteras are not respected") {
-			Params p;
+			GlobalParams p(t);
 			MeshlinePolicy a(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				10,
 				t);
 			MeshlinePolicy b(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				20,
 				t);
-			p.dmax = 0.8;
-			p.lmin = 10;
+			auto state_p = p.get_current_state();
 			auto state_a = a.get_current_state();
+			state_p.dmax = 0.8;
+			state_p.lmin = 10;
 			state_a.d = 1.0;
+			p.set_next_state(state_p);
 			a.set_next_state(state_a);
-			Interval i(&a, &b, Y, p, t);
+			Interval i(&a, &b, Y, &p, t);
 			auto state_i = i.get_current_state();
 			i.update_ls(state_i);
 			i.set_next_state(state_i);
 			THEN("Initial ls should not be conform") {
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(i.get_current_state().before.ls, a.get_current_state().d, i.get_current_state().before.lambda, p.dmax, p.lmin));
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(
+					i.get_current_state().before.ls,
+					a.get_current_state().d,
+					i.get_current_state().before.lambda,
+					p.get_current_state().dmax,
+					p.get_current_state().lmin));
 			}
 
 			AND_WHEN("Process iterations are unlimited") {
@@ -601,7 +643,12 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 						auto state_i = i.get_current_state();
 						i.update_ls(state_i);
 						i.set_next_state(state_i);
-						REQUIRE(is_ls_valid_for_dmax_lmin_lambda(i.get_current_state().before.ls, a.get_current_state().d, i.get_current_state().before.lambda, p.dmax, p.lmin));
+						REQUIRE(is_ls_valid_for_dmax_lmin_lambda(
+							i.get_current_state().before.ls,
+							a.get_current_state().d,
+							i.get_current_state().before.lambda,
+							p.get_current_state().dmax,
+							p.get_current_state().lmin));
 					}
 				}
 			}
@@ -618,7 +665,12 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 						auto state_i = i.get_current_state();
 						i.update_ls(state_i);
 						i.set_next_state(state_i);
-						REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(i.get_current_state().before.ls, a.get_current_state().d, i.get_current_state().before.lambda, p.dmax, p.lmin));
+						REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(
+							i.get_current_state().before.ls,
+							a.get_current_state().d,
+							i.get_current_state().before.lambda,
+							p.get_current_state().dmax,
+							p.get_current_state().lmin));
 					}
 				}
 			}
@@ -630,29 +682,31 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 SCENARIO("std::tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side const& side, size_t iter_limit) const", "[interval]") {
 	Timepoint* t = Caretaker::singleton().get_history_root();
 	GIVEN("A Side of an Interval with previously computed valid ls with lambda superior to 2") {
-		Params p;
+		GlobalParams p(t);
 		MeshlinePolicy a(
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
-			p,
+			&p,
 			0,
 			t);
 		MeshlinePolicy b(
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
-			p,
+			&p,
 			20,
 			t);
-		p.dmax = 30.0;
-		p.lmin = 5;
-		p.lambda = 2;
+		auto state_p = p.get_current_state();
 		auto state_a = a.get_current_state();
+		state_p.dmax = 30.0;
+		state_p.lmin = 5;
+		state_p.lambda = 2;
 		state_a.d = 0.1;
+		p.set_next_state(state_p);
 		a.set_next_state(state_a);
-		Interval i(&a, &b, Y, p, t);
-		Interval j(&a, &b, Y, p, t);
+		Interval i(&a, &b, Y, &p, t);
+		Interval j(&a, &b, Y, &p, t);
 		auto state_i = i.get_current_state();
 		auto state_j = j.get_current_state();
 		i.update_ls(state_i);
@@ -660,8 +714,18 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side 
 		i.set_next_state(state_i);
 		j.set_next_state(state_j);
 		Coord old_last_space = i.get_current_state().before.ls.back() - i.s(i.get_current_state().before);
-		REQUIRE(is_ls_valid_for_dmax_lmin_lambda(i.get_current_state().before.ls, a.get_current_state().d, i.get_current_state().before.lambda, p.dmax, p.lmin));
-		REQUIRE(is_ls_valid_for_dmax_lmin_lambda(j.get_current_state().before.ls, a.get_current_state().d, j.get_current_state().before.lambda, p.dmax, p.lmin));
+		REQUIRE(is_ls_valid_for_dmax_lmin_lambda(
+			i.get_current_state().before.ls,
+			a.get_current_state().d,
+			i.get_current_state().before.lambda,
+			p.get_current_state().dmax,
+			p.get_current_state().lmin));
+		REQUIRE(is_ls_valid_for_dmax_lmin_lambda(
+			j.get_current_state().before.ls,
+			a.get_current_state().d,
+			j.get_current_state().before.lambda,
+			p.get_current_state().dmax,
+			p.get_current_state().lmin));
 		WHEN("Process iterations are unlimited") {
 			THEN("Side's lambda should be reduced") {
 				{
@@ -671,7 +735,7 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side 
 					i.update_ls(state_i);
 					i.set_next_state(state_i);
 					REQUIRE_FALSE(is_limit_reached);
-					REQUIRE(i.get_current_state().before.lambda < p.lambda);
+					REQUIRE(i.get_current_state().before.lambda < p.get_current_state().lambda);
 				}
 
 				AND_THEN("The space between the last ls line and the middle of the Interval should be reduced") {
@@ -687,7 +751,7 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side 
 								j.update_ls(state_j);
 								j.set_next_state(state_j);
 								REQUIRE(is_limit_reached);
-								REQUIRE(j.get_current_state().before.lambda < p.lambda);
+								REQUIRE(j.get_current_state().before.lambda < p.get_current_state().lambda);
 							}
 
 							AND_THEN("The space between the last ls line and the middle of the Interval should be reduced, but less than if unlimited") {
@@ -703,33 +767,40 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side 
 	}
 
 	GIVEN("A Side of an Interval with previously computed valid ls with lambda being 1") {
-		Params p;
+		GlobalParams p(t);
 		MeshlinePolicy a(
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
-			p,
+			&p,
 			0,
 			t);
 		MeshlinePolicy b(
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
-			p,
+			&p,
 			20,
 			t);
-		p.dmax = 30.0;
-		p.lmin = 5;
-		p.lambda = 1;
+		auto state_p = p.get_current_state();
 		auto state_a = a.get_current_state();
+		state_p.dmax = 30.0;
+		state_p.lmin = 5;
+		state_p.lambda = 1;
 		state_a.d = 0.1;
+		p.set_next_state(state_p);
 		a.set_next_state(state_a);
-		Interval i(&a, &b, Y, p, t);
+		Interval i(&a, &b, Y, &p, t);
 		auto state_i = i.get_current_state();
 		i.update_ls(state_i);
 		i.set_next_state(state_i);
 		Coord old_last_space = i.get_current_state().before.ls.back() - i.s(i.get_current_state().before);
-		REQUIRE(is_ls_valid_for_dmax_lmin_lambda(i.get_current_state().before.ls, a.get_current_state().d, i.get_current_state().before.lambda, p.dmax, p.lmin));
+		REQUIRE(is_ls_valid_for_dmax_lmin_lambda(
+			i.get_current_state().before.ls,
+			a.get_current_state().d,
+			i.get_current_state().before.lambda,
+			p.get_current_state().dmax,
+			p.get_current_state().lmin));
 		THEN("Side's lambda should not be reduced") {
 			auto [new_lambda, is_limit_reached] = i.adjust_lambda_for_s(i.get_current_state().before);
 			auto state_i = i.get_current_state();
@@ -737,7 +808,7 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side 
 			i.update_ls(state_i);
 			i.set_next_state(state_i);
 			REQUIRE_FALSE(is_limit_reached);
-			REQUIRE(new_lambda == p.lambda);
+			REQUIRE(new_lambda == p.get_current_state().lambda);
 
 			AND_THEN("The space between the last ls line and the middle of the Interval should not be reduced") {
 				Coord new_last_space = i.get_current_state().before.ls.back() - i.s(i.get_current_state().before);
@@ -761,52 +832,54 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 
 	GIVEN("An Interval with ls computed for both Sides") {
 		WHEN("Sides' policies are HALFS or THIRDS") {
-			Params p;
+			GlobalParams p(t);
 			MeshlinePolicy a(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				10,
 				t);
 			MeshlinePolicy b(
 				Y,
 				MeshlinePolicy::Policy::THIRDS,
 				MeshlinePolicy::Normal::MAX,
-				p,
+				&p,
 				30,
 				t);
 			MeshlinePolicy c(
 				Y,
 				MeshlinePolicy::Policy::THIRDS,
 				MeshlinePolicy::Normal::MAX,
-				p,
+				&p,
 				10,
 				t);
 			MeshlinePolicy d(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				30,
 				t);
-			p.dmax = 2;
-			p.lmin = 5;
-			p.lambda = 2;
+			auto state_p = p.get_current_state();
 			auto state_a = a.get_current_state();
 			auto state_b = b.get_current_state();
 			auto state_c = c.get_current_state();
 			auto state_d = d.get_current_state();
+			state_p.dmax = 2;
+			state_p.lmin = 5;
+			state_p.lambda = 2;
 			state_a.d = 0.1;
 			state_b.d = 0.1;
 			state_c.d = 0.1;
 			state_d.d = 0.1;
+			p.set_next_state(state_p);
 			a.set_next_state(state_a);
 			b.set_next_state(state_b);
 			c.set_next_state(state_c);
 			d.set_next_state(state_d);
-			Interval i(&a, &b, Y, p, t);
-			Interval j(&c, &d, Y, p, t);
+			Interval i(&a, &b, Y, &p, t);
+			Interval j(&c, &d, Y, &p, t);
 			auto state_i = i.get_current_state();
 			auto state_j = j.get_current_state();
 			i.update_ls(state_i);
@@ -875,31 +948,33 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 		}
 
 		WHEN("Sides' policies are ONELINE") {
-			Params p;
+			GlobalParams p(t);
 			MeshlinePolicy a(
 				Y,
 				MeshlinePolicy::Policy::ONELINE,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				10,
 				t);
 			MeshlinePolicy b(
 				Y,
 				MeshlinePolicy::Policy::ONELINE,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				30,
 				t);
-			p.dmax = 1.5;
-			p.lmin = 5;
-			p.lambda = 2;
+			auto state_p = p.get_current_state();
 			auto state_a = a.get_current_state();
 			auto state_b = b.get_current_state();
+			state_p.dmax = 1.5;
+			state_p.lmin = 5;
+			state_p.lambda = 2;
 			state_a.d = 0.1;
 			state_b.d = 0.1;
+			p.set_next_state(state_p);
 			a.set_next_state(state_a);
 			b.set_next_state(state_b);
-			Interval i(&a, &b, Y, p, t);
+			Interval i(&a, &b, Y, &p, t);
 			auto state_i = i.get_current_state();
 			i.update_ls(state_i);
 			i.set_next_state(state_i);
@@ -942,52 +1017,54 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 
 	GIVEN("An Interval without ls computed for both Sides") {
 		WHEN("Sides' policies are HALFS or THIRDS") {
-			Params p;
+			GlobalParams p(t);
 			MeshlinePolicy a(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				10,
 				t);
 			MeshlinePolicy b(
 				Y,
 				MeshlinePolicy::Policy::THIRDS,
 				MeshlinePolicy::Normal::MAX,
-				p,
+				&p,
 				30,
 				t);
 			MeshlinePolicy c(
 				Y,
 				MeshlinePolicy::Policy::THIRDS,
 				MeshlinePolicy::Normal::MAX,
-				p,
+				&p,
 				10,
 				t);
 			MeshlinePolicy d(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				30,
 				t);
-			p.dmax = 2;
-			p.lmin = 5;
-			p.lambda = 2;
+			auto state_p = p.get_current_state();
 			auto state_a = a.get_current_state();
 			auto state_b = b.get_current_state();
 			auto state_c = c.get_current_state();
 			auto state_d = d.get_current_state();
+			state_p.dmax = 2;
+			state_p.lmin = 5;
+			state_p.lambda = 2;
 			state_a.d = 0.1;
 			state_b.d = 0.1;
 			state_c.d = 0.1;
 			state_d.d = 0.1;
+			p.set_next_state(state_p);
 			a.set_next_state(state_a);
 			b.set_next_state(state_b);
 			c.set_next_state(state_c);
 			d.set_next_state(state_d);
-			Interval i(&a, &b, Y, p, t);
-			Interval j(&c, &d, Y, p, t);
+			Interval i(&a, &b, Y, &p, t);
+			Interval j(&c, &d, Y, &p, t);
 			auto mesh_i = i.mesh();
 			auto mesh_j = j.mesh();
 			THEN("The only lines should be policy lines and middle line") {
@@ -1003,31 +1080,33 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 		}
 
 		WHEN("Sides' policies are ONELINE") {
-			Params p;
+			GlobalParams p(t);
 			MeshlinePolicy a(
 				Y,
 				MeshlinePolicy::Policy::ONELINE,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				10,
 				t);
 			MeshlinePolicy b(
 				Y,
 				MeshlinePolicy::Policy::ONELINE,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				30,
 				t);
-			p.dmax = 1.5;
-			p.lmin = 5;
-			p.lambda = 2;
+			auto state_p = p.get_current_state();
 			auto state_a = a.get_current_state();
 			auto state_b = b.get_current_state();
+			state_p.dmax = 1.5;
+			state_p.lmin = 5;
+			state_p.lambda = 2;
 			state_a.d = 0.1;
 			state_b.d = 0.1;
+			p.set_next_state(state_p);
 			a.set_next_state(state_a);
 			b.set_next_state(state_b);
-			Interval i(&a, &b, Y, p, t);
+			Interval i(&a, &b, Y, &p, t);
 			auto mesh = i.mesh();
 			THEN("The only line should be the middle line") {
 				REQUIRE(mesh.size() == 1);

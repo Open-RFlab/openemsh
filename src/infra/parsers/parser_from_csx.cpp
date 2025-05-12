@@ -268,6 +268,14 @@ shared_ptr<Board> ParserFromCsx::run(std::filesystem::path const& input, Params 
 }
 
 //******************************************************************************
+shared_ptr<Board> ParserFromCsx::run(std::filesystem::path const& input, Params params, std::function<void (domain::Params&)> const& override_domain_params) {
+	ParserFromCsx parser(input, std::move(params));
+	parser.parse();
+	override_domain_params(parser.domain_params);
+	return parser.output();
+}
+
+//******************************************************************************
 ParserFromCsx::ParserFromCsx(filesystem::path const& input)
 : input(input)
 , pimpl(make_unique<Pimpl>(parser_params))
@@ -320,5 +328,5 @@ void ParserFromCsx::parse() {
 //******************************************************************************
 shared_ptr<Board> ParserFromCsx::output() {
 	pimpl->primitives_ids.clear();
-	return pimpl->board.build();
+	return pimpl->board.build(std::move(domain_params));
 }

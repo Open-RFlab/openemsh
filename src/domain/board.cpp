@@ -57,28 +57,34 @@ void sort_points_by_vector_orientation(vector<Point>& points, Point const& vecto
 }
 
 //******************************************************************************
-shared_ptr<Board> Board::Builder::build() {
-	return make_shared<Board>(std::move(polygons), std::move(line_policies), Caretaker::singleton().get_history_root());
+shared_ptr<Board> Board::Builder::build(Params&& params) {
+	return make_shared<Board>(
+		std::move(polygons),
+		std::move(fixed_meshline_policy_creators),
+		std::move(params),
+		Caretaker::singleton().get_history_root());
 }
 
 // TODO should be in meshline manager?
 //******************************************************************************
 void Board::Builder::add_fixed_meshline_policy(Axis const axis, Coord const coord) {
-	if(!contains_that(line_policies[axis],
-		[&coord](shared_ptr<MeshlinePolicy> const& policy) {
-			if(policy->policy == MeshlinePolicy::Policy::ONELINE
-			&& policy->normal == MeshlinePolicy::Normal::NONE
-			&& policy->coord == coord)
-				return true;
-			return false;
-		}))
-			line_policies[axis].emplace_back(make_shared<MeshlinePolicy>(
-				axis,
-				MeshlinePolicy::Policy::ONELINE,
-				MeshlinePolicy::Normal::NONE,
-				params,
-				coord,
-				Caretaker::singleton().get_history_root()));
+	fixed_meshline_policy_creators[axis].emplace_back([=](Board* board, Timepoint* t) {
+		if(!contains_that(board->line_policy_manager->get_current_state().line_policies[axis],
+			[&coord](shared_ptr<MeshlinePolicy> const& policy) {
+				if(policy->policy == MeshlinePolicy::Policy::ONELINE
+				&& policy->normal == MeshlinePolicy::Normal::NONE
+				&& policy->coord == coord)
+					return true;
+				return false;
+			}))
+				board->line_policy_manager->add_meshline_policy(
+					{},
+					axis,
+					MeshlinePolicy::Policy::ONELINE,
+					MeshlinePolicy::Normal::NONE,
+					coord,
+					t);
+	});
 }
 
 //******************************************************************************
@@ -116,33 +122,42 @@ BoardState::BoardState(PlaneSpace<vector<shared_ptr<Polygon>>>&& polygons)
 }
 
 //******************************************************************************
-Board::Board(PlaneSpace<vector<shared_ptr<Polygon>>>&& polygons, Timepoint* t)
+Board::Board(PlaneSpace<vector<shared_ptr<Polygon>>>&& polygons, Params&& params, Timepoint* t)
 : Originator(t, BoardState(std::move(polygons)))
+, global_params(make_shared<GlobalParams>(std::move(params), t))
 , conflict_manager(make_shared<ConflictManager>(t))
-, line_policy_manager(make_shared<MeshlinePolicyManager>(params, t)) {
+, line_policy_manager(make_shared<MeshlinePolicyManager>(global_params.get(), t)) {
 
 	conflict_manager->init(line_policy_manager.get());
 	line_policy_manager->init(conflict_manager.get());
-	Caretaker::singleton().take_care_of(conflict_manager);
-	Caretaker::singleton().take_care_of(line_policy_manager);
+	get_caretaker().take_care_of(conflict_manager);
+	get_caretaker().take_care_of(line_policy_manager);
+	get_caretaker().take_care_of(global_params);
 	for(auto const& plane : AllPlane)
 		for(auto const& polygon : get_current_state().polygons[plane])
-			Caretaker::singleton().take_care_of(polygon);
+			get_caretaker().take_care_of(polygon);
 }
 
 //******************************************************************************
 Board::Board(
 	PlaneSpace<std::vector<std::shared_ptr<Polygon>>>&& polygons,
-	AxisSpace<std::vector<std::shared_ptr<MeshlinePolicy>>>&& line_policies,
+	AxisSpace<std::vector<std::function<void (Board*, Timepoint*)>>>&& fixed_meshline_policy_creators,
+	Params&& params,
 	Timepoint* t)
 : Originator(t, BoardState(std::move(polygons)))
+, global_params(make_shared<GlobalParams>(std::move(params), t))
 , conflict_manager(make_shared<ConflictManager>(t))
-, line_policy_manager(make_shared<MeshlinePolicyManager>(params, std::move(line_policies), t)) {
+, line_policy_manager(make_shared<MeshlinePolicyManager>(global_params.get(), t))
+, fixed_meshline_policy_creators(std::move(fixed_meshline_policy_creators)) {
 
 	conflict_manager->init(line_policy_manager.get());
 	line_policy_manager->init(conflict_manager.get());
-	Caretaker::singleton().take_care_of(conflict_manager);
-	Caretaker::singleton().take_care_of(line_policy_manager);
+	get_caretaker().take_care_of(conflict_manager);
+	get_caretaker().take_care_of(line_policy_manager);
+	get_caretaker().take_care_of(global_params);
+	for(auto const& plane : AllPlane)
+		for(auto const& polygon : get_current_state().polygons[plane])
+			get_caretaker().take_care_of(polygon);
 }
 
 /// Detect all EDGE_IN_POLYGON. Will also detect some COLINEAR_EDGES.
@@ -300,7 +315,7 @@ void Board::detect_non_conflicting_edges(Plane const plane) {
 		if(coord && axis && normal && !edge->get_current_state().conflicts.size()) {
 			auto [t, state_e] = edge->make_next_state();
 			state_e.meshline_policy = line_policy_manager->add_meshline_policy(
-				edge,
+				{ edge },
 				axis.value(),
 				MeshlinePolicy::Policy::THIRDS,
 				normal.value(),
@@ -310,6 +325,13 @@ void Board::detect_non_conflicting_edges(Plane const plane) {
 			edge->set_state(t, state_e);
 		}
 	}
+}
+
+//******************************************************************************
+void Board::add_fixed_meshline_policies(Axis axis) {
+	auto* t = next_timepoint();
+	for(auto const& create_meshline_policy : fixed_meshline_policy_creators[axis])
+		create_meshline_policy(this, t);
 }
 
 //******************************************************************************
@@ -328,6 +350,12 @@ void Board::detect_colinear_edges() {
 void Board::detect_non_conflicting_edges() {
 	for(auto const& plane : AllPlane)
 		detect_non_conflicting_edges(plane);
+}
+
+//******************************************************************************
+void Board::add_fixed_meshline_policies() {
+	for(auto const& axis : AllAxis)
+		add_fixed_meshline_policies(axis);
 }
 
 //******************************************************************************

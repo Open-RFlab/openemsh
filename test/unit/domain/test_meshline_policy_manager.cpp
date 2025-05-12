@@ -41,30 +41,30 @@ Coord const coord, \
 bool const is_enabled)", "[meshline_policy_manager]") {
 	Timepoint* t = Caretaker::singleton().get_history_root();
 	GIVEN("A meshline policy manager") {
-		Params params;
-		MeshlinePolicyManager mpm(params, t);
+		GlobalParams params(t);
+		MeshlinePolicyManager mpm(&params, t);
 		Point e0(1, 1), e1(1, 3);
 		Edge e(XY, &e0, &e1, t);
 
 		WHEN("We add a meshline policy with incoherent policy and normal parameters") { // TODO
 			MeshlinePolicy* m = mpm.add_meshline_policy(
-				&e, Y, MeshlinePolicy::Policy::THIRDS, MeshlinePolicy::Normal::NONE, 1);
+				{ &e }, Y, MeshlinePolicy::Policy::THIRDS, MeshlinePolicy::Normal::NONE, 1);
 			MeshlinePolicy* n = mpm.add_meshline_policy(
-				&e, Y, MeshlinePolicy::Policy::ONELINE, MeshlinePolicy::Normal::MIN, 1);
+				{ &e }, Y, MeshlinePolicy::Policy::ONELINE, MeshlinePolicy::Normal::MIN, 1);
 			MeshlinePolicy* o = mpm.add_meshline_policy(
-				&e, Y, MeshlinePolicy::Policy::ONELINE, MeshlinePolicy::Normal::MAX, 1);
+				{ &e }, Y, MeshlinePolicy::Policy::ONELINE, MeshlinePolicy::Normal::MAX, 1);
 			MeshlinePolicy* p = mpm.add_meshline_policy(
-				&e, X, MeshlinePolicy::Policy::ONELINE, MeshlinePolicy::Normal::MIN, 1);
+				{ &e }, X, MeshlinePolicy::Policy::ONELINE, MeshlinePolicy::Normal::MIN, 1);
 			MeshlinePolicy* q = mpm.add_meshline_policy(
-				&e, X, MeshlinePolicy::Policy::ONELINE, MeshlinePolicy::Normal::MAX, 1);
+				{ &e }, X, MeshlinePolicy::Policy::ONELINE, MeshlinePolicy::Normal::MAX, 1);
 			MeshlinePolicy* r = mpm.add_meshline_policy(
-				&e, Y, MeshlinePolicy::Policy::HALFS, MeshlinePolicy::Normal::MIN, 1);
+				{ &e }, Y, MeshlinePolicy::Policy::HALFS, MeshlinePolicy::Normal::MIN, 1);
 			MeshlinePolicy* s = mpm.add_meshline_policy(
-				&e, Y, MeshlinePolicy::Policy::HALFS, MeshlinePolicy::Normal::MAX, 1);
+				{ &e }, Y, MeshlinePolicy::Policy::HALFS, MeshlinePolicy::Normal::MAX, 1);
 			MeshlinePolicy* t = mpm.add_meshline_policy(
-				&e, X, MeshlinePolicy::Policy::HALFS, MeshlinePolicy::Normal::MIN, 1);
+				{ &e }, X, MeshlinePolicy::Policy::HALFS, MeshlinePolicy::Normal::MIN, 1);
 			MeshlinePolicy* u = mpm.add_meshline_policy(
-				&e, X, MeshlinePolicy::Policy::HALFS, MeshlinePolicy::Normal::MAX, 1);
+				{ &e }, X, MeshlinePolicy::Policy::HALFS, MeshlinePolicy::Normal::MAX, 1);
 			THEN("No meshline policy should be added nor returned") {
 				REQUIRE(mpm.get_current_state().line_policies[X].size() == 0);
 				REQUIRE(mpm.get_current_state().line_policies[Y].size() == 0);
@@ -83,7 +83,7 @@ bool const is_enabled)", "[meshline_policy_manager]") {
 
 		WHEN("We add a random meshline policy with coherent parameters") {
 			MeshlinePolicy* m = mpm.add_meshline_policy(
-				&e, X, MeshlinePolicy::Policy::THIRDS, MeshlinePolicy::Normal::MAX, 1);
+				{ &e }, X, MeshlinePolicy::Policy::THIRDS, MeshlinePolicy::Normal::MAX, 1);
 			THEN("Should add a meshline policy to the inner container and return a pointer to it") {
 				REQUIRE(mpm.get_current_state().line_policies[Y].size() == 0);
 				REQUIRE(mpm.get_current_state().line_policies[X].size() == 1);
@@ -109,11 +109,13 @@ Coord proximity_limit)", "[meshline_policy_manager]") {
 	Timepoint* t = Caretaker::singleton().get_history_root();
 	GIVEN("A vector of pointers to meshline policies and a proximity limit") {
 		std::vector<MeshlinePolicy*> vec;
-		Params params;
-		params.proximity_limit = 1;
+		GlobalParams params(t);
+		auto params_state = params.get_current_state();
+		params_state.proximity_limit = 1;
+		params.set_next_state(params_state);
 		WHEN("Containing no meshline policy") {
 			THEN("Should return nullopt") {
-				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				auto ret = detect_closest_meshline_policies(vec, params.get_current_state().proximity_limit);
 				REQUIRE_FALSE(ret.has_value());
 			}
 		}
@@ -123,12 +125,12 @@ Coord proximity_limit)", "[meshline_policy_manager]") {
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				params,
+				&params,
 				10,
 				t);
 			vec.emplace_back(&a);
 			THEN("Should return nullopt") {
-				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				auto ret = detect_closest_meshline_policies(vec, params.get_current_state().proximity_limit);
 				REQUIRE_FALSE(ret.has_value());
 			}
 		}
@@ -138,20 +140,20 @@ Coord proximity_limit)", "[meshline_policy_manager]") {
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				params,
+				&params,
 				10,
 				t);
 			MeshlinePolicy b(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				params,
+				&params,
 				20,
 				t);
 			vec.emplace_back(&a);
 			vec.emplace_back(&b);
 			THEN("Should return nullopt") {
-				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				auto ret = detect_closest_meshline_policies(vec, params.get_current_state().proximity_limit);
 				REQUIRE_FALSE(ret.has_value());
 			}
 		}
@@ -161,20 +163,20 @@ Coord proximity_limit)", "[meshline_policy_manager]") {
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				params,
+				&params,
 				10,
 				t);
 			MeshlinePolicy b(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				params,
+				&params,
 				11,
 				t);
 			vec.emplace_back(&a);
 			vec.emplace_back(&b);
 			THEN("Should return both") {
-				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				auto ret = detect_closest_meshline_policies(vec, params.get_current_state().proximity_limit);
 				REQUIRE(ret.has_value());
 				REQUIRE_THAT(*ret, Catch::Matchers::Contains(&a));
 				REQUIRE_THAT(*ret, Catch::Matchers::Contains(&b));
@@ -186,20 +188,20 @@ Coord proximity_limit)", "[meshline_policy_manager]") {
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				params,
+				&params,
 				10,
 				t);
 			MeshlinePolicy b(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				params,
+				&params,
 				10.5,
 				t);
 			vec.emplace_back(&a);
 			vec.emplace_back(&b);
 			THEN("Should return both") {
-				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				auto ret = detect_closest_meshline_policies(vec, params.get_current_state().proximity_limit);
 				REQUIRE(ret.has_value());
 				REQUIRE_THAT(*ret, Catch::Matchers::Contains(&a));
 				REQUIRE_THAT(*ret, Catch::Matchers::Contains(&b));
@@ -211,28 +213,28 @@ Coord proximity_limit)", "[meshline_policy_manager]") {
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				params,
+				&params,
 				10,
 				t);
 			MeshlinePolicy b(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				params,
+				&params,
 				10.5,
 				t);
 			MeshlinePolicy c(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				params,
+				&params,
 				20,
 				t);
 			vec.emplace_back(&a);
 			vec.emplace_back(&b);
 			vec.emplace_back(&c);
 			THEN("Should return the two closer than the limit") {
-				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				auto ret = detect_closest_meshline_policies(vec, params.get_current_state().proximity_limit);
 				REQUIRE(ret.has_value());
 				REQUIRE_THAT(*ret, Catch::Matchers::Contains(&a));
 				REQUIRE_THAT(*ret, Catch::Matchers::Contains(&b));
@@ -244,28 +246,28 @@ Coord proximity_limit)", "[meshline_policy_manager]") {
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				params,
+				&params,
 				11.2,
 				t);
 			MeshlinePolicy b(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				params,
+				&params,
 				10.8,
 				t);
 			MeshlinePolicy c(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				params,
+				&params,
 				10,
 				t);
 			vec.emplace_back(&a);
 			vec.emplace_back(&b);
 			vec.emplace_back(&c);
 			THEN("Should return the two closer") {
-				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				auto ret = detect_closest_meshline_policies(vec, params.get_current_state().proximity_limit);
 				REQUIRE(ret.has_value());
 				REQUIRE_THAT(*ret, Catch::Matchers::Contains(&a));
 				REQUIRE_THAT(*ret, Catch::Matchers::Contains(&b));
@@ -277,7 +279,7 @@ Coord proximity_limit)", "[meshline_policy_manager]") {
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				params,
+				&params,
 				10,
 				t,
 				{},
@@ -286,13 +288,13 @@ Coord proximity_limit)", "[meshline_policy_manager]") {
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				params,
+				&params,
 				10.5,
 				t);
 			vec.emplace_back(&a);
 			vec.emplace_back(&b);
 			THEN("Should return nullopt") {
-				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				auto ret = detect_closest_meshline_policies(vec, params.get_current_state().proximity_limit);
 				REQUIRE_FALSE(ret.has_value());
 			}
 		}
@@ -302,20 +304,20 @@ Coord proximity_limit)", "[meshline_policy_manager]") {
 				Y,
 				MeshlinePolicy::Policy::ONELINE,
 				MeshlinePolicy::Normal::NONE,
-				params,
+				&params,
 				10,
 				t);
 			MeshlinePolicy b(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				params,
+				&params,
 				10.5,
 				t);
 			vec.emplace_back(&a);
 			vec.emplace_back(&b);
 			THEN("Should return nullopt") {
-				auto ret = detect_closest_meshline_policies(vec, params.proximity_limit);
+				auto ret = detect_closest_meshline_policies(vec, params.get_current_state().proximity_limit);
 				REQUIRE_FALSE(ret.has_value());
 			}
 		}
@@ -328,13 +330,14 @@ SCENARIO("void MeshlinePolicyManager::detect_and_solve_too_close_meshline_polici
 
 	class Wrapper {
 	public:
-		Params params;
+		GlobalParams params;
 		ConflictManager cm;
 		MeshlinePolicyManager mpm;
 
 		Wrapper(Timepoint* t)
-		: cm(t)
-		, mpm(params, t)
+		: params(t)
+		, cm(t)
+		, mpm(&params, t)
 		{
 			cm.init(&mpm);
 			mpm.init(&cm);
@@ -343,7 +346,9 @@ SCENARIO("void MeshlinePolicyManager::detect_and_solve_too_close_meshline_polici
 
 	GIVEN("A meshline policy manager and some meshline policies") {
 		Wrapper w(t);
-		w.params.proximity_limit = 1;
+		auto params_state = w.params.get_current_state();
+		params_state.proximity_limit = 1;
+		w.params.set_next_state(params_state);
 		Point e0(1, 1), e1(1, 3);
 		Edge e(XY, &e0, &e1, t);
 
@@ -353,31 +358,31 @@ SCENARIO("void MeshlinePolicyManager::detect_and_solve_too_close_meshline_polici
 		//       10,3          11,4
 
 		w.mpm.add_meshline_policy(
-			&e,
+			{ &e },
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
 			10);
 		w.mpm.add_meshline_policy(
-			&e,
+			{ &e },
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
 			10.2);
 		w.mpm.add_meshline_policy(
-			&e,
+			{ &e },
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
 			10.5);
 		w.mpm.add_meshline_policy(
-			&e,
+			{ &e },
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
 			11.1);
 		w.mpm.add_meshline_policy(
-			&e,
+			{ &e },
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
@@ -413,13 +418,14 @@ SCENARIO("void MeshlinePolicyManager::detect_intervals()", "[meshline_policy_man
 
 	class Wrapper {
 	public:
-		Params params;
+		GlobalParams params;
 		ConflictManager cm;
 		MeshlinePolicyManager mpm;
 
 		Wrapper(Timepoint* t)
-		: cm(t)
-		, mpm(params, t)
+		: params(t)
+		, cm(t)
+		, mpm(&params, t)
 		{
 			cm.init(&mpm);
 			mpm.init(&cm);
@@ -428,49 +434,51 @@ SCENARIO("void MeshlinePolicyManager::detect_intervals()", "[meshline_policy_man
 
 	GIVEN("A meshline policy manager and some meshline policies") {
 		Wrapper w(t);
-		w.params.proximity_limit = 1;
+		auto params_state = w.params.get_current_state();
+		params_state.proximity_limit = 1;
+		w.params.set_next_state(params_state);
 		Point e0(1, 1), e1(1, 3);
 		Edge e(XY, &e0, &e1, t);
 
 		w.mpm.add_meshline_policy(
-			&e,
+			{ &e },
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
 			10);
 		w.mpm.add_meshline_policy(
-			&e,
+			{ &e },
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
 			40);
 		w.mpm.add_meshline_policy(
-			&e,
+			{ &e },
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
 			30);
 		w.mpm.add_meshline_policy(
-			&e,
+			{ &e },
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
 			20);
 		w.mpm.add_meshline_policy(
-			&e,
+			{ &e },
 			X,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
 			30);
 		w.mpm.add_meshline_policy(
-			&e,
+			{ &e },
 			X,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
 			25,
 			false);
 		w.mpm.add_meshline_policy(
-			&e,
+			{ &e },
 			X,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
@@ -506,13 +514,14 @@ SCENARIO("void MeshlinePolicyManager::mesh()", "[meshline_policy_manager]") {
 
 	class Wrapper {
 	public:
-		Params params;
+		GlobalParams params;
 		ConflictManager cm;
 		MeshlinePolicyManager mpm;
 
 		Wrapper(Timepoint* t)
-		: cm(t)
-		, mpm(params, t)
+		: params(t)
+		, cm(t)
+		, mpm(&params, t)
 		{
 			cm.init(&mpm);
 			mpm.init(&cm);
@@ -521,38 +530,40 @@ SCENARIO("void MeshlinePolicyManager::mesh()", "[meshline_policy_manager]") {
 
 	GIVEN("A meshline policy manager and some meshline policies") {
 		Wrapper w(t);
-		w.params.proximity_limit = 1;
-		w.params.lmin = 2;
-		w.params.dmax = 4.0;
+		auto params_state = w.params.get_current_state();
+		params_state.proximity_limit = 1;
+		params_state.lmin = 2;
+		params_state.dmax = 4.0;
+		w.params.set_next_state(params_state);
 		Point e0(1, 1), e1(1, 3);
 		Edge e(XY, &e0, &e1, t);
 
 		w.mpm.add_meshline_policy(
-			&e,
+			{ &e },
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
 			10);
 		w.mpm.add_meshline_policy(
-			&e,
+			{ &e },
 			Y,
 			MeshlinePolicy::Policy::ONELINE,
 			MeshlinePolicy::Normal::NONE,
 			40);
 		w.mpm.add_meshline_policy(
-			&e,
+			{ &e },
 			Y,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::MAX,
 			30);
 		w.mpm.add_meshline_policy(
-			&e,
+			{ &e },
 			Y,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::MIN,
 			25);
 		w.mpm.add_meshline_policy(
-			&e,
+			{ &e },
 			Y,
 			MeshlinePolicy::Policy::ONELINE,
 			MeshlinePolicy::Normal::NONE,

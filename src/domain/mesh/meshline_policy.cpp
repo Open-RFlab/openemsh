@@ -19,7 +19,7 @@ MeshlinePolicy::MeshlinePolicy(
 		Axis const axis,
 		Policy const policy,
 		Normal normal,
-		Params& params,
+		GlobalParams* global_params,
 		Coord const coord,
 		Timepoint* t,
 		vector<IMeshLineOrigin*> const& origins,
@@ -28,13 +28,13 @@ MeshlinePolicy::MeshlinePolicy(
 : Originator(t, {
 	.is_enabled = is_enabled,
 	.res_factor = res_factor,
-	.d = params.dmax / res_factor,
+	.d = global_params->get_current_state().dmax / res_factor,
 	.origins = origins
 })
 , axis(axis)
 , policy(policy)
 , normal(normal)
-, params(params)
+, global_params(global_params)
 , coord(coord)
 {}
 

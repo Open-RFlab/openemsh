@@ -19,24 +19,24 @@ namespace domain {
 using namespace std;
 
 //******************************************************************************
-MeshlinePolicyManager::MeshlinePolicyManager(Params& params, Timepoint* t)
+MeshlinePolicyManager::MeshlinePolicyManager(GlobalParams* global_params, Timepoint* t)
 : Originator(t)
-, params(params)
+, global_params(global_params)
 , conflict_manager(nullptr)
 {}
 
 //******************************************************************************
 MeshlinePolicyManager::MeshlinePolicyManager(
-	Params& params,
+	GlobalParams* global_params,
 	AxisSpace<std::vector<std::shared_ptr<MeshlinePolicy>>>&& line_policies,
 	Timepoint* t)
 : Originator(t, { .line_policies = std::move(line_policies) })
-, params(params)
+, global_params(global_params)
 , conflict_manager(nullptr)
 {
 	for(auto const& axis : AllAxis)
 		for(auto const& policy : get_current_state().line_policies[axis])
-			Caretaker::singleton().take_care_of(policy);
+			get_caretaker().take_care_of(policy);
 }
 
 //******************************************************************************
@@ -46,7 +46,7 @@ void MeshlinePolicyManager::init(ConflictManager* conflict_manager) {
 
 //******************************************************************************
 MeshlinePolicy* MeshlinePolicyManager::add_meshline_policy(
-		IMeshLineOrigin* origin,
+		vector<IMeshLineOrigin*> origins,
 		Axis const axis,
 		MeshlinePolicy::Policy const policy,
 		MeshlinePolicy::Normal const normal,
@@ -61,8 +61,8 @@ MeshlinePolicy* MeshlinePolicyManager::add_meshline_policy(
 	auto state = get_current_state();
 
 	auto const& line_policy = state.line_policies[axis].emplace_back(make_shared<MeshlinePolicy>(
-		axis, policy, normal, params, coord, t, vector<IMeshLineOrigin*> { origin }, is_enabled));
-	Caretaker::singleton().take_care_of(line_policy);
+		axis, policy, normal, global_params, coord, t, origins, is_enabled));
+	get_caretaker().take_care_of(line_policy);
 
 	set_given_or_next_state(state, t);
 	return line_policy.get();
@@ -104,7 +104,7 @@ optional<array<MeshlinePolicy*, 2>> detect_closest_meshline_policies(
 //******************************************************************************
 void MeshlinePolicyManager::detect_and_solve_too_close_meshline_policies(Axis const axis) {
 	while(true) {
-		auto closest = detect_closest_meshline_policies(create_view(get_current_state().line_policies[axis]), params.proximity_limit);
+		auto closest = detect_closest_meshline_policies(create_view(get_current_state().line_policies[axis]), global_params->get_current_state().proximity_limit);
 		if(!closest)
 			break;
 
@@ -132,8 +132,8 @@ void MeshlinePolicyManager::detect_intervals(Axis const axis) {
 
 	for(size_t i = 1; i < dimension.size(); ++i) {
 		auto const& interval = state.intervals[axis].emplace_back(make_shared<Interval>(
-			dimension[i-1], dimension[i], axis, params, t));
-		Caretaker::singleton().take_care_of(interval);
+			dimension[i-1], dimension[i], axis, global_params, t));
+		get_caretaker().take_care_of(interval);
 
 		// TODO add links MLP -> I ?
 	}

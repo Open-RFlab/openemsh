@@ -7,6 +7,7 @@
 #pragma once
 
 #include <filesystem>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <set>
@@ -24,8 +25,7 @@ namespace app {
 class OpenEMSH {
 public:
 	struct Params final
-	: public domain::Params
-	, public ParserFromCsx::Params
+	: public ParserFromCsx::Params
 	, public SerializerToCsx::Params
 	{
 		std::filesystem::path input;
@@ -48,6 +48,8 @@ public:
 		bool with_step_detect_and_solve_too_close_meshline_policies = true;
 		bool with_step_detect_intervals = true;
 		bool with_step_mesh = true;
+
+		std::function<void (domain::Params&)> override_from_cli;
 	};
 
 	explicit OpenEMSH(Params params);

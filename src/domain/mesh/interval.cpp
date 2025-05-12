@@ -42,10 +42,10 @@ Coord calc_h(Coord const& a, Coord const& b) noexcept {
 }
 
 //******************************************************************************
-Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Params& params, Timepoint* t)
+Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, GlobalParams* global_params, Timepoint* t)
 : Originator(t, {
-	.dmax = params.dmax,
-	.before = Side(before, params.lmin, params.lambda, calc_h(before->coord, after->coord), t, [before](double d) noexcept {
+	.dmax = global_params->get_current_state().dmax,
+	.before = Side(before, global_params->get_current_state().lmin, global_params->get_current_state().lambda, calc_h(before->coord, after->coord), t, [before](double d) noexcept {
 		switch(before->policy) {
 		case MeshlinePolicy::Policy::ONELINE: return 0.0;
 		case MeshlinePolicy::Policy::HALFS: return d / 2.0;
@@ -62,7 +62,7 @@ Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Par
 		default: unreachable();
 		}
 	}),
-	.after = Side(after, params.lmin, params.lambda, calc_h(before->coord, after->coord), t, [after](double d) noexcept {
+	.after = Side(after, global_params->get_current_state().lmin, global_params->get_current_state().lambda, calc_h(before->coord, after->coord), t, [after](double d) noexcept {
 		switch(after->policy) {
 		case MeshlinePolicy::Policy::ONELINE: return 0.0;
 		case MeshlinePolicy::Policy::HALFS: return d / 2.0;
@@ -80,7 +80,7 @@ Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Par
 		}
 	})
 })
-, params(params)
+, global_params(global_params)
 , axis(axis)
 , h(calc_h(before->coord, after->coord))
 , m(mid(before->coord, after->coord))

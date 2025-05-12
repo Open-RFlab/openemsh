@@ -19,22 +19,22 @@ using namespace domain;
 //******************************************************************************
 SCENARIO("void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManager& line_policy_manager)", "[conflict_too_close_meshline_policies]") {
 	Timepoint* t = Caretaker::singleton().get_history_root();
-	Params params;
-	MeshlinePolicyManager mpm(params, t);
+	GlobalParams params(t);
+	MeshlinePolicyManager mpm(&params, t);
 
 	GIVEN("A conflict between HALFS and HALFS meshline policies") {
 		MeshlinePolicy a(
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
-			params,
+			&params,
 			10,
 			t);
 		MeshlinePolicy b(
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
-			params,
+			&params,
 			11,
 			t);
 		ConflictTooCloseMeshlinePolicies x(Y, &a, &b, t);
@@ -59,14 +59,14 @@ SCENARIO("void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManage
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
-			params,
+			&params,
 			10,
 			t);
 		MeshlinePolicy b(
 			Y,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::MIN,
-			params,
+			&params,
 			11,
 			t);
 		ConflictTooCloseMeshlinePolicies x(Y, &a, &b, t);
@@ -102,28 +102,28 @@ SCENARIO("void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManage
 			Y,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::MIN,
-			params,
+			&params,
 			10,
 			t);
 		MeshlinePolicy b(
 			Y,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::MAX,
-			params,
+			&params,
 			11,
 			t);
 		MeshlinePolicy c(
 			X,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::MIN,
-			params,
+			&params,
 			10,
 			t);
 		MeshlinePolicy d(
 			X,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::MAX,
-			params,
+			&params,
 			11,
 			t);
 		ConflictTooCloseMeshlinePolicies x(Y, &a, &b, t);
@@ -159,56 +159,56 @@ SCENARIO("void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManage
 			Y,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::MIN,
-			params,
+			&params,
 			10,
 			t);
 		MeshlinePolicy b(
 			Y,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::MIN,
-			params,
+			&params,
 			11,
 			t);
 		MeshlinePolicy c(
 			Y,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::MAX,
-			params,
+			&params,
 			10,
 			t);
 		MeshlinePolicy d(
 			Y,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::MAX,
-			params,
+			&params,
 			11,
 			t);
 		MeshlinePolicy e(
 			X,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::MIN,
-			params,
+			&params,
 			10,
 			t);
 		MeshlinePolicy f(
 			X,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::MIN,
-			params,
+			&params,
 			11,
 			t);
 		MeshlinePolicy g(
 			X,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::MAX,
-			params,
+			&params,
 			10,
 			t);
 		MeshlinePolicy h(
 			X,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::MAX,
-			params,
+			&params,
 			11,
 			t);
 		ConflictTooCloseMeshlinePolicies w(Y, &a, &b, t);
@@ -266,14 +266,14 @@ SCENARIO("void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManage
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
-			params,
+			&params,
 			10,
 			t);
 		MeshlinePolicy b(
 			X,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
-			params,
+			&params,
 			11,
 			t);
 		ConflictTooCloseMeshlinePolicies x(X, &a, &b, t);
@@ -291,21 +291,21 @@ SCENARIO("void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManage
 			Y,
 			MeshlinePolicy::Policy::HALFS,
 			MeshlinePolicy::Normal::NONE,
-			params,
+			&params,
 			10,
 			t);
 		MeshlinePolicy b(
 			Y,
 			MeshlinePolicy::Policy::THIRDS,
 			MeshlinePolicy::Normal::NONE,
-			params,
+			&params,
 			10,
 			t);
 		MeshlinePolicy c(
 			Y,
 			MeshlinePolicy::Policy::ONELINE,
 			MeshlinePolicy::Normal::NONE,
-			params,
+			&params,
 			11,
 			t);
 		ConflictTooCloseMeshlinePolicies x(X, &a, &c, t);

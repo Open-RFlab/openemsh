@@ -286,7 +286,7 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }}), t));
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 2 }, { 2, 3 }, { 3, 3 }, { 3, 2 }}), t));
-				b = std::make_unique<Board>(std::move(tmp), t);
+				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
 			THEN("4 EDGE_IN_POLYGON conflicts should be registered") {
@@ -363,7 +363,7 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 2 }, { 3, 2 }, { 3, 4 }, { 1, 4 }}), t));
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 1 }, { 4, 1 }, { 4, 3 }, { 2, 3 }}), t));
-				b = std::make_unique<Board>(std::move(tmp), t);
+				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
 			THEN("4 EDGE_IN_POLYGON conflicts should be registered") {
@@ -441,7 +441,7 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }}), t));
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 3 }, { 2, 3 }}), t));
-				b = std::make_unique<Board>(std::move(tmp), t);
+				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
 			THEN("4 EDGE_IN_POLYGON conflicts should be registered") {
@@ -519,7 +519,7 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }}), t));
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 3 }, { 3, 2 }, { 5, 4 }, { 4, 5 }}), t));
-				b = std::make_unique<Board>(std::move(tmp), t);
+				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
 			THEN("5 EDGE_IN_POLYGON conflicts should be registered") {
@@ -610,7 +610,7 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }}), t));
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }}), t));
-				b = std::make_unique<Board>(std::move(tmp), t);
+				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
 			THEN("2 EDGE_IN_POLYGON conflicts should be registered") {
@@ -663,7 +663,7 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 2 }, { 2, 2 }, { 2, 3 }, { 1, 3 }}), t));
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }}), t));
-				b = std::make_unique<Board>(std::move(tmp), t);
+				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
 			THEN("There should not be any conflict registered") {
@@ -677,7 +677,7 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 2, 1 }}), t));
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }, { 4, 3 }}), t));
-				b = std::make_unique<Board>(std::move(tmp), t);
+				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
 			THEN("There should not be any conflict registered") {
@@ -698,7 +698,7 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 					{ 5, 11 }, { 4, 11.3 }, { 3, 10 }, { 2, 10 },
 					{ 2.3, 12 }, { 6, 11.3 }, { 6, 9 }, { 10, 10 },
 					{ 11, 9 }, { 9, 7 }, { 10, 6.3 }, { 10, 5 }}), t));
-				b = std::make_unique<Board>(std::move(tmp), t);
+				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
 			THEN("12 EDGE_IN_POLYGON conflicts should be registered") {
@@ -832,7 +832,7 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }}), t));
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 0.5, 3 }, { 2, 3 }, { 2, 4 }, { 0.5, 4 }}), t));
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 3, 5 }, { 2, 5 }, { 2, 6 }, { 3, 6 }}), t));
-				b = std::make_unique<Board>(std::move(tmp), t);
+				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_colinear_edges();
 			THEN("A COLINEAR_EDGES conflict should be registered") {
@@ -875,7 +875,7 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }}), t));
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 3, 0.5 }, { 3, 2 }, { 4, 2 }, { 4, 0.5 }}), t));
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 5, 3 }, { 5, 2 }, { 6, 2 }, { 6, 3 }}), t));
-				b = std::make_unique<Board>(std::move(tmp), t);
+				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_colinear_edges();
 			THEN("A COLINEAR_EDGES conflict should be registered") {
@@ -918,7 +918,7 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 1, 2 }, { 2, 2 }}), t));
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }}), t));
 				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 5, 5 }, { 5, 6 }, { 6, 6 }}), t));
-				b = std::make_unique<Board>(std::move(tmp), t);
+				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_colinear_edges();
 			THEN("There should not be any conflict registered") {
@@ -939,7 +939,7 @@ SCENARIO("void Board::detect_non_conflicting_edges()", "[board]") {
 			PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
 			tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 1, 2 }, { 2, 2 }}), t));
 			tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }}), t));
-			b = std::make_unique<Board>(std::move(tmp), t);
+			b = std::make_unique<Board>(std::move(tmp), Params(), t);
 		}
 		REQUIRE(b->get_current_state().edges[XY].size() == 6);
 		auto state_e0 = b->get_current_state().edges[XY][0]->get_current_state();

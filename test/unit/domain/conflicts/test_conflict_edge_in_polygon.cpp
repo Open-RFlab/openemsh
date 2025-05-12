@@ -161,8 +161,8 @@ SCENARIO("void sort_overlaps_by_p0_by_vector_orientation(vector<Overlap>& overla
 //******************************************************************************
 SCENARIO("void ConflictEdgeInPolygon::auto_solve(MeshlinePolicyManager&)", "[conflict_edge_in_polygon]") {
 	Timepoint* t = Caretaker::singleton().get_history_root();
-	Params params;
-	MeshlinePolicyManager mpm(params, t);
+	GlobalParams params(t);
+	MeshlinePolicyManager mpm(&params, t);
 	GIVEN("A conflict about a vertical edge partially covered by some polygons (with a gap)") {
 		Point e0(1, 1), e1(8, 1);
 		Edge e(XY, &e0, &e1, t);

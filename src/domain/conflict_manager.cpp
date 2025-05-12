@@ -79,7 +79,7 @@ void ConflictManager::add_colinear_edges(Edge* a, Edge* b) {
 
 			auto const& conflict = state.all_colinear_edges[axis.value()].emplace_back(
 				make_shared<ConflictColinearEdges>(axis.value(), a, b, t));
-			Caretaker::singleton().take_care_of(conflict);
+			get_caretaker().take_care_of(conflict);
 			state_a.conflicts.push_back(conflict.get());
 			state_b.conflicts.push_back(conflict.get());
 
@@ -150,7 +150,7 @@ void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, Range const
 
 		auto const& conflict = state.all_edge_in_polygons[plane].emplace_back(
 			make_shared<ConflictEdgeInPolygon>(plane, a, polygon, range, b, t));
-		Caretaker::singleton().take_care_of(conflict);
+		get_caretaker().take_care_of(conflict);
 		state_a.conflicts.push_back(conflict.get());
 //		b->conflicts.push_back(conflict); // TODO needed?
 		state_p.conflicts.push_back(conflict.get());
@@ -184,7 +184,7 @@ ConflictTooCloseMeshlinePolicies* ConflictManager::add_too_close_meshline_polici
 
 	auto const& conflict = state.all_too_close_meshline_policies[axis].emplace_back(
 		make_shared<ConflictTooCloseMeshlinePolicies>(axis, a, b, t));
-	Caretaker::singleton().take_care_of(conflict);
+	get_caretaker().take_care_of(conflict);
 	state_a.conflicts.push_back(conflict.get());
 	state_b.conflicts.push_back(conflict.get());
 	state_a.is_enabled = false;

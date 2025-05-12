@@ -16,6 +16,7 @@ namespace domain {
 
 //******************************************************************************
 struct ConflictTooCloseMeshlinePoliciesState final : public ConflictState {
+	bool is_enabled;
 };
 
 //******************************************************************************

@@ -44,6 +44,8 @@ class Board
 : public Originator<BoardState>
 , public Visitable<Board, EntityVisitor>
 , public Entity {
+public:
+	std::shared_ptr<GlobalParams> global_params;
 private:
 	std::shared_ptr<ConflictManager> conflict_manager;
 	std::shared_ptr<MeshlinePolicyManager> line_policy_manager;
@@ -58,20 +60,20 @@ public:
 		void add_polygon(Plane plane, Polygon::Type type, std::string const& name, std::vector<std::unique_ptr<Point const>>&& points);
 		void add_polygon_from_box(Plane plane, Polygon::Type type, std::string const& name, Point const p1, Point const p3);
 
-		[[nodiscard]] std::shared_ptr<Board> build();
+		[[nodiscard]] std::shared_ptr<Board> build(Params&& params = Params());
 
 	private:
-		Params params;
 		PlaneSpace<std::vector<std::shared_ptr<Polygon>>> polygons;
-		AxisSpace<std::vector<std::shared_ptr<MeshlinePolicy>>> line_policies;
+		AxisSpace<std::vector<std::function<void (Board*, Timepoint*)>>> fixed_meshline_policy_creators;
 	};
 
-	Params params;
+	AxisSpace<std::vector<std::function<void (Board*, Timepoint*)>>> const fixed_meshline_policy_creators; // Meant to delay MeshlinePolicies creation at Step time instead of Parse time.
 
-	Board(PlaneSpace<std::vector<std::shared_ptr<Polygon>>>&& polygons, Timepoint* t);
+	Board(PlaneSpace<std::vector<std::shared_ptr<Polygon>>>&& polygons, Params&& params, Timepoint* t);
 	Board(
 		PlaneSpace<std::vector<std::shared_ptr<Polygon>>>&& polygons,
-		AxisSpace<std::vector<std::shared_ptr<MeshlinePolicy>>>&& line_policies,
+		AxisSpace<std::vector<std::function<void (Board*, Timepoint*)>>>&& fixed_meshline_policy_creators,
+		Params&& params,
 		Timepoint* t);
 
 	/// Mesh resolution independant detection tasks
@@ -79,10 +81,12 @@ public:
 	void detect_edges_in_polygons(Plane const plane);
 	void detect_colinear_edges(Plane plane);
 	void detect_non_conflicting_edges(Plane const plane);
+	void add_fixed_meshline_policies(Axis axis);
 
 	void detect_edges_in_polygons();
 	void detect_colinear_edges();
 	void detect_non_conflicting_edges();
+	void add_fixed_meshline_policies();
 
 	/// Mesh resolution dependant detection tasks
 	///*************************************************************************

@@ -34,6 +34,7 @@ public:
 
 	[[nodiscard]] static std::shared_ptr<domain::Board> run(std::filesystem::path const& input);
 	[[nodiscard]] static std::shared_ptr<domain::Board> run(std::filesystem::path const& input, Params params);
+	[[nodiscard]] static std::shared_ptr<domain::Board> run(std::filesystem::path const& input, Params params, std::function<void (domain::Params&)> const& override_domain_params);
 	[[nodiscard]] static std::shared_ptr<domain::Board> run(std::filesystem::path const& input, std::vector<std::string> ground_names, Params params);
 
 private:
@@ -45,7 +46,7 @@ private:
 
 	std::filesystem::path const input;
 	Params const parser_params;
-	domain::Params params;
+	domain::Params domain_params; // Created from defaults + CSX.
 
 //	std::vector<std::unique_ptr<Polygon>> polygons;
 	class Pimpl;

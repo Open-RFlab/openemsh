@@ -61,7 +61,7 @@ void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manage
 	auto const add_policy = [&, this](MeshlinePolicy::Policy policy, MeshlinePolicy::Normal normal) {
 		auto [t, state] = this->make_next_state();
 		state.meshline_policy = line_policy_manager.add_meshline_policy(
-			this,
+			{ this },
 			axis,
 			policy,
 			normal,

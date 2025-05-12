@@ -25,6 +25,8 @@ optional<Step> next(Step step) {
 	case Step::DETECT_CONFLICT_CE:
 		return Step::DETECT_NON_CONFLICTING_EDGES;
 	case Step::DETECT_NON_CONFLICTING_EDGES:
+		return Step::ADD_FIXED_MLP;
+	case Step::ADD_FIXED_MLP:
 		return Step::SOLVE_ALL_EIP;
 	case Step::SOLVE_ALL_EIP:
 		return Step::SOLVE_ALL_CE;
@@ -58,8 +60,7 @@ domain::Board const& OpenEMSH::get_board() const {
 
 //******************************************************************************
 void OpenEMSH::parse() {
-	board = ParserFromCsx::run(params.input, static_cast<ParserFromCsx::Params const&>(params));
-	board->params = static_cast<domain::Params const&>(params);
+	board = ParserFromCsx::run(params.input, static_cast<ParserFromCsx::Params const&>(params), params.override_from_cli);
 }
 
 //******************************************************************************
@@ -99,6 +100,10 @@ void OpenEMSH::run(std::set<Step> const& steps) {
 		annotate(Step::DETECT_NON_CONFLICTING_EDGES);
 		board->detect_non_conflicting_edges();
 	}
+	if(steps.contains(Step::ADD_FIXED_MLP)) {
+		annotate(Step::ADD_FIXED_MLP);
+		board->add_fixed_meshline_policies();
+	}
 	if(steps.contains(Step::SOLVE_ALL_EIP)) {
 		annotate(Step::SOLVE_ALL_EIP);
 		board->auto_solve_all_edge_in_polygon();
@@ -119,6 +124,8 @@ void OpenEMSH::run(std::set<Step> const& steps) {
 		annotate(Step::MESH);
 		board->mesh();
 	}
+
+	Caretaker::singleton().remember_current_timepoint();
 }
 
 //******************************************************************************
@@ -127,6 +134,7 @@ void OpenEMSH::run_all_steps() {
 		Step::DETECT_CONFLICT_EIP,
 		Step::DETECT_CONFLICT_CE,
 		Step::DETECT_NON_CONFLICTING_EDGES,
+		Step::ADD_FIXED_MLP,
 		Step::SOLVE_ALL_EIP,
 		Step::SOLVE_ALL_CE,
 		Step::DETECT_AND_SOLVE_TCMLP,

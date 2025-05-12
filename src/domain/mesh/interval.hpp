@@ -30,13 +30,16 @@ class MeshlinePolicy;
 
 struct IntervalState;
 
+// TODO BUG Z mesh populated only by ONELINE/NONE/D=0 MLPs does not converge.
+// Is it because of D=0 ?
+
 //******************************************************************************
 class Interval
 : public Originator<IntervalState>
 , public Visitable<Interval, EntityVisitor>
 , public Entity {
 private:
-	Params& params;
+	GlobalParams* global_params;
 
 public:
 	Axis const axis;
@@ -56,7 +59,7 @@ public:
 	Coord const h;    ///< Distance between a side's coord and the middle m.
 	Coord const m;    ///< Middle between both sides' coord.
 
-	Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Params& params, Timepoint* t);
+	Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, GlobalParams* global_params, Timepoint* t);
 
 	void auto_solve_d();
 	void auto_solve_lambda();

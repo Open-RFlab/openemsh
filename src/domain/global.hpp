@@ -8,6 +8,8 @@
 
 #include <cstddef>
 
+#include "utils/state_management.hpp"
+
 namespace domain {
 
 //******************************************************************************
@@ -18,6 +20,13 @@ struct Params {
 	double lambda = 2;
 	std::size_t lmin = 10;
 	double dmax = 2.5;
+};
+
+//******************************************************************************
+class GlobalParams : public Originator<Params> {
+public:
+	explicit GlobalParams(Timepoint* t) : Originator(t) {}
+	GlobalParams(Params params, Timepoint* t) : Originator(t, std::move(params)) {}
 };
 
 inline double equality_tolerance = 1e-8;

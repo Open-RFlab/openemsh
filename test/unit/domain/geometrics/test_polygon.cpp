@@ -14,7 +14,7 @@
 #include "domain/geometrics/polygon.hpp"
 
 /// @test Bounding2D detect_bounding(std::vector<std::unique_ptr<Point const>> const& points) noexcept
-/// @test std::vector<std::unique_ptr<Edge>> detect_edges(std::vector<std::unique_ptr<Point const>> const& points, Plane plane)
+/// @test std::vector<std::shared_ptr<Edge>> detect_edges(std::vector<std::unique_ptr<Point const>> const& points, Plane plane)
 /// @test template<class T> Polygon::Rotation detect_rotation(T& points) noexcept
 /// @test void Polygon::detect_edge_normal() noexcept
 /// @test relation::PolygonPoint Polygon::relation_to(Point const* point) const noexcept
@@ -36,11 +36,11 @@ SCENARIO("Bounding2D detect_bounding(std::vector<std::unique_ptr<Point const>> c
 }
 
 //******************************************************************************
-SCENARIO("std::vector<std::unique_ptr<Edge>> detect_edges(std::vector<std::unique_ptr<Point const>> const& points, Plane plane)", "[polygon]") {
+SCENARIO("std::vector<std::shared_ptr<Edge>> detect_edges(std::vector<std::unique_ptr<Point const>> const& points, Plane plane)", "[polygon]") {
 	Timepoint t;
 	GIVEN("A vector of points") {
 		std::vector<std::unique_ptr<Point const>> points(from_init_list<Point>({{ 1, 2 }, { 1, 4 }, { 4, 4 }}));
-		std::vector<std::unique_ptr<Edge>> edges(detect_edges(points, XY, &t));
+		std::vector<std::shared_ptr<Edge>> edges(detect_edges(points, XY, &t));
 		THEN("Should return a vector of edges") {
 			REQUIRE(edges.size() == points.size());
 			AND_THEN("First edge should be between last point and first point") {

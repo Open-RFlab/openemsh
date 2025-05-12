@@ -640,19 +640,19 @@ MeshlinePolicy* b)", "[conflict_manager]") {
 	GIVEN("A conflict manager and some meshline policies") {
 		ConflictManager cm(t);
 		WHEN("Two meshline policies of different axis are reported") {
-			Params p;
+			GlobalParams p(t);
 			MeshlinePolicy a(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				5,
 				t);
 			MeshlinePolicy b(
 				X,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				5,
 				t);
 			THEN("No conflict should be registered") {
@@ -662,19 +662,19 @@ MeshlinePolicy* b)", "[conflict_manager]") {
 		}
 
 		WHEN("Two meshline policies of same axis are reported") {
-			Params p;
+			GlobalParams p(t);
 			MeshlinePolicy a(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				5,
 				t);
 			MeshlinePolicy b(
 				Y,
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE,
-				p,
+				&p,
 				5,
 				t);
 			auto* c0 = cm.add_too_close_meshline_policies(&a, &b);
@@ -692,14 +692,14 @@ MeshlinePolicy* b)", "[conflict_manager]") {
 					Y,
 					MeshlinePolicy::Policy::HALFS,
 					MeshlinePolicy::Normal::NONE,
-					p,
+					&p,
 					5,
 					t);
 				MeshlinePolicy e(
 					Y,
 					MeshlinePolicy::Policy::HALFS,
 					MeshlinePolicy::Normal::NONE,
-					p,
+					&p,
 					5,
 					t);
 				auto* c1 = cm.add_too_close_meshline_policies(&d, &e);
@@ -719,7 +719,7 @@ MeshlinePolicy* b)", "[conflict_manager]") {
 					Y,
 					MeshlinePolicy::Policy::HALFS,
 					MeshlinePolicy::Normal::NONE,
-					p,
+					&p,
 					5,
 					t);
 				auto* c1 = cm.add_too_close_meshline_policies(&a, &d);

@@ -77,8 +77,20 @@ struct FutureConditional : CLI::Validator {
 };
 
 //******************************************************************************
+template<auto Member>
+auto make_overrider(auto& overrides_collector) {
+	return [&](auto const& value) { // This is CLI::add_option_function callback.
+		overrides_collector.emplace_back(
+			[=](auto& to_override) { // This is to be executed to actually apply override.
+				to_override.*Member = value;
+			});
+	};
+}
+
+//******************************************************************************
 app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app::OpenEMSH::Params params;
+	vector<function<void (domain::Params&)>> domain_overrides;
 
 //	auto fmt = make_shared<CliFormatter>();
 	CLI::App app("OpenEMSH mesher", argv[0]);
@@ -115,14 +127,41 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 //	app.add_flag("--step-detect-intervals", params.with_step_detect_intervals, "Do intervals detection step.")->group("Processing options");
 //	app.add_flag("--step-mesh", params.with_step_mesh, "Do intervals meshing step.")->group("Processing options");
 
-	//Mesher options
-	app.add_option("--metal_res", params.metal_res, "Desired mesh resolution for metal regions.")->group("Mesher options");
-	app.add_option("--air_res", params.metal_res, "Desired mesh resolution for air regions.")->group("Mesher options");
-	app.add_option("--substrate_res", params.substrate_res, "Desired mesh resolution for substrate / ground plane regions.")->group("Mesher options");
-	app.add_option("--proximity_limit", params.proximity_limit, "Distance under which two adjacent lines trigger a conflict.")->group("Mesher options");
-//	app.add_option("--dmax", params.dmax, "Maximum distance between two adjacent lines.")->group("Mesher options"); // TODO is in fact mres / sres / ares
-	app.add_option("--lmin", params.lmin, "Minimum line number per interval half.")->group("Mesher options");
-	app.add_option("--lambda", params.lambda, "Smoothness factor ]1;2].")->group("Mesher options")->check(BoundExclusiveInclusive(1.0, 2.0));
+	// Mesher options
+	app.add_option_function<decltype(domain::Params::metal_res)>("--metal_res",
+		make_overrider<&domain::Params::metal_res>(domain_overrides),
+		"Desired mesh resolution for metal regions."
+	)->group("Mesher options");
+
+//	app.add_option_function<decltype(domain::Params::air_res)>("--air_res",
+//		make_overrider<&domain::Params::air_res>(domain_overrides),
+//		"Desired mesh resolution for air regions."
+//	)->group("Mesher options");
+
+	app.add_option_function<decltype(domain::Params::substrate_res)>("--substrate_res",
+		make_overrider<&domain::Params::substrate_res>(domain_overrides),
+		"Desired mesh resolution for substrate / ground plane regions."
+	)->group("Mesher options");
+
+	app.add_option_function<decltype(domain::Params::proximity_limit)>("--proximity_limit",
+		make_overrider<&domain::Params::proximity_limit>(domain_overrides),
+		"Distance under which two adjacent lines trigger a conflict."
+	)->group("Mesher options");
+
+	app.add_option_function<decltype(domain::Params::dmax)>("--dmax",
+		make_overrider<&domain::Params::dmax>(domain_overrides),
+		"Maximum distance between two adjacent lines."
+	)->group("Mesher options"); // TODO is in fact mres / sres / ares
+
+	app.add_option_function<decltype(domain::Params::lmin)>("--lmin",
+		make_overrider<&domain::Params::lmin>(domain_overrides),
+		"Minimum line number per interval half."
+	)->group("Mesher options");
+
+	app.add_option_function<decltype(domain::Params::lambda)>("--lambda",
+		make_overrider<&domain::Params::lambda>(domain_overrides),
+		"Smoothness factor ]1;2]."
+	)->group("Mesher options")->check(BoundExclusiveInclusive(1.0, 2.0));
 
 	app.add_flag("--no-x", [&params](size_t) { params.with_axis_x = false; }, "Don't include X axis meshlines in output.")->group("Output options");
 	app.add_flag("--no-y", [&params](size_t) { params.with_axis_y = false; }, "Don't include Y axis meshlines in output.")->group("Output options");
@@ -140,6 +179,11 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 		app.exit(e);
 		exit(EXIT_FAILURE);
 	}
+
+	params.override_from_cli = [domain_overrides](domain::Params& to_override) {
+		for(auto const& apply : domain_overrides)
+			apply(to_override);
+	};
 
 	return params;
 }

@@ -36,20 +36,20 @@ struct MeshlinePolicyManagerState final {
 class MeshlinePolicyManager // TODO MeshlineManager
 : public Originator<MeshlinePolicyManagerState> {
 private:
-	Params& params;
+	GlobalParams* global_params;
 	ConflictManager* conflict_manager;
 
 public:
-	MeshlinePolicyManager(Params& params, Timepoint* t);
+	MeshlinePolicyManager(GlobalParams* global_params, Timepoint* t);
 	MeshlinePolicyManager(
-		Params& params,
+		GlobalParams* global_params,
 		AxisSpace<std::vector<std::shared_ptr<MeshlinePolicy>>>&& line_policies,
 		Timepoint* t);
 
 	void init(ConflictManager* conflict_manager);
 
 	MeshlinePolicy* add_meshline_policy(
-		IMeshLineOrigin* origin,
+		std::vector<IMeshLineOrigin*> origins,
 		Axis const axis,
 		MeshlinePolicy::Policy const policy,
 		MeshlinePolicy::Normal const normal,

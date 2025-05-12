@@ -33,9 +33,11 @@ SCENARIO("string SerializerToPlantuml::run(Board& board)", "[serializer_to_plant
 
 	GIVEN("The Lpf complex structure") {
 		std::shared_ptr<Board> lpf = create_lpf();
-		lpf->params.lmin = 1;
-		lpf->params.proximity_limit = 0;
-//		lpf->params.dmax = 2;
+		auto params_state = lpf->global_params->get_current_state();
+		params_state.lmin = 1;
+		params_state.proximity_limit = 0;
+//		params_state.dmax = 2;
+		lpf->global_params->set_next_state(params_state);
 		auto_mesh(lpf);
 
 		WHEN("Serializing to Plantuml") {
@@ -58,9 +60,11 @@ SCENARIO("string SerializerToPlantuml::run(Board& board)", "[serializer_to_plant
 	// TODO This part might be better as 'e2e test' than 'unit test'.
 	GIVEN("The Stub complex structure") {
 		std::shared_ptr<Board> stub = create_stub();
-		stub->params.lmin = 0;
-		stub->params.proximity_limit = 0.1;
-//		stub->params.dmax = 2;
+		auto params_state = stub->global_params->get_current_state();
+		params_state.lmin = 0;
+		params_state.proximity_limit = 0.1;
+//		params_state.dmax = 2;
+		stub->global_params->set_next_state(params_state);
 		auto_mesh(stub);
 
 		WHEN("Serializing to Plantuml") {

@@ -11,13 +11,9 @@
 #include <string>
 #include <vector>
 
-//#include "conflict.hpp"
-//#include "edge.hpp"
-//#include "point.hpp"
 #include "domain/conflicts/i_conflict_origin.hpp"
 #include "domain/mesh/i_meshline_origin.hpp"
 #include "domain/utils/entity_visitor.hpp"
-#include "domain/global.hpp"
 #include "utils/entity.hpp"
 #include "utils/state_management.hpp"
 #include "bounding.hpp"
@@ -68,7 +64,7 @@ public:
 	/// edge[0] is between points[n] & points[0]
 	/// edge[x] is between points[x-1] & points[x]
 	///*************************************************************************
-	std::vector<std::unique_ptr<Edge>> const edges;
+	std::vector<std::shared_ptr<Edge>> const edges;
 
 	Polygon(Plane plane, Type type, std::string const& name, std::vector<std::unique_ptr<Point const>>&& points, Timepoint* t);
 	~Polygon();
@@ -87,6 +83,6 @@ extern template Polygon::Rotation detect_rotation(std::vector<Point const*> cons
 Bounding2D detect_bounding(std::vector<std::unique_ptr<Point const>> const& points) noexcept;
 
 //******************************************************************************
-std::vector<std::unique_ptr<Edge>> detect_edges(std::vector<std::unique_ptr<Point const>> const& points, Plane plane, Timepoint* t);
+std::vector<std::shared_ptr<Edge>> detect_edges(std::vector<std::unique_ptr<Point const>> const& points, Plane plane, Timepoint* t);
 
 } // namespace domain
