@@ -45,7 +45,7 @@ struct MeshlinePolicyState final
 /// a conflict between lines that can require a modification of other lines.
 ///*****************************************************************************
 class MeshlinePolicy
-: public Originator<MeshlinePolicyState>
+: public Originator<MeshlinePolicyState const>
 , public Visitable<MeshlinePolicy, EntityVisitor>
 , public Entity
 , public IConflictOrigin

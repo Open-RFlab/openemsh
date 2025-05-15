@@ -46,7 +46,7 @@ struct EdgeState final
 
 //******************************************************************************
 class Edge
-: public Originator<EdgeState>
+: public Originator<EdgeState const>
 , public Visitable<Edge, EntityVisitor>
 , public Entity
 , public Segment

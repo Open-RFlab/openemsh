@@ -41,7 +41,7 @@ struct BoardState final {
 
 //******************************************************************************
 class Board
-: public Originator<BoardState>
+: public Originator<BoardState const>
 , public Visitable<Board, EntityVisitor>
 , public Entity {
 public:

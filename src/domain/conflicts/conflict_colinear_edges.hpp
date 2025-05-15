@@ -23,7 +23,7 @@ struct ConflictColinearEdgesState final : public ConflictState {
 
 //******************************************************************************
 class ConflictColinearEdges
-: public Originator<ConflictColinearEdgesState>
+: public Originator<ConflictColinearEdgesState const>
 , public Visitable<ConflictColinearEdges, EntityVisitor>
 , public Conflict {
 public:

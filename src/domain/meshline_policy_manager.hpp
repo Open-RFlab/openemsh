@@ -34,7 +34,7 @@ struct MeshlinePolicyManagerState final {
 
 //******************************************************************************
 class MeshlinePolicyManager // TODO MeshlineManager
-: public Originator<MeshlinePolicyManagerState> {
+: public Originator<MeshlinePolicyManagerState const> {
 private:
 	GlobalParams* global_params;
 	ConflictManager* conflict_manager;

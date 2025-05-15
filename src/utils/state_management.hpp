@@ -13,6 +13,7 @@
 #include <optional>
 #include <ranges>
 #include <set>
+#include <type_traits>
 #include <vector>
 
 #include "tree_node.hpp"
@@ -134,7 +135,7 @@ public:
 	void set_state(Timepoint* t, State const& state) noexcept;
 	void set_next_state(State const& state) noexcept;
 	void set_given_or_next_state(State const& state, Timepoint* t = nullptr) noexcept;
-	std::tuple<Timepoint*, State> make_next_state() const noexcept;
+	std::tuple<Timepoint*, std::remove_const_t<State>> make_next_state() const noexcept;
 };
 
 #ifdef UNITTEST
@@ -258,11 +259,17 @@ Timepoint* Originator<State>::next_timepoint() const noexcept {
 //******************************************************************************
 template<typename State>
 void Originator<State>::set_state(Timepoint* t, State const& state) noexcept {
-	states[t] = state;
 	if(std::ranges::none_of(ordered_timepoints, [&](auto const& it) { return it == t; })) {
 		lazy_go.reset();
+		states.emplace(t, state);
 		ordered_timepoints.push_back(t);
 		current_timepoint = t;
+	} else {
+		if constexpr(!std::is_const_v<std::remove_reference_t<State>>) {
+//			states.insert_or_assign(t, state);
+			std::erase_if(states, [&](auto const& it) { return it.first == t; });
+			states.emplace(t, state);
+		}
 	}
 }
 
@@ -282,6 +289,6 @@ void Originator<State>::set_given_or_next_state(State const& state, Timepoint* t
 // setting the new state, eg. to propagate it to new objects.
 //******************************************************************************
 template<typename State>
-std::tuple<Timepoint*, State> Originator<State>::make_next_state() const noexcept {
+std::tuple<Timepoint*, std::remove_const_t<State>> Originator<State>::make_next_state() const noexcept {
 	return { next_timepoint(), get_current_state() };
 }

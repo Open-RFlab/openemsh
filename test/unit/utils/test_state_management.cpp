@@ -507,52 +507,78 @@ SCENARIO("template<typename State> void Originator<State>::set_state(Timepoint* 
 	GIVEN("An Originator") {
 		Timepoint t0;
 		Originator<StateA> a(&t0, { .str = "ac", .num = 56 });
+		Originator<StateA const> b(&t0, { .str = "ac", .num = 56 });
 
 		WHEN("Setting a new state") {
 			Timepoint t1;
 			a.set_state(&t1, { .str = "lp", .num = 8 });
+			b.set_state(&t1, { .str = "lp", .num = 8 });
 
 			THEN("The new state should be registered to the given Timepoint") {
 				REQUIRE(a.states.contains(&t1));
 				REQUIRE(a.states.at(&t1).str == "lp");
 				REQUIRE(a.states.at(&t1).num == 8);
+				REQUIRE(b.states.contains(&t1));
+				REQUIRE(b.states.at(&t1).str == "lp");
+				REQUIRE(b.states.at(&t1).num == 8);
 			}
 
 			THEN("The given Timepoint should be appended to timepoints order tracking") {
 				REQUIRE(a.ordered_timepoints.size() == 2);
 				REQUIRE(a.ordered_timepoints[0] == &t0);
 				REQUIRE(a.ordered_timepoints[1] == &t1);
+				REQUIRE(b.ordered_timepoints.size() == 2);
+				REQUIRE(b.ordered_timepoints[0] == &t0);
+				REQUIRE(b.ordered_timepoints[1] == &t1);
 			}
 
 			THEN("The current timepoint should be updated to the given Timepoint") {
 				REQUIRE(a.get_current_timepoint() == &t1);
+				REQUIRE(b.get_current_timepoint() == &t1);
 			}
 
 			THEN("The init timepoint should not change") {
 				REQUIRE(a.get_init_timepoint() == &t0);
+				REQUIRE(b.get_init_timepoint() == &t0);
 			}
 
 			AND_WHEN("Setting an existing state") {
 				a.set_state(&t0, { .str = "gh", .num = 444 });
+				b.set_state(&t0, { .str = "gh", .num = 444 });
 
-				THEN("The new state should be registered to the given Timepoint") {
-					REQUIRE(a.states.contains(&t0));
-					REQUIRE(a.states.at(&t0).str == "gh");
-					REQUIRE(a.states.at(&t0).num == 444);
+				AND_WHEN("State type is not const") {
+					THEN("The new state should be registered to the given Timepoint") {
+						REQUIRE(a.states.contains(&t0));
+						REQUIRE(a.states.at(&t0).str == "gh");
+						REQUIRE(a.states.at(&t0).num == 444);
+					}
+				}
+
+				AND_WHEN("State type is const") {
+					THEN("The new state should not be registered to the given Timepoint") {
+						REQUIRE(b.states.contains(&t0));
+						REQUIRE(b.states.at(&t0).str == "ac");
+						REQUIRE(b.states.at(&t0).num == 56);
+					}
 				}
 
 				THEN("The given Timepoint should not be appended to timepoints order tracking") {
 					REQUIRE(a.ordered_timepoints.size() == 2);
 					REQUIRE(a.ordered_timepoints[0] == &t0);
 					REQUIRE(a.ordered_timepoints[1] == &t1);
+					REQUIRE(b.ordered_timepoints.size() == 2);
+					REQUIRE(b.ordered_timepoints[0] == &t0);
+					REQUIRE(b.ordered_timepoints[1] == &t1);
 				}
 
 				THEN("The current timepoint should not be updated to the given Timepoint") {
 					REQUIRE(a.get_current_timepoint() == &t1);
+					REQUIRE(b.get_current_timepoint() == &t1);
 				}
 
 				THEN("The init timepoint should not change") {
 					REQUIRE(a.get_init_timepoint() == &t0);
+					REQUIRE(b.get_init_timepoint() == &t0);
 				}
 			}
 		}

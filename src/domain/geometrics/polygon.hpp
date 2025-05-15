@@ -32,7 +32,7 @@ struct PolygonState final : public IConflictOriginState {
 
 //******************************************************************************
 class Polygon
-: public Originator<PolygonState>
+: public Originator<PolygonState const>
 , public Visitable<Polygon, EntityVisitor>
 , public Entity
 , public IConflictOrigin

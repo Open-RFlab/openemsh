@@ -21,7 +21,7 @@ struct ConflictTooCloseMeshlinePoliciesState final : public ConflictState {
 
 //******************************************************************************
 class ConflictTooCloseMeshlinePolicies
-: public Originator<ConflictTooCloseMeshlinePoliciesState>
+: public Originator<ConflictTooCloseMeshlinePoliciesState const>
 , public Visitable<ConflictTooCloseMeshlinePolicies, EntityVisitor>
 , public Conflict {
 public:

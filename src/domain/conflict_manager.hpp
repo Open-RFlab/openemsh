@@ -39,7 +39,7 @@ struct ConflictManagerState final {
 /// Create / append conflicts regarding already existing conflicts
 ///*****************************************************************************
 class ConflictManager
-: public Originator<ConflictManagerState> {
+: public Originator<ConflictManagerState const> {
 private:
 	MeshlinePolicyManager* line_policy_manager;
 

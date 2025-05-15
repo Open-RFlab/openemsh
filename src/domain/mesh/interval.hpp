@@ -35,7 +35,7 @@ struct IntervalState;
 
 //******************************************************************************
 class Interval
-: public Originator<IntervalState>
+: public Originator<IntervalState const>
 , public Visitable<Interval, EntityVisitor>
 , public Entity {
 private:

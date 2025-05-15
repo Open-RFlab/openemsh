@@ -23,7 +23,7 @@ struct Params {
 };
 
 //******************************************************************************
-class GlobalParams : public Originator<Params> {
+class GlobalParams : public Originator<Params const> {
 public:
 	explicit GlobalParams(Timepoint* t) : Originator(t) {}
 	GlobalParams(Params params, Timepoint* t) : Originator(t, std::move(params)) {}

@@ -38,7 +38,7 @@ struct ConflictEdgeInPolygonState final : public ConflictState {
 
 //******************************************************************************
 class ConflictEdgeInPolygon
-: public Originator<ConflictEdgeInPolygonState>
+: public Originator<ConflictEdgeInPolygonState const>
 , public Visitable<ConflictEdgeInPolygon, EntityVisitor>
 , public Conflict {
 public:
