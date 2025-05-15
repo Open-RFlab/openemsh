@@ -747,12 +747,12 @@ SCENARIO("void Caretaker::garbage_collector() noexcept", "[utils][state_manageme
 		c.go_and_remember(g1);
 		c.go_without_remembering(e1);
 
-		auto const contains_originator = [](std::list<std::weak_ptr<IOriginator>> const& list, IOriginator* originator) {
+		auto const contains_originator = [](std::vector<std::weak_ptr<IOriginator>> const& list, IOriginator* originator) {
 			return std::ranges::any_of(list, [&](auto const& wptr) {
 				return wptr.expired() ? false : (wptr.lock().get() == originator);
 			});
 		};
-		auto const contains_expired = [](std::list<std::weak_ptr<IOriginator>> const& list) {
+		auto const contains_expired = [](std::vector<std::weak_ptr<IOriginator>> const& list) {
 			return std::ranges::any_of(list, [](auto const& wptr) {
 				return wptr.expired();
 			});
