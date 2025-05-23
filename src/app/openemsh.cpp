@@ -130,6 +130,7 @@ void OpenEMSH::run(std::set<Step> const& steps) {
 
 //******************************************************************************
 void OpenEMSH::run_all_steps() {
+	Caretaker::singleton().remember_current_timepoint();
 	run({
 		Step::DETECT_CONFLICT_EIP,
 		Step::DETECT_CONFLICT_CE,

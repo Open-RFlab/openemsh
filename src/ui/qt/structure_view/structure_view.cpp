@@ -43,12 +43,11 @@ static QPainterPath create_repair() {
 //******************************************************************************
 StructureView::StructureView(QWidget* parent)
 : QGraphicsView(parent)
-, scenes{{
-	new StructureScene(style_selector, this),
-	new StructureScene(style_selector, this),
-	new StructureScene(style_selector, this) }}
 , repair(std::make_unique<QGraphicsPathItem const>(create_repair()))
 , rotation(0)
+, displayed_plane(domain::XY)
+, board(nullptr)
+, current_timepoint(nullptr)
 {
 	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
@@ -59,6 +58,11 @@ StructureView::StructureView(QWidget* parent)
 
 //******************************************************************************
 StructureView::~StructureView() = default;
+
+//******************************************************************************
+void StructureView::init(domain::Board const* board) {
+	this->board = board;
+}
 
 //******************************************************************************
 void StructureView::drawForeground(QPainter* painter, QRectF const& rect) {
@@ -86,16 +90,20 @@ void StructureView::drawForeground(QPainter* painter, QRectF const& rect) {
 
 	// TODO wrap switch in set_scene()
 	painter->drawText(box_x, Qt::AlignHCenter | Qt::AlignVCenter, [this]() {
-		if(scene() == scenes[domain::Plane::YZ]) return "y";
-		if(scene() == scenes[domain::Plane::ZX]) return "z";
-		if(scene() == scenes[domain::Plane::XY]) return "x";
-		return "?";
+		switch(displayed_plane) {
+		case domain::Plane::YZ: return "y";
+		case domain::Plane::ZX: return "z";
+		case domain::Plane::XY: return "x";
+		default: return "?";
+		}
 	} ());
 	painter->drawText(box_y, Qt::AlignHCenter | Qt::AlignVCenter, [this]() {
-		if(scene() == scenes[domain::Plane::YZ]) return "z";
-		if(scene() == scenes[domain::Plane::ZX]) return "x";
-		if(scene() == scenes[domain::Plane::XY]) return "y";
-		return "?";
+		switch(displayed_plane) {
+		case domain::Plane::YZ: return "z";
+		case domain::Plane::ZX: return "x";
+		case domain::Plane::XY: return "y";
+		default: return "?";
+		}
 	} ());
 }
 
@@ -132,7 +140,14 @@ void StructureView::fit() {
 //******************************************************************************
 void StructureView::set_mesh_visibility(StructureScene::MeshVisibility mesh_visibility) {
 	for(auto const plane : domain::AllPlane)
-		scenes[plane]->set_mesh_visibility(mesh_visibility);
+		get_current_state().scenes[plane]->set_mesh_visibility(mesh_visibility);
+}
+
+//******************************************************************************
+void StructureView::set_display_plane(domain::Plane plane) {
+	displayed_plane = plane;
+	setScene(get_current_state().scenes[plane]);
+	centerOn(get_current_state().scenes[plane]->polygons->boundingRect().center());
 }
 
 //******************************************************************************
@@ -152,7 +167,43 @@ qreal StructureView::get_rotation() const {
 }
 
 //******************************************************************************
-void StructureView::populate(domain::Board const* board) {
+StructureState& StructureView::get_current_state() {
+	return states.at(current_timepoint);
+}
+
+//******************************************************************************
+void StructureView::make_current_state() {
+	if(!board)
+		return;
+
+	domain::PlaneSpace<StructureScene*> scenes = {{
+		new StructureScene(style_selector, this),
+		new StructureScene(style_selector, this),
+		new StructureScene(style_selector, this) }};
+
+	populate(scenes);
+
+	states.emplace(Caretaker::singleton().get_current_timepoint(), scenes);
+
+	go_to_current_state();
+}
+
+//******************************************************************************
+void StructureView::go_to_current_state() {
+	auto* t = Caretaker::singleton().get_current_timepoint();
+	if(current_timepoint != t) {
+		if(states.contains(t)) {
+			current_timepoint = t;
+			setScene(states.at(t).scenes[displayed_plane]);
+		} else {
+			make_current_state(); // Should only be called from MainWindow, because some signals/slots must be connected at this level
+		}
+	}
+	// TODO switch current viewed scene
+}
+
+//******************************************************************************
+void StructureView::populate(domain::PlaneSpace<StructureScene*> scenes) {
 	for(domain::Plane const plane : domain::AllPlane) {
 		scenes[plane]->clear_all();
 

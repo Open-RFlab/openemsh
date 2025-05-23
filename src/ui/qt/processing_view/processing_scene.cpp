@@ -31,11 +31,12 @@
 namespace ui::qt {
 
 //******************************************************************************
-ProcessingScene::ProcessingScene(QObject* parent)
+ProcessingScene::ProcessingScene(ProcessingStyleSelector& style_selector, QObject* parent)
 : QGraphicsScene(parent)
+, style_selector(style_selector)
 , is_select_counterparts_locked(false)
 , is_display_selected_chain_locked(false)
-, display_mode(DisplayMode::EVERYTHING)
+, display_mode(DisplayMode::SELECTED_CHAIN)
 , plane_displayed_on_structure_view(domain::XY)
 , axes_displayed_on_structure_view({ true, true })
 {
@@ -49,6 +50,11 @@ ProcessingScene::~ProcessingScene() {
 	disconnect(
 		this, &QGraphicsScene::selectionChanged,
 		this, &ProcessingScene::on_selectionChanged);
+}
+
+//******************************************************************************
+void ProcessingScene::init() {
+	set_display(display_mode);
 }
 
 //******************************************************************************

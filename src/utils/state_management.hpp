@@ -46,7 +46,6 @@ private:
 	std::optional<decltype(user_history)::reverse_iterator> user_history_browser;
 	std::map<Timepoint*, std::unique_ptr<IAnnotation>> annotations;
 
-	bool go_without_remembering(Timepoint* t) noexcept;
 	void stop_browsing_user_history() noexcept;
 
 public:
@@ -67,6 +66,7 @@ public:
 
 //	bool go_and_remember(Timepoint* t, bool overwrite_redoable_history = false) noexcept; // TODO
 	bool go_and_remember(Timepoint* t) noexcept;
+	bool go_without_remembering(Timepoint* t) noexcept;
 	void remember_current_timepoint() noexcept;
 
 	void pin_current_timepoint() noexcept;

@@ -18,7 +18,8 @@ namespace ui::qt {
 //******************************************************************************
 ProcessingView::ProcessingView(QWidget* parent)
 : QGraphicsView(parent)
-, processing_scene(new ProcessingScene(this))
+, board(nullptr)
+, current_timepoint(nullptr)
 {
 	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
@@ -26,14 +27,12 @@ ProcessingView::ProcessingView(QWidget* parent)
 	setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 	setDragMode(QGraphicsView::RubberBandDrag);
 	setRubberBandSelectionMode(Qt::IntersectsItemShape); //default
-
-	setScene(processing_scene);
-	connect(
-		processing_scene, &ProcessingScene::requires_fit,
-		this, &ProcessingView::fit);
-
 }
 
+//******************************************************************************
+void ProcessingView::init(domain::Board const* board) {
+	this->board = board;
+}
 //******************************************************************************
 void ProcessingView::wheelEvent(QWheelEvent* event) {
 	if(event->modifiers() & Qt::ControlModifier) {
@@ -55,73 +54,110 @@ void ProcessingView::wheelEvent(QWheelEvent* event) {
 
 //******************************************************************************
 void ProcessingView::fit() {
-	processing_scene->fit();
-	fitInView(processing_scene->sceneRect(), Qt::KeepAspectRatio);
+	get_current_state().scene->fit();
+	fitInView(get_current_state().scene->sceneRect(), Qt::KeepAspectRatio);
 }
 
 //******************************************************************************
-void ProcessingView::populate(domain::Board const* board) {
+ProcessingState& ProcessingView::get_current_state() {
+	return states.at(current_timepoint);
+}
+
+// TODO This seems to require to invoke some fit() at some point
+//******************************************************************************
+void ProcessingView::make_current_state() {
+	if(!board)
+		return;
+
+	auto* scene = new ProcessingScene(style_selector, this);
+	connect(
+		scene, &ProcessingScene::requires_fit,
+		this, &ProcessingView::fit);
+
+	populate(scene);
+	scene->init();
+
+	states.emplace(Caretaker::singleton().get_current_timepoint(), scene);
+	go_to_current_state();
+}
+
+//******************************************************************************
+void ProcessingView::go_to_current_state() {
+	auto* t = Caretaker::singleton().get_current_timepoint();
+	if(current_timepoint != t) {
+		if(states.contains(t)) {
+			current_timepoint = t;
+			setScene(states.at(t).scene);
+		} else {
+			make_current_state();
+		}
+	}
+	// TODO switch current viewed scene
+}
+
+//******************************************************************************
+void ProcessingView::populate(ProcessingScene* scene) {
 	for(domain::Plane const plane : domain::AllPlane) {
-		auto* processing_plane = processing_scene->add(plane);
+		auto* processing_plane = scene->add(plane);
 
 		for(auto const& polygon : board->get_polygons(plane)) {
-			auto* processing_polygon = processing_scene->add(polygon.get(), processing_plane);
+			auto* processing_polygon = scene->add(polygon.get(), processing_plane);
 
 			for(auto const& edge : polygon->edges)
-				processing_scene->add(edge.get(), processing_polygon);
+				scene->add(edge.get(), processing_polygon);
 
 			processing_polygon->fit();
 		}
 
 		for(auto const& conflict : board->get_conflicts_edge_in_polygons(plane))
-			processing_scene->add(conflict.get(), processing_plane);
+			scene->add(conflict.get(), processing_plane);
 
 		processing_plane->fit();
 	}
 
 	for(domain::Axis const axis : domain::AllAxis) {
-		auto* processing_axis = processing_scene->add(axis);
+		auto* processing_axis = scene->add(axis);
 
 		for(auto const& conflict : board->get_conflicts_colinear_edges(axis))
-			processing_scene->add(conflict.get(), processing_axis);
+			scene->add(conflict.get(), processing_axis);
 
 		for(auto const& conflict : board->get_conflicts_too_close_meshline_policies(axis))
-			processing_scene->add(conflict.get(), processing_axis);
+			scene->add(conflict.get(), processing_axis);
 
 		for(auto const& policy : board->get_meshline_policies(axis))
-			processing_scene->add(policy.get(), processing_axis);
+			scene->add(policy.get(), processing_axis);
 
 		for(auto const& interval : board->get_intervals(axis))
-			processing_scene->add(interval.get(), processing_axis);
+			scene->add(interval.get(), processing_axis);
 
 		for(auto const& meshline : board->get_meshlines(axis))
-			processing_scene->add(meshline.get(), processing_axis);
+			scene->add(meshline.get(), processing_axis);
 
 		processing_axis->fit();
 	}
 
-	for(auto* edge : processing_scene->edges)
-		processing_scene->wire_to_destination_first_output_port(edge);
+	for(auto* edge : scene->edges)
+		scene->wire_to_destination_first_output_port(edge);
 
-	for(auto* conflict : processing_scene->conflict_colinear_edges)
-		processing_scene->wire_to_destination_first_output_port(conflict);
+	for(auto* conflict : scene->conflict_colinear_edges)
+		scene->wire_to_destination_first_output_port(conflict);
 
-	for(auto* conflict : processing_scene->conflict_too_close_meshline_policies)
-		processing_scene->wire_to_destination_first_output_port(conflict);
+	for(auto* conflict : scene->conflict_too_close_meshline_policies)
+		scene->wire_to_destination_first_output_port(conflict);
 
-	for(auto* conflict : processing_scene->conflict_edge_in_polygons)
-		processing_scene->wire_to_destination_first_output_port(conflict);
+	for(auto* conflict : scene->conflict_edge_in_polygons)
+		scene->wire_to_destination_first_output_port(conflict);
 
-	for(auto* policy : processing_scene->meshline_policies)
-		processing_scene->wire_to_destination_first_output_port(policy);
+	for(auto* policy : scene->meshline_policies)
+		scene->wire_to_destination_first_output_port(policy);
 
-	for(auto* meshline : processing_scene->meshlines)
-		processing_scene->wire_to_destination_first_output_port(meshline);
+	for(auto* meshline : scene->meshlines)
+		scene->wire_to_destination_first_output_port(meshline);
 
-	for(auto* interval : processing_scene->intervals)
-		processing_scene->wire_to_destination_first_output_port(interval);
+	for(auto* interval : scene->intervals)
+		scene->wire_to_destination_first_output_port(interval);
 
-	processing_scene->fit_scene();
+	scene->fit_scene();
 }
 
 } // namespace ui::qt

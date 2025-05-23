@@ -43,7 +43,7 @@ public:
 		SELECTED_CHAIN
 	};
 
-	explicit ProcessingScene(QObject* parent = nullptr);
+	explicit ProcessingScene(ProcessingStyleSelector& style_selector, QObject* parent = nullptr);
 	~ProcessingScene() override;
 
 	void set_wire_style(nodegraph::Wire::Style style) const;
@@ -73,8 +73,9 @@ public:
 	void set_display(DisplayMode mode);
 	void set_display_view_axes(domain::ViewAxisSpace<bool> const& axes);
 	void set_display_plane(domain::Plane plane);
+	void init();
 
-	ProcessingStyleSelector style_selector;
+	ProcessingStyleSelector& style_selector;
 
 //private: //TODO
 	QList<nodegraph::Node*> nodes;

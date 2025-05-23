@@ -13,6 +13,7 @@
 #include <memory>
 
 #include "domain/geometrics/space.hpp"
+#include "utils/state_management.hpp"
 #include "structure_scene.hpp"
 #include "structure_style.hpp"
 
@@ -25,14 +26,17 @@ class Board;
 namespace ui::qt {
 
 //******************************************************************************
+struct StructureState {
+	domain::PlaneSpace<StructureScene*> scenes;
+};
+
+//******************************************************************************
 class StructureView : public QGraphicsView {
 	Q_OBJECT
 public:
 	explicit StructureView(QWidget* parent = nullptr);
 	~StructureView() override;
-
-	void populate(domain::Board const* board);
-	void reset_view();
+	void init(domain::Board const* board);
 
 	void fit();
 	void rotate_view(qreal angle);
@@ -40,9 +44,14 @@ public:
 	qreal get_rotation() const;
 
 	void set_mesh_visibility(StructureScene::MeshVisibility mesh_visibility);
+	void set_display_plane(domain::Plane plane);
 
 	StructureStyleSelector style_selector;
-	domain::PlaneSpace<StructureScene*> scenes;
+	std::map<Timepoint*, StructureState> states;
+
+	StructureState& get_current_state();
+	void make_current_state();
+	void go_to_current_state();
 
 protected:
 	void drawForeground(QPainter* painter, QRectF const& rect) override;
@@ -60,6 +69,11 @@ private:
 
 	using QGraphicsView::rotate;
 	qreal rotation;
+	domain::Plane displayed_plane;
+	domain::Board const* board;
+	Timepoint* current_timepoint;
+
+	void populate(domain::PlaneSpace<StructureScene*> scenes);
 };
 
 } // namespace ui::qt
