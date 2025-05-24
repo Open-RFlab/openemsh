@@ -18,7 +18,7 @@ namespace domain {
 using namespace std;
 
 //******************************************************************************
-Interval::Side::Side(MeshlinePolicy* meshline_policy, size_t lmin, double lambda, Coord h, Timepoint* t, function<double (double)> d_init)
+Interval::Side::Side(MeshlinePolicy* meshline_policy, size_t lmin, double lambda, Coord h, function<double (double)> d_init)
 : meshline_policy(meshline_policy)
 , lmin(lmin)
 , lambda(lambda)
@@ -45,7 +45,7 @@ Coord calc_h(Coord const& a, Coord const& b) noexcept {
 Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, GlobalParams* global_params, Timepoint* t)
 : Originator(t, {
 	.dmax = global_params->get_current_state().dmax,
-	.before = Side(before, global_params->get_current_state().lmin, global_params->get_current_state().lambda, calc_h(before->coord, after->coord), t, [before](double d) noexcept {
+	.before = Side(before, global_params->get_current_state().lmin, global_params->get_current_state().lambda, calc_h(before->coord, after->coord), [before](double d) noexcept {
 		switch(before->policy) {
 		case MeshlinePolicy::Policy::ONELINE: return 0.0;
 		case MeshlinePolicy::Policy::HALFS: return d / 2.0;
@@ -62,7 +62,7 @@ Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Glo
 		default: unreachable();
 		}
 	}),
-	.after = Side(after, global_params->get_current_state().lmin, global_params->get_current_state().lambda, calc_h(before->coord, after->coord), t, [after](double d) noexcept {
+	.after = Side(after, global_params->get_current_state().lmin, global_params->get_current_state().lambda, calc_h(before->coord, after->coord), [after](double d) noexcept {
 		switch(after->policy) {
 		case MeshlinePolicy::Policy::ONELINE: return 0.0;
 		case MeshlinePolicy::Policy::HALFS: return d / 2.0;

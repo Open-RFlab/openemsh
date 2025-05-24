@@ -83,7 +83,7 @@ void OpenEMSH::write() const {
 }
 
 //******************************************************************************
-void OpenEMSH::run(std::set<Step> const& steps) {
+void OpenEMSH::run(std::set<Step> const& steps) const {
 	auto const annotate = [](Step step) {
 		Caretaker::singleton().annotate_current_timepoint(make_unique<Annotation>(step));
 	};
@@ -129,7 +129,7 @@ void OpenEMSH::run(std::set<Step> const& steps) {
 }
 
 //******************************************************************************
-void OpenEMSH::run_all_steps() {
+void OpenEMSH::run_all_steps() const {
 	Caretaker::singleton().remember_current_timepoint();
 	run({
 		Step::DETECT_CONFLICT_EIP,
@@ -139,16 +139,16 @@ void OpenEMSH::run_all_steps() {
 		Step::SOLVE_ALL_EIP,
 		Step::SOLVE_ALL_CE,
 		Step::DETECT_AND_SOLVE_TCMLP,
-		Step::DETECT_INTERVALS,
-		Step::MESH
+		Step::DETECT_INTERVALS
+//		Step::MESH
 	});
 }
 
 //******************************************************************************
-void OpenEMSH::run_next_step() {
+void OpenEMSH::run_next_step() const {
 	auto& c = Caretaker::singleton();
 	auto* t = c.find_first_ancestor_with_annotation();
-	if(auto* a = c.get_annotation(t); a)
+	if(auto const* a = c.get_annotation(t); a)
 		if(optional<Step> step = next(static_cast<Annotation const*>(a)->before_step)
 		; step)
 			run({ step.value() });
@@ -159,7 +159,7 @@ void OpenEMSH::go_before(Step step) const {
 	auto& c = Caretaker::singleton();
 	c.go_without_remembering(
 		c.find_first_ancestor_with_annotation_that(
-			[&](IAnnotation const* annotation) {
+			[&step](IAnnotation const* annotation) {
 				return static_cast<Annotation const*>(annotation)->before_step == step;
 			}));
 }

@@ -16,6 +16,7 @@
 #include <type_traits>
 #include <vector>
 
+#include "concepts.hpp"
 #include "tree_node.hpp"
 #include "unconst.hpp"
 
@@ -77,16 +78,16 @@ public:
 
 	void annotate_current_timepoint(std::unique_ptr<IAnnotation> annotation) noexcept;
 	IAnnotation* get_annotation(Timepoint* t) noexcept;
-	Timepoint* find_first_ancestor_with_annotation_that(std::function<bool (IAnnotation const*)> const& predicate, bool include_itself = false) noexcept;
+	template<InvocableR<bool, IAnnotation const*> P>
+	Timepoint* find_first_ancestor_with_annotation_that(P const& predicate, bool include_itself = false) noexcept;
 	Timepoint* find_first_ancestor_with_annotation(bool include_itself = false) noexcept;
 
 	bool get_auto_gc() const noexcept;
-	void set_auto_gc(bool auto_gc) noexcept;
+	void set_auto_gc(bool _auto_gc) noexcept;
 };
 
 //******************************************************************************
 class IOriginator {
-private:
 protected:
 	friend class Caretaker;
 	virtual Caretaker& get_caretaker() const noexcept = 0;
@@ -142,6 +143,17 @@ public:
 #undef private
 #undef protected
 #endif // UNITTEST
+
+// In predicate, you will probably want to downcast to a well-known user-defined
+// type.
+//******************************************************************************
+template<InvocableR<bool, IAnnotation const*> P>
+Timepoint* Caretaker::find_first_ancestor_with_annotation_that(P const& predicate, bool include_itself) noexcept {
+	for(auto* t : current_timepoint->ancestors(include_itself))
+		if(annotations.contains(t) && predicate(annotations.at(t).get()))
+			return t;
+	return nullptr;
+}
 
 //******************************************************************************
 template<typename State>
@@ -208,7 +220,7 @@ void Originator<State>::actually_go() noexcept {
 		lazy_go.reset();
 		if(t)
 			for(auto* it : std::ranges::reverse_view(ordered_timepoints)) {
-				if(auto* common_ancestor = it->common_ancestor(*t, true)
+				if(auto const* common_ancestor = it->common_ancestor(*t, true)
 				; common_ancestor == it) {
 					current_timepoint = it;
 					return;

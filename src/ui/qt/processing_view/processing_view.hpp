@@ -27,7 +27,7 @@ class ProcessingView : public QGraphicsView {
 	Q_OBJECT
 public:
 	explicit ProcessingView(QWidget* parent = nullptr);
-	void init(domain::Board const* board);
+	void init(domain::Board const* _board);
 
 	ProcessingStyleSelector style_selector;
 	std::map<Timepoint*, ProcessingState> states;

@@ -53,7 +53,7 @@
 /// @test bool Caretaker::go_without_remembering(Timepoint* t) noexcept
 /// @test bool Caretaker::go_and_remember(Timepoint* t) noexcept
 /// @test bool Caretaker::get_auto_gc() const noexcept
-/// @test void Caretaker::set_auto_gc(bool auto_gc) noexcept
+/// @test void Caretaker::set_auto_gc(bool _auto_gc) noexcept
 /// @test void Caretaker::annotate_current_timepoint(std::unique_ptr<IAnnotation> annotation) noexcept
 /// @test IAnnotation* Caretaker::get_annotation(Timepoint* t) noexcept
 /// @test Timepoint* Caretaker::find_first_ancestor_with_annotation_that(std::function<bool (IAnnotation const*)> const& predicate) noexcept
@@ -1837,7 +1837,7 @@ SCENARIO("bool Caretaker::get_auto_gc() const noexcept", "[utils][state_manageme
 }
 
 //******************************************************************************
-SCENARIO("void Caretaker::set_auto_gc(bool auto_gc) noexcept", "[utils][state_management]") {
+SCENARIO("void Caretaker::set_auto_gc(bool _auto_gc) noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker") {
 		Caretaker c;
 

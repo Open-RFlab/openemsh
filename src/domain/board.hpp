@@ -36,7 +36,7 @@ struct BoardState final {
 	PlaneSpace<std::vector<std::shared_ptr<Polygon>>> polygons;
 	PlaneSpace<std::vector<Edge*>> edges;
 
-	BoardState(PlaneSpace<std::vector<std::shared_ptr<Polygon>>>&& polygons);
+	explicit BoardState(PlaneSpace<std::vector<std::shared_ptr<Polygon>>>&& polygons);
 };
 
 //******************************************************************************

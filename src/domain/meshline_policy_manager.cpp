@@ -40,8 +40,8 @@ MeshlinePolicyManager::MeshlinePolicyManager(
 }
 
 //******************************************************************************
-void MeshlinePolicyManager::init(ConflictManager* conflict_manager) {
-	this->conflict_manager = conflict_manager;
+void MeshlinePolicyManager::init(ConflictManager* _conflict_manager) {
+	conflict_manager = _conflict_manager;
 }
 
 //******************************************************************************

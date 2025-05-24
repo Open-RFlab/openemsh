@@ -132,7 +132,7 @@ void Caretaker::redo(size_t remembered_timepoints) noexcept {
 	if(!remembered_timepoints || !can_redo())
 		return;
 
-	advance(*user_history_browser, - min(remembered_timepoints, (size_t) abs(distance(user_history.rbegin(), *user_history_browser))));
+	advance(*user_history_browser, - make_signed_t<size_t>(min(remembered_timepoints, (size_t) abs(distance(user_history.rbegin(), *user_history_browser)))));
 	current_timepoint = **user_history_browser;
 
 	if(user_history_browser == user_history.rbegin())
@@ -214,16 +214,6 @@ IAnnotation* Caretaker::get_annotation(Timepoint* t) noexcept {
 		return nullptr;
 }
 
-// In predicate, you will probably want to downcast to a well-known user-defined
-// type.
-//******************************************************************************
-Timepoint* Caretaker::find_first_ancestor_with_annotation_that(function<bool (IAnnotation const*)> const& predicate, bool include_itself) noexcept{
-	for(auto* t : current_timepoint->ancestors(include_itself))
-		if(annotations.contains(t) && predicate(annotations.at(t).get()))
-			return t;
-	return nullptr;
-}
-
 //******************************************************************************
 Timepoint* Caretaker::find_first_ancestor_with_annotation(bool include_itself) noexcept {
 	return find_first_ancestor_with_annotation_that(
@@ -237,6 +227,6 @@ bool Caretaker::get_auto_gc() const noexcept {
 }
 
 //******************************************************************************
-void Caretaker::set_auto_gc(bool auto_gc) noexcept {
-	this->auto_gc = auto_gc;
+void Caretaker::set_auto_gc(bool _auto_gc) noexcept {
+	auto_gc = _auto_gc;
 }

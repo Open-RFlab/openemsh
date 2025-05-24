@@ -30,8 +30,8 @@ ProcessingView::ProcessingView(QWidget* parent)
 }
 
 //******************************************************************************
-void ProcessingView::init(domain::Board const* board) {
-	this->board = board;
+void ProcessingView::init(domain::Board const* _board) {
+	board = _board;
 }
 //******************************************************************************
 void ProcessingView::wheelEvent(QWheelEvent* event) {

@@ -10,7 +10,12 @@
 #include <type_traits>
 
 //******************************************************************************
-template<typename T> concept Enum = std::is_enum_v<T>;
+template<typename T>
+concept Enum = std::is_enum_v<T>;
+
+//******************************************************************************
+template<typename T, typename R, typename... Args>
+concept InvocableR = std::is_invocable_r_v<R, T, Args...>;
 
 //******************************************************************************
 template<typename P>

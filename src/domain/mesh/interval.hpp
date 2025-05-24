@@ -51,7 +51,7 @@ public:
 		std::function<double (double)> const d_init_;
 		std::vector<Coord> ls; // TODO avoid Coord::operator= -> double
 
-		Side(MeshlinePolicy* meshline_policy, size_t lmin, double lambda, Coord h, Timepoint* t, std::function<double (double)> d_init);
+		Side(MeshlinePolicy* meshline_policy, size_t lmin, double lambda, Coord h, std::function<double (double)> d_init);
 
 		double d_init() const;
 	};

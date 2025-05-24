@@ -79,9 +79,9 @@ struct FutureConditional : CLI::Validator {
 //******************************************************************************
 template<auto Member>
 auto make_overrider(auto& overrides_collector) {
-	return [&](auto const& value) { // This is CLI::add_option_function callback.
+	return [&overrides_collector](auto const& value) { // This is CLI::add_option_function callback.
 		overrides_collector.emplace_back(
-			[=](auto& to_override) { // This is to be executed to actually apply override.
+			[value](auto& to_override) { // This is to be executed to actually apply override.
 				to_override.*Member = value;
 			});
 	};

@@ -68,7 +68,7 @@ shared_ptr<Board> Board::Builder::build(Params&& params) {
 // TODO should be in meshline manager?
 //******************************************************************************
 void Board::Builder::add_fixed_meshline_policy(Axis const axis, Coord const coord) {
-	fixed_meshline_policy_creators[axis].emplace_back([=](Board* board, Timepoint* t) {
+	fixed_meshline_policy_creators[axis].emplace_back([=](Board const* board, Timepoint* t) {
 		if(!contains_that(board->line_policy_manager->get_current_state().line_policies[axis],
 			[&coord](shared_ptr<MeshlinePolicy> const& policy) {
 				if(policy->policy == MeshlinePolicy::Policy::ONELINE

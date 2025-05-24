@@ -61,9 +61,9 @@ public:
 //	void check_x();
 
 	void parse();
-	void run(std::set<Step> const& steps);
-	void run_all_steps();
-	void run_next_step();
+	void run(std::set<Step> const& steps) const;
+	void run_all_steps() const;
+	void run_next_step() const;
 	void go_before(Step step) const;
 	void go_before_previous_step() const;
 	void write() const;

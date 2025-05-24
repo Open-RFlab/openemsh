@@ -46,7 +46,7 @@ private:
 public:
 	explicit ConflictManager(Timepoint* t);
 
-	void init(MeshlinePolicyManager* line_policy_manager);
+	void init(MeshlinePolicyManager* _line_policy_manager);
 
 	void add_colinear_edges(Edge* a, Edge* b);
 

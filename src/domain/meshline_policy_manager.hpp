@@ -46,7 +46,7 @@ public:
 		AxisSpace<std::vector<std::shared_ptr<MeshlinePolicy>>>&& line_policies,
 		Timepoint* t);
 
-	void init(ConflictManager* conflict_manager);
+	void init(ConflictManager* _conflict_manager);
 
 	MeshlinePolicy* add_meshline_policy(
 		std::vector<IMeshLineOrigin*> origins,

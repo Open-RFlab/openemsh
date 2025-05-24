@@ -21,8 +21,8 @@ ConflictManager::ConflictManager(Timepoint* t)
 {}
 
 //******************************************************************************
-void ConflictManager::init(MeshlinePolicyManager* line_policy_manager) {
-	this->line_policy_manager = line_policy_manager;
+void ConflictManager::init(MeshlinePolicyManager* _line_policy_manager) {
+	line_policy_manager = _line_policy_manager;
 }
 
 /// @warning Allows geometrically inconsistent datas.

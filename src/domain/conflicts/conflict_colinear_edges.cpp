@@ -36,7 +36,7 @@ void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manage
 
 	auto const& s = get_current_state();
 
-	for(Edge* edge : s.edges) {
+	for(Edge const* edge : s.edges) {
 		if(!edge->get_current_state().to_mesh)
 			continue;
 

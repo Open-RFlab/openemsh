@@ -36,7 +36,7 @@ class StructureView : public QGraphicsView {
 public:
 	explicit StructureView(QWidget* parent = nullptr);
 	~StructureView() override;
-	void init(domain::Board const* board);
+	void init(domain::Board const* _board);
 
 	void fit();
 	void rotate_view(qreal angle);

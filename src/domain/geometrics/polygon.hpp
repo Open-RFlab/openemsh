@@ -67,7 +67,7 @@ public:
 	std::vector<std::shared_ptr<Edge>> const edges;
 
 	Polygon(Plane plane, Type type, std::string const& name, std::vector<std::unique_ptr<Point const>>&& points, Timepoint* t);
-	~Polygon();
+	~Polygon() override;
 
 //	relation::PolygonEdge relation_to(Edge const* edge);
 	relation::PolygonPoint relation_to(Point const& point) const noexcept;

@@ -60,8 +60,8 @@ StructureView::StructureView(QWidget* parent)
 StructureView::~StructureView() = default;
 
 //******************************************************************************
-void StructureView::init(domain::Board const* board) {
-	this->board = board;
+void StructureView::init(domain::Board const* _board) {
+	board = _board;
 }
 
 //******************************************************************************
@@ -177,13 +177,13 @@ void StructureView::make_current_state() {
 		return;
 
 	domain::PlaneSpace<StructureScene*> scenes = {{
-		new StructureScene(style_selector, this),
-		new StructureScene(style_selector, this),
-		new StructureScene(style_selector, this) }};
+		std::make_unique<StructureScene>(style_selector, this).release(),
+		std::make_unique<StructureScene>(style_selector, this).release(),
+		std::make_unique<StructureScene>(style_selector, this).release() }};
 
 	populate(scenes);
 
-	states.emplace(Caretaker::singleton().get_current_timepoint(), scenes);
+	states.try_emplace(Caretaker::singleton().get_current_timepoint(), scenes);
 
 	go_to_current_state();
 }
