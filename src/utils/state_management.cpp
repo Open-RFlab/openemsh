@@ -5,6 +5,7 @@
 ///*****************************************************************************
 
 #include <cmath>
+#include <execution>
 #include <iterator>
 
 #include "state_management.hpp"
@@ -43,9 +44,10 @@ void Caretaker::garbage_collector() noexcept {
 	});
 
 	// Step 3: for each originator, erase blacklisted nodes.
-	for(auto& ptr : originators)
+	for_each(execution::unseq, begin(originators), end(originators), [&](auto const& ptr) {
 		if(auto originator = ptr.lock(); originator)
 			originator->erase(to_remove);
+	});
 
 	// Step 4: erase annotations related to blacklisted nodes.
 	erase_if(annotations, [&](auto const& item) {
@@ -181,9 +183,10 @@ void Caretaker::remember_current_timepoint() noexcept {
 bool Caretaker::go_without_remembering(Timepoint* t) noexcept {
 	if(t && t->root() == history_root.get()) {
 		current_timepoint = t;
-		for(auto& it : originators)
-			if(auto ptr = it.lock(); ptr)
-				ptr->go(t);
+		for_each(execution::unseq, begin(originators), end(originators), [&](auto const& ptr) {
+			if(auto originator = ptr.lock(); originator)
+				originator->go(t);
+		});
 		return true;
 	} else {
 		return false;
@@ -199,7 +202,7 @@ bool Caretaker::go_and_remember(Timepoint* t) noexcept {
 }
 
 //******************************************************************************
-void Caretaker::annotate_current_timepoint(std::unique_ptr<IAnnotation> annotation) noexcept {
+void Caretaker::annotate_current_timepoint(unique_ptr<IAnnotation> annotation) noexcept {
 	annotations.emplace(current_timepoint, std::move(annotation));
 }
 
@@ -214,7 +217,7 @@ IAnnotation* Caretaker::get_annotation(Timepoint* t) noexcept {
 // In predicate, you will probably want to downcast to a well-known user-defined
 // type.
 //******************************************************************************
-Timepoint* Caretaker::find_first_ancestor_with_annotation_that(std::function<bool (IAnnotation const*)> const& predicate, bool include_itself) noexcept{
+Timepoint* Caretaker::find_first_ancestor_with_annotation_that(function<bool (IAnnotation const*)> const& predicate, bool include_itself) noexcept{
 	for(auto* t : current_timepoint->ancestors(include_itself))
 		if(annotations.contains(t) && predicate(annotations.at(t).get()))
 			return t;

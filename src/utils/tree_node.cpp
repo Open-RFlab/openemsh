@@ -4,12 +4,9 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#include <list>
-#include <string>
-#include <cstddef>
-#include <iostream>
 #include <algorithm>
-#include <vector>
+#include <execution>
+#include <string>
 
 #include "id_generator.hpp"
 
@@ -107,20 +104,16 @@ vector<TreeNode*> TreeNode::cluster(bool include_itself) {
 //******************************************************************************
 TreeNode* TreeNode::common_ancestor(TreeNode& node, bool include_themselves) {
 	for(auto* it_a : ancestors(include_themselves))
-		for(auto* it_b : node.ancestors(include_themselves))
-			if(it_a == it_b)
-				return it_a;
+		if(auto node_ancestors = node.ancestors(include_themselves)
+		; any_of(execution::unseq, begin(node_ancestors), end(node_ancestors), [&](auto const& it_b) { return it_a == it_b; }))
+			return it_a;
+
 	return nullptr;
 }
 
 //******************************************************************************
 TreeNode* common_ancestor(TreeNode& a, TreeNode& b, bool include_themselves) {
-//	return a.common_ancestor(b, include_themselves);
-	for(auto* it_a : a.ancestors(include_themselves))
-		for(auto* it_b : b.ancestors(include_themselves))
-			if(it_a == it_b)
-				return it_a;
-	return nullptr;
+	return a.common_ancestor(b, include_themselves);
 }
 
 //******************************************************************************
