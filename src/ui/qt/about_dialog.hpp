@@ -11,6 +11,8 @@
 
 #include <memory>
 
+class QAbstractButton;
+
 namespace Ui {
 class AboutDialog;
 } // namespace Ui
@@ -24,7 +26,7 @@ private:
 	std::unique_ptr<Ui::AboutDialog> ui;
 
 private slots:
-	void on_pb_ok_clicked();
+	void on_dbb_ok_clicked(QAbstractButton* button);
 
 public:
 	explicit AboutDialog(QWidget* parent = nullptr);
