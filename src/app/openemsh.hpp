@@ -64,6 +64,7 @@ public:
 	void run(std::set<Step> const& steps) const;
 	void run_all_steps() const;
 	void run_next_step() const;
+	void run_from_step(Step step) const;
 	void go_before(Step step) const;
 	void go_before_previous_step() const;
 	void write() const;
@@ -84,5 +85,8 @@ public:
 
 //******************************************************************************
 std::optional<Step> next(Step step);
+
+//******************************************************************************
+std::set<Step> that_and_after(Step step);
 
 } // namespace app

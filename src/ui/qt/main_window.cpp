@@ -8,6 +8,9 @@
 #include <QMarginsF>
 
 #include "domain/geometrics/space.hpp"
+#include "edit/edit_dialog.hpp"
+#include "edit/edit_model.hpp"
+#include "edit/edit_model_global.hpp"
 #include "processing_view/processing_view.hpp"
 #include "structure_view/structure_view.hpp"
 #include "utils/state_management.hpp"
@@ -40,7 +43,6 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 	}
 
 	oemsh.parse();
-	oemsh.run_all_steps();
 
 	ui->structure_view->init(&oemsh.get_board());
 	ui->processing_view->init(&oemsh.get_board());
@@ -236,6 +238,29 @@ void MainWindow::on_tb_processing_zoom_out_clicked() {
 }
 
 //******************************************************************************
+void MainWindow::on_a_edit_triggered() {
+	auto* widget = static_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->a_edit));
+	widget->setDown(true);
+	ui->processing_view->get_current_state().scene->edit_selected_nodes(widget->mapToGlobal(widget->rect().bottomLeft()));
+	widget->setDown(false);
+}
+
+//******************************************************************************
+void MainWindow::edit_global_params() {
+	EditModelGlobal model(oemsh.get_board().global_params.get());
+	EditDialog edit(&model, "global parameters");
+	connect(
+		&model, &EditModel::request_to_go_before,
+		[this](app::Step step) {
+			this->oemsh.go_before(step);
+		});
+	connect(
+		&model, &EditModel::edited,
+		this, &MainWindow::handle_edition);
+	edit.exec();
+}
+
+//******************************************************************************
 void MainWindow::on_a_mesh_prev_triggered() {
 	setCursor(Qt::WaitCursor);
 	oemsh.go_before_previous_step();
@@ -302,15 +327,26 @@ void MainWindow::make_current_state_view() {
 			ui->processing_view->states[t].scene, &ProcessingScene::select_counterparts);
 	}
 
+	connect(
+		ui->processing_view->states[t].scene, &ProcessingScene::edit_global_params,
+		this, &MainWindow::edit_global_params);
+
+	connect(
+		ui->processing_view->states[t].scene, &ProcessingScene::request_to_go_before,
+		[this](app::Step step) {
+			this->oemsh.go_before(step);
+		});
+
+	connect(
+		ui->processing_view->states[t].scene, &ProcessingScene::edited,
+		this, &MainWindow::handle_edition);
+
 	update_navigation_visibility();
 }
 
 //******************************************************************************
-void MainWindow::handle_edition(std::set<app::Step> const& to_redo) {
-//	Caretaker::singleton().remember_current_timepoint();
-
-//	if(ui->a_mesh_auto->is_checked()) // TODO may not be that useful since editing at once two things from different steps will discard newer objects edits??
-		oemsh.run(to_redo);
+void MainWindow::handle_edition(app::Step const redo_from) {
+	oemsh.run_from_step(redo_from);
 	Caretaker::singleton().remember_current_timepoint();
 
 	make_current_state_view();
@@ -323,5 +359,15 @@ void MainWindow::update_navigation_visibility() {
 	ui->a_mesh_prev->setEnabled(oemsh.can_go_before());
 	ui->a_mesh_next->setEnabled(oemsh.can_run_a_next_step());
 };
+
+
+//******************************************************************************
+void MainWindow::keyPressEvent(QKeyEvent* event) {
+	if(event->key() == Qt::Key_E) {
+		on_a_edit_triggered();
+	} else {
+		QWidget::keyPressEvent(event);
+	}
+}
 
 } // namespace ui::qt

@@ -35,6 +35,7 @@ private:
 	void go_to_current_state();
 	void make_current_state_view();
 	void go_to_or_make_current_state();
+	void edit_global_params();
 
 private slots:
 	void on_a_about_triggered();
@@ -62,17 +63,20 @@ private slots:
 	void on_tb_structure_zoom_out_clicked();
 	void on_tb_processing_zoom_in_clicked();
 	void on_tb_processing_zoom_out_clicked();
+	void on_a_edit_triggered();
 	void on_a_mesh_prev_triggered();
 	void on_a_mesh_next_triggered();
 	void on_a_undo_triggered();
 	void on_a_redo_triggered();
 
-	void handle_edition(std::set<app::Step> const& to_redo = {}); // TODO handle_edition / on_edition
+	void handle_edition(app::Step const redo_from = app::Step::DETECT_CONFLICT_EIP);
 
 public:
 	MainWindow(app::OpenEMSH& oemsh, QWidget* parent = nullptr);
 	~MainWindow() override;
 
+protected:
+	void keyPressEvent(QKeyEvent* event) override;
 };
 
 } // namespace ui::qt

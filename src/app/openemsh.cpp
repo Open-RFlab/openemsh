@@ -44,6 +44,43 @@ optional<Step> next(Step step) {
 }
 
 //******************************************************************************
+set<Step> that_and_after(Step step) {
+	set<Step> out;
+	switch(step) {
+	case Step::DETECT_CONFLICT_EIP:
+		out.emplace(Step::DETECT_CONFLICT_EIP);
+		[[fallthrough]];
+	case Step::DETECT_CONFLICT_CE:
+		out.emplace(Step::DETECT_CONFLICT_CE);
+		[[fallthrough]];
+	case Step::DETECT_NON_CONFLICTING_EDGES:
+		out.emplace(Step::DETECT_NON_CONFLICTING_EDGES);
+		[[fallthrough]];
+	case Step::ADD_FIXED_MLP:
+		out.emplace(Step::ADD_FIXED_MLP);
+		[[fallthrough]];
+	case Step::SOLVE_ALL_EIP:
+		out.emplace(Step::SOLVE_ALL_EIP);
+		[[fallthrough]];
+	case Step::SOLVE_ALL_CE:
+		out.emplace(Step::SOLVE_ALL_CE);
+		[[fallthrough]];
+	case Step::DETECT_AND_SOLVE_TCMLP:
+		out.emplace(Step::DETECT_AND_SOLVE_TCMLP);
+		[[fallthrough]];
+	case Step::DETECT_INTERVALS:
+		out.emplace(Step::DETECT_INTERVALS);
+		[[fallthrough]];
+	case Step::MESH:
+		out.emplace(Step::MESH);
+		break;
+	default:
+		unreachable();
+	}
+	return out;
+}
+
+//******************************************************************************
 OpenEMSH::OpenEMSH(Params params)
 : params(std::move(params))
 {}
@@ -156,6 +193,11 @@ void OpenEMSH::run_next_step() const {
 	} else {
 		run({ Step::DETECT_CONFLICT_EIP });
 	}
+}
+
+//******************************************************************************
+void OpenEMSH::run_from_step(Step step) const {
+	run(that_and_after(step));
 }
 
 //******************************************************************************

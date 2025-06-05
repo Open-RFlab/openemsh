@@ -350,6 +350,7 @@
    <addaction name="a_vertical_layout"/>
    <addaction name="a_horizontal_layout"/>
    <addaction name="separator"/>
+   <addaction name="a_edit"/>
    <addaction name="a_mesh_prev"/>
    <addaction name="a_mesh_next"/>
    <addaction name="separator"/>
@@ -390,6 +391,14 @@
    </property>
    <property name="toolTip">
     <string>Reset view</string>
+   </property>
+  </action>
+  <action name="a_edit">
+   <property name="text">
+    <string>🖉</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit parameters</string>
    </property>
   </action>
   <action name="a_mesh_next">
