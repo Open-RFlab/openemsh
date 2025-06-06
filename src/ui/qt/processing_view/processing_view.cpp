@@ -20,6 +20,9 @@ ProcessingView::ProcessingView(QWidget* parent)
 : QGraphicsView(parent)
 , board(nullptr)
 , current_timepoint(nullptr)
+, display_mode(ProcessingScene::DisplayMode::SELECTED_CHAIN)
+, plane_displayed_on_structure_view(domain::XY)
+, axes_displayed_on_structure_view({ true, true })
 {
 	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
@@ -59,6 +62,24 @@ void ProcessingView::fit() {
 }
 
 //******************************************************************************
+void ProcessingView::set_display(ProcessingScene::DisplayMode mode) {
+	display_mode = mode;
+	get_current_state().scene->set_display(mode);
+}
+
+//******************************************************************************
+void ProcessingView::set_display_view_axes(domain::ViewAxisSpace<bool> const& axes) {
+	axes_displayed_on_structure_view = axes;
+	get_current_state().scene->set_display_view_axes(axes);
+}
+
+//******************************************************************************
+void ProcessingView::set_display_plane(domain::Plane plane) {
+	plane_displayed_on_structure_view = plane;
+	get_current_state().scene->set_display_plane(plane);
+}
+
+//******************************************************************************
 ProcessingState& ProcessingView::get_current_state() {
 	return states.at(current_timepoint);
 }
@@ -76,6 +97,9 @@ void ProcessingView::make_current_state() {
 
 	populate(scene);
 	scene->init();
+	scene->set_display(display_mode);
+	scene->set_display_view_axes(axes_displayed_on_structure_view);
+	scene->set_display_plane(plane_displayed_on_structure_view);
 
 	states.emplace(Caretaker::singleton().get_current_timepoint(), scene);
 	go_to_current_state();

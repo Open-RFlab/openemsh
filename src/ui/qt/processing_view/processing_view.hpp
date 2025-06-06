@@ -36,6 +36,10 @@ public:
 	void make_current_state();
 	void go_to_current_state();
 
+	void set_display(ProcessingScene::DisplayMode mode);
+	void set_display_view_axes(domain::ViewAxisSpace<bool> const& axes);
+	void set_display_plane(domain::Plane plane);
+
 public slots:
 	void fit();
 
@@ -45,6 +49,10 @@ protected:
 private:
 	domain::Board const* board;
 	Timepoint* current_timepoint;
+
+	ProcessingScene::DisplayMode display_mode;
+	domain::Plane plane_displayed_on_structure_view;
+	domain::ViewAxisSpace<bool> axes_displayed_on_structure_view;
 
 	void populate(ProcessingScene* scene);
 };

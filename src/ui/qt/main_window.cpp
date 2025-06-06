@@ -48,9 +48,6 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 	ui->processing_view->init(&oemsh.get_board());
 	handle_edition();
 
-	ui->structure_view->set_display_plane(domain::XY);
-	ui->processing_view->get_current_state().scene->set_display_plane(domain::XY);
-	ui->processing_view->get_current_state().scene->set_display_view_axes({ true, true });
 //	ui->structure_view->setup_scale_max(ui->structure_view->scenes[domain::XY].polygons->boundingRect());
 //	on_tb_reset_clicked();
 }
@@ -88,7 +85,7 @@ void MainWindow::on_ag_styles_triggered(QAction* const action) {
 void MainWindow::on_rb_plane_xy_toggled(bool const is_checked) {
 	if(is_checked) {
 		ui->structure_view->set_display_plane(domain::XY);
-		ui->processing_view->get_current_state().scene->set_display_plane(domain::XY);
+		ui->processing_view->set_display_plane(domain::XY);
 	}
 }
 
@@ -96,7 +93,7 @@ void MainWindow::on_rb_plane_xy_toggled(bool const is_checked) {
 void MainWindow::on_rb_plane_yz_toggled(bool const is_checked) {
 	if(is_checked) {
 		ui->structure_view->set_display_plane(domain::YZ);
-		ui->processing_view->get_current_state().scene->set_display_plane(domain::YZ);
+		ui->processing_view->set_display_plane(domain::YZ);
 	}
 }
 
@@ -104,7 +101,7 @@ void MainWindow::on_rb_plane_yz_toggled(bool const is_checked) {
 void MainWindow::on_rb_plane_zx_toggled(bool const is_checked) {
 	if(is_checked) {
 		ui->structure_view->set_display_plane(domain::ZX);
-		ui->processing_view->get_current_state().scene->set_display_plane(domain::ZX);
+		ui->processing_view->set_display_plane(domain::ZX);
 	}
 }
 
@@ -154,46 +151,46 @@ void MainWindow::on_a_vertical_layout_triggered() {
 //******************************************************************************
 void MainWindow::on_tb_show_all_mesh_clicked() {
 	ui->structure_view->set_mesh_visibility(StructureScene::MeshVisibility::FULL);
-	ui->processing_view->get_current_state().scene->set_display_view_axes({ true, true });
+	ui->processing_view->set_display_view_axes({ true, true });
 	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_horizontal_mesh_clicked() {
 	ui->structure_view->set_mesh_visibility(StructureScene::MeshVisibility::HORIZONTAL);
-	ui->processing_view->get_current_state().scene->set_display_view_axes({ true, false });
+	ui->processing_view->set_display_view_axes({ true, false });
 	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_vertical_mesh_clicked() {
 	ui->structure_view->set_mesh_visibility(StructureScene::MeshVisibility::VERTICAL);
-	ui->processing_view->get_current_state().scene->set_display_view_axes({ false, true });
+	ui->processing_view->set_display_view_axes({ false, true });
 	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_no_mesh_clicked() {
 	ui->structure_view->set_mesh_visibility(StructureScene::MeshVisibility::NONE);
-	ui->processing_view->get_current_state().scene->set_display_view_axes({ false, false });
+	ui->processing_view->set_display_view_axes({ false, false });
 	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_selected_clicked() {
-	ui->processing_view->get_current_state().scene->set_display(ProcessingScene::DisplayMode::SELECTED_CHAIN);
+	ui->processing_view->set_display(ProcessingScene::DisplayMode::SELECTED_CHAIN);
 	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_displayed_clicked() {
-	ui->processing_view->get_current_state().scene->set_display(ProcessingScene::DisplayMode::STRUCTURE_VIEW);
+	ui->processing_view->set_display(ProcessingScene::DisplayMode::STRUCTURE_VIEW);
 	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_everything_clicked() {
-	ui->processing_view->get_current_state().scene->set_display(ProcessingScene::DisplayMode::EVERYTHING);
+	ui->processing_view->set_display(ProcessingScene::DisplayMode::EVERYTHING);
 	ui->processing_view->fit();
 }
 

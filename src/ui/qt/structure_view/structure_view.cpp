@@ -43,11 +43,12 @@ static QPainterPath create_repair() {
 //******************************************************************************
 StructureView::StructureView(QWidget* parent)
 : QGraphicsView(parent)
-, repair(std::make_unique<QGraphicsPathItem const>(create_repair()))
-, rotation(0)
-, displayed_plane(domain::XY)
 , board(nullptr)
 , current_timepoint(nullptr)
+, repair(std::make_unique<QGraphicsPathItem const>(create_repair()))
+, rotation(0)
+, mesh_visibility_on_scene(StructureScene::MeshVisibility::FULL)
+, displayed_plane(domain::XY)
 {
 	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
@@ -139,6 +140,7 @@ void StructureView::fit() {
 
 //******************************************************************************
 void StructureView::set_mesh_visibility(StructureScene::MeshVisibility mesh_visibility) {
+	mesh_visibility_on_scene = mesh_visibility;
 	for(auto const plane : domain::AllPlane)
 		get_current_state().scenes[plane]->set_mesh_visibility(mesh_visibility);
 }
@@ -182,6 +184,8 @@ void StructureView::make_current_state() {
 		std::make_unique<StructureScene>(style_selector, this).release() }};
 
 	populate(scenes);
+	for(auto* scene : scenes)
+		scene->set_mesh_visibility(mesh_visibility_on_scene);
 
 	states.try_emplace(Caretaker::singleton().get_current_timepoint(), scenes);
 
