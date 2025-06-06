@@ -28,16 +28,7 @@ namespace domain {
 class Conflict;
 class Meshline;
 
-//******************************************************************************
-struct MeshlinePolicyState final
-: public IConflictOriginState
-, public IConflictSolutionState {
-	bool is_enabled;
-	double res_factor; // TODO useful? d directly? come from params
-	double d; ///< Distance betwen two lines (HALFS and THIRDS only).
-	std::vector<IMeshLineOrigin*> origins;
-	std::vector<Meshline*> meshlines;
-};
+struct MeshlinePolicyState;
 
 /// This class is an interface between a mesh line and its origin because
 /// multiples edges can be responsible for the same lines and some lines can
@@ -61,13 +52,13 @@ public:
 		ONELINE,     ///< Place one line on the coord. typically produced by ports.
 		HALFS,       ///< Apply halfs rule while meshing : when edges conflict on the direction.
 		THIRDS       ///< Apply thirds rule while meshing : normal case for edges.
-	} const policy; // TODO rename meshing_rule
+	};
 
 	enum class Normal {
 		NONE,
 		MIN,
 		MAX
-	} const normal;
+	};
 
 	GlobalParams* global_params;
 	Coord const coord;
@@ -85,6 +76,19 @@ public:
 		double const res_factor = 2);
 
 	std::optional<Meshline> mesh();
+};
+
+//******************************************************************************
+struct MeshlinePolicyState final
+: public IConflictOriginState
+, public IConflictSolutionState {
+	MeshlinePolicy::Policy policy;
+	MeshlinePolicy::Normal normal;
+	bool is_enabled;
+	double res_factor; // TODO useful? d directly? come from params
+	double d; ///< Distance betwen two lines (HALFS and THIRDS only).
+	std::vector<IMeshLineOrigin*> origins;
+	std::vector<Meshline*> meshlines;
 };
 
 //******************************************************************************

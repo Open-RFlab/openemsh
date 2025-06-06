@@ -46,11 +46,11 @@ Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Glo
 : Originator(t, {
 	.dmax = global_params->get_current_state().dmax,
 	.before = Side(before, global_params->get_current_state().lmin, global_params->get_current_state().lambda, calc_h(before->coord, after->coord), [before](double d) noexcept {
-		switch(before->policy) {
+		switch(before->get_current_state().policy) {
 		case MeshlinePolicy::Policy::ONELINE: return 0.0;
 		case MeshlinePolicy::Policy::HALFS: return d / 2.0;
 		case MeshlinePolicy::Policy::THIRDS: return [&] {
-			switch(before->normal) {
+			switch(before->get_current_state().normal) {
 			case MeshlinePolicy::Normal::MAX:
 				return 2.0/3.0 * d;
 			case MeshlinePolicy::Normal::MIN:
@@ -63,11 +63,11 @@ Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Glo
 		}
 	}),
 	.after = Side(after, global_params->get_current_state().lmin, global_params->get_current_state().lambda, calc_h(before->coord, after->coord), [after](double d) noexcept {
-		switch(after->policy) {
+		switch(after->get_current_state().policy) {
 		case MeshlinePolicy::Policy::ONELINE: return 0.0;
 		case MeshlinePolicy::Policy::HALFS: return d / 2.0;
 		case MeshlinePolicy::Policy::THIRDS: return [&] {
-			switch(after->normal) {
+			switch(after->get_current_state().normal) {
 			case MeshlinePolicy::Normal::MAX:
 				return 1.0/3.0 * d;
 			case MeshlinePolicy::Normal::MIN:
@@ -405,7 +405,7 @@ vector<shared_ptr<Meshline>> Interval::mesh() const {
 	double const d_init_after = state.after.d_init();
 	vector<shared_ptr<Meshline>> meshlines;
 
-	if(state.before.meshline_policy->policy != MeshlinePolicy::Policy::ONELINE)
+	if(state.before.meshline_policy->get_current_state().policy != MeshlinePolicy::Policy::ONELINE)
 		meshlines.push_back(make_shared<Meshline>(
 			state.before.meshline_policy->coord + d_init_before,
 			this,
@@ -425,7 +425,7 @@ vector<shared_ptr<Meshline>> Interval::mesh() const {
 				state.after.meshline_policy->coord - d_init_after - (*it),
 				this,
 				state.after.meshline_policy));
-	if(state.after.meshline_policy->policy != MeshlinePolicy::Policy::ONELINE)
+	if(state.after.meshline_policy->get_current_state().policy != MeshlinePolicy::Policy::ONELINE)
 		meshlines.push_back(make_shared<Meshline>(
 			state.after.meshline_policy->coord - d_init_after,
 			this,

@@ -140,8 +140,8 @@ void SerializerToPlantuml::visit(ConflictColinearEdges& conflict) {
 
 	if(solution) {
 		out +=
-			id + " : Solution.policy = " + to_string(solution->policy) + "\n" +
-			id + " : Solution.normal = " + to_string(solution->normal) + "\n" +
+			id + " : Solution.policy = " + to_string(solution->get_current_state().policy) + "\n" +
+			id + " : Solution.normal = " + to_string(solution->get_current_state().normal) + "\n" +
 			id + "_out ------> " + to_string(solution->id) + "_in\n";
 	}
 
@@ -200,9 +200,9 @@ void SerializerToPlantuml::visit(MeshlinePolicy& policy) {
 		"state \"MeshlinePolicy\" as " + id + (policy.get_current_state().is_enabled ? " #green" : " #red") + " {\n"
 		"state \" \" as " + id + "_in <<inputPin>>\n"
 		"state \" \" as " + id + "_out <<outputPin>>\n" +
-		id + " : Normal = " + to_string(policy.normal) + "\n" +
+		id + " : Normal = " + to_string(policy.get_current_state().normal) + "\n" +
 		id + " : Is enabled = " + (policy.get_current_state().is_enabled ? "true" : "false") + "\n" +
-		id + " : Policy = " + to_string(policy.policy) + "\n" +
+		id + " : Policy = " + to_string(policy.get_current_state().policy) + "\n" +
 		id + " : d = " + to_string(policy.get_current_state().d) + "\n";
 
 	if(origin)

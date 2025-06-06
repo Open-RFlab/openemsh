@@ -43,11 +43,11 @@ static std::array<QLineF, 2> convert_policy_lines(domain::ViewAxis axis, domain:
 
 	auto const offset = [&]() -> std::array<double, 2> {
 		auto const d = meshline_policy->get_current_state().d;
-		switch(meshline_policy->policy) {
+		switch(meshline_policy->get_current_state().policy) {
 		case domain::MeshlinePolicy::Policy::ONELINE: return { 0.0, 0.0 };
 		case domain::MeshlinePolicy::Policy::HALFS: return { d / 2.0, -d / 2.0 };
 		case domain::MeshlinePolicy::Policy::THIRDS:
-			switch(meshline_policy->normal) {
+			switch(meshline_policy->get_current_state().normal) {
 			case domain::MeshlinePolicy::Normal::MAX:
 				return { 2.0 / 3.0 * d, -1.0 / 3.0 * d };
 			case domain::MeshlinePolicy::Normal::MIN:

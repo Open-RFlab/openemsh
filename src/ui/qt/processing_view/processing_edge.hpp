@@ -17,6 +17,8 @@ class Edge;
 
 namespace ui::qt {
 
+class EditModel;
+
 //******************************************************************************
 class ProcessingEdge : public nodegraph::Node {
 public:
@@ -39,6 +41,8 @@ public:
 	int type() const override;
 
 private:
+	friend EditModel;
+
 	domain::Edge const* const edge;
 };
 

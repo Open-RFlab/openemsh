@@ -17,6 +17,8 @@ class Interval;
 
 namespace ui::qt {
 
+class EditModel;
+
 //******************************************************************************
 class ProcessingInterval : public nodegraph::Node {
 public:
@@ -36,6 +38,8 @@ public:
 	int type() const override;
 
 private:
+	friend EditModel;
+
 	domain::Interval const* const interval;
 };
 

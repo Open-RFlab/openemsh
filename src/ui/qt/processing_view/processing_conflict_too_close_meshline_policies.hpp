@@ -17,6 +17,7 @@ class ConflictTooCloseMeshlinePolicies;
 
 namespace ui::qt {
 
+class EditModel;
 class ProcessingMeshlinePolicy;
 
 //******************************************************************************
@@ -40,6 +41,8 @@ public:
 	std::size_t count_tcmlp_mlp_deepness() const;
 
 private:
+	friend EditModel;
+
 	domain::ConflictTooCloseMeshlinePolicies const* const conflict;
 };
 

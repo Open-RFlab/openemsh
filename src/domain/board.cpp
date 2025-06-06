@@ -71,8 +71,8 @@ void Board::Builder::add_fixed_meshline_policy(Axis const axis, Coord const coor
 	fixed_meshline_policy_creators[axis].emplace_back([=](Board const* board, Timepoint* t) {
 		if(!contains_that(board->line_policy_manager->get_current_state().line_policies[axis],
 			[&coord](shared_ptr<MeshlinePolicy> const& policy) {
-				if(policy->policy == MeshlinePolicy::Policy::ONELINE
-				&& policy->normal == MeshlinePolicy::Normal::NONE
+				if(policy->get_current_state().policy == MeshlinePolicy::Policy::ONELINE
+				&& policy->get_current_state().normal == MeshlinePolicy::Normal::NONE
 				&& policy->coord == coord)
 					return true;
 				return false;
@@ -312,7 +312,7 @@ void Board::detect_non_conflicting_edges(Plane const plane) {
 		optional<Coord> const coord = domain::coord(edge->p0(), edge->axis);
 		optional<Axis> const axis = transpose(plane, edge->axis);
 		optional<MeshlinePolicy::Normal> const normal = cast(edge->normal);
-		if(coord && axis && normal && !edge->get_current_state().conflicts.size()) {
+		if(coord && axis && normal && edge->get_current_state().conflicts.empty()) {
 			auto [t, state_e] = edge->make_next_state();
 			state_e.meshline_policy = line_policy_manager->add_meshline_policy(
 				{ edge },
@@ -320,7 +320,7 @@ void Board::detect_non_conflicting_edges(Plane const plane) {
 				MeshlinePolicy::Policy::THIRDS,
 				normal.value(),
 				coord.value(),
-				true,
+				state_e.to_mesh,
 				t);
 			edge->set_state(t, state_e);
 		}
