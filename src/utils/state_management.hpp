@@ -31,7 +31,10 @@ class IOriginator;
 #endif // UNITTEST
 
 //******************************************************************************
-class IAnnotation {};
+class IAnnotation {
+public:
+	virtual ~IAnnotation() = default;
+};
 
 // Annotation and history/pining are orthogonal, annotation is for user to attach
 // user defined data to timepoints while history take a role in undo/redo navigation
