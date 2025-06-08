@@ -390,6 +390,7 @@ void ProcessingScene::display_selected_chain() {
 	auto const selected = selected_nodes();
 	auto const highlighted = highlighted_nodes();
 	reset_visibility(false);
+	clearSelection();
 
 	for(auto const& list : { selected, highlighted })
 		for(auto* node : list)
