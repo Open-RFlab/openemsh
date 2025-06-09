@@ -37,6 +37,7 @@ public:
 	explicit StructureView(QWidget* parent = nullptr);
 	~StructureView() override;
 	void init(domain::Board const* _board);
+	void clear();
 
 	void fit();
 	void rotate_view(qreal angle);

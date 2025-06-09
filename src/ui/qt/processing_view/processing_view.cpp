@@ -36,6 +36,16 @@ ProcessingView::ProcessingView(QWidget* parent)
 void ProcessingView::init(domain::Board const* _board) {
 	board = _board;
 }
+
+//******************************************************************************
+void ProcessingView::clear() {
+	for(auto [t, state] : states)
+		delete state.scene;
+	states.clear();
+	board = nullptr;
+	current_timepoint = nullptr;
+}
+
 //******************************************************************************
 void ProcessingView::wheelEvent(QWheelEvent* event) {
 	if(event->modifiers() & Qt::ControlModifier) {

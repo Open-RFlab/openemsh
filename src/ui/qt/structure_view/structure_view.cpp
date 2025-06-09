@@ -66,6 +66,16 @@ void StructureView::init(domain::Board const* _board) {
 }
 
 //******************************************************************************
+void StructureView::clear() {
+	for(auto [t, state] : states)
+		for(auto* ptr : state.scenes)
+			delete ptr;
+	states.clear();
+	board = nullptr;
+	current_timepoint = nullptr;
+}
+
+//******************************************************************************
 void StructureView::drawForeground(QPainter* painter, QRectF const& rect) {
 	QGraphicsView::drawForeground(painter, rect);
 
