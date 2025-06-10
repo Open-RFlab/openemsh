@@ -41,19 +41,26 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 		}
 		ui->m_style->addAction(action);
 	}
-
-	oemsh.parse();
-
-	ui->structure_view->init(&oemsh.get_board());
-	ui->processing_view->init(&oemsh.get_board());
-	handle_edition();
-
-//	ui->structure_view->setup_scale_max(ui->structure_view->scenes[domain::XY].polygons->boundingRect());
-//	on_tb_reset_clicked();
 }
 
 //******************************************************************************
 MainWindow::~MainWindow() = default;
+
+//******************************************************************************
+void MainWindow::parse_and_display() {
+	setCursor(Qt::WaitCursor);
+	oemsh.parse();
+	ui->structure_view->init(&oemsh.get_board());
+	ui->processing_view->init(&oemsh.get_board());
+	handle_edition();
+	unsetCursor();
+}
+
+//******************************************************************************
+void MainWindow::clear() {
+	ui->structure_view->clear();
+	ui->processing_view->clear();
+}
 
 //******************************************************************************
 void MainWindow::set_style(Style const& style) {

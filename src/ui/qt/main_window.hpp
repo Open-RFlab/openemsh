@@ -75,6 +75,9 @@ public:
 	MainWindow(app::OpenEMSH& oemsh, QWidget* parent = nullptr);
 	~MainWindow() override;
 
+	void parse_and_display();
+	void clear();
+
 protected:
 	void keyPressEvent(QKeyEvent* event) override;
 };
