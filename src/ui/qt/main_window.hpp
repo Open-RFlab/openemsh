@@ -63,6 +63,7 @@ private slots:
 	void on_tb_structure_zoom_out_clicked();
 	void on_tb_processing_zoom_in_clicked();
 	void on_tb_processing_zoom_out_clicked();
+	void on_a_file_open_triggered();
 	void on_a_edit_triggered();
 	void on_a_mesh_prev_triggered();
 	void on_a_mesh_next_triggered();

@@ -57,6 +57,9 @@ public:
 	Params const& get_params() const;
 	domain::Board const& get_board() const;
 
+	void set_input(std::filesystem::path const& path);
+	void set_output(std::filesystem::path const& path);
+
 	// TODO implement validation checks on params here.
 //	void check_x();
 

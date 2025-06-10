@@ -5,6 +5,7 @@
 ///*****************************************************************************
 
 #include <QDesktopServices>
+#include <QFileDialog>
 #include <QMarginsF>
 
 #include "domain/geometrics/space.hpp"
@@ -239,6 +240,22 @@ void MainWindow::on_tb_processing_zoom_in_clicked() {
 //******************************************************************************
 void MainWindow::on_tb_processing_zoom_out_clicked() {
 	ui->processing_view->scale(1 / 1.2, 1 / 1.2);
+}
+
+//******************************************************************************
+void MainWindow::on_a_file_open_triggered() {
+	static QString from_dir(".");
+	QString const csx = QFileDialog::getOpenFileName(this, "Open CSX file", from_dir, "OpenEMS CSX file (*.csx *.xml)");
+
+	if(csx.isEmpty())
+		return; // TODO log error
+
+	from_dir = QFileInfo(csx).path();
+
+	clear();
+	oemsh.set_input(csx.toStdString());
+	parse_and_display();
+	on_a_reset_triggered();
 }
 
 //******************************************************************************
