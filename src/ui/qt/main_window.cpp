@@ -384,8 +384,24 @@ void MainWindow::update_navigation_visibility() {
 
 //******************************************************************************
 void MainWindow::keyPressEvent(QKeyEvent* event) {
-	if(event->key() == Qt::Key_E) {
+	if(event->key() == Qt::Key_E || event->key() == Qt::Key_Space) {
 		on_a_edit_triggered();
+	} else if(event->key() == Qt::Key_F) {
+		on_a_reset_triggered();
+	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_O) {
+		on_a_file_open_triggered();
+	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_S) {
+//		if(event->modifiers() & Qt::ShiftModifier) {
+//			on_a_file_save_as_triggered();
+//		} else {
+//			on_a_file_save_triggered();
+//		}
+	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_Z) {
+		if(event->modifiers() & Qt::ShiftModifier) {
+			on_a_redo_triggered();
+		} else {
+			on_a_undo_triggered();
+		}
 	} else {
 		QWidget::keyPressEvent(event);
 	}
