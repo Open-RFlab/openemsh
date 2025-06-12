@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>OpenEMSH</string>
   </property>
+  <property name="windowIcon">
+   <iconset>:/openemsh.ico</iconset>
+  </property>
   <property name="windowState">
    <enum>Qt::WindowMaximized</enum>
   </property>
@@ -455,6 +458,8 @@
    <header>ui/qt/processing_view/processing_view.hpp</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

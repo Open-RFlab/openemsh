@@ -30,7 +30,6 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 , dock_layout_order(false)
 {
 	setWindowState(Qt::WindowMaximized);
-	setWindowIcon(QPixmap(":/openemsh.ico"));
 	ui->setupUi(this);
 
 	for(auto const& style : Style::available_styles) {
