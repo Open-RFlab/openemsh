@@ -6,6 +6,7 @@
 
 #include <QDesktopServices>
 #include <QFileDialog>
+#include <QGuiApplication>
 #include <QMarginsF>
 
 #include "domain/geometrics/space.hpp"
@@ -48,12 +49,12 @@ MainWindow::~MainWindow() = default;
 
 //******************************************************************************
 void MainWindow::parse_and_display() {
-	setCursor(Qt::WaitCursor);
+	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 	oemsh.parse();
 	ui->structure_view->init(&oemsh.get_board());
 	ui->processing_view->init(&oemsh.get_board());
 	handle_edition();
-	unsetCursor();
+	QGuiApplication::restoreOverrideCursor();
 }
 
 //******************************************************************************
@@ -282,35 +283,35 @@ void MainWindow::edit_global_params() {
 
 //******************************************************************************
 void MainWindow::on_a_mesh_prev_triggered() {
-	setCursor(Qt::WaitCursor);
+	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 	oemsh.go_before_previous_step();
 	go_to_or_make_current_state();
-	unsetCursor();
+	QGuiApplication::restoreOverrideCursor();
 }
 
 // TODO require some processing fit()
 //******************************************************************************
 void MainWindow::on_a_mesh_next_triggered() {
-	setCursor(Qt::WaitCursor);
+	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 	oemsh.run_next_step();
 	go_to_or_make_current_state();
-	unsetCursor();
+	QGuiApplication::restoreOverrideCursor();
 }
 
 //******************************************************************************
 void MainWindow::on_a_undo_triggered() {
-	setCursor(Qt::WaitCursor);
+	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 	Caretaker::singleton().undo();
 	go_to_or_make_current_state();
-	unsetCursor();
+	QGuiApplication::restoreOverrideCursor();
 }
 
 //******************************************************************************
 void MainWindow::on_a_redo_triggered() {
-	setCursor(Qt::WaitCursor);
+	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 	Caretaker::singleton().redo();
 	go_to_or_make_current_state();
-	unsetCursor();
+	QGuiApplication::restoreOverrideCursor();
 }
 
 //******************************************************************************

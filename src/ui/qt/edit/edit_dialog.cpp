@@ -4,6 +4,8 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <QGuiApplication>
+
 #include "edit_model.hpp"
 
 #include "ui_edit_dialog.h"
@@ -30,9 +32,9 @@ EditDialog::~EditDialog() = default;
 
 //******************************************************************************
 void EditDialog::on_dbb_ok_accepted() {
-	setCursor(Qt::WaitCursor);
+	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 	static_cast<EditModel*>(ui->tv_properties->model())->commit();
-	unsetCursor();
+	QGuiApplication::restoreOverrideCursor();
 	accept();
 }
 
