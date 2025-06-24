@@ -59,6 +59,7 @@ public:
 
 	void set_input(std::filesystem::path const& path);
 	void set_output(std::filesystem::path const& path);
+	void set_output_format(Params::OutputFormat format);
 
 	// TODO implement validation checks on params here.
 //	void check_x();

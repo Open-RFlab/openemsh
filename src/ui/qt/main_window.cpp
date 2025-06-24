@@ -29,6 +29,9 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 , ui(std::make_unique<Ui::MainWindow>())
 , oemsh(oemsh)
 , dock_layout_order(false)
+, csx_file(oemsh.get_params().input.empty()
+	? QString()
+	: QString::fromStdString(oemsh.get_params().input.generic_string()))
 {
 	setWindowState(Qt::WindowMaximized);
 	ui->setupUi(this);
@@ -50,11 +53,20 @@ MainWindow::~MainWindow() = default;
 //******************************************************************************
 void MainWindow::parse_and_display() {
 	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+	update_title();
 	oemsh.parse();
 	ui->structure_view->init(&oemsh.get_board());
 	ui->processing_view->init(&oemsh.get_board());
 	handle_edition();
 	QGuiApplication::restoreOverrideCursor();
+}
+
+//******************************************************************************
+void MainWindow::update_title() {
+	static QString const base_title(windowTitle());
+
+	if(!csx_file.isEmpty())
+		setWindowTitle(base_title + " - " + csx_file);
 }
 
 //******************************************************************************
@@ -243,19 +255,67 @@ void MainWindow::on_tb_processing_zoom_out_clicked() {
 }
 
 //******************************************************************************
+static QString const format_filter_csx("OpenEMS CSX file (*.csx *.xml)");
+
+//******************************************************************************
 void MainWindow::on_a_file_open_triggered() {
-	static QString from_dir(".");
-	QString const csx = QFileDialog::getOpenFileName(this, "Open CSX file", from_dir, "OpenEMS CSX file (*.csx *.xml)");
+	QFileDialog dialog(this, ui->a_file_open->toolTip());
+	dialog.setAcceptMode(QFileDialog::AcceptOpen);
+	dialog.setFileMode(QFileDialog::ExistingFile);
+	dialog.setNameFilter(format_filter_csx);
+	dialog.setDirectory(csx_file.isEmpty() ? QString(".") : QFileInfo(csx_file).path());
+	if(dialog.exec()) {
+		QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+		csx_file = dialog.selectedFiles().first();
 
-	if(csx.isEmpty())
-		return; // TODO log error
+		clear();
+		oemsh.set_input(csx_file.toStdString());
+		parse_and_display();
 
-	from_dir = QFileInfo(csx).path();
+		on_a_reset_triggered();
+		QGuiApplication::restoreOverrideCursor();
+	}
+}
 
-	clear();
-	oemsh.set_input(csx.toStdString());
-	parse_and_display();
-	on_a_reset_triggered();
+//******************************************************************************
+void MainWindow::on_a_file_save_triggered() {
+	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+
+	if(oemsh.get_params().output.empty())
+		oemsh.set_output(csx_file.toStdString());
+
+	// TODO deduce from csx_file suffix
+	oemsh.set_output_format(app::OpenEMSH::Params::OutputFormat::CSX);
+
+	// TODO warn for overwrite?
+
+	// TODO be sure in this mode, the XML file is edited and stuff like comments won't be discarded
+	oemsh.write();
+
+	QGuiApplication::restoreOverrideCursor();
+}
+
+//******************************************************************************
+void MainWindow::on_a_file_save_as_triggered() {
+	QFileDialog dialog(this, ui->a_file_save_as->toolTip());
+	dialog.setAcceptMode(QFileDialog::AcceptSave);
+	dialog.setFileMode(QFileDialog::AnyFile);
+	dialog.setNameFilter(format_filter_csx);
+	dialog.setDefaultSuffix(".csx");
+	dialog.setDirectory(csx_file.isEmpty() ? QString(".") : QFileInfo(csx_file).path());
+	if(dialog.exec()) {
+		QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+		csx_file = dialog.selectedFiles().first();
+		update_title();
+
+		// TODO deduce from filter selected by user
+		// dialog.selectedNameFilter(); // TODO check actual suffix with that ?
+		oemsh.set_output_format(app::OpenEMSH::Params::OutputFormat::CSX);
+		oemsh.set_output(csx_file.toStdString());
+		oemsh.write();
+
+		QGuiApplication::restoreOverrideCursor();
+	}
 }
 
 //******************************************************************************
@@ -391,11 +451,11 @@ void MainWindow::keyPressEvent(QKeyEvent* event) {
 	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_O) {
 		on_a_file_open_triggered();
 	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_S) {
-//		if(event->modifiers() & Qt::ShiftModifier) {
-//			on_a_file_save_as_triggered();
-//		} else {
-//			on_a_file_save_triggered();
-//		}
+		if(event->modifiers() & Qt::ShiftModifier) {
+			on_a_file_save_as_triggered();
+		} else {
+			on_a_file_save_triggered();
+		}
 	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_Z) {
 		if(event->modifiers() & Qt::ShiftModifier) {
 			on_a_redo_triggered();

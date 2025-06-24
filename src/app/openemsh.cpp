@@ -106,6 +106,11 @@ void OpenEMSH::set_output(std::filesystem::path const& path) {
 }
 
 //******************************************************************************
+void OpenEMSH::set_output_format(Params::OutputFormat format) {
+	params.output_format = format;
+}
+
+//******************************************************************************
 void OpenEMSH::parse() {
 	Caretaker::singleton().reset();
 	board = ParserFromCsx::run(params.input, static_cast<ParserFromCsx::Params const&>(params), params.override_from_cli);

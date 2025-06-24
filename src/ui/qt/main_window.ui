@@ -354,6 +354,8 @@
    <addaction name="a_horizontal_layout"/>
    <addaction name="separator"/>
    <addaction name="a_file_open"/>
+   <addaction name="a_file_save"/>
+   <addaction name="a_file_save_as"/>
    <addaction name="a_edit"/>
    <addaction name="a_mesh_prev"/>
    <addaction name="a_mesh_next"/>
@@ -403,6 +405,22 @@
    </property>
    <property name="toolTip">
     <string>Open CSX file</string>
+   </property>
+  </action>
+  <action name="a_file_save">
+   <property name="text">
+    <string>🗎</string>
+   </property>
+   <property name="toolTip">
+    <string>Save mesh overwriting input CSX file</string>
+   </property>
+  </action>
+  <action name="a_file_save_as">
+   <property name="text">
+    <string>🗎</string>
+   </property>
+   <property name="toolTip">
+    <string>Save mesh as...</string>
    </property>
   </action>
   <action name="a_edit">

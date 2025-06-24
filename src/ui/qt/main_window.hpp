@@ -28,9 +28,11 @@ private:
 	app::OpenEMSH& oemsh;
 
 	bool dock_layout_order;
+	QString csx_file;
 
 	void set_style(Style const& style);
 
+	void update_title();
 	void update_navigation_visibility();
 	void go_to_current_state();
 	void make_current_state_view();
@@ -64,6 +66,8 @@ private slots:
 	void on_tb_processing_zoom_in_clicked();
 	void on_tb_processing_zoom_out_clicked();
 	void on_a_file_open_triggered();
+	void on_a_file_save_triggered();
+	void on_a_file_save_as_triggered();
 	void on_a_edit_triggered();
 	void on_a_mesh_prev_triggered();
 	void on_a_mesh_next_triggered();
