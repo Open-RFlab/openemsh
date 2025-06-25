@@ -14,6 +14,7 @@
 #include <map>
 #include <string>
 
+#include "utils/concepts.hpp"
 #include "utils/unreachable.hpp"
 
 #include "cli.hpp"
@@ -77,6 +78,18 @@ struct FutureConditional : CLI::Validator {
 };
 
 //******************************************************************************
+template<InvocableR<void> F>
+struct JustDo : CLI::Validator {
+	JustDo(F const& func) {
+		name_ = "JustDo";
+		func_ = [func](string const&) {
+			func();
+			return std::string();
+		};
+	}
+};
+
+//******************************************************************************
 template<auto Member>
 auto make_overrider(auto& overrides_collector) {
 	return [&overrides_collector](auto const& value) { // This is CLI::add_option_function callback.
@@ -99,8 +112,9 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app.set_help_flag("-h,--help", "Display help and exit.");
 	app.set_version_flag("--version", OEMSH_VERSION, "Display version and exit.");
 	app.add_flag("-v,--verbose", params.verbose, "Verbose mode.")->capture_default_str();
-	app.add_flag("-G", params.gui, "GUI mode.");
-	app.add_option("-i,--input", params.input, "Input CSX file.")->check(CLI::ExistingFile)->required();
+	auto* g = app.add_flag("-G", params.gui, "GUI mode.");
+	auto* i = app.add_option("-i,--input", params.input, "Input CSX file.")->check(CLI::ExistingFile)->required();
+	g->trigger_on_parse()->check(JustDo([i]() { i->required(false); }));
 //	app.add_option("-o,--output", params.output, "Output CSX file. If different from input, will copy and extend it.")->check((!CLI::ExistingFile)|FutureConditional(params.force,"Cannot overwrite a file without --force"));
 	app.add_option("-o,--output", params.output, "Output CSX file. If different from input, will copy and extend it.")->check(CLI::Validator((!CLI::ExistingFile)|FutureConditional(params.force,"Cannot overwrite a file without --force"), "FILE", "KO"));
 	app.add_flag("-f,--force", params.force, "Allow overwriting a file.")->trigger_on_parse();
