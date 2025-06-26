@@ -398,6 +398,9 @@
    <property name="toolTip">
     <string>Reset view</string>
    </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::ZoomFitBest"/>
+   </property>
   </action>
   <action name="a_file_open">
    <property name="text">
@@ -405,6 +408,9 @@
    </property>
    <property name="toolTip">
     <string>Open CSX file</string>
+   </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentOpen"/>
    </property>
   </action>
   <action name="a_file_save">
@@ -414,6 +420,9 @@
    <property name="toolTip">
     <string>Save mesh overwriting input CSX file</string>
    </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentSave"/>
+   </property>
   </action>
   <action name="a_file_save_as">
    <property name="text">
@@ -421,6 +430,9 @@
    </property>
    <property name="toolTip">
     <string>Save mesh as...</string>
+   </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentSaveAs"/>
    </property>
   </action>
   <action name="a_edit">
@@ -430,6 +442,9 @@
    <property name="toolTip">
     <string>Edit parameters</string>
    </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentProperties"/>
+   </property>
   </action>
   <action name="a_mesh_next">
    <property name="text">
@@ -437,6 +452,9 @@
    </property>
    <property name="toolTip">
     <string>Run the next meshing step</string>
+   </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::MediaSkipForward"/>
    </property>
   </action>
   <action name="a_mesh_prev">
@@ -446,6 +464,9 @@
    <property name="toolTip">
     <string>Go back to previous meshing step</string>
    </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::MediaSkipBackward"/>
+   </property>
   </action>
   <action name="a_undo">
    <property name="text">
@@ -454,6 +475,9 @@
    <property name="toolTip">
     <string>Undo</string>
    </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditUndo"/>
+   </property>
   </action>
   <action name="a_redo">
    <property name="text">
@@ -461,6 +485,9 @@
    </property>
    <property name="toolTip">
     <string>Redo</string>
+   </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditRedo"/>
    </property>
   </action>
  </widget>
