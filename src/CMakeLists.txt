@@ -111,6 +111,7 @@ target_sources( openemsh_bin
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/structure_view/structure_scene.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/structure_view/structure_view.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/about_dialog.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/icons.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/main_window.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/style.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/resources.qrc"

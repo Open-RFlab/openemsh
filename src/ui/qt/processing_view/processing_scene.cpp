@@ -17,6 +17,7 @@
 #include "domain/mesh/meshline.hpp"
 #include "domain/mesh/meshline_policy.hpp"
 #include "ui/qt/data_keys.hpp"
+#include "ui/qt/icons.hpp"
 #include "ui/qt/edit/edit_dialog.hpp"
 #include "ui/qt/edit/edit_model.hpp"
 #include "ui/qt/utils/qlist_utils.hpp"
@@ -494,7 +495,7 @@ void ProcessingScene::edit(QList<nodegraph::Node*> nodes, QPoint const& pos) {
 		for(auto* node : nodes) {
 //			// TODO add entity icon
 			auto const title = make_title(node);
-			auto* action = new QAction(title, &menu);
+			auto* action = new QAction(Icons::select(node), title, &menu);
 			menu.addAction(action);
 			QObject::connect(action, &QAction::triggered, [&edit_node, node, title]() {
 				edit_node(node, title);

@@ -38,11 +38,11 @@ public:
 
 	int type() const override;
 
+	domain::ViewAxis const axis;
+
 protected:
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;
 	QVariant itemChange(GraphicsItemChange change, QVariant const& value) override;
-
-	domain::ViewAxis const axis;
 
 private:
 	domain::Interval const* const interval;
