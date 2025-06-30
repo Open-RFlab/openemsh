@@ -47,7 +47,7 @@ private slots:
 	void on_rb_plane_yz_toggled(bool const is_checked);
 	void on_rb_plane_zx_toggled(bool const is_checked);
 	void on_tb_anchor_clicked(bool const is_checked);
-	void on_a_reset_triggered();
+	void on_a_fit_triggered();
 	void on_a_horizontal_layout_triggered();
 	void on_a_vertical_layout_triggered();
 	void on_tb_show_all_mesh_clicked();

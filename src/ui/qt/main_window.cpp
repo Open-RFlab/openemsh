@@ -135,7 +135,7 @@ void MainWindow::on_tb_anchor_clicked(bool const is_checked) {
 }
 
 //******************************************************************************
-void MainWindow::on_a_reset_triggered() {
+void MainWindow::on_a_fit_triggered() {
 	ui->processing_view->get_current_state().scene->fit_containers();
 	ui->processing_view->get_current_state().scene->fit_scene();
 	ui->processing_view->fit();
@@ -272,7 +272,7 @@ void MainWindow::on_a_file_open_triggered() {
 		oemsh.set_input(csx_file.toStdString());
 		parse_and_display();
 
-		on_a_reset_triggered();
+		on_a_fit_triggered();
 		QGuiApplication::restoreOverrideCursor();
 	}
 }
@@ -447,7 +447,7 @@ void MainWindow::keyPressEvent(QKeyEvent* event) {
 	if(event->key() == Qt::Key_E || event->key() == Qt::Key_Space) {
 		on_a_edit_triggered();
 	} else if(event->key() == Qt::Key_F) {
-		on_a_reset_triggered();
+		on_a_fit_triggered();
 	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_O) {
 		on_a_file_open_triggered();
 	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_S) {
