@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <list>
 #include <map>
 #include <memory>
 #include <optional>
@@ -43,7 +44,7 @@ private:
 	Timepoint* current_timepoint;
 	std::vector<std::weak_ptr<IOriginator>> originators;
 	std::vector<Timepoint*> pinned_timepoints; // TODO use std::set ?
-	std::vector<Timepoint*> user_history;
+	std::list<Timepoint*> user_history;
 	std::optional<decltype(user_history)::reverse_iterator> user_history_browser;
 	std::map<Timepoint*, std::unique_ptr<IAnnotation>> annotations;
 

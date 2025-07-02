@@ -30,12 +30,18 @@ Caretaker::Caretaker() noexcept
 void Caretaker::garbage_collector() noexcept {
 	// Step 1: fill a set with all pinned/visited/current + ancestors : to keep.
 	set<Timepoint*> to_keep;
-	for(auto const& list : { pinned_timepoints, user_history, { current_timepoint } })
+	auto const keep = [&](auto const& list) {
 		for(auto* t : list) {
-//			to_keep.insert_range(t->ancestors()); // TODO C++23 unsupported yet feature
 			auto ancestors = t->ancestors(true);
 			to_keep.insert(begin(ancestors), end(ancestors));
 		}
+	};
+	keep(pinned_timepoints);
+	keep(user_history);
+	keep(array { current_timepoint });
+//	// TODO C++26 std::ranges::concat_view & C++23 unsupported yet feature std::set::insert_range()
+//	for(auto* t : ranges::concat_view(pinned_timepoints, user_history, { current_timepoint }))
+//		to_keep.insert_range(t->ancestors(true));
 
 	// Step 2: retrieve all nodes that are not to keep : to remove.
 	set<Timepoint*> to_remove;
@@ -121,7 +127,7 @@ void Caretaker::undo(size_t remembered_timepoints) noexcept {
 	ranges::advance(*user_history_browser, remembered_timepoints, prev(user_history.rend()));
 	current_timepoint = **user_history_browser;
 
-	if(user_history_browser == user_history.rbegin())
+	if(*user_history_browser == user_history.rbegin())
 		user_history_browser = nullopt;
 
 	go_without_remembering(current_timepoint);
@@ -135,7 +141,7 @@ void Caretaker::redo(size_t remembered_timepoints) noexcept {
 	ranges::advance(*user_history_browser, - make_signed_t<size_t>(remembered_timepoints), user_history.rbegin());
 	current_timepoint = **user_history_browser;
 
-	if(user_history_browser == user_history.rbegin())
+	if(*user_history_browser == user_history.rbegin())
 		user_history_browser = nullopt;
 
 	go_without_remembering(current_timepoint);

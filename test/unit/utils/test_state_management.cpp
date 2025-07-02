@@ -158,6 +158,11 @@ public:
 };
 
 //******************************************************************************
+constexpr Timepoint* at(std::list<Timepoint*> const& list, std::size_t i) {
+	return *std::next(list.begin(), i);
+}
+
+//******************************************************************************
 SCENARIO("template<typename State> Originator<State>::Originator(Timepoint* init_timepoint, T state, Caretaker& caretaker) noexcept", "[utils][state_management]") {
 	GIVEN("An Originator") {
 		Caretaker c;
@@ -711,7 +716,7 @@ SCENARIO("Caretaker::Caretaker() noexcept", "[utils][state_management]") {
 
 		THEN("User history should contain to the history tree root") {
 			REQUIRE(c.user_history.size() == 1);
-			REQUIRE(c.user_history[0] == c.history_root.get());
+			REQUIRE(at(c.user_history, 0) == c.history_root.get());
 		}
 	}
 }
@@ -789,8 +794,8 @@ SCENARIO("void Caretaker::garbage_collector() noexcept", "[utils][state_manageme
 		REQUIRE(c.pinned_timepoints.size() == 1);
 		REQUIRE(contains(c.pinned_timepoints, f1));
 		REQUIRE(c.user_history.size() == 2);
-		REQUIRE(c.user_history[0] == a);
-		REQUIRE(c.user_history[1] == g1);
+		REQUIRE(at(c.user_history, 0) == a);
+		REQUIRE(at(c.user_history, 1) == g1);
 		REQUIRE(c.originators.size() == 3);
 		REQUIRE(contains_originator(c.originators, x.get()));
 		REQUIRE(contains_originator(c.originators, y.get()));
@@ -890,19 +895,19 @@ SCENARIO("void Caretaker::stop_browsing_user_history() noexcept", "[utils][state
 
 		WHEN("Not browsing user history") {
 			REQUIRE(c.user_history.size() == 4);
-			REQUIRE(c.user_history[0] == t0);
-			REQUIRE(c.user_history[1] == t1);
-			REQUIRE(c.user_history[2] == t2);
-			REQUIRE(c.user_history[3] == t3);
+			REQUIRE(at(c.user_history, 0) == t0);
+			REQUIRE(at(c.user_history, 1) == t1);
+			REQUIRE(at(c.user_history, 2) == t2);
+			REQUIRE(at(c.user_history, 3) == t3);
 			REQUIRE(c.get_current_timepoint() == t3);
 
 			THEN("Should not do anything") {
 				c.stop_browsing_user_history();
 				REQUIRE(c.user_history.size() == 4);
-				REQUIRE(c.user_history[0] == t0);
-				REQUIRE(c.user_history[1] == t1);
-				REQUIRE(c.user_history[2] == t2);
-				REQUIRE(c.user_history[3] == t3);
+				REQUIRE(at(c.user_history, 0) == t0);
+				REQUIRE(at(c.user_history, 1) == t1);
+				REQUIRE(at(c.user_history, 2) == t2);
+				REQUIRE(at(c.user_history, 3) == t3);
 				REQUIRE(c.get_current_timepoint() == t3);
 			}
 		}
@@ -910,10 +915,10 @@ SCENARIO("void Caretaker::stop_browsing_user_history() noexcept", "[utils][state
 		WHEN("Browsing user history by undoing") {
 			c.undo(2);
 			REQUIRE(c.user_history.size() == 4);
-			REQUIRE(c.user_history[0] == t0);
-			REQUIRE(c.user_history[1] == t1);
-			REQUIRE(c.user_history[2] == t2);
-			REQUIRE(c.user_history[3] == t3);
+			REQUIRE(at(c.user_history, 0) == t0);
+			REQUIRE(at(c.user_history, 1) == t1);
+			REQUIRE(at(c.user_history, 2) == t2);
+			REQUIRE(at(c.user_history, 3) == t3);
 			REQUIRE(c.get_current_timepoint() == t1);
 
 			WHEN("Auto garbage collector is enabled") {
@@ -922,8 +927,8 @@ SCENARIO("void Caretaker::stop_browsing_user_history() noexcept", "[utils][state
 
 				THEN("Should remove undoed timepoints from user history") {
 					REQUIRE(c.user_history.size() == 2);
-					REQUIRE(c.user_history[0] == t0);
-					REQUIRE(c.user_history[1] == t1);
+					REQUIRE(at(c.user_history, 0) == t0);
+					REQUIRE(at(c.user_history, 1) == t1);
 					REQUIRE(c.get_current_timepoint() == t1);
 				}
 
@@ -943,8 +948,8 @@ SCENARIO("void Caretaker::stop_browsing_user_history() noexcept", "[utils][state
 
 				THEN("Should remove undoed timepoints from user history") {
 					REQUIRE(c.user_history.size() == 2);
-					REQUIRE(c.user_history[0] == t0);
-					REQUIRE(c.user_history[1] == t1);
+					REQUIRE(at(c.user_history, 0) == t0);
+					REQUIRE(at(c.user_history, 1) == t1);
 					REQUIRE(c.get_current_timepoint() == t1);
 				}
 
@@ -1040,10 +1045,10 @@ SCENARIO("Timepoint* Caretaker::make_next_timepoint() noexcept", "[utils][state_
 
 		WHEN("Not browsing user history") {
 			REQUIRE(c.user_history.size() == 4);
-			REQUIRE(c.user_history[0] == t0);
-			REQUIRE(c.user_history[1] == t1);
-			REQUIRE(c.user_history[2] == t2);
-			REQUIRE(c.user_history[3] == t3);
+			REQUIRE(at(c.user_history, 0) == t0);
+			REQUIRE(at(c.user_history, 1) == t1);
+			REQUIRE(at(c.user_history, 2) == t2);
+			REQUIRE(at(c.user_history, 3) == t3);
 			REQUIRE(c.get_current_timepoint() == t3);
 			REQUIRE_FALSE(c.can_redo());
 
@@ -1063,10 +1068,10 @@ SCENARIO("Timepoint* Caretaker::make_next_timepoint() noexcept", "[utils][state_
 		WHEN("Browsing user history") {
 			c.undo(2);
 			REQUIRE(c.user_history.size() == 4);
-			REQUIRE(c.user_history[0] == t0);
-			REQUIRE(c.user_history[1] == t1);
-			REQUIRE(c.user_history[2] == t2);
-			REQUIRE(c.user_history[3] == t3);
+			REQUIRE(at(c.user_history, 0) == t0);
+			REQUIRE(at(c.user_history, 1) == t1);
+			REQUIRE(at(c.user_history, 2) == t2);
+			REQUIRE(at(c.user_history, 3) == t3);
 			REQUIRE(c.get_current_timepoint() == t1);
 			REQUIRE(c.can_redo());
 
@@ -1084,8 +1089,8 @@ SCENARIO("Timepoint* Caretaker::make_next_timepoint() noexcept", "[utils][state_
 				THEN("Should remove undoed timepoints from user history") {
 					REQUIRE_FALSE(c.can_redo());
 					REQUIRE(c.user_history.size() == 2);
-					REQUIRE(c.user_history[0] == t0);
-					REQUIRE(c.user_history[1] == t1);
+					REQUIRE(at(c.user_history, 0) == t0);
+					REQUIRE(at(c.user_history, 1) == t1);
 				}
 			}
 		}
@@ -1171,10 +1176,10 @@ SCENARIO("void Caretaker::undo(size_t remembered_timepoints) noexcept", "[utils]
 			WHEN("Current timepoint is a remembered timepoint") {
 				c.remember_current_timepoint();
 				REQUIRE(c.user_history.size() == 4);
-				REQUIRE(c.user_history[0] == t0);
-				REQUIRE(c.user_history[1] == t1);
-				REQUIRE(c.user_history[2] == t2);
-				REQUIRE(c.user_history[3] == t3);
+				REQUIRE(at(c.user_history, 0) == t0);
+				REQUIRE(at(c.user_history, 1) == t1);
+				REQUIRE(at(c.user_history, 2) == t2);
+				REQUIRE(at(c.user_history, 3) == t3);
 				REQUIRE(c.get_current_timepoint() == t3);
 
 				WHEN("Undoing one timepoint") {
@@ -1204,9 +1209,9 @@ SCENARIO("void Caretaker::undo(size_t remembered_timepoints) noexcept", "[utils]
 
 			WHEN("Current timepoint is not a remembered timepoint") {
 				REQUIRE(c.user_history.size() == 3);
-				REQUIRE(c.user_history[0] == t0);
-				REQUIRE(c.user_history[1] == t1);
-				REQUIRE(c.user_history[2] == t2);
+				REQUIRE(at(c.user_history, 0) == t0);
+				REQUIRE(at(c.user_history, 1) == t1);
+				REQUIRE(at(c.user_history, 2) == t2);
 				REQUIRE(c.get_current_timepoint() == t3);
 
 				WHEN("Undoing one timepoint") {
@@ -1237,7 +1242,7 @@ SCENARIO("void Caretaker::undo(size_t remembered_timepoints) noexcept", "[utils]
 
 		WHEN("Cannot undo") {
 			REQUIRE(c.user_history.size() == 1);
-			REQUIRE(c.user_history[0] == c.get_history_root());
+			REQUIRE(at(c.user_history, 0) == c.get_history_root());
 			REQUIRE(c.get_current_timepoint() == c.get_history_root());
 			REQUIRE_FALSE(c.can_undo());
 
@@ -1319,8 +1324,8 @@ SCENARIO("bool Caretaker::can_undo() const noexcept", "[utils][state_management]
 		Caretaker c;
 
 		THEN("Should return false") {
-			REQUIRE(c.user_history[0] == c.get_current_timepoint());
-			REQUIRE(c.user_history[0] == c.get_history_root());
+			REQUIRE(at(c.user_history, 0) == c.get_current_timepoint());
+			REQUIRE(at(c.user_history, 0) == c.get_history_root());
 			REQUIRE_FALSE(c.can_undo());
 		}
 	}
@@ -1337,10 +1342,10 @@ SCENARIO("bool Caretaker::can_undo() const noexcept", "[utils][state_management]
 
 		WHEN("Not browsing user history") {
 			REQUIRE(c.user_history.size() == 4);
-			REQUIRE(c.user_history[0] == t0);
-			REQUIRE(c.user_history[1] == t1);
-			REQUIRE(c.user_history[2] == t2);
-			REQUIRE(c.user_history[3] == t3);
+			REQUIRE(at(c.user_history, 0) == t0);
+			REQUIRE(at(c.user_history, 1) == t1);
+			REQUIRE(at(c.user_history, 2) == t2);
+			REQUIRE(at(c.user_history, 3) == t3);
 			REQUIRE(c.get_current_timepoint() == t3);
 
 			THEN("Should return true") {
@@ -1351,10 +1356,10 @@ SCENARIO("bool Caretaker::can_undo() const noexcept", "[utils][state_management]
 		WHEN("Browsing user history by undoing to the history root") {
 			c.undo(3);
 			REQUIRE(c.user_history.size() == 4);
-			REQUIRE(c.user_history[0] == t0);
-			REQUIRE(c.user_history[1] == t1);
-			REQUIRE(c.user_history[2] == t2);
-			REQUIRE(c.user_history[3] == t3);
+			REQUIRE(at(c.user_history, 0) == t0);
+			REQUIRE(at(c.user_history, 1) == t1);
+			REQUIRE(at(c.user_history, 2) == t2);
+			REQUIRE(at(c.user_history, 3) == t3);
 			REQUIRE(c.get_current_timepoint() == t0);
 
 			THEN("Should return false") {
@@ -1364,10 +1369,10 @@ SCENARIO("bool Caretaker::can_undo() const noexcept", "[utils][state_management]
 			AND_WHEN("Redoing some but not all of the undoed timepoints") {
 				c.redo(2);
 				REQUIRE(c.user_history.size() == 4);
-				REQUIRE(c.user_history[0] == t0);
-				REQUIRE(c.user_history[1] == t1);
-				REQUIRE(c.user_history[2] == t2);
-				REQUIRE(c.user_history[3] == t3);
+				REQUIRE(at(c.user_history, 0) == t0);
+				REQUIRE(at(c.user_history, 1) == t1);
+				REQUIRE(at(c.user_history, 2) == t2);
+				REQUIRE(at(c.user_history, 3) == t3);
 				REQUIRE(c.get_current_timepoint() == t2);
 
 				THEN("Should return true") {
@@ -1379,10 +1384,10 @@ SCENARIO("bool Caretaker::can_undo() const noexcept", "[utils][state_management]
 		WHEN("Browsing user history by undoing to an intermediate timepoint") {
 			c.undo(2);
 			REQUIRE(c.user_history.size() == 4);
-			REQUIRE(c.user_history[0] == t0);
-			REQUIRE(c.user_history[1] == t1);
-			REQUIRE(c.user_history[2] == t2);
-			REQUIRE(c.user_history[3] == t3);
+			REQUIRE(at(c.user_history, 0) == t0);
+			REQUIRE(at(c.user_history, 1) == t1);
+			REQUIRE(at(c.user_history, 2) == t2);
+			REQUIRE(at(c.user_history, 3) == t3);
 			REQUIRE(c.get_current_timepoint() == t1);
 
 			THEN("Should return true") {
@@ -1406,10 +1411,10 @@ SCENARIO("bool Caretaker::can_redo() const noexcept", "[utils][state_management]
 
 		WHEN("Not browsing user history") {
 			REQUIRE(c.user_history.size() == 4);
-			REQUIRE(c.user_history[0] == t0);
-			REQUIRE(c.user_history[1] == t1);
-			REQUIRE(c.user_history[2] == t2);
-			REQUIRE(c.user_history[3] == t3);
+			REQUIRE(at(c.user_history, 0) == t0);
+			REQUIRE(at(c.user_history, 1) == t1);
+			REQUIRE(at(c.user_history, 2) == t2);
+			REQUIRE(at(c.user_history, 3) == t3);
 			REQUIRE(c.get_current_timepoint() == t3);
 
 			THEN("Should return false") {
@@ -1420,10 +1425,10 @@ SCENARIO("bool Caretaker::can_redo() const noexcept", "[utils][state_management]
 		WHEN("Browsing user history by undoing") {
 			c.undo(2);
 			REQUIRE(c.user_history.size() == 4);
-			REQUIRE(c.user_history[0] == t0);
-			REQUIRE(c.user_history[1] == t1);
-			REQUIRE(c.user_history[2] == t2);
-			REQUIRE(c.user_history[3] == t3);
+			REQUIRE(at(c.user_history, 0) == t0);
+			REQUIRE(at(c.user_history, 1) == t1);
+			REQUIRE(at(c.user_history, 2) == t2);
+			REQUIRE(at(c.user_history, 3) == t3);
 			REQUIRE(c.get_current_timepoint() == t1);
 
 			THEN("Should return true") {
@@ -1433,8 +1438,8 @@ SCENARIO("bool Caretaker::can_redo() const noexcept", "[utils][state_management]
 			AND_WHEN("Stopping browsing user history by creating a next timepoint") {
 				Timepoint* t4 = c.make_next_timepoint();
 				REQUIRE(c.user_history.size() == 2);
-				REQUIRE(c.user_history[0] == t0);
-				REQUIRE(c.user_history[1] == t1);
+				REQUIRE(at(c.user_history, 0) == t0);
+				REQUIRE(at(c.user_history, 1) == t1);
 				REQUIRE(c.get_current_timepoint() == t4);
 
 				THEN("Should return false") {
@@ -1447,10 +1452,10 @@ SCENARIO("bool Caretaker::can_redo() const noexcept", "[utils][state_management]
 				REQUIRE(c.can_redo());
 				c.redo();
 				REQUIRE(c.user_history.size() == 4);
-				REQUIRE(c.user_history[0] == t0);
-				REQUIRE(c.user_history[1] == t1);
-				REQUIRE(c.user_history[2] == t2);
-				REQUIRE(c.user_history[3] == t3);
+				REQUIRE(at(c.user_history, 0) == t0);
+				REQUIRE(at(c.user_history, 1) == t1);
+				REQUIRE(at(c.user_history, 2) == t2);
+				REQUIRE(at(c.user_history, 3) == t3);
 				REQUIRE(c.get_current_timepoint() == t3);
 
 				THEN("Should return false") {
@@ -1474,9 +1479,9 @@ SCENARIO("void Caretaker::unpin(Timepoint* t) noexcept", "[utils][state_manageme
 		c.go_without_remembering(t0);
 
 		REQUIRE(c.user_history.size() == 3);
-		REQUIRE(c.user_history[0] == t0);
-		REQUIRE(c.user_history[1] == t1);
-		REQUIRE(c.user_history[2] == t2);
+		REQUIRE(at(c.user_history, 0) == t0);
+		REQUIRE(at(c.user_history, 1) == t1);
+		REQUIRE(at(c.user_history, 2) == t2);
 		REQUIRE(c.pinned_timepoints.size() == 2);
 		REQUIRE(contains(c.pinned_timepoints, t1));
 		REQUIRE(contains(c.pinned_timepoints, t2));
@@ -1501,9 +1506,9 @@ SCENARIO("void Caretaker::unpin(Timepoint* t) noexcept", "[utils][state_manageme
 				REQUIRE(contains(h, t2)); // Still in user_history
 				REQUIRE_FALSE(contains(h, t3));
 				REQUIRE(c.user_history.size() == 3);
-				REQUIRE(c.user_history[0] == t0);
-				REQUIRE(c.user_history[1] == t1);
-				REQUIRE(c.user_history[2] == t2);
+				REQUIRE(at(c.user_history, 0) == t0);
+				REQUIRE(at(c.user_history, 1) == t1);
+				REQUIRE(at(c.user_history, 2) == t2);
 			}
 		}
 
@@ -1526,9 +1531,9 @@ SCENARIO("void Caretaker::unpin(Timepoint* t) noexcept", "[utils][state_manageme
 				REQUIRE(contains(h, t2));
 				REQUIRE(contains(h, t3));
 				REQUIRE(c.user_history.size() == 3);
-				REQUIRE(c.user_history[0] == t0);
-				REQUIRE(c.user_history[1] == t1);
-				REQUIRE(c.user_history[2] == t2);
+				REQUIRE(at(c.user_history, 0) == t0);
+				REQUIRE(at(c.user_history, 1) == t1);
+				REQUIRE(at(c.user_history, 2) == t2);
 			}
 		}
 	}
@@ -1543,7 +1548,7 @@ SCENARIO("void Caretaker::pin_current_timepoint() noexcept", "[utils][state_mana
 		THEN("No timepoint should be pinned but root history should be in user history") {
 			REQUIRE(c.pinned_timepoints.empty());
 			REQUIRE(c.user_history.size() == 1);
-			REQUIRE(c.user_history[0] == t0);
+			REQUIRE(at(c.user_history, 0) == t0);
 		}
 
 		WHEN("Trying to pin current timepoint") {
@@ -1553,7 +1558,7 @@ SCENARIO("void Caretaker::pin_current_timepoint() noexcept", "[utils][state_mana
 				REQUIRE(c.pinned_timepoints.size() == 1);
 				REQUIRE(contains(c.pinned_timepoints, t0));
 				REQUIRE(c.user_history.size() == 1);
-				REQUIRE(c.user_history[0] == t0);
+				REQUIRE(at(c.user_history, 0) == t0);
 			}
 
 			AND_WHEN("Trying to pin current timepoint again") {
@@ -1563,7 +1568,7 @@ SCENARIO("void Caretaker::pin_current_timepoint() noexcept", "[utils][state_mana
 					REQUIRE(c.pinned_timepoints.size() == 1);
 					REQUIRE(contains(c.pinned_timepoints, t0));
 					REQUIRE(c.user_history.size() == 1);
-					REQUIRE(c.user_history[0] == t0);
+					REQUIRE(at(c.user_history, 0) == t0);
 				}
 			}
 
@@ -1576,8 +1581,8 @@ SCENARIO("void Caretaker::pin_current_timepoint() noexcept", "[utils][state_mana
 					REQUIRE(contains(c.pinned_timepoints, t0));
 					REQUIRE(contains(c.pinned_timepoints, t1));
 					REQUIRE(c.user_history.size() == 2);
-					REQUIRE(c.user_history[0] == t0);
-					REQUIRE(c.user_history[1] == t1);
+					REQUIRE(at(c.user_history, 0) == t0);
+					REQUIRE(at(c.user_history, 1) == t1);
 				}
 
 				AND_WHEN("Trying to pin current timepoint after going_without_remembering to the previous timepoint") {
@@ -1589,9 +1594,9 @@ SCENARIO("void Caretaker::pin_current_timepoint() noexcept", "[utils][state_mana
 						REQUIRE(contains(c.pinned_timepoints, t0));
 						REQUIRE(contains(c.pinned_timepoints, t1));
 						REQUIRE(c.user_history.size() == 3);
-						REQUIRE(c.user_history[0] == t0);
-						REQUIRE(c.user_history[1] == t1);
-						REQUIRE(c.user_history[2] == t0);
+						REQUIRE(at(c.user_history, 0) == t0);
+						REQUIRE(at(c.user_history, 1) == t1);
+						REQUIRE(at(c.user_history, 2) == t0);
 					}
 				}
 			}
@@ -1607,7 +1612,7 @@ SCENARIO("void Caretaker::remember_current_timepoint() noexcept", "[utils][state
 
 		THEN("Root history should be in user history") {
 			REQUIRE(c.user_history.size() == 1);
-			REQUIRE(c.user_history[0] == t0);
+			REQUIRE(at(c.user_history, 0) == t0);
 		}
 
 		WHEN("Trying to remember current timepoint") {
@@ -1615,7 +1620,7 @@ SCENARIO("void Caretaker::remember_current_timepoint() noexcept", "[utils][state
 
 			THEN("Current timepoint should not be appended again to user history") {
 				REQUIRE(c.user_history.size() == 1);
-				REQUIRE(c.user_history[0] == t0);
+				REQUIRE(at(c.user_history, 0) == t0);
 			}
 
 			AND_WHEN("Trying to remember current timepoint after going to the next timepoint") {
@@ -1624,8 +1629,8 @@ SCENARIO("void Caretaker::remember_current_timepoint() noexcept", "[utils][state
 
 				THEN("Next timepoint should be appended to user history") {
 					REQUIRE(c.user_history.size() == 2);
-					REQUIRE(c.user_history[0] == t0);
-					REQUIRE(c.user_history[1] == t1);
+					REQUIRE(at(c.user_history, 0) == t0);
+					REQUIRE(at(c.user_history, 1) == t1);
 				}
 
 				AND_WHEN("Trying to remember current timepoint after going_without_remembering to the previous timepoint") {
@@ -1634,9 +1639,9 @@ SCENARIO("void Caretaker::remember_current_timepoint() noexcept", "[utils][state
 
 					THEN("Previous timepoint should be appended to user history") {
 						REQUIRE(c.user_history.size() == 3);
-						REQUIRE(c.user_history[0] == t0);
-						REQUIRE(c.user_history[1] == t1);
-						REQUIRE(c.user_history[2] == t0);
+						REQUIRE(at(c.user_history, 0) == t0);
+						REQUIRE(at(c.user_history, 1) == t1);
+						REQUIRE(at(c.user_history, 2) == t0);
 					}
 				}
 			}
@@ -1760,7 +1765,7 @@ SCENARIO("bool Caretaker::go_and_remember(Timepoint* t) noexcept", "[utils][stat
 
 		THEN("Root history should be in user history") {
 			REQUIRE(c.user_history.size() == 1);
-			REQUIRE(c.user_history[0] == a);
+			REQUIRE(at(c.user_history, 0) == a);
 		}
 
 		WHEN("Trying to go to a Timepoint that is part of the history tree") {
@@ -1770,8 +1775,8 @@ SCENARIO("bool Caretaker::go_and_remember(Timepoint* t) noexcept", "[utils][stat
 				REQUIRE(r);
 				REQUIRE(c.get_current_timepoint() == d1);
 				REQUIRE(c.user_history.size() == 2);
-				REQUIRE(c.user_history[0] == a);
-				REQUIRE(c.user_history[1] == d1);
+				REQUIRE(at(c.user_history, 0) == a);
+				REQUIRE(at(c.user_history, 1) == d1);
 			}
 
 			THEN("Current timepoint should be propagated to valid Originators") {
@@ -1793,7 +1798,7 @@ SCENARIO("bool Caretaker::go_and_remember(Timepoint* t) noexcept", "[utils][stat
 				REQUIRE(x->get_current_timepoint() == d2);
 				REQUIRE(y->get_current_timepoint() == c1);
 				REQUIRE(c.user_history.size() == 1);
-				REQUIRE(c.user_history[0] == a);
+				REQUIRE(at(c.user_history, 0) == a);
 			}
 		}
 
@@ -1807,7 +1812,7 @@ SCENARIO("bool Caretaker::go_and_remember(Timepoint* t) noexcept", "[utils][stat
 				REQUIRE(x->get_current_timepoint() == d2);
 				REQUIRE(y->get_current_timepoint() == c1);
 				REQUIRE(c.user_history.size() == 1);
-				REQUIRE(c.user_history[0] == a);
+				REQUIRE(at(c.user_history, 0) == a);
 			}
 		}
 	}
@@ -1883,7 +1888,7 @@ SCENARIO("void Caretaker::annotate_current_timepoint(std::unique_ptr<IAnnotation
 			THEN("Current timepoint should not be pinned nor appended to user history") {
 				REQUIRE(c.pinned_timepoints.empty());
 				REQUIRE(c.user_history.size() == 1);
-				REQUIRE(c.user_history[0] == c.history_root.get());
+				REQUIRE(at(c.user_history, 0) == c.history_root.get());
 			}
 
 			AND_WHEN("Trying to annotate current timepoint again") {
