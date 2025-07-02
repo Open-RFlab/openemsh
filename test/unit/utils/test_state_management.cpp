@@ -1478,10 +1478,8 @@ SCENARIO("void Caretaker::unpin(Timepoint* t) noexcept", "[utils][state_manageme
 		[[maybe_unused]] Timepoint* t3 = c.make_next_timepoint();
 		c.go_without_remembering(t0);
 
-		REQUIRE(c.user_history.size() == 3);
+		REQUIRE(c.user_history.size() == 1);
 		REQUIRE(at(c.user_history, 0) == t0);
-		REQUIRE(at(c.user_history, 1) == t1);
-		REQUIRE(at(c.user_history, 2) == t2);
 		REQUIRE(c.pinned_timepoints.size() == 2);
 		REQUIRE(contains(c.pinned_timepoints, t1));
 		REQUIRE(contains(c.pinned_timepoints, t2));
@@ -1489,12 +1487,12 @@ SCENARIO("void Caretaker::unpin(Timepoint* t) noexcept", "[utils][state_manageme
 
 		WHEN("Auto garbage collector is enabled") {
 			c.set_auto_gc(true);
-			c.unpin(t2);
+			c.unpin(t1);
 
 			THEN("Should remove unpined timepoint from pinned timepoints") {
 				REQUIRE(c.pinned_timepoints.size() == 1);
-				REQUIRE(contains(c.pinned_timepoints, t1));
-				REQUIRE_FALSE(contains(c.pinned_timepoints, t2));
+				REQUIRE_FALSE(contains(c.pinned_timepoints, t1));
+				REQUIRE(contains(c.pinned_timepoints, t2));
 				REQUIRE(c.get_current_timepoint() == t0);
 			}
 
@@ -1502,24 +1500,22 @@ SCENARIO("void Caretaker::unpin(Timepoint* t) noexcept", "[utils][state_manageme
 				auto h = t0->cluster(true);
 				REQUIRE(h.size() == 3);
 				REQUIRE(contains(h, t0));
-				REQUIRE(contains(h, t1));
-				REQUIRE(contains(h, t2)); // Still in user_history
+				REQUIRE(contains(h, t1)); // Ancestor of pinned timepoint
+				REQUIRE(contains(h, t2));
 				REQUIRE_FALSE(contains(h, t3));
-				REQUIRE(c.user_history.size() == 3);
+				REQUIRE(c.user_history.size() == 1);
 				REQUIRE(at(c.user_history, 0) == t0);
-				REQUIRE(at(c.user_history, 1) == t1);
-				REQUIRE(at(c.user_history, 2) == t2);
 			}
 		}
 
 		WHEN("Auto garbage collector is disabled") {
 			c.set_auto_gc(false);
-			c.unpin(t2);
+			c.unpin(t1);
 
 			THEN("Should remove unpined timepoint from pinned timepoints") {
 				REQUIRE(c.pinned_timepoints.size() == 1);
-				REQUIRE(contains(c.pinned_timepoints, t1));
-				REQUIRE_FALSE(contains(c.pinned_timepoints, t2));
+				REQUIRE_FALSE(contains(c.pinned_timepoints, t1));
+				REQUIRE(contains(c.pinned_timepoints, t2));
 				REQUIRE(c.get_current_timepoint() == t0);
 			}
 
@@ -1530,10 +1526,8 @@ SCENARIO("void Caretaker::unpin(Timepoint* t) noexcept", "[utils][state_manageme
 				REQUIRE(contains(h, t1));
 				REQUIRE(contains(h, t2));
 				REQUIRE(contains(h, t3));
-				REQUIRE(c.user_history.size() == 3);
+				REQUIRE(c.user_history.size() == 1);
 				REQUIRE(at(c.user_history, 0) == t0);
-				REQUIRE(at(c.user_history, 1) == t1);
-				REQUIRE(at(c.user_history, 2) == t2);
 			}
 		}
 	}
@@ -1554,7 +1548,7 @@ SCENARIO("void Caretaker::pin_current_timepoint() noexcept", "[utils][state_mana
 		WHEN("Trying to pin current timepoint") {
 			c.pin_current_timepoint();
 
-			THEN("Current timepoint should be pinned but not appended again to user history") {
+			THEN("Current timepoint should be pinned and not appended again to user history") {
 				REQUIRE(c.pinned_timepoints.size() == 1);
 				REQUIRE(contains(c.pinned_timepoints, t0));
 				REQUIRE(c.user_history.size() == 1);
@@ -1576,27 +1570,23 @@ SCENARIO("void Caretaker::pin_current_timepoint() noexcept", "[utils][state_mana
 				Timepoint* t1 = c.make_next_timepoint();
 				c.pin_current_timepoint();
 
-				THEN("Next timepoint should be pinned and appended to user history") {
+				THEN("Next timepoint should be pinned nor appended to user history") {
 					REQUIRE(c.pinned_timepoints.size() == 2);
 					REQUIRE(contains(c.pinned_timepoints, t0));
 					REQUIRE(contains(c.pinned_timepoints, t1));
-					REQUIRE(c.user_history.size() == 2);
+					REQUIRE(c.user_history.size() == 1);
 					REQUIRE(at(c.user_history, 0) == t0);
-					REQUIRE(at(c.user_history, 1) == t1);
 				}
 
 				AND_WHEN("Trying to pin current timepoint after going_without_remembering to the previous timepoint") {
 					c.go_without_remembering(t0);
 					c.pin_current_timepoint();
 
-					THEN("Previous timepoint should be appended to user history but not added again to pinned timepoints") {
+					THEN("Previous timepoint should not be added again to pinned timepoints nor appended to user history") {
 						REQUIRE(c.pinned_timepoints.size() == 2);
 						REQUIRE(contains(c.pinned_timepoints, t0));
 						REQUIRE(contains(c.pinned_timepoints, t1));
-						REQUIRE(c.user_history.size() == 3);
 						REQUIRE(at(c.user_history, 0) == t0);
-						REQUIRE(at(c.user_history, 1) == t1);
-						REQUIRE(at(c.user_history, 2) == t0);
 					}
 				}
 			}

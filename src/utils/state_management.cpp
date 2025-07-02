@@ -176,7 +176,6 @@ void Caretaker::pin_current_timepoint() noexcept {
 		}
 	))
 		pinned_timepoints.emplace_back(current_timepoint);
-	remember_current_timepoint();
 }
 
 //******************************************************************************
