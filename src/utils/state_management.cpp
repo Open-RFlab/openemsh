@@ -118,7 +118,7 @@ void Caretaker::undo(size_t remembered_timepoints) noexcept {
 			--remembered_timepoints;
 	}
 
-	advance(*user_history_browser, min(remembered_timepoints, (size_t) abs(distance(*user_history_browser, user_history.rend()))));
+	ranges::advance(*user_history_browser, remembered_timepoints, prev(user_history.rend()));
 	current_timepoint = **user_history_browser;
 
 	if(user_history_browser == user_history.rbegin())
@@ -132,7 +132,7 @@ void Caretaker::redo(size_t remembered_timepoints) noexcept {
 	if(!remembered_timepoints || !can_redo())
 		return;
 
-	advance(*user_history_browser, - make_signed_t<size_t>(min(remembered_timepoints, (size_t) abs(distance(user_history.rbegin(), *user_history_browser)))));
+	ranges::advance(*user_history_browser, - make_signed_t<size_t>(remembered_timepoints), user_history.rbegin());
 	current_timepoint = **user_history_browser;
 
 	if(user_history_browser == user_history.rbegin())
