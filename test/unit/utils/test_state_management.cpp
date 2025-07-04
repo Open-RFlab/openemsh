@@ -21,6 +21,7 @@
 /// @test template<typename State> Caretaker& Originator<State>::get_caretaker() const noexcept
 /// @test template<typename State> Timepoint* Originator<State>::get_init_timepoint() const noexcept
 /// @test template<typename State> Timepoint* Originator<State>::get_current_timepoint() const noexcept
+/// @test template<typename State> void Originator<State>::actually_go() noexcept
 /// @test template<typename State> void Originator<State>::go(Timepoint* t) noexcept
 /// @test template<typename State> void Originator<State>::erase(std::set<Timepoint*> const& ts) noexcept
 /// @test template<typename State> std::vector<std::tuple<Timepoint*, State>> Originator<State>::get_available_states() const noexcept
@@ -238,6 +239,72 @@ SCENARIO("template<typename State> Timepoint* Originator<State>::get_current_tim
 
 			THEN("Should return another Timepoint") {
 				REQUIRE_FALSE(a.get_current_timepoint() == &t);
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("template<typename State> void Originator<State>::actually_go() noexcept", "[utils][state_management]") {
+	GIVEN("An Originator having multiple states, corresponding to an history tree") {
+		// + a
+		//   + b <---------- 0 init
+		//     + c1
+		//     | + d1 <----- 2
+		//     | + d2 <----- 1
+		//     | | + e1 <--- 3 current
+		//     | | + e2
+		//     | + d3
+		//     + c2
+
+		[[maybe_unused]] Timepoint a;
+		[[maybe_unused]] Timepoint& b = a.add_child();
+		[[maybe_unused]] Timepoint& c1 = b.add_child();
+		[[maybe_unused]] Timepoint& c2 = b.add_child();
+		[[maybe_unused]] Timepoint& d1 = c1.add_child();
+		[[maybe_unused]] Timepoint& d2 = c1.add_child();
+		[[maybe_unused]] Timepoint& d3 = c1.add_child();
+		[[maybe_unused]] Timepoint& e1 = d2.add_child();
+		[[maybe_unused]] Timepoint& e2 = d2.add_child();
+
+		Originator<StateA> x(&b, { .str = "ac", .num = 56 });
+		x.set_state(&d2, { .str = "lp", .num = 8 });
+		x.set_state(&d1, { .str = "gh", .num = 444 });
+		x.set_state(&e1, { .str = "lo", .num = 69 });
+
+		REQUIRE(x.current_timepoint == &e1);
+
+		WHEN("Trying to go to a timepoint with go()") {
+			x.go(&d3);
+
+			THEN("Should update lazy_go to the given timepoint") {
+				REQUIRE(x.lazy_go.has_value());
+				REQUIRE(x.lazy_go.value() == &d3);
+			}
+
+			THEN("Should not update current_timepoint") {
+				REQUIRE(x.current_timepoint == &e1);
+			}
+
+			AND_WHEN("Running actually_go()") {
+				x.actually_go();
+
+				THEN("Should free lazy_go") {
+					REQUIRE_FALSE(x.lazy_go.has_value());
+				}
+
+				THEN("Should update current_timepoint adequately") {
+					REQUIRE(x.current_timepoint == &b);
+				}
+			}
+		}
+
+		WHEN("Run whitout having run go() before") {
+			x.actually_go();
+
+			THEN("Should not do anything") {
+				REQUIRE_FALSE(x.lazy_go.has_value());
+				REQUIRE(x.current_timepoint == &e1);
 			}
 		}
 	}
