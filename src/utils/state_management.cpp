@@ -4,7 +4,7 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#include <cmath>
+#include <cstdlib>
 #include <execution>
 #include <iterator>
 
@@ -115,7 +115,7 @@ void Caretaker::take_care_of(shared_ptr<IOriginator> const& originator) noexcept
 
 //******************************************************************************
 void Caretaker::undo(size_t remembered_timepoints) noexcept {
-	if(!remembered_timepoints || !can_undo())
+	if(!remembered_timepoints || !can_undo(remembered_timepoints))
 		return;
 
 	if(!user_history_browser.has_value()) {
@@ -135,7 +135,7 @@ void Caretaker::undo(size_t remembered_timepoints) noexcept {
 
 //******************************************************************************
 void Caretaker::redo(size_t remembered_timepoints) noexcept {
-	if(!remembered_timepoints || !can_redo())
+	if(!remembered_timepoints || !can_redo(remembered_timepoints))
 		return;
 
 	ranges::advance(*user_history_browser, - make_signed_t<size_t>(remembered_timepoints), user_history.rbegin());
@@ -148,17 +148,32 @@ void Caretaker::redo(size_t remembered_timepoints) noexcept {
 }
 
 //******************************************************************************
-bool Caretaker::can_undo() const noexcept {
-	if(user_history_browser.has_value()) {
-		return *user_history_browser != prev(user_history.rend());
-	} else {
-		return user_history.size() > 1; // First is history_root
-	}
+bool Caretaker::can_undo(size_t remembered_timepoints) const noexcept {
+	using It = decltype(user_history)::const_reverse_iterator;
+
+	if(!remembered_timepoints)
+		return false;
+	else if(user_history_browser.has_value())
+		return remembered_timepoints
+			< (size_t) abs(distance<It>(*user_history_browser, user_history.rend()));
+	else
+		return remembered_timepoints
+			<= ((user_history.back() == current_timepoint)
+				? user_history.size() - 1
+				: user_history.size());
 }
 
 //******************************************************************************
-bool Caretaker::can_redo() const noexcept {
-	return user_history_browser.has_value();
+bool Caretaker::can_redo(size_t remembered_timepoints) const noexcept {
+	using It = decltype(user_history)::const_reverse_iterator;
+
+	if(!remembered_timepoints)
+		return false;
+	else if(user_history_browser.has_value())
+		return remembered_timepoints
+			<= (size_t) abs(distance<It>(user_history.rbegin(), *user_history_browser));
+	else
+		return false;
 }
 
 //******************************************************************************

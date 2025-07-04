@@ -45,8 +45,8 @@
 /// @test void Caretaker::take_care_of(shared_ptr<IOriginator> const& originator) noexcept
 /// @test void Caretaker::undo(size_t remembered_timepoints) noexcept
 /// @test void Caretaker::redo(size_t remembered_timepoints) noexcept
-/// @test bool Caretaker::can_undo() const noexcept
-/// @test bool Caretaker::can_redo() const noexcept
+/// @test bool Caretaker::can_undo(size_t remembered_timepoints) const noexcept
+/// @test bool Caretaker::can_redo(size_t remembered_timepoints) const noexcept
 /// @test void Caretaker::unpin(Timepoint* t) noexcept
 /// @test void Caretaker::pin_current_timepoint() noexcept
 /// @test void Caretaker::remember_current_timepoint() noexcept
@@ -1319,7 +1319,7 @@ SCENARIO("void Caretaker::redo(size_t remembered_timepoints) noexcept", "[utils]
 }
 
 //******************************************************************************
-SCENARIO("bool Caretaker::can_undo() const noexcept", "[utils][state_management]") {
+SCENARIO("bool Caretaker::can_undo(size_t remembered_timepoints) const noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker with history root as current timepoint and only remembered timepoint") {
 		Caretaker c;
 
@@ -1348,8 +1348,25 @@ SCENARIO("bool Caretaker::can_undo() const noexcept", "[utils][state_management]
 			REQUIRE(at(c.user_history, 3) == t3);
 			REQUIRE(c.get_current_timepoint() == t3);
 
-			THEN("Should return true") {
-				REQUIRE(c.can_undo());
+			WHEN("Running about 0 timepoints") {
+				THEN("Should return false") {
+					REQUIRE_FALSE(c.can_undo(0));
+				}
+			}
+
+			WHEN("Running about less or the exact number of timepoints available") {
+				THEN("Should return true") {
+					REQUIRE(c.can_undo());
+					REQUIRE(c.can_undo(1));
+					REQUIRE(c.can_undo(2));
+					REQUIRE(c.can_undo(3));
+				}
+			}
+
+			WHEN("Running about more timepoints than available") {
+				THEN("Should return false") {
+					REQUIRE_FALSE(c.can_undo(4));
+				}
 			}
 		}
 
@@ -1364,6 +1381,9 @@ SCENARIO("bool Caretaker::can_undo() const noexcept", "[utils][state_management]
 
 			THEN("Should return false") {
 				REQUIRE_FALSE(c.can_undo());
+				REQUIRE_FALSE(c.can_undo(0));
+				REQUIRE_FALSE(c.can_undo(1));
+				REQUIRE_FALSE(c.can_undo(2));
 			}
 
 			AND_WHEN("Redoing some but not all of the undoed timepoints") {
@@ -1375,8 +1395,24 @@ SCENARIO("bool Caretaker::can_undo() const noexcept", "[utils][state_management]
 				REQUIRE(at(c.user_history, 3) == t3);
 				REQUIRE(c.get_current_timepoint() == t2);
 
-				THEN("Should return true") {
-					REQUIRE(c.can_undo());
+				WHEN("Running about 0 timepoints") {
+					THEN("Should return false") {
+						REQUIRE_FALSE(c.can_undo(0));
+					}
+				}
+
+				WHEN("Running about less or the exact number of timepoints available") {
+					THEN("Should return true") {
+						REQUIRE(c.can_undo());
+						REQUIRE(c.can_undo(1));
+						REQUIRE(c.can_undo(2));
+					}
+				}
+
+				WHEN("Running about more timepoints than available") {
+					THEN("Should return false") {
+						REQUIRE_FALSE(c.can_undo(3));
+					}
 				}
 			}
 		}
@@ -1390,15 +1426,30 @@ SCENARIO("bool Caretaker::can_undo() const noexcept", "[utils][state_management]
 			REQUIRE(at(c.user_history, 3) == t3);
 			REQUIRE(c.get_current_timepoint() == t1);
 
-			THEN("Should return true") {
-				REQUIRE(c.can_undo());
+			WHEN("Running about 0 timepoints") {
+				THEN("Should return false") {
+					REQUIRE_FALSE(c.can_undo(0));
+				}
+			}
+
+			WHEN("Running about less or the exact number of timepoints available") {
+				THEN("Should return true") {
+					REQUIRE(c.can_undo());
+					REQUIRE(c.can_undo(1));
+				}
+			}
+
+			WHEN("Running about more timepoints than available") {
+				THEN("Should return false") {
+					REQUIRE_FALSE(c.can_undo(2));
+				}
 			}
 		}
 	}
 }
 
 //******************************************************************************
-SCENARIO("bool Caretaker::can_redo() const noexcept", "[utils][state_management]") {
+SCENARIO("bool Caretaker::can_redo(size_t remembered_timepoints) const noexcept", "[utils][state_management]") {
 	GIVEN("A Caretaker with some remembered timepoints") {
 		Caretaker c;
 		[[maybe_unused]] Timepoint* t0 = c.get_current_timepoint();
@@ -1419,6 +1470,9 @@ SCENARIO("bool Caretaker::can_redo() const noexcept", "[utils][state_management]
 
 			THEN("Should return false") {
 				REQUIRE_FALSE(c.can_redo());
+				REQUIRE_FALSE(c.can_redo(0));
+				REQUIRE_FALSE(c.can_redo(1));
+				REQUIRE_FALSE(c.can_redo(2));
 			}
 		}
 
@@ -1431,8 +1485,24 @@ SCENARIO("bool Caretaker::can_redo() const noexcept", "[utils][state_management]
 			REQUIRE(at(c.user_history, 3) == t3);
 			REQUIRE(c.get_current_timepoint() == t1);
 
-			THEN("Should return true") {
-				REQUIRE(c.can_redo());
+			WHEN("Running about 0 timepoints") {
+				THEN("Should return false") {
+					REQUIRE_FALSE(c.can_redo(0));
+				}
+			}
+
+			WHEN("Running about less or the exact number of timepoints available") {
+				THEN("Should return true") {
+					REQUIRE(c.can_redo());
+					REQUIRE(c.can_redo(1));
+					REQUIRE(c.can_redo(2));
+				}
+			}
+
+			WHEN("Running about more timepoints than available") {
+				THEN("Should return false") {
+					REQUIRE_FALSE(c.can_redo(3));
+				}
 			}
 
 			AND_WHEN("Stopping browsing user history by creating a next timepoint") {
@@ -1444,6 +1514,9 @@ SCENARIO("bool Caretaker::can_redo() const noexcept", "[utils][state_management]
 
 				THEN("Should return false") {
 					REQUIRE_FALSE(c.can_redo());
+					REQUIRE_FALSE(c.can_redo(0));
+					REQUIRE_FALSE(c.can_redo(1));
+					REQUIRE_FALSE(c.can_redo(2));
 				}
 			}
 
@@ -1460,6 +1533,9 @@ SCENARIO("bool Caretaker::can_redo() const noexcept", "[utils][state_management]
 
 				THEN("Should return false") {
 					REQUIRE_FALSE(c.can_redo());
+					REQUIRE_FALSE(c.can_redo(0));
+					REQUIRE_FALSE(c.can_redo(1));
+					REQUIRE_FALSE(c.can_redo(2));
 				}
 			}
 		}

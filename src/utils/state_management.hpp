@@ -74,8 +74,8 @@ public:
 	void pin_current_timepoint() noexcept;
 	void unpin(Timepoint* t) noexcept;
 
-	bool can_undo() const noexcept;
-	bool can_redo() const noexcept;
+	bool can_undo(std::size_t remembered_timepoints = 1) const noexcept;
+	bool can_redo(std::size_t remembered_timepoints = 1) const noexcept;
 
 	void annotate_current_timepoint(std::unique_ptr<IAnnotation> annotation) noexcept;
 	IAnnotation* get_annotation(Timepoint* t) noexcept;
