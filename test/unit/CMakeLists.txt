@@ -7,6 +7,7 @@ if( Catch2_FOUND )
 
 	target_sources( openemsh_unittest
 		PRIVATE
+		"${CMAKE_CURRENT_SOURCE_DIR}/app/test_openemsh.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/test_bounding.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/test_space.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/test_coord.cpp"
