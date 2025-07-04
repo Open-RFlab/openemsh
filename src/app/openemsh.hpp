@@ -68,6 +68,8 @@ public:
 	void go_before_previous_step() const;
 	void write() const;
 
+	bool can_run_a_next_step() const;
+	bool can_go_before() const;
 private:
 	Params params;
 	std::shared_ptr<domain::Board> board;

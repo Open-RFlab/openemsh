@@ -282,7 +282,7 @@ void MainWindow::go_to_or_make_current_state() {
 void MainWindow::go_to_current_state() {
 	ui->structure_view->go_to_current_state();
 	ui->processing_view->go_to_current_state();
-	update_undo_redo_visibility();
+	update_navigation_visibility();
 	// TODO handle passing selection from a scene to its own future couterpart
 }
 
@@ -302,7 +302,7 @@ void MainWindow::make_current_state_view() {
 			ui->processing_view->states[t].scene, &ProcessingScene::select_counterparts);
 	}
 
-	update_undo_redo_visibility();
+	update_navigation_visibility();
 }
 
 //******************************************************************************
@@ -317,9 +317,11 @@ void MainWindow::handle_edition(std::set<app::Step> const& to_redo) {
 }
 
 //******************************************************************************
-void MainWindow::update_undo_redo_visibility() { // TODO rename
+void MainWindow::update_navigation_visibility() {
 	ui->a_undo->setEnabled(Caretaker::singleton().can_undo());
 	ui->a_redo->setEnabled(Caretaker::singleton().can_redo());
+	ui->a_mesh_prev->setEnabled(oemsh.can_go_before());
+	ui->a_mesh_next->setEnabled(oemsh.can_run_a_next_step());
 };
 
 } // namespace ui::qt
