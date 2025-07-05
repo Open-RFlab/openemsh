@@ -76,7 +76,7 @@ if( Catch2_FOUND )
 
 		coverage(
 			TARGET_TO_RUN openemsh_unittest
-			TARGETS_TO_COVER openemsh
+			TARGETS_TO_COVER openemsh openemsh_unittest
 #			ARGS_GCOVR
 #				-f "${CMAKE_SOURCE_DIR}/src"
 #				-e "${CMAKE_SOURCE_DIR}/src/domain/board.cpp"
