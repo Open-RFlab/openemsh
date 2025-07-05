@@ -161,7 +161,7 @@ void OpenEMSH::run_next_step() const {
 //******************************************************************************
 void OpenEMSH::go_before(Step step) const {
 	auto& c = Caretaker::singleton();
-	c.go_without_remembering(
+	c.go_and_remember(
 		c.find_first_ancestor_with_annotation_that(
 			[&step](IAnnotation const* annotation) {
 				return static_cast<Annotation const*>(annotation)->before_step == step;
@@ -171,7 +171,7 @@ void OpenEMSH::go_before(Step step) const {
 //******************************************************************************
 void OpenEMSH::go_before_previous_step() const {
 	auto& c = Caretaker::singleton();
-	c.go_without_remembering(c.find_first_ancestor_with_annotation());
+	c.go_and_remember(c.find_first_ancestor_with_annotation());
 }
 
 //******************************************************************************
