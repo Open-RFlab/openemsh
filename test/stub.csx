@@ -8,6 +8,7 @@
   </FDTD>
   <ContinuousStructure CoordSystem="0">
     <Properties>
+<!--
       <Material Name="Subst1.substrate">
         <Property Epsilon="4.7" Kappa="0.00933457764526183">
         </Property>
@@ -30,6 +31,7 @@
           </Box>
         </Primitives>
       </ConductingSheet>
+-->
       <ConductingSheet Name="MS1" Conductivity="59594755.6615018" Thickness="3.5e-05">
         <Primitives>
           <Box Priority="2">

@@ -354,7 +354,9 @@ void Board::detect_non_conflicting_edges() {
 
 //******************************************************************************
 void Board::add_fixed_meshline_policies() {
-	for(auto const& axis : AllAxis)
+#warning TODO
+//	for(auto const& axis : AllAxis)
+	for(auto const& axis : { X, Y })
 		add_fixed_meshline_policies(axis);
 }
 
