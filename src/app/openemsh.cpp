@@ -89,6 +89,7 @@ void OpenEMSH::run(std::set<Step> const& steps) const {
 	};
 
 	if(steps.contains(Step::DETECT_CONFLICT_EIP)) {
+		Caretaker::singleton().remember_current_timepoint();
 		annotate(Step::DETECT_CONFLICT_EIP);
 		board->detect_edges_in_polygons();
 	}
@@ -130,7 +131,6 @@ void OpenEMSH::run(std::set<Step> const& steps) const {
 
 //******************************************************************************
 void OpenEMSH::run_all_steps() const {
-	Caretaker::singleton().remember_current_timepoint();
 	run({
 		Step::DETECT_CONFLICT_EIP,
 		Step::DETECT_CONFLICT_CE,
@@ -139,8 +139,8 @@ void OpenEMSH::run_all_steps() const {
 		Step::SOLVE_ALL_EIP,
 		Step::SOLVE_ALL_CE,
 		Step::DETECT_AND_SOLVE_TCMLP,
-		Step::DETECT_INTERVALS
-//		Step::MESH
+		Step::DETECT_INTERVALS,
+		Step::MESH
 	});
 }
 
@@ -148,10 +148,13 @@ void OpenEMSH::run_all_steps() const {
 void OpenEMSH::run_next_step() const {
 	auto& c = Caretaker::singleton();
 	auto* t = c.find_first_ancestor_with_annotation();
-	if(auto const* a = c.get_annotation(t); a)
+	if(auto const* a = c.get_annotation(t); a) {
 		if(optional<Step> step = next(static_cast<Annotation const*>(a)->before_step)
 		; step)
 			run({ step.value() });
+	} else {
+		run({ Step::DETECT_CONFLICT_EIP });
+	}
 }
 
 //******************************************************************************
