@@ -37,6 +37,7 @@
 //******************************************************************************
 /// @test static Caretaker& Caretaker::singleton() noexcept
 /// @test Caretaker::Caretaker() noexcept
+/// @test void Caretaker::reset() noexcept
 /// @test void Caretaker::garbage_collector() noexcept
 /// @test void Caretaker::stop_browsing_user_history() noexcept
 /// @test Timepoint* Caretaker::get_history_root() noexcept
@@ -784,6 +785,136 @@ SCENARIO("Caretaker::Caretaker() noexcept", "[utils][state_management]") {
 		THEN("User history should contain to the history tree root") {
 			REQUIRE(c.user_history.size() == 1);
 			REQUIRE(at(c.user_history, 0) == c.history_root.get());
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("void Caretaker::reset() noexcept", "[utils][state_management]") {
+	GIVEN("A Caretaker with an history tree and managing some Originators") {
+		// + a <---------- root, init
+		//   + b
+		//     + c1 <------- y1
+		//     | + d1
+		//     | + d2 <----- x1
+		//     | | + e1 <--- current
+		//     | | + e2 <--- x2, annotated
+		//     | + d3 <----- y2
+		//     | | + f1 <--- y3, pinned, annotated
+		//     | + d4 <----- y4
+		//     |   + g1 <--- y5, remembered
+		//     + c2 <------- z1
+
+		Caretaker c;
+		[[maybe_unused]] Timepoint* a = c.get_history_root();
+		[[maybe_unused]] Timepoint* b = &a->add_child();
+		[[maybe_unused]] Timepoint* c1 = &b->add_child();
+		[[maybe_unused]] Timepoint* c2 = &b->add_child();
+		[[maybe_unused]] Timepoint* d1 = &c1->add_child();
+		[[maybe_unused]] Timepoint* d2 = &c1->add_child();
+		[[maybe_unused]] Timepoint* d3 = &c1->add_child();
+		[[maybe_unused]] Timepoint* d4 = &c1->add_child();
+		[[maybe_unused]] Timepoint* e1 = &d2->add_child();
+		[[maybe_unused]] Timepoint* e2 = &d2->add_child();
+		[[maybe_unused]] Timepoint* f1 = &d3->add_child();
+		[[maybe_unused]] Timepoint* g1 = &d4->add_child();
+
+		auto x = std::make_shared<Originator<StateA>>(a, StateA { .str = "ac", .num = 56 }, c);
+		auto y = std::make_shared<Originator<StateA>>(a, StateA { .str = "lp", .num = 8 }, c);
+		auto z = std::make_shared<Originator<StateA>>(a, StateA { .str = "gh", .num = 444 }, c);
+		x->set_state(d2, { .str = "lo", .num = 69 });
+		x->set_state(e2, { .str = "lo", .num = 68 });
+		y->set_state(c1, { .str = "dk", .num = 12 });
+		y->set_state(d3, { .str = "dk", .num = 13 });
+		y->set_state(f1, { .str = "dk", .num = 14 });
+		y->set_state(d4, { .str = "dk", .num = 15 });
+		y->set_state(g1, { .str = "dk", .num = 16 });
+		z->set_state(c2, { .str = "ws", .num = 6 });
+		c.take_care_of(x);
+		c.take_care_of(y);
+		c.take_care_of(z);
+		z.reset();
+
+		c.set_auto_gc(false);
+		c.go_without_remembering(e2);
+		c.annotate_current_timepoint(std::make_unique<Annotation>(5));
+		c.go_without_remembering(f1);
+		c.pin_current_timepoint();
+		c.annotate_current_timepoint(std::make_unique<Annotation>(6));
+		c.undo();
+		c.stop_browsing_user_history();
+		c.go_and_remember(g1);
+		c.go_without_remembering(e1);
+
+		auto const contains_originator = [](std::vector<std::weak_ptr<IOriginator>> const& list, IOriginator* originator) {
+			return std::ranges::any_of(list, [&](auto const& wptr) {
+				return wptr.expired() ? false : (wptr.lock().get() == originator);
+			});
+		};
+		auto const contains_expired = [](std::vector<std::weak_ptr<IOriginator>> const& list) {
+			return std::ranges::any_of(list, [](auto const& wptr) {
+				return wptr.expired();
+			});
+		};
+
+		REQUIRE(c.history_root.get() == a);
+		REQUIRE(c.current_timepoint == e1);
+		REQUIRE(c.pinned_timepoints.size() == 1);
+		REQUIRE(contains(c.pinned_timepoints, f1));
+		REQUIRE(c.user_history.size() == 2);
+		REQUIRE(at(c.user_history, 0) == a);
+		REQUIRE(at(c.user_history, 1) == g1);
+		REQUIRE(c.originators.size() == 3);
+		REQUIRE(contains_originator(c.originators, x.get()));
+		REQUIRE(contains_originator(c.originators, y.get()));
+		REQUIRE(contains_expired(c.originators));
+
+		REQUIRE(x->states.size() == 3);
+		REQUIRE(x->states[a].str == "ac");
+		REQUIRE(x->states[a].num == 56);
+		REQUIRE(x->states[d2].str == "lo");
+		REQUIRE(x->states[d2].num == 69);
+		REQUIRE(x->states[e2].str == "lo");
+		REQUIRE(x->states[e2].num == 68);
+
+		REQUIRE(y->states.size() == 6);
+		REQUIRE(y->states[a].str == "lp");
+		REQUIRE(y->states[a].num == 8);
+		REQUIRE(y->states[c1].str == "dk");
+		REQUIRE(y->states[c1].num == 12);
+		REQUIRE(y->states[d3].str == "dk");
+		REQUIRE(y->states[d3].num == 13);
+		REQUIRE(y->states[f1].str == "dk");
+		REQUIRE(y->states[f1].num == 14);
+		REQUIRE(y->states[d4].str == "dk");
+		REQUIRE(y->states[d4].num == 15);
+		REQUIRE(y->states[g1].str == "dk");
+		REQUIRE(y->states[g1].num == 16);
+
+		WHEN("Running") {
+			c.reset();
+
+			THEN("Current timepoint should be set to the history tree root") {
+				REQUIRE(c.current_timepoint == c.history_root.get());
+			}
+
+			THEN("User history should only contain to the history tree root") {
+				REQUIRE(c.user_history.size() == 1);
+				REQUIRE(at(c.user_history, 0) == c.history_root.get());
+				REQUIRE_FALSE(c.user_history_browser.has_value());
+			}
+
+			THEN("There should not be any Annotation") {
+				REQUIRE(c.annotations.empty());
+			}
+
+			THEN("There should not be any pinned timepoint") {
+				REQUIRE(c.pinned_timepoints.empty());
+			}
+
+			THEN("There should not be any Originator") {
+				REQUIRE(c.originators.empty());
+			}
 		}
 	}
 }

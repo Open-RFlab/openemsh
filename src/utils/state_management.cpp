@@ -27,6 +27,16 @@ Caretaker::Caretaker() noexcept
 {}
 
 //******************************************************************************
+void Caretaker::reset() noexcept {
+	current_timepoint = history_root.get();
+	pinned_timepoints.clear();
+	user_history.erase(next(begin(user_history)), end(user_history));
+	user_history_browser.reset();
+	originators.clear();
+	garbage_collector();
+}
+
+//******************************************************************************
 void Caretaker::garbage_collector() noexcept {
 	// Step 1: fill a set with all pinned/visited/current + ancestors : to keep.
 	set<Timepoint*> to_keep;

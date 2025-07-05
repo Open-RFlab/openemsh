@@ -51,8 +51,10 @@ private:
 	void stop_browsing_user_history() noexcept;
 
 public:
-	void garbage_collector() noexcept;
 	static Caretaker& singleton() noexcept;
+
+	void reset() noexcept;
+	void garbage_collector() noexcept;
 
 	Caretaker() noexcept;
 

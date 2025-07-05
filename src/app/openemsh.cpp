@@ -60,6 +60,7 @@ domain::Board const& OpenEMSH::get_board() const {
 
 //******************************************************************************
 void OpenEMSH::parse() {
+	Caretaker::singleton().reset();
 	board = ParserFromCsx::run(params.input, static_cast<ParserFromCsx::Params const&>(params), params.override_from_cli);
 }
 
