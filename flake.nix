@@ -65,6 +65,7 @@
 
       doc = pkgs.mkShell {
         packages = [
+          pkgs.d2
           (pkgs.python3.withPackages (python-pkgs: [
             python-pkgs.numpy
             python-pkgs.matplotlib

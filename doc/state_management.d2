@@ -1,0 +1,288 @@
+classes {
+	history {
+		shape: circle
+		width: 30
+		height: 30
+	}
+	object {
+		grid-rows: 1
+		grid-gap: 0
+		label.near: top-center
+	}
+	step1.style { stroke: blue; fill: blue }
+	step2.style { stroke: blueviolet; fill: blueviolet }
+	step3.style { stroke: chartreuse; fill: chartreuse }
+	step4.style { stroke: coral; fill: coral }
+	step5.style { stroke: cornflowerblue; fill: cornflowerblue }
+	step6.style { stroke: crimson; fill: crimson }
+	step7.style { stroke: darkmagenta; fill: darkmagenta }
+	step8.style { stroke: darkorchid; fill: darkorchid }
+	step9.style { stroke: darkturquoise; fill: darkturquoise }
+	step10.style { stroke: darkviolet; fill: darkviolet }
+	step11.style { stroke: deeppink; fill: deeppink }
+	step12.style { stroke: deepskyblue; fill: deepskyblue }
+	step13.style { stroke: dodgerblue; fill: dodgerblue }
+	step14.style { stroke: gold; fill: gold }
+}
+
+History {
+	style.fill: transparent
+	near: center-left
+}
+
+Memory {
+	style.fill: transparent
+	near: center-right
+}
+
+steps {
+	1 {
+		history {
+			1 { class: [history; step1] }
+		}
+		memory {
+			g { class: object; label: "global params" }
+			g.0 { class: step1 }
+		}
+	}
+	2 {
+		history {
+			2 { class: [history; step2] }
+			1 -> 2
+		}
+		memory {
+			p1 { class: object }; p1.0 { class: step2 }
+			p1e1 { class: object; label: e1 }; p1e1.0 { class: step2 }
+			p1e2 { class: object; label: e2 }; p1e2.0 { class: step2 }
+			p1e3 { class: object; label: e3 }; p1e3.0 { class: step2 }
+			p2 { class: object }; p2.0 { class: step2 }
+			p2e1 { class: object; label: e1 }; p2e1.0 { class: step2 }
+			p2e2 { class: object; label: e2 }; p2e2.0 { class: step2 }
+			p2e3 { class: object; label: e3 }; p2e3.0 { class: step2 }
+			p1 <- p1e1 { source-arrowhead: { shape: diamond; style.filled: true }; class: step2 }
+			p1 <- p1e2 { source-arrowhead: { shape: diamond; style.filled: true }; class: step2 }
+			p1 <- p1e3 { source-arrowhead: { shape: diamond; style.filled: true }; class: step2 }
+			p2 <- p2e1 { source-arrowhead: { shape: diamond; style.filled: true }; class: step2 }
+			p2 <- p2e2 { source-arrowhead: { shape: diamond; style.filled: true }; class: step2 }
+			p2 <- p2e3 { source-arrowhead: { shape: diamond; style.filled: true }; class: step2 }
+		}
+	}
+	3 {
+		history {
+			3 { class: [history; step3] }
+			2 -> 3
+		}
+		memory {
+			cce1 { class: object }; cce1.0 { class: step3 }
+			cce1 <-> p1e1 { source-arrowhead: { shape: diamond }; target-arrowhead: { shape: none; }; class: step3 }
+			cce1 <-> p1e2 { source-arrowhead: { shape: diamond }; target-arrowhead: { shape: none; }; class: step3 }
+			cce1 <-> p2e3 { source-arrowhead: { shape: diamond }; target-arrowhead: { shape: none; }; class: step3 }
+		}
+	}
+	4 {
+		history {
+			4 { class: [history; step4] }
+			3 -> 4
+		}
+		memory {
+			cce2 { class: object }; cce2.0 { class: step4 }
+			cce2 <-> p2e2 { source-arrowhead: { shape: diamond }; target-arrowhead: { shape: none; }; class: step4 }
+			cce2 <-> p1e3 { source-arrowhead: { shape: diamond }; target-arrowhead: { shape: none; }; class: step4 }
+		}
+	}
+	5 {
+		history {
+			5 { class: [history; step5] }
+			4 -> 5
+		}
+		memory {
+			mlp1 { class: object }; mlp1.0 { class: step5 }
+			mlp2 { class: object }; mlp2.0 { class: step5 }
+			mlp3 { class: object }; mlp3.0 { class: step5 }
+			mlp1 -- cce1 { class: step5 }
+			mlp2 -- cce2 { class: step5 }
+			mlp3 -- p2e1 { class: step5 }
+		}
+	}
+	6 {
+		history {
+			6 { class: [history; step6] }
+			5 -> 6
+		}
+		memory {
+			ctcmlp1 { class: object }; ctcmlp1.0 { class: step6 }
+			ctcmlp1 -- mlp1 { class: step6 }
+			ctcmlp1 -- mlp2 { class: step6 }
+		}
+	}
+	7 {
+		history {
+			7 { class: [history; step7] }
+			6 -> 7
+		}
+		memory {
+			mlp4 { class: object }; mlp4.0 { class: step7 }
+			mlp4 -- ctcmlp1 { class: step7 }
+		}
+	}
+	8 {
+		history {
+			8 { class: [history; step8] }
+			7 -> 8
+		}
+		memory {
+			i1 { class: object }; i1.0 { class: step8 }
+			i1 -- mlp3 { class: step8 }
+			i1 -- mlp4 { class: step8 }
+		}
+	}
+	9 {
+		history {
+			9 { class: [history; step9] }
+			8 -> 9
+		}
+		memory {
+			i1.0.style.opacity: 0.3
+			i1.1 { class: step9 }
+			m1 { class: object }; m1.0 { class: step9 }
+			m2 { class: object }; m2.0 { class: step9 }
+			m3 { class: object }; m3.0 { class: step9 }
+			m4 { class: object }; m4.0 { class: step9 }
+			m5 { class: object }; m5.0 { class: step9 }
+			m6 { class: object }; m6.0 { class: step9 }
+			m7 { class: object }; m7.0 { class: step9 }
+			m8 { class: object }; m8.0 { class: step9 }
+			m9 { class: object }; m9.0 { class: step9 }
+			m1 -- i1 { class: step9 }
+			m2 -- i1 { class: step9 }
+			m3 -- i1 { class: step9 }
+			m4 -- i1 { class: step9 }
+			m5 -- i1 { class: step9 }
+			m6 -- i1 { class: step9 }
+			m7 -- i1 { class: step9 }
+			m8 -- i1 { class: step9 }
+			m9 -- i1 { class: step9 }
+		}
+	}
+	10 {
+		history {
+			6.style.opacity: 0.3
+			7.style.opacity: 0.3
+			8.style.opacity: 0.3
+			9.style.opacity: 0.3
+			10 { class: [history; step10] }
+			5 -> 10
+		}
+		memory {
+			ctcmlp1.style.opacity: 0.3; ctcmlp1.*.style.opacity: 0.3
+			mlp4.style.opacity: 0.3; mlp4.*.style.opacity: 0.3
+			i1.style.opacity: 0.3; i1.*.style.opacity: 0.3
+			m1.style.opacity: 0.3; m1.*.style.opacity: 0.3
+			m2.style.opacity: 0.3; m2.*.style.opacity: 0.3
+			m3.style.opacity: 0.3; m3.*.style.opacity: 0.3
+			m4.style.opacity: 0.3; m4.*.style.opacity: 0.3
+			m5.style.opacity: 0.3; m5.*.style.opacity: 0.3
+			m6.style.opacity: 0.3; m6.*.style.opacity: 0.3
+			m7.style.opacity: 0.3; m7.*.style.opacity: 0.3
+			m8.style.opacity: 0.3; m8.*.style.opacity: 0.3
+			m9.style.opacity: 0.3; m9.*.style.opacity: 0.3
+			(ctcmlp1 -- mlp1)[0].style.opacity: 0.3
+			(ctcmlp1 -- mlp2)[0].style.opacity: 0.3
+			(mlp4 -- ctcmlp1)[0].style.opacity: 0.3
+			(i1 -- mlp3)[0].style.opacity: 0.3
+			(i1 -- mlp4)[0].style.opacity: 0.3
+			(m1 -- i1)[0].style.opacity: 0.3
+			(m2 -- i1)[0].style.opacity: 0.3
+			(m3 -- i1)[0].style.opacity: 0.3
+			(m4 -- i1)[0].style.opacity: 0.3
+			(m5 -- i1)[0].style.opacity: 0.3
+			(m6 -- i1)[0].style.opacity: 0.3
+			(m7 -- i1)[0].style.opacity: 0.3
+			(m8 -- i1)[0].style.opacity: 0.3
+			(m9 -- i1)[0].style.opacity: 0.3
+			g.0.style.opacity: 0.3
+			g.1 { class: step10 }
+		}
+	}
+	11 {
+		history {
+			11 { class: [history; step11] }
+			10 -> 11
+		}
+		memory {
+			i2 { class: object }; i2.0 { class: step11 }
+			i2 -- mlp1 { class: step11 }
+			i2 -- mlp2 { class: step11 }
+			i3 { class: object }; i3.0 { class: step11 }
+			i3 -- mlp1 { class: step11 }
+			i3 -- mlp3 { class: step11 }
+		}
+	}
+	12 {
+		history {
+			12 { class: [history; step12] }
+			11 -> 12
+		}
+		memory {
+			i2.0.style.opacity: 0.3
+			i2.1 { class: step12 }
+			m10 { class: object }; m10.0 { class: step12 }
+			m11 { class: object }; m11.0 { class: step12 }
+			m12 { class: object }; m12.0 { class: step12 }
+			m13 { class: object }; m13.0 { class: step12 }
+			m14 { class: object }; m14.0 { class: step12 }
+			m10 -- i2 { class: step12 }
+			m11 -- i2 { class: step12 }
+			m12 -- i2 { class: step12 }
+			m13 -- i2 { class: step12 }
+			m14 -- i2 { class: step12 }
+		}
+	}
+	13 {
+		history {
+			13 { class: [history; step13] }
+			12 -> 13
+		}
+		memory {
+			i3.0.style.opacity: 0.3
+			i3.1 { class: step13 }
+			m15 { class: object }; m15.0 { class: step13 }
+			m16 { class: object }; m16.0 { class: step13 }
+			m17 { class: object }; m17.0 { class: step13 }
+			m18 { class: object }; m18.0 { class: step13 }
+			m19 { class: object }; m19.0 { class: step13 }
+			m15 -- i3 { class: step13 }
+			m16 -- i3 { class: step13 }
+			m17 -- i3 { class: step13 }
+			m18 -- i3 { class: step13 }
+			m19 -- i3 { class: step13 }
+		}
+	}
+	14 {
+		history {
+			13.style.opacity: 0.3
+			14 { class: [history; step14] }
+			12 -> 14
+		}
+		memory {
+			m15.style.opacity: 0.3; m15.*.style.opacity: 0.3
+			m16.style.opacity: 0.3; m16.*.style.opacity: 0.3
+			m17.style.opacity: 0.3; m17.*.style.opacity: 0.3
+			m18.style.opacity: 0.3; m18.*.style.opacity: 0.3
+			m19.style.opacity: 0.3; m19.*.style.opacity: 0.3
+			(m15 -- i3)[0].style.opacity: 0.3
+			(m16 -- i3)[0].style.opacity: 0.3
+			(m17 -- i3)[0].style.opacity: 0.3
+			(m18 -- i3)[0].style.opacity: 0.3
+			(m19 -- i3)[0].style.opacity: 0.3
+			i3.1.style.opacity: 0.3
+			i3.2 { class: step14 }
+			m20 { class: object }; m20.0 { class: step14 }
+			m21 { class: object }; m21.0 { class: step14 }
+			m22 { class: object }; m22.0 { class: step14 }
+			m20 -- i3 { class: step14 }
+			m21 -- i3 { class: step14 }
+			m22 -- i3 { class: step14 }
+		}
+	}
+}
