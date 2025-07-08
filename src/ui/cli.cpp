@@ -184,6 +184,11 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app.add_flag("--policy-lines", params.with_meshline_policies, "Include meshline policies in output.")->group("Output options")->default_str(to_string(params.with_meshline_policies));
 //	app.add_flag("--policy-lines", params.with_meshline_policies, "Include meshline policies in output.")->group("Output options")->capture_default_str();
 
+	app.preparse_callback([g](size_t argc) {
+		if(argc == 0)
+			g->force_callback()->default_val(true);
+	});
+
 	try {
 		app.parse(argc, argv);
 	} catch(CLI::Success const& e) {
