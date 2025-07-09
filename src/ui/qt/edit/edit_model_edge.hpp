@@ -6,31 +6,22 @@
 
 #pragma once
 
-#include <QDialog>
-#include <QObject>
+#include "edit_model.hpp"
 
-#include <memory>
-
-class QAbstractButton;
-
-namespace Ui {
-class AboutDialog;
-} // namespace Ui
+namespace domain {
+class Edge;
+} // namespace domain
 
 namespace ui::qt {
 
 //******************************************************************************
-class AboutDialog : public QDialog {
-	Q_OBJECT
-private:
-	std::unique_ptr<Ui::AboutDialog> ui;
-
-private slots:
-	void on_dbb_ok_clicked(QAbstractButton* button);
-
+class EditModelEdge : public EditModel {
 public:
-	explicit AboutDialog(QWidget* parent = nullptr);
-	~AboutDialog() override;
+	explicit EditModelEdge(domain::Edge* edge, QObject* parent = nullptr);
+	void commit() override;
+
+private:
+	domain::Edge* edge;
 };
 
 } // namespace ui::qt

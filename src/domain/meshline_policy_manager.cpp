@@ -76,7 +76,7 @@ optional<array<MeshlinePolicy*, 2>> detect_closest_meshline_policies(
 	erase_if(dimension,
 		[](MeshlinePolicy const* a) {
 			return (!a->get_current_state().is_enabled)
-			    || a->policy == MeshlinePolicy::Policy::ONELINE;
+			    || a->get_current_state().policy == MeshlinePolicy::Policy::ONELINE;
 		});
 
 	ranges::sort(dimension,

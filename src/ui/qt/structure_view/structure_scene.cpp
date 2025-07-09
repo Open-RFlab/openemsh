@@ -22,6 +22,7 @@
 #include "domain/mesh/meshline_policy.hpp"
 #include "utils/unreachable.hpp"
 #include "ui/qt/data_keys.hpp"
+#include "ui/qt/icons.hpp"
 #include "ui/qt/user_types.hpp"
 #include "structure_conflict_colinear_edges.hpp"
 #include "structure_conflict_too_close_meshline_policies.hpp"
@@ -317,7 +318,7 @@ void StructureScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 			if(item->type() == StructurePolygon::Type)
 				title.append(" - " + item->data(DataKeys::NAME).toString());
 
-			auto* action = new QAction(title, &menu);
+			auto* action = new QAction(Icons::select(item), title, &menu);
 			menu.addAction(action);
 			QObject::connect(action, &QAction::triggered, [item]() {
 				item->setSelected(true);

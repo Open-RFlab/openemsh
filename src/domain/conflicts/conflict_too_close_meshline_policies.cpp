@@ -37,19 +37,22 @@ void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManager& line_po
 		return;
 
 	auto [policy, normal] = [&]() -> tuple<optional<MeshlinePolicy::Policy>, optional<MeshlinePolicy::Normal>> {
-		if(a->policy == MeshlinePolicy::Policy::THIRDS && b->policy == MeshlinePolicy::Policy::THIRDS) {
-			if(a->normal != b->normal) {
+		auto const& state_a = a->get_current_state();
+		auto const& state_b = b->get_current_state();
+
+		if(state_a.policy == MeshlinePolicy::Policy::THIRDS && state_b.policy == MeshlinePolicy::Policy::THIRDS) {
+			if(state_a.normal != state_b.normal) {
 				return { MeshlinePolicy::Policy::HALFS, MeshlinePolicy::Normal::NONE };
-			} else if(a->normal == MeshlinePolicy::Normal::MIN
-			       && b->normal == MeshlinePolicy::Normal::MIN) {
+			} else if(state_a.normal == MeshlinePolicy::Normal::MIN
+			       && state_b.normal == MeshlinePolicy::Normal::MIN) {
 				return { MeshlinePolicy::Policy::THIRDS, MeshlinePolicy::Normal::MIN };
-			} else if(a->normal == MeshlinePolicy::Normal::MAX
-			       && b->normal == MeshlinePolicy::Normal::MAX) {
+			} else if(state_a.normal == MeshlinePolicy::Normal::MAX
+			       && state_b.normal == MeshlinePolicy::Normal::MAX) {
 				return { MeshlinePolicy::Policy::THIRDS, MeshlinePolicy::Normal::MAX };
 			}
-		} else if((a->policy == MeshlinePolicy::Policy::HALFS && b->policy == MeshlinePolicy::Policy::HALFS)
-		       || (a->policy == MeshlinePolicy::Policy::HALFS && b->policy == MeshlinePolicy::Policy::THIRDS)
-		       || (a->policy == MeshlinePolicy::Policy::THIRDS && b->policy == MeshlinePolicy::Policy::HALFS)) {
+		} else if((state_a.policy == MeshlinePolicy::Policy::HALFS && state_b.policy == MeshlinePolicy::Policy::HALFS)
+		       || (state_a.policy == MeshlinePolicy::Policy::HALFS && state_b.policy == MeshlinePolicy::Policy::THIRDS)
+		       || (state_a.policy == MeshlinePolicy::Policy::THIRDS && state_b.policy == MeshlinePolicy::Policy::HALFS)) {
 			return { MeshlinePolicy::Policy::HALFS, MeshlinePolicy::Normal::NONE };
 		} //else if(ONE and *) { // TODO }
 		// TODO should not have been created ?

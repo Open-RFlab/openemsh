@@ -92,8 +92,8 @@ bool const is_enabled)", "[meshline_policy_manager]") {
 					REQUIRE(m->get_current_state().origins.size() == 1);
 					REQUIRE(m->get_current_state().origins[0] == &e);
 					REQUIRE(m->axis == X);
-					REQUIRE(m->policy == MeshlinePolicy::Policy::THIRDS);
-					REQUIRE(m->normal == MeshlinePolicy::Normal::MAX);
+					REQUIRE(m->get_current_state().policy == MeshlinePolicy::Policy::THIRDS);
+					REQUIRE(m->get_current_state().normal == MeshlinePolicy::Normal::MAX);
 					REQUIRE(m->coord == 1);
 					REQUIRE(m->get_current_state().is_enabled);
 				}

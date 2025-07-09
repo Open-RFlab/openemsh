@@ -57,6 +57,10 @@ public:
 	Params const& get_params() const;
 	domain::Board const& get_board() const;
 
+	void set_input(std::filesystem::path const& path);
+	void set_output(std::filesystem::path const& path);
+	void set_output_format(Params::OutputFormat format);
+
 	// TODO implement validation checks on params here.
 //	void check_x();
 
@@ -64,6 +68,7 @@ public:
 	void run(std::set<Step> const& steps) const;
 	void run_all_steps() const;
 	void run_next_step() const;
+	void run_from_step(Step step) const;
 	void go_before(Step step) const;
 	void go_before_previous_step() const;
 	void write() const;
@@ -84,5 +89,8 @@ public:
 
 //******************************************************************************
 std::optional<Step> next(Step step);
+
+//******************************************************************************
+std::set<Step> that_and_after(Step step);
 
 } // namespace app

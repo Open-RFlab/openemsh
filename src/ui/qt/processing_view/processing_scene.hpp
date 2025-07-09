@@ -12,7 +12,9 @@
 
 #include <concepts>
 #include <map>
+#include <set>
 
+#include "app/steps.hpp"
 #include "domain/geometrics/space.hpp"
 #include "ui/qt/utils/nodegraph/wire.hpp"
 #include "utils/concepts.hpp"
@@ -45,6 +47,7 @@ public:
 
 	explicit ProcessingScene(ProcessingStyleSelector& style_selector, QObject* parent = nullptr);
 	~ProcessingScene() override;
+	void init();
 
 	void set_wire_style(nodegraph::Wire::Style style) const;
 	void fit_containers() const;
@@ -73,7 +76,8 @@ public:
 	void set_display(DisplayMode mode);
 	void set_display_view_axes(domain::ViewAxisSpace<bool> const& axes);
 	void set_display_plane(domain::Plane plane);
-	void init();
+
+	void edit_selected_nodes(QPoint const& pos);
 
 	ProcessingStyleSelector& style_selector;
 
@@ -100,6 +104,10 @@ private slots:
 signals:
 	void selection_changed(QList<QGraphicsItem*> items);
 	void requires_fit();
+	void edit_global_params();
+	void request_to_go_before(app::Step step);
+	void edited(app::Step const redo_from);
+
 public slots:
 	void select_counterparts(QList<QGraphicsItem*> foreign_items);
 
@@ -120,6 +128,10 @@ private:
 
 	void display_structure_view();
 	void display_selected_chain();
+	void edit(QList<nodegraph::Node*> nodes, QPoint const& pos);
+
+protected:
+	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
 };
 
 } // namespace ui::qt
