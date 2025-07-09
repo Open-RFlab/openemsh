@@ -43,9 +43,9 @@ private slots:
 	void on_a_about_triggered();
 	void on_a_doc_oems_meshing_triggered() const;
 	void on_ag_styles_triggered(QAction* const action);
-	void on_rb_plane_xy_toggled(bool const is_checked);
-	void on_rb_plane_yz_toggled(bool const is_checked);
-	void on_rb_plane_zx_toggled(bool const is_checked);
+	void on_tb_plane_xy_clicked();
+	void on_tb_plane_yz_clicked();
+	void on_tb_plane_zx_clicked();
 	void on_tb_anchor_clicked(bool const is_checked);
 	void on_a_fit_triggered();
 	void on_a_horizontal_layout_triggered();

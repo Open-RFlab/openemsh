@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QGuiApplication>
 #include <QMarginsF>
+#include <QToolButton>
 
 #include "domain/geometrics/space.hpp"
 #include "edit/edit_dialog.hpp"
@@ -35,6 +36,8 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 {
 	setWindowState(Qt::WindowMaximized);
 	ui->setupUi(this);
+
+	// TODO Init StructureView & ProcessingView stuff from buttons default values
 
 	for(auto const& style : Style::available_styles) {
 		auto* const action = new QAction(style.name, ui->ag_styles);
@@ -102,27 +105,21 @@ void MainWindow::on_ag_styles_triggered(QAction* const action) {
 }
 
 //******************************************************************************
-void MainWindow::on_rb_plane_xy_toggled(bool const is_checked) {
-	if(is_checked) {
-		ui->structure_view->set_display_plane(domain::XY);
-		ui->processing_view->set_display_plane(domain::XY);
-	}
+void MainWindow::on_tb_plane_xy_clicked() {
+	ui->structure_view->set_display_plane(domain::XY);
+	ui->processing_view->set_display_plane(domain::XY);
 }
 
 //******************************************************************************
-void MainWindow::on_rb_plane_yz_toggled(bool const is_checked) {
-	if(is_checked) {
-		ui->structure_view->set_display_plane(domain::YZ);
-		ui->processing_view->set_display_plane(domain::YZ);
-	}
+void MainWindow::on_tb_plane_yz_clicked() {
+	ui->structure_view->set_display_plane(domain::YZ);
+	ui->processing_view->set_display_plane(domain::YZ);
 }
 
 //******************************************************************************
-void MainWindow::on_rb_plane_zx_toggled(bool const is_checked) {
-	if(is_checked) {
-		ui->structure_view->set_display_plane(domain::ZX);
-		ui->processing_view->set_display_plane(domain::ZX);
-	}
+void MainWindow::on_tb_plane_zx_clicked() {
+	ui->structure_view->set_display_plane(domain::ZX);
+	ui->processing_view->set_display_plane(domain::ZX);
 }
 
 //******************************************************************************
