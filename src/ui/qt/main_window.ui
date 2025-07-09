@@ -49,6 +49,15 @@
          <property name="autoRepeat">
           <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
         </widget>
        </item>
        <item>
@@ -61,6 +70,15 @@
          </property>
          <property name="autoRepeat">
           <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
         </widget>
        </item>
@@ -88,6 +106,15 @@
          <property name="checked">
           <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <attribute name="buttonGroup">
           <string notr="true">bg_show_processing</string>
          </attribute>
@@ -104,6 +131,15 @@
          <property name="checkable">
           <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <attribute name="buttonGroup">
           <string notr="true">bg_show_processing</string>
          </attribute>
@@ -119,6 +155,15 @@
          </property>
          <property name="checkable">
           <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
          <attribute name="buttonGroup">
           <string notr="true">bg_show_processing</string>
@@ -149,6 +194,15 @@
          <property name="checked">
           <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <attribute name="buttonGroup">
           <string notr="true">bg_wires</string>
          </attribute>
@@ -164,6 +218,15 @@
          </property>
          <property name="checkable">
           <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
          <attribute name="buttonGroup">
           <string notr="true">bg_wires</string>
@@ -216,6 +279,15 @@
          <property name="checkable">
           <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
         </widget>
        </item>
        <item>
@@ -228,6 +300,15 @@
          </property>
          <property name="autoRepeat">
           <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
         </widget>
        </item>
@@ -242,6 +323,15 @@
          <property name="autoRepeat">
           <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
         </widget>
        </item>
        <item>
@@ -255,6 +345,15 @@
          <property name="autoRepeat">
           <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
         </widget>
        </item>
        <item>
@@ -267,6 +366,15 @@
          </property>
          <property name="autoRepeat">
           <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
         </widget>
        </item>
@@ -294,6 +402,15 @@
          <property name="checked">
           <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <attribute name="buttonGroup">
           <string notr="true">bg_show_mesh</string>
          </attribute>
@@ -309,6 +426,15 @@
          </property>
          <property name="checkable">
           <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
          <attribute name="buttonGroup">
           <string notr="true">bg_show_mesh</string>
@@ -326,6 +452,15 @@
          <property name="checkable">
           <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <attribute name="buttonGroup">
           <string notr="true">bg_show_mesh</string>
          </attribute>
@@ -341,6 +476,15 @@
          </property>
          <property name="checkable">
           <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
          <attribute name="buttonGroup">
           <string notr="true">bg_show_mesh</string>
@@ -368,6 +512,15 @@
          <property name="checkable">
           <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <attribute name="buttonGroup">
           <string notr="true">bg_plane</string>
          </attribute>
@@ -383,6 +536,15 @@
          </property>
          <property name="checkable">
           <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
          <attribute name="buttonGroup">
           <string notr="true">bg_plane</string>
@@ -402,6 +564,15 @@
          </property>
          <property name="checked">
           <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
          <attribute name="buttonGroup">
           <string notr="true">bg_plane</string>
