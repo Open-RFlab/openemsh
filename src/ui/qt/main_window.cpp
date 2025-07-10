@@ -425,7 +425,6 @@ void MainWindow::make_current_state_view() {
 //******************************************************************************
 void MainWindow::handle_edition(app::Step const redo_from) {
 	oemsh.run_from_step(redo_from);
-	Caretaker::singleton().remember_current_timepoint();
 
 	make_current_state_view();
 }
