@@ -73,7 +73,8 @@ public:
 	QList<nodegraph::Node*> selected_nodes() const;
 	QList<nodegraph::Node*> highlighted_nodes() const;
 	void reset_visibility(bool are_visible = true) const;
-	void set_display(DisplayMode mode);
+	DisplayMode get_display_mode() const;
+	void set_display_mode(DisplayMode mode);
 	void set_display_view_axes(domain::ViewAxisSpace<bool> const& axes);
 	void set_display_plane(domain::Plane plane);
 

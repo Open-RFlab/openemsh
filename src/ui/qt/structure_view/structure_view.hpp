@@ -44,6 +44,7 @@ public:
 	void reset_rotation();
 	qreal get_rotation() const;
 
+	StructureScene::MeshVisibility get_mesh_visibility();
 	void set_mesh_visibility(StructureScene::MeshVisibility mesh_visibility);
 	void set_display_plane(domain::Plane plane);
 
@@ -73,7 +74,6 @@ private:
 
 	using QGraphicsView::rotate;
 	qreal rotation;
-	StructureScene::MeshVisibility mesh_visibility_on_scene;
 	domain::Plane displayed_plane;
 
 	void populate(domain::PlaneSpace<StructureScene*> scenes);

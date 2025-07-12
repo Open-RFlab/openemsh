@@ -37,9 +37,11 @@ public:
 	void make_current_state();
 	void go_to_current_state();
 
-	void set_display(ProcessingScene::DisplayMode mode);
+	ProcessingScene::DisplayMode get_display_mode();
+	void set_display_mode(ProcessingScene::DisplayMode mode);
 	void set_display_view_axes(domain::ViewAxisSpace<bool> const& axes);
 	void set_display_plane(domain::Plane plane);
+	void set_wire_style(nodegraph::Wire::Style style);
 
 public slots:
 	void fit();
@@ -51,7 +53,7 @@ private:
 	domain::Board const* board;
 	Timepoint* current_timepoint;
 
-	ProcessingScene::DisplayMode display_mode;
+	nodegraph::Wire::Style wire_style;
 	domain::Plane plane_displayed_on_structure_view;
 	domain::ViewAxisSpace<bool> axes_displayed_on_structure_view;
 

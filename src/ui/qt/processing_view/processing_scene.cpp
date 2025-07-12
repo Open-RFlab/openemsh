@@ -61,7 +61,7 @@ ProcessingScene::~ProcessingScene() {
 
 //******************************************************************************
 void ProcessingScene::init() {
-	set_display(display_mode);
+	set_display_mode(display_mode);
 }
 
 //******************************************************************************
@@ -342,7 +342,7 @@ void ProcessingScene::set_display_plane(domain::Plane plane) {
 }
 
 //******************************************************************************
-void ProcessingScene::set_display(DisplayMode mode) {
+void ProcessingScene::set_display_mode(DisplayMode mode) {
 	display_mode = mode;
 	switch(display_mode) {
 	case DisplayMode::EVERYTHING:
@@ -359,6 +359,11 @@ void ProcessingScene::set_display(DisplayMode mode) {
 	default:
 		unreachable();
 	}
+}
+
+//******************************************************************************
+ProcessingScene::DisplayMode ProcessingScene::get_display_mode() const {
+	return display_mode;
 }
 
 //******************************************************************************

@@ -64,6 +64,7 @@ StructureScene::StructureScene(StructureStyleSelector& style_selector, QObject* 
 , intervals{{ new StructureGroup(), new StructureGroup() }}
 , meshlines{{ new StructureGroup(), new StructureGroup() }}
 , meshline_policies{{ new StructureGroup(), new StructureGroup() }}
+, mesh_visibility_on_view(MeshVisibility::FULL)
 {
 	// Adding order matters.
 	addItem(edges);
@@ -259,6 +260,7 @@ void StructureScene::clear_all() {
 
 //******************************************************************************
 void StructureScene::set_mesh_visibility(MeshVisibility mesh_visibility) {
+	mesh_visibility_on_view = mesh_visibility;
 	switch(mesh_visibility) {
 	case MeshVisibility::NONE:
 		meshlines[domain::H]->setVisible(false);
@@ -279,6 +281,11 @@ void StructureScene::set_mesh_visibility(MeshVisibility mesh_visibility) {
 	default:
 		unreachable();
 	}
+}
+
+//******************************************************************************
+StructureScene::MeshVisibility StructureScene::get_mesh_visibility() const {
+	return mesh_visibility_on_view;
 }
 
 // TODO use simple click + double click to select / deselect

@@ -73,6 +73,7 @@ public:
 	void clear_all();
 
 	void set_mesh_visibility(MeshVisibility mesh_visibility);
+	MeshVisibility get_mesh_visibility() const;
 
 	StructureStyleSelector& style_selector;
 //private: //TODO
@@ -96,6 +97,7 @@ public slots:
 	void select_counterparts(QList<QGraphicsItem*> foreign_items);
 private:
 	bool is_select_counterparts_locked = false;
+	MeshVisibility mesh_visibility_on_view;
 
 protected:
 	void mousePressEvent(QGraphicsSceneMouseEvent* event) override;

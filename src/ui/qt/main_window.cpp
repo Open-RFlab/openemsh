@@ -17,6 +17,7 @@
 #include "processing_view/processing_view.hpp"
 #include "structure_view/structure_view.hpp"
 #include "utils/state_management.hpp"
+#include "utils/unreachable.hpp"
 #include "about_dialog.hpp"
 
 #include "ui_main_window.h"
@@ -195,30 +196,30 @@ void MainWindow::on_tb_show_no_mesh_clicked() {
 
 //******************************************************************************
 void MainWindow::on_tb_show_selected_clicked() {
-	ui->processing_view->set_display(ProcessingScene::DisplayMode::SELECTED_CHAIN);
+	ui->processing_view->set_display_mode(ProcessingScene::DisplayMode::SELECTED_CHAIN);
 	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_displayed_clicked() {
-	ui->processing_view->set_display(ProcessingScene::DisplayMode::STRUCTURE_VIEW);
+	ui->processing_view->set_display_mode(ProcessingScene::DisplayMode::STRUCTURE_VIEW);
 	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_everything_clicked() {
-	ui->processing_view->set_display(ProcessingScene::DisplayMode::EVERYTHING);
+	ui->processing_view->set_display_mode(ProcessingScene::DisplayMode::EVERYTHING);
 	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_curved_wires_clicked() {
-	ui->processing_view->get_current_state().scene->set_wire_style(nodegraph::Wire::Style::CURVED);
+	ui->processing_view->set_wire_style(nodegraph::Wire::Style::CURVED);
 }
 
 //******************************************************************************
 void MainWindow::on_tb_direct_wires_clicked() {
-	ui->processing_view->get_current_state().scene->set_wire_style(nodegraph::Wire::Style::DIRECT);
+	ui->processing_view->set_wire_style(nodegraph::Wire::Style::DIRECT);
 }
 
 //******************************************************************************
@@ -385,7 +386,8 @@ void MainWindow::go_to_or_make_current_state() {
 void MainWindow::go_to_current_state() {
 	ui->structure_view->go_to_current_state();
 	ui->processing_view->go_to_current_state();
-	update_navigation_visibility();
+	update_navigation_buttons_visibility();
+	update_show_buttons_pressing();
 	// TODO handle passing selection from a scene to its own future couterpart
 }
 
@@ -419,7 +421,7 @@ void MainWindow::make_current_state_view() {
 		ui->processing_view->states[t].scene, &ProcessingScene::edited,
 		this, &MainWindow::handle_edition);
 
-	update_navigation_visibility();
+	update_navigation_buttons_visibility();
 }
 
 //******************************************************************************
@@ -430,13 +432,30 @@ void MainWindow::handle_edition(app::Step const redo_from) {
 }
 
 //******************************************************************************
-void MainWindow::update_navigation_visibility() {
+void MainWindow::update_navigation_buttons_visibility() {
 	ui->a_undo->setEnabled(Caretaker::singleton().can_undo());
 	ui->a_redo->setEnabled(Caretaker::singleton().can_redo());
 	ui->a_mesh_prev->setEnabled(oemsh.can_go_before());
 	ui->a_mesh_next->setEnabled(oemsh.can_run_a_next_step());
 };
 
+//******************************************************************************
+void MainWindow::update_show_buttons_pressing() {
+	switch(ui->structure_view->get_mesh_visibility()) {
+	case StructureScene::MeshVisibility::NONE: ui->tb_show_no_mesh->setChecked(true); break;
+	case StructureScene::MeshVisibility::VERTICAL: ui->tb_show_vertical_mesh->setChecked(true); break;
+	case StructureScene::MeshVisibility::HORIZONTAL: ui->tb_show_horizontal_mesh->setChecked(true); break;
+	case StructureScene::MeshVisibility::FULL: ui->tb_show_all_mesh->setChecked(true); break;
+	default: unreachable();
+	}
+
+	switch(ui->processing_view->get_display_mode()) {
+	case ProcessingScene::DisplayMode::EVERYTHING: ui->tb_show_everything->setChecked(true); break;
+	case ProcessingScene::DisplayMode::STRUCTURE_VIEW: ui->tb_show_displayed->setChecked(true); break;
+	case ProcessingScene::DisplayMode::SELECTED_CHAIN: ui->tb_show_selected->setChecked(true); break;
+	default: unreachable();
+	}
+}
 
 //******************************************************************************
 void MainWindow::keyPressEvent(QKeyEvent* event) {
