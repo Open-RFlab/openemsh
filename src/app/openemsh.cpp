@@ -114,6 +114,7 @@ void OpenEMSH::set_output_format(Params::OutputFormat format) {
 void OpenEMSH::parse() {
 	Caretaker::singleton().reset();
 	board = ParserFromCsx::run(params.input, static_cast<ParserFromCsx::Params const&>(params), params.override_from_cli);
+	Caretaker::singleton().remember_current_timepoint();
 }
 
 //******************************************************************************
@@ -142,7 +143,6 @@ void OpenEMSH::run(std::set<Step> const& steps) const {
 	};
 
 	if(steps.contains(Step::DETECT_CONFLICT_EIP)) {
-		Caretaker::singleton().remember_current_timepoint();
 		annotate(Step::DETECT_CONFLICT_EIP);
 		board->detect_edges_in_polygons();
 	}
