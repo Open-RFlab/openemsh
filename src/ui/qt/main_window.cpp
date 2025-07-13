@@ -472,6 +472,10 @@ void MainWindow::keyPressEvent(QKeyEvent* event) {
 		} else {
 			on_a_undo_triggered();
 		}
+	} else if(event->key() == Qt::Key_Escape) {
+		// Will be forwarded to the 3 StructureScenes
+		if(auto* scene = ui->processing_view->scene(); scene)
+			scene->clearSelection();
 	} else {
 		QWidget::keyPressEvent(event);
 	}
