@@ -9,6 +9,7 @@
 
 #include "infra/serializers/serializer_to_plantuml.hpp"
 #include "infra/serializers/serializer_to_prettyprint.hpp"
+#include "utils/concepts.hpp"
 #include "utils/unreachable.hpp"
 
 #include "openemsh.hpp"
@@ -138,46 +139,23 @@ void OpenEMSH::write() const {
 
 //******************************************************************************
 void OpenEMSH::run(std::set<Step> const& steps) const {
-	auto const annotate = [](Step step) {
-		Caretaker::singleton().annotate_current_timepoint(make_unique<Annotation>(step));
+	auto const handle = [&]<InvocableR<void> F>(Step step, F const& func) {
+		if(steps.contains(step)) {
+			Caretaker::singleton().annotate_current_timepoint(make_unique<Annotation>(step));
+			func();
+		}
 	};
 
-	if(steps.contains(Step::DETECT_CONFLICT_EIP)) {
-		annotate(Step::DETECT_CONFLICT_EIP);
-		board->detect_edges_in_polygons();
-	}
-	if(steps.contains(Step::DETECT_CONFLICT_CE)) {
-		annotate(Step::DETECT_CONFLICT_CE);
-		board->detect_colinear_edges();
-	}
-	if(steps.contains(Step::DETECT_NON_CONFLICTING_EDGES)) {
-		annotate(Step::DETECT_NON_CONFLICTING_EDGES);
-		board->detect_non_conflicting_edges();
-	}
-	if(steps.contains(Step::ADD_FIXED_MLP)) {
-		annotate(Step::ADD_FIXED_MLP);
-		board->add_fixed_meshline_policies();
-	}
-	if(steps.contains(Step::SOLVE_ALL_EIP)) {
-		annotate(Step::SOLVE_ALL_EIP);
-		board->auto_solve_all_edge_in_polygon();
-	}
-	if(steps.contains(Step::SOLVE_ALL_CE)) {
-		annotate(Step::SOLVE_ALL_CE);
-		board->auto_solve_all_colinear_edges();
-	}
-	if(steps.contains(Step::DETECT_AND_SOLVE_TCMLP)) {
-		annotate(Step::DETECT_AND_SOLVE_TCMLP);
-		board->detect_and_solve_too_close_meshline_policies();
-	}
-	if(steps.contains(Step::DETECT_INTERVALS)) {
-		annotate(Step::DETECT_INTERVALS);
-		board->detect_intervals();
-	}
-	if(steps.contains(Step::MESH)) {
-		annotate(Step::MESH);
-		board->mesh();
-	}
+	using enum Step;
+	handle(DETECT_CONFLICT_EIP,          [&] { board->detect_edges_in_polygons(); });
+	handle(DETECT_CONFLICT_CE,           [&] { board->detect_colinear_edges(); });
+	handle(DETECT_NON_CONFLICTING_EDGES, [&] { board->detect_non_conflicting_edges(); });
+	handle(ADD_FIXED_MLP,                [&] { board->add_fixed_meshline_policies(); });
+	handle(SOLVE_ALL_EIP,                [&] { board->auto_solve_all_edge_in_polygon(); });
+	handle(SOLVE_ALL_CE,                 [&] { board->auto_solve_all_colinear_edges(); });
+	handle(DETECT_AND_SOLVE_TCMLP,       [&] { board->detect_and_solve_too_close_meshline_policies(); });
+	handle(DETECT_INTERVALS,             [&] { board->detect_intervals(); });
+	handle(MESH,                         [&] { board->mesh(); });
 
 	Caretaker::singleton().remember_current_timepoint();
 }
