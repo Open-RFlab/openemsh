@@ -481,11 +481,8 @@ void ProcessingScene::edit(QList<nodegraph::Node*> nodes, QPoint const& pos) {
 			EditDialog edit(model, title);
 			model->setParent(&edit);
 			connect(
-				model, &EditModel::request_to_go_before,
-				this, &ProcessingScene::request_to_go_before);
-			connect(
-				model, &EditModel::edited,
-				this, &ProcessingScene::edited);
+				model, &EditModel::edit_from,
+				this, &ProcessingScene::edit_from);
 			edit.exec();
 		}
 	};

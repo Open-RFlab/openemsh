@@ -8,6 +8,7 @@
 
 #include <QStandardItemModel>
 
+#include <functional>
 #include <map>
 
 #include "app/steps.hpp"
@@ -38,8 +39,7 @@ protected:
 	static bool try_from_map(std::map<QString, O> const& map, QString const& in, O& out);
 
 signals:
-	void request_to_go_before(app::Step step);
-	void edited(app::Step const redo_from);
+	void edit_from(app::Step from, std::function<void ()> const& edit);
 };
 
 //******************************************************************************

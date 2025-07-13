@@ -51,9 +51,9 @@ void EditModelInterval::commit() {
 	};
 
 	if(std::ranges::all_of(does_succeed, is_true)) {
-		emit request_to_go_before(app::Step::MESH);
-		interval->set_next_state(state);
-		emit edited(app::Step::MESH);
+		emit edit_from(app::Step::MESH, [&] {
+			interval->set_next_state(state);
+		});
 	}
 }
 

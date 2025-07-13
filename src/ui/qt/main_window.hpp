@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 
 #include <QMainWindow>
@@ -38,7 +39,7 @@ private:
 	void go_to_current_state();
 	void make_current_state_view();
 	void go_to_or_make_current_state();
-	void edit_global_params();
+	void run(app::Step from = app::Step::DETECT_CONFLICT_EIP);
 
 private slots:
 	void on_a_about_triggered();
@@ -75,7 +76,8 @@ private slots:
 	void on_a_undo_triggered();
 	void on_a_redo_triggered();
 
-	void handle_edition(app::Step const redo_from = app::Step::DETECT_CONFLICT_EIP);
+	void edit_global_params();
+	void handle_edition_from(app::Step from, std::function<void ()> const& edit);
 
 public:
 	MainWindow(app::OpenEMSH& oemsh, QWidget* parent = nullptr);

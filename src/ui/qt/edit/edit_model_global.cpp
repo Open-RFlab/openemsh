@@ -54,9 +54,9 @@ void EditModelGlobal::commit() {
 	};
 
 	if(std::ranges::all_of(does_succeed, is_true)) {
-		emit request_to_go_before(app::Step::DETECT_CONFLICT_EIP);
-		global->set_next_state(params);
-		emit edited(app::Step::DETECT_CONFLICT_EIP);
+		emit edit_from(app::Step::DETECT_CONFLICT_EIP, [&]() {
+			global->set_next_state(params);
+		});
 	}
 }
 

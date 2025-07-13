@@ -11,6 +11,7 @@
 #include <QList>
 
 #include <concepts>
+#include <functional>
 #include <map>
 #include <set>
 
@@ -106,8 +107,7 @@ signals:
 	void selection_changed(QList<QGraphicsItem*> items);
 	void requires_fit();
 	void edit_global_params();
-	void request_to_go_before(app::Step step);
-	void edited(app::Step const redo_from);
+	void edit_from(app::Step from, std::function<void ()> const& edit);
 
 public slots:
 	void select_counterparts(QList<QGraphicsItem*> foreign_items);

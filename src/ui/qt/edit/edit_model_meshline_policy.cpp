@@ -83,9 +83,9 @@ void EditModelMeshlinePolicy::commit() {
 	};
 
 	if(std::ranges::all_of(does_succeed, is_true)) {
-		emit request_to_go_before(app::Step::DETECT_INTERVALS);
-		meshline_policy->set_next_state(state);
-		emit edited(app::Step::DETECT_INTERVALS);
+		emit edit_from(app::Step::DETECT_INTERVALS, [&]() {
+			meshline_policy->set_next_state(state);
+		});
 	}
 }
 

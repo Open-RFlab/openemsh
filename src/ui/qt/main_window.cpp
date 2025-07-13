@@ -61,7 +61,7 @@ void MainWindow::parse_and_display() {
 	oemsh.parse();
 	ui->structure_view->init(&oemsh.get_board());
 	ui->processing_view->init(&oemsh.get_board());
-	handle_edition();
+	run();
 	QGuiApplication::restoreOverrideCursor();
 }
 
@@ -329,13 +329,8 @@ void MainWindow::edit_global_params() {
 	EditModelGlobal model(oemsh.get_board().global_params.get());
 	EditDialog edit(&model, "global parameters");
 	connect(
-		&model, &EditModel::request_to_go_before,
-		[this](app::Step step) {
-			this->oemsh.go_before(step);
-		});
-	connect(
-		&model, &EditModel::edited,
-		this, &MainWindow::handle_edition);
+		&model, &EditModel::edit_from,
+		this, &MainWindow::handle_edition_from);
 	edit.exec();
 }
 
@@ -412,23 +407,23 @@ void MainWindow::make_current_state_view() {
 		this, &MainWindow::edit_global_params);
 
 	connect(
-		ui->processing_view->states[t].scene, &ProcessingScene::request_to_go_before,
-		[this](app::Step step) {
-			this->oemsh.go_before(step);
-		});
-
-	connect(
-		ui->processing_view->states[t].scene, &ProcessingScene::edited,
-		this, &MainWindow::handle_edition);
+		ui->processing_view->states[t].scene, &ProcessingScene::edit_from,
+		this, &MainWindow::handle_edition_from);
 
 	update_navigation_buttons_visibility();
 }
 
 //******************************************************************************
-void MainWindow::handle_edition(app::Step const redo_from) {
-	oemsh.run_from_step(redo_from);
-
+void MainWindow::run(app::Step from) {
+	oemsh.run_from_step(from);
 	make_current_state_view();
+}
+
+//******************************************************************************
+void MainWindow::handle_edition_from(app::Step from, std::function<void ()> const& edit) {
+	oemsh.go_before(from);
+	edit();
+	run(from);
 }
 
 //******************************************************************************
