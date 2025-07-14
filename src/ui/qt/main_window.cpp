@@ -472,6 +472,46 @@ void MainWindow::keyPressEvent(QKeyEvent* event) {
 		} else {
 			on_a_undo_triggered();
 		}
+	} else if(event->key() == Qt::Key_Greater) {
+		on_a_mesh_next_triggered();
+	} else if(event->key() == Qt::Key_Less) {
+		on_a_mesh_prev_triggered();
+	} else if(event->key() == Qt::Key_1) {
+		ui->tb_show_selected->click();
+	} else if(event->key() == Qt::Key_2) {
+		ui->tb_show_displayed->click();
+	} else if(event->key() == Qt::Key_3) {
+		ui->tb_show_everything->click();
+	} else if(event->key() == Qt::Key_C) {
+		ui->tb_curved_wires->click();
+	} else if(event->key() == Qt::Key_D) {
+		ui->tb_direct_wires->click();
+	} else if(event->key() == Qt::Key_X) {
+		ui->tb_show_all_mesh->click();
+	} else if(event->key() == Qt::Key_V) {
+		ui->tb_show_vertical_mesh->click();
+	} else if(event->key() == Qt::Key_H) {
+		ui->tb_show_horizontal_mesh->click();
+	} else if(event->key() == Qt::Key_Period) {
+		ui->tb_show_no_mesh->click();
+	} else if(event->key() == Qt::Key_PageUp) {
+		if(auto* b = ui->bg_plane->checkedButton()
+		; b == ui->tb_plane_xy) {
+			ui->tb_plane_zx->click();
+		} else if(b == ui->tb_plane_zx) {
+			ui->tb_plane_yz->click();
+		} else if(b == ui->tb_plane_yz) {
+			ui->tb_plane_xy->click();
+		}
+	} else if(event->key() == Qt::Key_PageDown) {
+		if(auto* b = ui->bg_plane->checkedButton()
+		; b == ui->tb_plane_xy) {
+			ui->tb_plane_yz->click();
+		} else if(b == ui->tb_plane_zx) {
+			ui->tb_plane_xy->click();
+		} else if(b == ui->tb_plane_yz) {
+			ui->tb_plane_zx->click();
+		}
 	} else if(event->key() == Qt::Key_Escape) {
 		// Will be forwarded to the 3 StructureScenes
 		if(auto* scene = ui->processing_view->scene(); scene)
