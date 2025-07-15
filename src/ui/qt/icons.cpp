@@ -4,9 +4,11 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <QGuiApplication>
 #include <QPainter>
 #include <QPixmap>
 #include <QString>
+#include <QStyleHints>
 #include <QTransform>
 
 #include "structure_view/structure_conflict_colinear_edges.hpp"
@@ -38,7 +40,11 @@ QPixmap make_pixmap(Drawer const& draw) {
 	QPixmap icon(size, size);
 	icon.fill(Qt::transparent);
 	QPainter painter(&icon);
-	painter.setPen(Qt::black);
+	switch(QGuiApplication::styleHints()->colorScheme()) {
+	default: [[fallthrough]];
+	case Qt::ColorScheme::Light: painter.setPen(Qt::black); break;
+	case Qt::ColorScheme::Dark: painter.setPen(Qt::white); break;
+	}
 	draw(size, painter);
 	return icon;
 };
@@ -72,8 +78,17 @@ QPixmap apply(QTransform const& transform, QPixmap const& pixmap) {
 //******************************************************************************
 #define PIXMAP_MAKER_DEF(NAME, FUNC) \
 	QPixmap const& Icons::NAME() { \
-		static QPixmap const pixmap = FUNC; \
-		return pixmap; \
+		switch(QGuiApplication::styleHints()->colorScheme()) { \
+		default: [[fallthrough]]; \
+		case Qt::ColorScheme::Light: { \
+			static QPixmap const light = FUNC; \
+			return light; \
+		} \
+		case Qt::ColorScheme::Dark: { \
+			static QPixmap const dark = FUNC; \
+			return dark; \
+		} \
+		} \
 	}
 
 //******************************************************************************
