@@ -47,7 +47,7 @@ AboutDialog::AboutDialog(QWidget* parent)
 AboutDialog::~AboutDialog() = default;
 
 //******************************************************************************
-void AboutDialog::on_pb_ok_clicked() {
+void AboutDialog::on_dbb_ok_clicked(QAbstractButton* /*button*/) {
 	accept();
 }
 

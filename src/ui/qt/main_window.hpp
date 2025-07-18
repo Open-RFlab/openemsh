@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 
 #include <QMainWindow>
@@ -28,23 +29,27 @@ private:
 	app::OpenEMSH& oemsh;
 
 	bool dock_layout_order;
+	QString csx_file;
 
 	void set_style(Style const& style);
 
-	void update_navigation_visibility();
+	void update_title();
+	void update_navigation_buttons_visibility();
+	void update_show_buttons_pressing();
 	void go_to_current_state();
 	void make_current_state_view();
 	void go_to_or_make_current_state();
+	void run(app::Step from = app::Step::DETECT_CONFLICT_EIP);
 
 private slots:
 	void on_a_about_triggered();
 	void on_a_doc_oems_meshing_triggered() const;
 	void on_ag_styles_triggered(QAction* const action);
-	void on_rb_plane_xy_toggled(bool const is_checked);
-	void on_rb_plane_yz_toggled(bool const is_checked);
-	void on_rb_plane_zx_toggled(bool const is_checked);
+	void on_tb_plane_xy_clicked();
+	void on_tb_plane_yz_clicked();
+	void on_tb_plane_zx_clicked();
 	void on_tb_anchor_clicked(bool const is_checked);
-	void on_a_reset_triggered();
+	void on_a_fit_triggered();
 	void on_a_horizontal_layout_triggered();
 	void on_a_vertical_layout_triggered();
 	void on_tb_show_all_mesh_clicked();
@@ -62,17 +67,27 @@ private slots:
 	void on_tb_structure_zoom_out_clicked();
 	void on_tb_processing_zoom_in_clicked();
 	void on_tb_processing_zoom_out_clicked();
+	void on_a_file_open_triggered();
+	void on_a_file_save_triggered();
+	void on_a_file_save_as_triggered();
+	void on_a_edit_triggered();
 	void on_a_mesh_prev_triggered();
 	void on_a_mesh_next_triggered();
 	void on_a_undo_triggered();
 	void on_a_redo_triggered();
 
-	void handle_edition(std::set<app::Step> const& to_redo = {}); // TODO handle_edition / on_edition
+	void edit_global_params();
+	void handle_edition_from(app::Step from, std::function<void ()> const& edit);
 
 public:
 	MainWindow(app::OpenEMSH& oemsh, QWidget* parent = nullptr);
 	~MainWindow() override;
 
+	void parse_and_display();
+	void clear();
+
+protected:
+	void keyPressEvent(QKeyEvent* event) override;
 };
 
 } // namespace ui::qt

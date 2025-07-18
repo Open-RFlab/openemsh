@@ -20,6 +20,9 @@ ProcessingView::ProcessingView(QWidget* parent)
 : QGraphicsView(parent)
 , board(nullptr)
 , current_timepoint(nullptr)
+, wire_style(nodegraph::Wire::Style::CURVED)
+, plane_displayed_on_structure_view(domain::XY)
+, axes_displayed_on_structure_view({ true, true })
 {
 	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
@@ -33,6 +36,16 @@ ProcessingView::ProcessingView(QWidget* parent)
 void ProcessingView::init(domain::Board const* _board) {
 	board = _board;
 }
+
+//******************************************************************************
+void ProcessingView::clear() {
+	for(auto [t, state] : states)
+		delete state.scene;
+	states.clear();
+	board = nullptr;
+	current_timepoint = nullptr;
+}
+
 //******************************************************************************
 void ProcessingView::wheelEvent(QWheelEvent* event) {
 	if(event->modifiers() & Qt::ControlModifier) {
@@ -59,6 +72,35 @@ void ProcessingView::fit() {
 }
 
 //******************************************************************************
+ProcessingScene::DisplayMode ProcessingView::get_display_mode() {
+	return get_current_state().scene->get_display_mode();
+}
+
+//******************************************************************************
+void ProcessingView::set_display_mode(ProcessingScene::DisplayMode mode) {
+	get_current_state().scene->set_display_mode(mode);
+}
+
+//******************************************************************************
+void ProcessingView::set_display_view_axes(domain::ViewAxisSpace<bool> const& axes) {
+	axes_displayed_on_structure_view = axes;
+	get_current_state().scene->set_display_view_axes(axes);
+}
+
+//******************************************************************************
+void ProcessingView::set_display_plane(domain::Plane plane) {
+	plane_displayed_on_structure_view = plane;
+	get_current_state().scene->set_display_plane(plane);
+}
+
+//******************************************************************************
+void ProcessingView::set_wire_style(nodegraph::Wire::Style style) {
+	wire_style = style;
+	for(auto& [t, state] : states)
+		state.scene->set_wire_style(style);
+}
+
+//******************************************************************************
 ProcessingState& ProcessingView::get_current_state() {
 	return states.at(current_timepoint);
 }
@@ -76,6 +118,11 @@ void ProcessingView::make_current_state() {
 
 	populate(scene);
 	scene->init();
+	if(auto* current_scene = static_cast<ProcessingScene*>(this->scene()); current_scene)
+		scene->set_display_mode(current_scene->get_display_mode());
+	scene->set_display_view_axes(axes_displayed_on_structure_view);
+	scene->set_display_plane(plane_displayed_on_structure_view);
+	scene->set_wire_style(wire_style);
 
 	states.emplace(Caretaker::singleton().get_current_timepoint(), scene);
 	go_to_current_state();

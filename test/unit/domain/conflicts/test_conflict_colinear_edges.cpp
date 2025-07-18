@@ -55,8 +55,8 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.get_current_state().line_policies[X][0].get() == cce.get_current_state().solution);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().origins.size() == 1);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().origins[0] == &cce);
-				REQUIRE(mpm.get_current_state().line_policies[X][0]->policy == MeshlinePolicy::Policy::HALFS);
-				REQUIRE(mpm.get_current_state().line_policies[X][0]->normal == MeshlinePolicy::Normal::NONE);
+				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().policy == MeshlinePolicy::Policy::HALFS);
+				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().normal == MeshlinePolicy::Normal::NONE);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->coord == 1);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().is_enabled);
 			}
@@ -82,8 +82,8 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.get_current_state().line_policies[X][0].get() == cce.get_current_state().solution);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().origins.size() == 1);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().origins[0] == &cce);
-				REQUIRE(mpm.get_current_state().line_policies[X][0]->policy == MeshlinePolicy::Policy::HALFS);
-				REQUIRE(mpm.get_current_state().line_policies[X][0]->normal == MeshlinePolicy::Normal::NONE);
+				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().policy == MeshlinePolicy::Policy::HALFS);
+				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().normal == MeshlinePolicy::Normal::NONE);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->coord == 1);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().is_enabled);
 			}
@@ -109,8 +109,8 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.get_current_state().line_policies[X][0].get() == cce.get_current_state().solution);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().origins.size() == 1);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().origins[0] == &cce);
-				REQUIRE(mpm.get_current_state().line_policies[X][0]->policy == MeshlinePolicy::Policy::THIRDS);
-				REQUIRE(mpm.get_current_state().line_policies[X][0]->normal == MeshlinePolicy::Normal::MIN);
+				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().policy == MeshlinePolicy::Policy::THIRDS);
+				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().normal == MeshlinePolicy::Normal::MIN);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->coord == 1);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().is_enabled);
 			}
@@ -136,8 +136,8 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.get_current_state().line_policies[X][0].get() == cce.get_current_state().solution);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().origins.size() == 1);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().origins[0] == &cce);
-				REQUIRE(mpm.get_current_state().line_policies[X][0]->policy == MeshlinePolicy::Policy::HALFS);
-				REQUIRE(mpm.get_current_state().line_policies[X][0]->normal == MeshlinePolicy::Normal::NONE);
+				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().policy == MeshlinePolicy::Policy::HALFS);
+				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().normal == MeshlinePolicy::Normal::NONE);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->coord == 1);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().is_enabled);
 			}
@@ -163,8 +163,8 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.get_current_state().line_policies[X][0].get() == cce.get_current_state().solution);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().origins.size() == 1);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().origins[0] == &cce);
-				REQUIRE(mpm.get_current_state().line_policies[X][0]->policy == MeshlinePolicy::Policy::THIRDS);
-				REQUIRE(mpm.get_current_state().line_policies[X][0]->normal == MeshlinePolicy::Normal::MAX);
+				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().policy == MeshlinePolicy::Policy::THIRDS);
+				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().normal == MeshlinePolicy::Normal::MAX);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->coord == 1);
 				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().is_enabled);
 			}
@@ -206,8 +206,8 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.get_current_state().line_policies[Y][0].get() == cce.get_current_state().solution);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().origins.size() == 1);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().origins[0] == &cce);
-				REQUIRE(mpm.get_current_state().line_policies[Y][0]->policy == MeshlinePolicy::Policy::HALFS);
-				REQUIRE(mpm.get_current_state().line_policies[Y][0]->normal == MeshlinePolicy::Normal::NONE);
+				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().policy == MeshlinePolicy::Policy::HALFS);
+				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().normal == MeshlinePolicy::Normal::NONE);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->coord == 1);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().is_enabled);
 			}
@@ -233,8 +233,8 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.get_current_state().line_policies[Y][0].get() == cce.get_current_state().solution);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().origins.size() == 1);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().origins[0] == &cce);
-				REQUIRE(mpm.get_current_state().line_policies[Y][0]->policy == MeshlinePolicy::Policy::HALFS);
-				REQUIRE(mpm.get_current_state().line_policies[Y][0]->normal == MeshlinePolicy::Normal::NONE);
+				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().policy == MeshlinePolicy::Policy::HALFS);
+				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().normal == MeshlinePolicy::Normal::NONE);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->coord == 1);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().is_enabled);
 			}
@@ -260,8 +260,8 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.get_current_state().line_policies[Y][0].get() == cce.get_current_state().solution);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().origins.size() == 1);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().origins[0] == &cce);
-				REQUIRE(mpm.get_current_state().line_policies[Y][0]->policy == MeshlinePolicy::Policy::THIRDS);
-				REQUIRE(mpm.get_current_state().line_policies[Y][0]->normal == MeshlinePolicy::Normal::MIN);
+				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().policy == MeshlinePolicy::Policy::THIRDS);
+				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().normal == MeshlinePolicy::Normal::MIN);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->coord == 1);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().is_enabled);
 			}
@@ -287,8 +287,8 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.get_current_state().line_policies[Y][0].get() == cce.get_current_state().solution);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().origins.size() == 1);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().origins[0] == &cce);
-				REQUIRE(mpm.get_current_state().line_policies[Y][0]->policy == MeshlinePolicy::Policy::HALFS);
-				REQUIRE(mpm.get_current_state().line_policies[Y][0]->normal == MeshlinePolicy::Normal::NONE);
+				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().policy == MeshlinePolicy::Policy::HALFS);
+				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().normal == MeshlinePolicy::Normal::NONE);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->coord == 1);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().is_enabled);
 			}
@@ -314,8 +314,8 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.get_current_state().line_policies[Y][0].get() == cce.get_current_state().solution);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().origins.size() == 1);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().origins[0] == &cce);
-				REQUIRE(mpm.get_current_state().line_policies[Y][0]->policy == MeshlinePolicy::Policy::THIRDS);
-				REQUIRE(mpm.get_current_state().line_policies[Y][0]->normal == MeshlinePolicy::Normal::MAX);
+				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().policy == MeshlinePolicy::Policy::THIRDS);
+				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().normal == MeshlinePolicy::Normal::MAX);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->coord == 1);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().is_enabled);
 			}

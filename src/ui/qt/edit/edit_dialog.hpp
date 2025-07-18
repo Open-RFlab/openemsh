@@ -7,30 +7,32 @@
 #pragma once
 
 #include <QDialog>
-#include <QObject>
 
 #include <memory>
 
-class QAbstractButton;
-
 namespace Ui {
-class AboutDialog;
+class EditDialog;
 } // namespace Ui
 
 namespace ui::qt {
 
+class EditDelegate;
+class EditModel;
+
 //******************************************************************************
-class AboutDialog : public QDialog {
+class EditDialog : public QDialog {
 	Q_OBJECT
 private:
-	std::unique_ptr<Ui::AboutDialog> ui;
+	std::unique_ptr<Ui::EditDialog> ui;
+	EditDelegate* delegate;
 
 private slots:
-	void on_dbb_ok_clicked(QAbstractButton* button);
+	void on_dbb_ok_accepted();
+	void on_dbb_ok_rejected();
 
 public:
-	explicit AboutDialog(QWidget* parent = nullptr);
-	~AboutDialog() override;
+	explicit EditDialog(EditModel* model, QString const& title = QString(), QWidget* parent = nullptr);
+	~EditDialog() override;
 };
 
 } // namespace ui::qt

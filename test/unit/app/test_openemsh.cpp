@@ -9,6 +9,7 @@
 #include "app/openemsh.hpp"
 
 /// @test optional<Step> next(Step step)
+/// @test set<Step> that_and_after(Step step)
 ///*****************************************************************************
 
 using namespace app;
@@ -75,6 +76,109 @@ SCENARIO("optional<Step> next(Step step)", "[app][openemsh]") {
 		THEN("Should return nullopt") {
 			std::optional<Step> a = next(Step::MESH);
 			REQUIRE_FALSE(a.has_value());
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
+	WHEN("Running for DETECT_CONFLICT_EIP") {
+		THEN("Should return all Steps except those coming before DETECT_CONFLICT_EIP") {
+			REQUIRE(that_and_after(Step::DETECT_CONFLICT_EIP) == std::set<Step> {
+				Step::DETECT_CONFLICT_EIP,
+				Step::DETECT_CONFLICT_CE,
+				Step::DETECT_NON_CONFLICTING_EDGES,
+				Step::ADD_FIXED_MLP,
+				Step::SOLVE_ALL_EIP,
+				Step::SOLVE_ALL_CE,
+				Step::DETECT_AND_SOLVE_TCMLP,
+				Step::DETECT_INTERVALS,
+				Step::MESH
+			});
+		}
+	}
+	WHEN("Running for DETECT_CONFLICT_CE") {
+		THEN("Should return all Steps except those coming before DETECT_CONFLICT_CE") {
+			REQUIRE(that_and_after(Step::DETECT_CONFLICT_CE) == std::set<Step> {
+				Step::DETECT_CONFLICT_CE,
+				Step::DETECT_NON_CONFLICTING_EDGES,
+				Step::ADD_FIXED_MLP,
+				Step::SOLVE_ALL_EIP,
+				Step::SOLVE_ALL_CE,
+				Step::DETECT_AND_SOLVE_TCMLP,
+				Step::DETECT_INTERVALS,
+				Step::MESH
+			});
+		}
+	}
+	WHEN("Running for DETECT_NON_CONFLICTING_EDGES") {
+		THEN("Should return all Steps except those coming before DETECT_NON_CONFLICTING_EDGES") {
+			REQUIRE(that_and_after(Step::DETECT_NON_CONFLICTING_EDGES) == std::set<Step> {
+				Step::DETECT_NON_CONFLICTING_EDGES,
+				Step::ADD_FIXED_MLP,
+				Step::SOLVE_ALL_EIP,
+				Step::SOLVE_ALL_CE,
+				Step::DETECT_AND_SOLVE_TCMLP,
+				Step::DETECT_INTERVALS,
+				Step::MESH
+			});
+		}
+	}
+	WHEN("Running for ADD_FIXED_MLP") {
+		THEN("Should return all Steps except those coming before ADD_FIXED_MLP") {
+			REQUIRE(that_and_after(Step::ADD_FIXED_MLP) == std::set<Step> {
+				Step::ADD_FIXED_MLP,
+				Step::SOLVE_ALL_EIP,
+				Step::SOLVE_ALL_CE,
+				Step::DETECT_AND_SOLVE_TCMLP,
+				Step::DETECT_INTERVALS,
+				Step::MESH
+			});
+		}
+	}
+	WHEN("Running for SOLVE_ALL_EIP") {
+		THEN("Should return all Steps except those coming before SOLVE_ALL_EIP") {
+			REQUIRE(that_and_after(Step::SOLVE_ALL_EIP) == std::set<Step> {
+				Step::SOLVE_ALL_EIP,
+				Step::SOLVE_ALL_CE,
+				Step::DETECT_AND_SOLVE_TCMLP,
+				Step::DETECT_INTERVALS,
+				Step::MESH
+			});
+		}
+	}
+	WHEN("Running for SOLVE_ALL_CE") {
+		THEN("Should return all Steps except those coming before SOLVE_ALL_CE") {
+			REQUIRE(that_and_after(Step::SOLVE_ALL_CE) == std::set<Step> {
+				Step::SOLVE_ALL_CE,
+				Step::DETECT_AND_SOLVE_TCMLP,
+				Step::DETECT_INTERVALS,
+				Step::MESH
+			});
+		}
+	}
+	WHEN("Running for DETECT_AND_SOLVE_TCMLP") {
+		THEN("Should return all Steps except those coming before DETECT_AND_SOLVE_TCMLP") {
+			REQUIRE(that_and_after(Step::DETECT_AND_SOLVE_TCMLP) == std::set<Step> {
+				Step::DETECT_AND_SOLVE_TCMLP,
+				Step::DETECT_INTERVALS,
+				Step::MESH
+			});
+		}
+	}
+	WHEN("Running for DETECT_INTERVALS") {
+		THEN("Should return all Steps except those coming before DETECT_INTERVALS") {
+			REQUIRE(that_and_after(Step::DETECT_INTERVALS) == std::set<Step> {
+				Step::DETECT_INTERVALS,
+				Step::MESH
+			});
+		}
+	}
+	WHEN("Running for MESH") {
+		THEN("Should return all Steps except those coming before MESH") {
+			REQUIRE(that_and_after(Step::MESH) == std::set<Step> {
+				Step::MESH
+			});
 		}
 	}
 }

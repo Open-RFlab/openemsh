@@ -43,11 +43,11 @@ static QPainterPath create_repair() {
 //******************************************************************************
 StructureView::StructureView(QWidget* parent)
 : QGraphicsView(parent)
+, board(nullptr)
+, current_timepoint(nullptr)
 , repair(std::make_unique<QGraphicsPathItem const>(create_repair()))
 , rotation(0)
 , displayed_plane(domain::XY)
-, board(nullptr)
-, current_timepoint(nullptr)
 {
 	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
@@ -62,6 +62,16 @@ StructureView::~StructureView() = default;
 //******************************************************************************
 void StructureView::init(domain::Board const* _board) {
 	board = _board;
+}
+
+//******************************************************************************
+void StructureView::clear() {
+	for(auto [t, state] : states)
+		for(auto* ptr : state.scenes)
+			delete ptr;
+	states.clear();
+	board = nullptr;
+	current_timepoint = nullptr;
 }
 
 //******************************************************************************
@@ -138,6 +148,11 @@ void StructureView::fit() {
 }
 
 //******************************************************************************
+StructureScene::MeshVisibility StructureView::get_mesh_visibility() {
+	return get_current_state().scenes.front()->get_mesh_visibility();
+}
+
+//******************************************************************************
 void StructureView::set_mesh_visibility(StructureScene::MeshVisibility mesh_visibility) {
 	for(auto const plane : domain::AllPlane)
 		get_current_state().scenes[plane]->set_mesh_visibility(mesh_visibility);
@@ -182,6 +197,9 @@ void StructureView::make_current_state() {
 		std::make_unique<StructureScene>(style_selector, this).release() }};
 
 	populate(scenes);
+	if(auto* current_scene = static_cast<StructureScene*>(scene()); current_scene)
+		for(auto* scene : scenes)
+			scene->set_mesh_visibility(current_scene->get_mesh_visibility());
 
 	states.try_emplace(Caretaker::singleton().get_current_timepoint(), scenes);
 

@@ -119,7 +119,7 @@ void SerializerToPrettyprint::visit(ConflictColinearEdges& conflict) {
 	}
 
 	if(solution)
-		out += "\tSolution: " + F_D_GREEN + to_string(solution->policy) + S_RESET;
+		out += "\tSolution: " + F_D_GREEN + to_string(solution->get_current_state().policy) + S_RESET;
 
 	out += "\n";
 }

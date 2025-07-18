@@ -79,9 +79,9 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 	QString policy("Policy: ");
 	QString d("d: ");
 	if(meshline_policy) {
-		normal += QString::fromStdString(to_string(meshline_policy->normal));
+		normal += QString::fromStdString(to_string(meshline_policy->get_current_state().normal));
 		is_enabled += (meshline_policy->get_current_state().is_enabled ? "true" : "false");
-		policy += QString::fromStdString(to_string(meshline_policy->policy));
+		policy += QString::fromStdString(to_string(meshline_policy->get_current_state().policy));
 		d += QString::number(meshline_policy->get_current_state().d);
 	}
 

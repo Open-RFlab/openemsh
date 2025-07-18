@@ -4,6 +4,9 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <QGraphicsSceneMouseEvent>
+#include <QMenu>
+
 #include "domain/conflicts/conflict_colinear_edges.hpp"
 #include "domain/conflicts/conflict_edge_in_polygon.hpp"
 #include "domain/conflicts/conflict_too_close_meshline_policies.hpp"
@@ -14,6 +17,10 @@
 #include "domain/mesh/meshline.hpp"
 #include "domain/mesh/meshline_policy.hpp"
 #include "ui/qt/data_keys.hpp"
+#include "ui/qt/icons.hpp"
+#include "ui/qt/edit/edit_dialog.hpp"
+#include "ui/qt/edit/edit_model.hpp"
+#include "ui/qt/utils/qlist_utils.hpp"
 #include "utils/unreachable.hpp"
 #include "processing_axis.hpp"
 #include "processing_conflict_colinear_edges.hpp"
@@ -54,7 +61,7 @@ ProcessingScene::~ProcessingScene() {
 
 //******************************************************************************
 void ProcessingScene::init() {
-	set_display(display_mode);
+	set_display_mode(display_mode);
 }
 
 //******************************************************************************
@@ -335,7 +342,7 @@ void ProcessingScene::set_display_plane(domain::Plane plane) {
 }
 
 //******************************************************************************
-void ProcessingScene::set_display(DisplayMode mode) {
+void ProcessingScene::set_display_mode(DisplayMode mode) {
 	display_mode = mode;
 	switch(display_mode) {
 	case DisplayMode::EVERYTHING:
@@ -352,6 +359,11 @@ void ProcessingScene::set_display(DisplayMode mode) {
 	default:
 		unreachable();
 	}
+}
+
+//******************************************************************************
+ProcessingScene::DisplayMode ProcessingScene::get_display_mode() const {
+	return display_mode;
 }
 
 //******************************************************************************
@@ -384,6 +396,7 @@ void ProcessingScene::display_selected_chain() {
 	auto const selected = selected_nodes();
 	auto const highlighted = highlighted_nodes();
 	reset_visibility(false);
+	clearSelection();
 
 	for(auto const& list : { selected, highlighted })
 		for(auto* node : list)
@@ -427,6 +440,70 @@ void ProcessingScene::select_counterparts(QList<QGraphicsItem*> foreign_items) {
 				node->setSelected(true);
 			}
 		}
+	}
+}
+
+//******************************************************************************
+void ProcessingScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) {
+	event->accept();
+	edit(dynamic_to_qlist<nodegraph::Node*>(QGraphicsScene::items(event->scenePos())), event->screenPos());
+}
+
+//******************************************************************************
+void ProcessingScene::edit_selected_nodes(QPoint const& pos) {
+	edit(selected_nodes(), pos);
+}
+
+//******************************************************************************
+void ProcessingScene::edit(QList<nodegraph::Node*> nodes, QPoint const& pos) {
+	static QList<int> const type_index = {
+		UserTypes::PROCESSING_EDGE,
+		UserTypes::PROCESSING_INTERVAL,
+		UserTypes::PROCESSING_MESHLINE_POLICY,
+		UserTypes::PROCESSING_CONFLICT_CE,
+		UserTypes::PROCESSING_CONFLICT_EIP,
+		UserTypes::PROCESSING_CONFLICT_TCMLP
+	};
+
+//	items.removeIf([](auto const it) { return it->type() <= QGraphicsItem::UserType; }); // Wire::Type == UserType
+	nodes.removeIf([](auto const it) { return !type_index.contains(it->type()); });
+
+	// TODO isolate in own file
+	auto const make_title = [](QGraphicsItem const* item) {
+		QString title(item->data(DataKeys::TYPE).toString() + " - " + item->data(DataKeys::ID).toString());
+		if(item->type() == ProcessingPolygon::Type)
+			title.append(" - " + item->data(DataKeys::NAME).toString());
+		return title;
+	};
+
+	auto const edit_node = [this](nodegraph::Node* node, QString const& title = QString()) {
+		if(auto* model = EditModel::make(node); model) {
+			EditDialog edit(model, title);
+			model->setParent(&edit);
+			connect(
+				model, &EditModel::edit_from,
+				this, &ProcessingScene::edit_from);
+			edit.exec();
+		}
+	};
+
+	if(nodes.isEmpty()) {
+		clearSelection();
+		emit edit_global_params();
+	} else if(nodes.size() == 1) {
+			edit_node(nodes.first(), make_title(nodes.first()));
+	} else {
+		QMenu menu;
+		for(auto* node : nodes) {
+//			// TODO add entity icon
+			auto const title = make_title(node);
+			auto* action = new QAction(Icons::select(node), title, &menu);
+			menu.addAction(action);
+			QObject::connect(action, &QAction::triggered, [&edit_node, node, title]() {
+				edit_node(node, title);
+			});
+		}
+		menu.exec(pos);
 	}
 }
 

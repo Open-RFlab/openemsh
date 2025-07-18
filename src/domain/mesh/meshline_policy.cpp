@@ -26,21 +26,21 @@ MeshlinePolicy::MeshlinePolicy(
 		bool const is_enabled,
 		double const res_factor)
 : Originator(t, {
+	.policy = policy,
+	.normal = normal,
 	.is_enabled = is_enabled,
 	.res_factor = res_factor,
 	.d = global_params->get_current_state().dmax / res_factor,
 	.origins = origins
 })
 , axis(axis)
-, policy(policy)
-, normal(normal)
 , global_params(global_params)
 , coord(coord)
 {}
 
 //******************************************************************************
 optional<Meshline> MeshlinePolicy::mesh() {
-	if(policy == Policy::ONELINE)
+	if(get_current_state().policy == Policy::ONELINE)
 		return Meshline(coord, this);
 	else
 		return nullopt;

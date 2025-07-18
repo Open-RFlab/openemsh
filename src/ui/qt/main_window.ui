@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>OpenEMSH</string>
   </property>
+  <property name="windowIcon">
+   <iconset>:/openemsh.ico</iconset>
+  </property>
   <property name="windowState">
    <enum>Qt::WindowMaximized</enum>
   </property>
@@ -46,6 +49,15 @@
          <property name="autoRepeat">
           <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
         </widget>
        </item>
        <item>
@@ -59,6 +71,25 @@
          <property name="autoRepeat">
           <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame">
+         <property name="frameShape">
+          <enum>QFrame::Shape::HLine</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Sunken</enum>
+         </property>
         </widget>
        </item>
        <item>
@@ -69,6 +100,24 @@
          <property name="toolTip">
           <string>Show selected chain only</string>
          </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">bg_show_processing</string>
+         </attribute>
         </widget>
        </item>
        <item>
@@ -79,6 +128,21 @@
          <property name="toolTip">
           <string>Show axes/plane currently displayed only</string>
          </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">bg_show_processing</string>
+         </attribute>
         </widget>
        </item>
        <item>
@@ -88,6 +152,31 @@
          </property>
          <property name="toolTip">
           <string>Show everything</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">bg_show_processing</string>
+         </attribute>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame">
+         <property name="frameShape">
+          <enum>QFrame::Shape::HLine</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Sunken</enum>
          </property>
         </widget>
        </item>
@@ -99,6 +188,24 @@
          <property name="toolTip">
           <string>Curved wires</string>
          </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">bg_wires</string>
+         </attribute>
         </widget>
        </item>
        <item>
@@ -109,6 +216,21 @@
          <property name="toolTip">
           <string>Direct wires</string>
          </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">bg_wires</string>
+         </attribute>
         </widget>
        </item>
        <item>
@@ -157,6 +279,15 @@
          <property name="checkable">
           <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
         </widget>
        </item>
        <item>
@@ -169,6 +300,15 @@
          </property>
          <property name="autoRepeat">
           <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
         </widget>
        </item>
@@ -183,6 +323,15 @@
          <property name="autoRepeat">
           <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
         </widget>
        </item>
        <item>
@@ -195,6 +344,15 @@
          </property>
          <property name="autoRepeat">
           <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
         </widget>
        </item>
@@ -209,6 +367,25 @@
          <property name="autoRepeat">
           <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame">
+         <property name="frameShape">
+          <enum>QFrame::Shape::HLine</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Sunken</enum>
+         </property>
         </widget>
        </item>
        <item>
@@ -219,6 +396,24 @@
          <property name="toolTip">
           <string>Show mesh</string>
          </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">bg_show_mesh</string>
+         </attribute>
         </widget>
        </item>
        <item>
@@ -229,6 +424,21 @@
          <property name="toolTip">
           <string>Show vertical meshlines only</string>
          </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">bg_show_mesh</string>
+         </attribute>
         </widget>
        </item>
        <item>
@@ -239,6 +449,21 @@
          <property name="toolTip">
           <string>Show horizontal meshlines only</string>
          </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">bg_show_mesh</string>
+         </attribute>
         </widget>
        </item>
        <item>
@@ -249,49 +474,109 @@
          <property name="toolTip">
           <string>Don't show mesh</string>
          </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">bg_show_mesh</string>
+         </attribute>
         </widget>
        </item>
-
        <item>
-        <widget class="QRadioButton" name="rb_plane_yz">
+        <widget class="QFrame">
+         <property name="frameShape">
+          <enum>QFrame::Shape::HLine</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Sunken</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="tb_plane_yz">
          <property name="text">
           <string>YZ</string>
          </property>
          <property name="toolTip">
           <string>View YZ plane</string>
          </property>
-         <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">bg_plane</string>
+         </attribute>
         </widget>
        </item>
        <item>
-        <widget class="QRadioButton" name="rb_plane_zx">
+        <widget class="QToolButton" name="tb_plane_zx">
          <property name="text">
           <string>ZX</string>
          </property>
          <property name="toolTip">
           <string>View ZX plane</string>
          </property>
-         <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">bg_plane</string>
+         </attribute>
         </widget>
        </item>
        <item>
-        <widget class="QRadioButton" name="rb_plane_xy">
+        <widget class="QToolButton" name="tb_plane_xy">
          <property name="text">
           <string>XY</string>
          </property>
          <property name="toolTip">
           <string>View XY plane</string>
          </property>
-         <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
          <property name="checked">
           <bool>true</bool>
          </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">bg_plane</string>
+         </attribute>
         </widget>
        </item>
        <item>
@@ -350,10 +635,14 @@
    <addaction name="a_vertical_layout"/>
    <addaction name="a_horizontal_layout"/>
    <addaction name="separator"/>
+   <addaction name="a_file_open"/>
+   <addaction name="a_file_save"/>
+   <addaction name="a_file_save_as"/>
+   <addaction name="a_edit"/>
    <addaction name="a_mesh_prev"/>
    <addaction name="a_mesh_next"/>
    <addaction name="separator"/>
-   <addaction name="a_reset"/>
+   <addaction name="a_fit"/>
    <addaction name="separator"/>
    <addaction name="a_undo"/>
    <addaction name="a_redo"/>
@@ -384,12 +673,59 @@
     <string>Horizontal layout</string>
    </property>
   </action>
-  <action name="a_reset">
+  <action name="a_fit">
    <property name="text">
     <string>⊹</string>
    </property>
    <property name="toolTip">
-    <string>Reset view</string>
+    <string>Fit view</string>
+   </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::ZoomFitBest"/>
+   </property>
+  </action>
+  <action name="a_file_open">
+   <property name="text">
+    <string>🗋</string>
+   </property>
+   <property name="toolTip">
+    <string>Open CSX file</string>
+   </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentOpen"/>
+   </property>
+  </action>
+  <action name="a_file_save">
+   <property name="text">
+    <string>🗎</string>
+   </property>
+   <property name="toolTip">
+    <string>Save mesh overwriting input CSX file</string>
+   </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentSave"/>
+   </property>
+  </action>
+  <action name="a_file_save_as">
+   <property name="text">
+    <string>🗎</string>
+   </property>
+   <property name="toolTip">
+    <string>Save mesh as...</string>
+   </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentSaveAs"/>
+   </property>
+  </action>
+  <action name="a_edit">
+   <property name="text">
+    <string>🖉</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit parameters</string>
+   </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentProperties"/>
    </property>
   </action>
   <action name="a_mesh_next">
@@ -399,6 +735,9 @@
    <property name="toolTip">
     <string>Run the next meshing step</string>
    </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::MediaSkipForward"/>
+   </property>
   </action>
   <action name="a_mesh_prev">
    <property name="text">
@@ -406,6 +745,9 @@
    </property>
    <property name="toolTip">
     <string>Go back to previous meshing step</string>
+   </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::MediaSkipBackward"/>
    </property>
   </action>
   <action name="a_undo">
@@ -415,6 +757,9 @@
    <property name="toolTip">
     <string>Undo</string>
    </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditUndo"/>
+   </property>
   </action>
   <action name="a_redo">
    <property name="text">
@@ -423,8 +768,17 @@
    <property name="toolTip">
     <string>Redo</string>
    </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditRedo"/>
+   </property>
   </action>
  </widget>
+ <buttongroups>
+  <buttongroup name="bg_plane"/>
+  <buttongroup name="bg_show_mesh"/>
+  <buttongroup name="bg_show_processing"/>
+  <buttongroup name="bg_wires"/>
+ </buttongroups>
  <customwidgets>
   <customwidget>
    <class>ui::qt::StructureView</class>
@@ -437,6 +791,8 @@
    <header>ui/qt/processing_view/processing_view.hpp</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

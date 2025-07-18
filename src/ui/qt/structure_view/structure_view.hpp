@@ -37,12 +37,14 @@ public:
 	explicit StructureView(QWidget* parent = nullptr);
 	~StructureView() override;
 	void init(domain::Board const* _board);
+	void clear();
 
 	void fit();
 	void rotate_view(qreal angle);
 	void reset_rotation();
 	qreal get_rotation() const;
 
+	StructureScene::MeshVisibility get_mesh_visibility();
 	void set_mesh_visibility(StructureScene::MeshVisibility mesh_visibility);
 	void set_display_plane(domain::Plane plane);
 
@@ -65,13 +67,14 @@ private:
 	// + public set_scene() that wrap axis QStrings or repair
 
 //	qreal scale_max;
+	domain::Board const* board;
+	Timepoint* current_timepoint;
+
 	std::unique_ptr<QGraphicsPathItem const> const repair;
 
 	using QGraphicsView::rotate;
 	qreal rotation;
 	domain::Plane displayed_plane;
-	domain::Board const* board;
-	Timepoint* current_timepoint;
 
 	void populate(domain::PlaneSpace<StructureScene*> scenes);
 };

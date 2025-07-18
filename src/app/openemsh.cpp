@@ -9,6 +9,7 @@
 
 #include "infra/serializers/serializer_to_plantuml.hpp"
 #include "infra/serializers/serializer_to_prettyprint.hpp"
+#include "utils/concepts.hpp"
 #include "utils/unreachable.hpp"
 
 #include "openemsh.hpp"
@@ -44,6 +45,43 @@ optional<Step> next(Step step) {
 }
 
 //******************************************************************************
+set<Step> that_and_after(Step step) {
+	set<Step> out;
+	switch(step) {
+	case Step::DETECT_CONFLICT_EIP:
+		out.emplace(Step::DETECT_CONFLICT_EIP);
+		[[fallthrough]];
+	case Step::DETECT_CONFLICT_CE:
+		out.emplace(Step::DETECT_CONFLICT_CE);
+		[[fallthrough]];
+	case Step::DETECT_NON_CONFLICTING_EDGES:
+		out.emplace(Step::DETECT_NON_CONFLICTING_EDGES);
+		[[fallthrough]];
+	case Step::ADD_FIXED_MLP:
+		out.emplace(Step::ADD_FIXED_MLP);
+		[[fallthrough]];
+	case Step::SOLVE_ALL_EIP:
+		out.emplace(Step::SOLVE_ALL_EIP);
+		[[fallthrough]];
+	case Step::SOLVE_ALL_CE:
+		out.emplace(Step::SOLVE_ALL_CE);
+		[[fallthrough]];
+	case Step::DETECT_AND_SOLVE_TCMLP:
+		out.emplace(Step::DETECT_AND_SOLVE_TCMLP);
+		[[fallthrough]];
+	case Step::DETECT_INTERVALS:
+		out.emplace(Step::DETECT_INTERVALS);
+		[[fallthrough]];
+	case Step::MESH:
+		out.emplace(Step::MESH);
+		break;
+	default:
+		unreachable();
+	}
+	return out;
+}
+
+//******************************************************************************
 OpenEMSH::OpenEMSH(Params params)
 : params(std::move(params))
 {}
@@ -59,9 +97,25 @@ domain::Board const& OpenEMSH::get_board() const {
 }
 
 //******************************************************************************
+void OpenEMSH::set_input(std::filesystem::path const& path) {
+	params.input = path;
+}
+
+//******************************************************************************
+void OpenEMSH::set_output(std::filesystem::path const& path) {
+	params.output = path;
+}
+
+//******************************************************************************
+void OpenEMSH::set_output_format(Params::OutputFormat format) {
+	params.output_format = format;
+}
+
+//******************************************************************************
 void OpenEMSH::parse() {
 	Caretaker::singleton().reset();
 	board = ParserFromCsx::run(params.input, static_cast<ParserFromCsx::Params const&>(params), params.override_from_cli);
+	Caretaker::singleton().remember_current_timepoint();
 }
 
 //******************************************************************************
@@ -85,47 +139,23 @@ void OpenEMSH::write() const {
 
 //******************************************************************************
 void OpenEMSH::run(std::set<Step> const& steps) const {
-	auto const annotate = [](Step step) {
-		Caretaker::singleton().annotate_current_timepoint(make_unique<Annotation>(step));
+	auto const handle = [&]<InvocableR<void> F>(Step step, F const& func) {
+		if(steps.contains(step)) {
+			Caretaker::singleton().annotate_current_timepoint(make_unique<Annotation>(step));
+			func();
+		}
 	};
 
-	if(steps.contains(Step::DETECT_CONFLICT_EIP)) {
-		Caretaker::singleton().remember_current_timepoint();
-		annotate(Step::DETECT_CONFLICT_EIP);
-		board->detect_edges_in_polygons();
-	}
-	if(steps.contains(Step::DETECT_CONFLICT_CE)) {
-		annotate(Step::DETECT_CONFLICT_CE);
-		board->detect_colinear_edges();
-	}
-	if(steps.contains(Step::DETECT_NON_CONFLICTING_EDGES)) {
-		annotate(Step::DETECT_NON_CONFLICTING_EDGES);
-		board->detect_non_conflicting_edges();
-	}
-	if(steps.contains(Step::ADD_FIXED_MLP)) {
-		annotate(Step::ADD_FIXED_MLP);
-		board->add_fixed_meshline_policies();
-	}
-	if(steps.contains(Step::SOLVE_ALL_EIP)) {
-		annotate(Step::SOLVE_ALL_EIP);
-		board->auto_solve_all_edge_in_polygon();
-	}
-	if(steps.contains(Step::SOLVE_ALL_CE)) {
-		annotate(Step::SOLVE_ALL_CE);
-		board->auto_solve_all_colinear_edges();
-	}
-	if(steps.contains(Step::DETECT_AND_SOLVE_TCMLP)) {
-		annotate(Step::DETECT_AND_SOLVE_TCMLP);
-		board->detect_and_solve_too_close_meshline_policies();
-	}
-	if(steps.contains(Step::DETECT_INTERVALS)) {
-		annotate(Step::DETECT_INTERVALS);
-		board->detect_intervals();
-	}
-	if(steps.contains(Step::MESH)) {
-		annotate(Step::MESH);
-		board->mesh();
-	}
+	using enum Step;
+	handle(DETECT_CONFLICT_EIP,          [&] { board->detect_edges_in_polygons(); });
+	handle(DETECT_CONFLICT_CE,           [&] { board->detect_colinear_edges(); });
+	handle(DETECT_NON_CONFLICTING_EDGES, [&] { board->detect_non_conflicting_edges(); });
+	handle(ADD_FIXED_MLP,                [&] { board->add_fixed_meshline_policies(); });
+	handle(SOLVE_ALL_EIP,                [&] { board->auto_solve_all_edge_in_polygon(); });
+	handle(SOLVE_ALL_CE,                 [&] { board->auto_solve_all_colinear_edges(); });
+	handle(DETECT_AND_SOLVE_TCMLP,       [&] { board->detect_and_solve_too_close_meshline_policies(); });
+	handle(DETECT_INTERVALS,             [&] { board->detect_intervals(); });
+	handle(MESH,                         [&] { board->mesh(); });
 
 	Caretaker::singleton().remember_current_timepoint();
 }
@@ -159,9 +189,14 @@ void OpenEMSH::run_next_step() const {
 }
 
 //******************************************************************************
+void OpenEMSH::run_from_step(Step step) const {
+	run(that_and_after(step));
+}
+
+//******************************************************************************
 void OpenEMSH::go_before(Step step) const {
 	auto& c = Caretaker::singleton();
-	c.go_and_remember(
+	c.go_without_remembering(
 		c.find_first_ancestor_with_annotation_that(
 			[&step](IAnnotation const* annotation) {
 				return static_cast<Annotation const*>(annotation)->before_step == step;
