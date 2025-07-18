@@ -16,6 +16,7 @@ class EditDialog;
 
 namespace ui::qt {
 
+class EditDelegate;
 class EditModel;
 
 //******************************************************************************
@@ -23,6 +24,7 @@ class EditDialog : public QDialog {
 	Q_OBJECT
 private:
 	std::unique_ptr<Ui::EditDialog> ui;
+	EditDelegate* delegate;
 
 private slots:
 	void on_dbb_ok_accepted();

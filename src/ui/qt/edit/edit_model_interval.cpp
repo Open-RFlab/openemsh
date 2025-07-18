@@ -19,23 +19,14 @@ EditModelInterval::EditModelInterval(domain::Interval* interval, QObject* parent
 : EditModel(parent)
 , interval(interval)
 {
-	setRowCount(5);
-	for(std::size_t i = 0; auto& str : {
-		"dmax",
-		"before.lmin",
-		"before.lambda",
-		"after.lmin",
-		"after.lambda"
-	}) {
-		setItem(i++, 0, make_property_item(str));
-	}
-
 	auto const& state = interval->get_current_state();
-	setItem(0, 1, new QStandardItem(QString::number(state.dmax)));
-	setItem(1, 1, new QStandardItem(QString::number(state.before.lmin)));
-	setItem(2, 1, new QStandardItem(QString::number(state.before.lambda)));
-	setItem(3, 1, new QStandardItem(QString::number(state.after.lmin)));
-	setItem(4, 1, new QStandardItem(QString::number(state.after.lambda)));
+	setRowCount(5);
+
+	make_row(0, "dmax",          QString::number(state.dmax), "");
+	make_row(1, "before.lmin",   QString::number(state.before.lmin), "");
+	make_row(2, "before.lambda", QString::number(state.before.lambda), QString("2"), "");
+	make_row(3, "after.lmin",    QString::number(state.after.lmin), "");
+	make_row(4, "after.lambda",  QString::number(state.after.lambda), QString("2"), "");
 }
 
 //******************************************************************************

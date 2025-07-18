@@ -19,15 +19,10 @@ EditModelConflictTooCloseMeshlinePolicies::EditModelConflictTooCloseMeshlinePoli
 : EditModel(parent)
 , conflict(conflict)
 {
-	setRowCount(1);
-	for(std::size_t i = 0; auto& str : {
-		"is_enabled"
-	}) {
-		setItem(i++, 0, make_property_item(str));
-	}
-
 	auto const& state = conflict->get_current_state();
-	setItem(0, 1, make_bool_item(state.is_enabled));
+	setRowCount(1);
+
+	make_row(0, "is_enabled", state.is_enabled, "");
 }
 
 //******************************************************************************

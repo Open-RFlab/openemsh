@@ -6,6 +6,7 @@
 
 #include <QGuiApplication>
 
+#include "edit_delegate.hpp"
 #include "edit_model.hpp"
 
 #include "ui_edit_dialog.h"
@@ -18,11 +19,13 @@ using namespace std;
 //******************************************************************************
 EditDialog::EditDialog(EditModel* model, QString const& title, QWidget* parent)
 : QDialog(parent, Qt::Dialog)
-, ui(make_unique<Ui::EditDialog>()) {
+, ui(make_unique<Ui::EditDialog>())
+, delegate(new EditDelegate(this)) {
 	ui->setupUi(this);
 	setWindowIcon(QPixmap(":/openemsh.ico"));
 	setWindowTitle(windowTitle() + " " + title);
 
+	ui->tv_properties->setItemDelegate(delegate);
 	ui->tv_properties->setModel(model);
 	ui->tv_properties->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }

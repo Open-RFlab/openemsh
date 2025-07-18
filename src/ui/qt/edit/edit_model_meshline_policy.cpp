@@ -14,6 +14,9 @@
 
 #include "edit_model_meshline_policy.hpp"
 
+Q_DECLARE_METATYPE(domain::MeshlinePolicy::Policy)
+Q_DECLARE_METATYPE(domain::MeshlinePolicy::Normal)
+
 namespace ui::qt {
 
 //******************************************************************************
@@ -21,23 +24,14 @@ EditModelMeshlinePolicy::EditModelMeshlinePolicy(domain::MeshlinePolicy* meshlin
 : EditModel(parent)
 , meshline_policy(meshline_policy)
 {
-	setRowCount(5);
-	for(std::size_t i = 0; auto& str : {
-		"policy",
-		"normal",
-		"is_enabled",
-		"res_factor",
-		"d"
-	}) {
-		setItem(i++, 0, make_property_item(str));
-	}
-
 	auto const& state = meshline_policy->get_current_state();
-	setItem(0, 1, new QStandardItem(QString::fromStdString(to_string(state.policy))));
-	setItem(1, 1, new QStandardItem(QString::fromStdString(to_string(state.normal))));
-	setItem(2, 1, make_bool_item(state.is_enabled));
-	setItem(3, 1, new QStandardItem(QString::number(state.res_factor)));
-	setItem(4, 1, new QStandardItem(QString::number(state.d)));
+	setRowCount(5);
+
+	make_row(0, "policy", state.policy, "");
+	make_row(1, "normal", state.normal, "");
+	make_row(2, "is_enabled", state.is_enabled, "");
+	make_row(3, "res_factor", QString::number(state.res_factor), "");
+	make_row(4, "d", QString::number(state.d), "");
 }
 
 //******************************************************************************
@@ -65,17 +59,10 @@ void EditModelMeshlinePolicy::commit() {
 		}
 	};
 
+	state.policy = item(0, 1)->data().value<domain::MeshlinePolicy::Policy>();
+	state.normal = item(1, 1)->data().value<domain::MeshlinePolicy::Normal>();
+
 	std::array does_succeed = {
-		try_from_map({
-				{ "ONELINE", domain::MeshlinePolicy::Policy::ONELINE },
-				{ "HALFS", domain::MeshlinePolicy::Policy::HALFS },
-				{ "THIRDS", domain::MeshlinePolicy::Policy::THIRDS }
-			}, item(0, 1)->text(), state.policy),
-		try_from_map({
-				{ "MIN", domain::MeshlinePolicy::Normal::MIN },
-				{ "MAX", domain::MeshlinePolicy::Normal::MAX },
-				{ "NONE", domain::MeshlinePolicy::Normal::NONE }
-			}, item(1, 1)->text(), state.normal),
 		are_policy_and_normal_compatible(),
 		try_to_bool(item(2, 1)->checkState(), state.is_enabled),
 		try_to_double(item(3, 1)->text(), state.res_factor),

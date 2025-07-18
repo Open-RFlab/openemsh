@@ -80,6 +80,7 @@ target_sources( openemsh_bin
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/node.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/container.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/wire.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/edit/edit_delegate.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/edit/edit_dialog.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/edit/edit_model.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/edit/edit_model_global.cpp"

@@ -19,15 +19,10 @@ EditModelEdge::EditModelEdge(domain::Edge* edge, QObject* parent)
 : EditModel(parent)
 , edge(edge)
 {
-	setRowCount(1);
-	for(std::size_t i = 0; auto& str : {
-		"to_mesh"
-	}) {
-		setItem(i++, 0, make_property_item(str));
-	}
-
 	auto const& state = edge->get_current_state();
-	setItem(0, 1, make_bool_item(state.to_mesh));
+	setRowCount(1);
+
+	make_row(0, "to_mesh", state.to_mesh, "");
 }
 
 //******************************************************************************

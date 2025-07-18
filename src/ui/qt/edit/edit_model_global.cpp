@@ -19,25 +19,15 @@ EditModelGlobal::EditModelGlobal(domain::GlobalParams* global, QObject* parent)
 : EditModel(parent)
 , global(global)
 {
-	setRowCount(6);
-	for(std::size_t i = 0; auto& str : {
-		"metal_res",
-		"substrate_res",
-		"proximity_limit",
-		"lambda",
-		"lmin",
-		"dmax"
-	}) {
-		setItem(i++, 0, make_property_item(str));
-	}
-
 	auto const& params = global->get_current_state();
-	setItem(0, 1, new QStandardItem(QString::number(params.metal_res)));
-	setItem(1, 1, new QStandardItem(QString::number(params.substrate_res)));
-	setItem(2, 1, new QStandardItem(QString::number(params.proximity_limit)));
-	setItem(3, 1, new QStandardItem(QString::number(params.lambda)));
-	setItem(4, 1, new QStandardItem(QString::number(params.lmin)));
-	setItem(5, 1, new QStandardItem(QString::number(params.dmax)));
+	setRowCount(6);
+
+	make_row(0, "metal_res",       QString::number(params.metal_res), "");
+	make_row(1, "substrate_res",   QString::number(params.substrate_res), "");
+	make_row(2, "proximity_limit", QString::number(params.proximity_limit), "");
+	make_row(3, "lambda",          QString::number(params.lambda), "");
+	make_row(4, "lmin",            QString::number(params.lmin), "");
+	make_row(5, "dmax",            QString::number(params.dmax), "");
 }
 
 //******************************************************************************

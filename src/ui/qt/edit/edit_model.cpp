@@ -19,26 +19,6 @@
 
 namespace ui::qt {
 
-using namespace std;
-
-//******************************************************************************
-QStandardItem* EditModel::make_property_item(QString const& str) {
-	auto* item = new QStandardItem(str);
-	item->setFlags(item->flags() & ~Qt::ItemIsEditable);
-	return item;
-}
-
-//******************************************************************************
-QStandardItem* EditModel::make_bool_item(bool in) {
-	auto* item = new QStandardItem();
-	item->setCheckable(true);
-	if(in)
-		item->setCheckState(Qt::Checked);
-	else
-		item->setCheckState(Qt::Unchecked);
-	return item;
-}
-
 //******************************************************************************
 bool EditModel::try_to_double(QString const& in, double& out) {
 	bool does_succeed = false;
