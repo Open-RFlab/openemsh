@@ -75,10 +75,14 @@ EditModel* EditModel::make(nodegraph::Node* node, QObject* parent) {
 EditModel::EditModel(QObject* parent)
 : QStandardItemModel(parent)
 {
-	setColumnCount(2);
-	// TODO maybe 3 columns { "Property", "Old value", "New value" } would be better for UI
-	// especially for setting lambda to 2 by default
-	setHorizontalHeaderLabels({ "Property", "Value" });
+	static_assert(1 <= V && V <= 2, "The Value column index V must be either 1 or 2");
+
+	setColumnCount(V + 1);
+
+	if constexpr(V == 2)
+		setHorizontalHeaderLabels({ "Property", "Old value", "New value" });
+	else
+		setHorizontalHeaderLabels({ "Property", "Value" });
 }
 
 //******************************************************************************

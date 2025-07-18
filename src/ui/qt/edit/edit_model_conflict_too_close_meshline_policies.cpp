@@ -30,7 +30,7 @@ void EditModelConflictTooCloseMeshlinePolicies::commit() {
 	auto state = conflict->get_current_state();
 
 	std::array does_succeed = {
-		try_to_bool(item(0, 1)->checkState(), state.is_enabled)
+		try_to_bool(item(0, V)->checkState(), state.is_enabled)
 	};
 
 	if(std::ranges::all_of(does_succeed, is_true)) {

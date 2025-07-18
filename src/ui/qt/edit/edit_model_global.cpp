@@ -35,12 +35,12 @@ void EditModelGlobal::commit() {
 	domain::Params params;
 
 	std::array does_succeed = {
-		try_to_double(item(0, 1)->text(), params.metal_res),
-		try_to_double(item(1, 1)->text(), params.substrate_res),
-		try_to_double(item(2, 1)->text(), params.proximity_limit),
-		try_to_double(item(3, 1)->text(), params.lambda),
-		try_to_ulong(item(4, 1)->text(), params.lmin),
-		try_to_double(item(5, 1)->text(), params.dmax)
+		try_to_double(item(0, V)->text(), params.metal_res),
+		try_to_double(item(1, V)->text(), params.substrate_res),
+		try_to_double(item(2, V)->text(), params.proximity_limit),
+		try_to_double(item(3, V)->text(), params.lambda),
+		try_to_ulong(item(4, V)->text(), params.lmin),
+		try_to_double(item(5, V)->text(), params.dmax)
 	};
 
 	if(std::ranges::all_of(does_succeed, is_true)) {

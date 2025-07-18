@@ -34,11 +34,11 @@ void EditModelInterval::commit() {
 	auto state = interval->get_current_state();
 
 	std::array does_succeed = {
-		try_to_double(item(0, 1)->text(), state.dmax),
-		try_to_ulong(item(1, 1)->text(), state.before.lmin),
-		try_to_double(item(2, 1)->text(), state.before.lambda),
-		try_to_ulong(item(3, 1)->text(), state.after.lmin),
-		try_to_double(item(4, 1)->text(), state.after.lambda)
+		try_to_double(item(0, V)->text(), state.dmax),
+		try_to_ulong(item(1, V)->text(), state.before.lmin),
+		try_to_double(item(2, V)->text(), state.before.lambda),
+		try_to_ulong(item(3, V)->text(), state.after.lmin),
+		try_to_double(item(4, V)->text(), state.after.lambda)
 	};
 
 	if(std::ranges::all_of(does_succeed, is_true)) {

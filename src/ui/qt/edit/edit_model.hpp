@@ -29,6 +29,8 @@ public:
 	virtual void commit();
 
 protected:
+	static auto constexpr V = 2; // Value column index.
+
 	template<typename T>
 	void make_row(int row, QString const& property, T const& old_value, T const& new_value, QString const& tool_tip);
 	void make_row(int row, QString const& property, auto const& value, QString const& tool_tip);
@@ -78,9 +80,20 @@ void EditModel::make_row(int row, QString const& property, T const& old_value, T
 	item(row, 0)->setToolTip(tool_tip);
 	set_uneditable(item(row, 0));
 
-	setItem(row, 1, new QStandardItem());
-	item(row, 1)->setToolTip(tool_tip);
-	set_content(item(row, 1), old_value);
+	if constexpr(V == 2) {
+		setItem(row, 1, new QStandardItem());
+		item(row, 1)->setToolTip(tool_tip);
+		set_uneditable(item(row, 1));
+		set_content(item(row, 1), old_value);
+	}
+
+	setItem(row, V, new QStandardItem());
+	item(row, V)->setToolTip(tool_tip);
+	if constexpr(V == 2) {
+		set_content(item(row, V), new_value);
+	} else {
+		set_content(item(row, V), old_value);
+	}
 }
 
 //******************************************************************************

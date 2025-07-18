@@ -59,14 +59,14 @@ void EditModelMeshlinePolicy::commit() {
 		}
 	};
 
-	state.policy = item(0, 1)->data().value<domain::MeshlinePolicy::Policy>();
-	state.normal = item(1, 1)->data().value<domain::MeshlinePolicy::Normal>();
+	state.policy = item(0, V)->data().value<domain::MeshlinePolicy::Policy>();
+	state.normal = item(1, V)->data().value<domain::MeshlinePolicy::Normal>();
 
 	std::array does_succeed = {
 		are_policy_and_normal_compatible(),
-		try_to_bool(item(2, 1)->checkState(), state.is_enabled),
-		try_to_double(item(3, 1)->text(), state.res_factor),
-		try_to_double(item(4, 1)->text(), state.d)
+		try_to_bool(item(2, V)->checkState(), state.is_enabled),
+		try_to_double(item(3, V)->text(), state.res_factor),
+		try_to_double(item(4, V)->text(), state.d)
 	};
 
 	if(std::ranges::all_of(does_succeed, is_true)) {
