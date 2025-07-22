@@ -7,6 +7,7 @@
 #include <QComboBox>
 #include <QEvent>
 #include <QKeyEvent>
+#include <QListView>
 #include <QStandardItem>
 #include <QStandardItemModel>
 #include <QString>
@@ -95,6 +96,8 @@ QWidget* EditDelegate::createEditor(QWidget* parent, QStyleOptionViewItem const&
 	auto const handle_enum = [&]<Enum E, std::size_t N>(std::array<E, N> const& all) {
 		auto* widget = new QComboBox(parent);
 		widget->addItems(convert(all));
+		widget->setToolTip(index.data(Qt::ToolTipRole).toString());
+		static_cast<QListView*>(widget->view())->setToolTip(index.data(Qt::ToolTipRole).toString());
 		return widget;
 	};
 
