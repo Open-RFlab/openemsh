@@ -22,11 +22,20 @@ EditModelInterval::EditModelInterval(domain::Interval* interval, QObject* parent
 	auto const& state = interval->get_current_state();
 	setRowCount(5);
 
-	make_row(0, "dmax",          QString::number(state.dmax), "");
-	make_row(1, "before.lmin",   QString::number(state.before.lmin), "");
-	make_row(2, "before.lambda", QString::number(state.before.lambda), QString("2"), "");
-	make_row(3, "after.lmin",    QString::number(state.after.lmin), "");
-	make_row(4, "after.lambda",  QString::number(state.after.lambda), QString("2"), "");
+	make_row(0, "dmax", QString::number(state.dmax),
+		"Maximum distance between two adjacent lines.");
+	make_row(1, "Before.lmin", QString::number(state.before.lmin),
+		"Minimum line number in the minimal interval half. "
+		"Note a line will always be placed at the interval center.");
+	make_row(2, "Before.Smoothness", QString::number(state.before.lambda), QString("2"),
+		"Smoothness factor <b>]1;2]</b> around the minimal side. "
+		"Meshing algorithm will decrease it, better to start high.");
+	make_row(3, "After.lmin", QString::number(state.after.lmin),
+		"Minimum line number in the maximal interval half. "
+		"Note a line will always be placed at the interval center.");
+	make_row(4, "After.Smoothness", QString::number(state.after.lambda), QString("2"),
+		"Smoothness factor <b>]1;2]</b> around the maximal side. "
+		"Meshing algorithm will decrease it, better to start high.");
 }
 
 //******************************************************************************

@@ -22,7 +22,7 @@ EditModelConflictTooCloseMeshlinePolicies::EditModelConflictTooCloseMeshlinePoli
 	auto const& state = conflict->get_current_state();
 	setRowCount(1);
 
-	make_row(0, "is_enabled", state.is_enabled, "");
+	make_row(0, "Enabled", state.is_enabled, "Take into account in the meshing process.");
 }
 
 //******************************************************************************

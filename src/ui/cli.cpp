@@ -142,20 +142,20 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 //	app.add_flag("--step-mesh", params.with_step_mesh, "Do intervals meshing step.")->group("Processing options");
 
 	// Mesher options
-	app.add_option_function<decltype(domain::Params::metal_res)>("--metal_res",
-		make_overrider<&domain::Params::metal_res>(domain_overrides),
-		"Desired mesh resolution for metal regions."
-	)->group("Mesher options");
+//	app.add_option_function<decltype(domain::Params::metal_res)>("--metal_res",
+//		make_overrider<&domain::Params::metal_res>(domain_overrides),
+//		"Desired mesh resolution for metal regions."
+//	)->group("Mesher options");
 
 //	app.add_option_function<decltype(domain::Params::air_res)>("--air_res",
 //		make_overrider<&domain::Params::air_res>(domain_overrides),
 //		"Desired mesh resolution for air regions."
 //	)->group("Mesher options");
 
-	app.add_option_function<decltype(domain::Params::substrate_res)>("--substrate_res",
-		make_overrider<&domain::Params::substrate_res>(domain_overrides),
-		"Desired mesh resolution for substrate / ground plane regions."
-	)->group("Mesher options");
+//	app.add_option_function<decltype(domain::Params::substrate_res)>("--substrate_res",
+//		make_overrider<&domain::Params::substrate_res>(domain_overrides),
+//		"Desired mesh resolution for substrate / ground plane regions."
+//	)->group("Mesher options");
 
 	app.add_option_function<decltype(domain::Params::proximity_limit)>("--proximity_limit",
 		make_overrider<&domain::Params::proximity_limit>(domain_overrides),
@@ -172,7 +172,7 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 		"Minimum line number per interval half."
 	)->group("Mesher options");
 
-	app.add_option_function<decltype(domain::Params::lambda)>("--lambda",
+	app.add_option_function<decltype(domain::Params::lambda)>("--smoothness",
 		make_overrider<&domain::Params::lambda>(domain_overrides),
 		"Smoothness factor ]1;2]."
 	)->group("Mesher options")->check(BoundExclusiveInclusive(1.0, 2.0));

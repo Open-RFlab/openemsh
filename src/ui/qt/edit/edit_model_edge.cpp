@@ -22,7 +22,7 @@ EditModelEdge::EditModelEdge(domain::Edge* edge, QObject* parent)
 	auto const& state = edge->get_current_state();
 	setRowCount(1);
 
-	make_row(0, "to_mesh", state.to_mesh, "");
+	make_row(0, "To mesh", state.to_mesh, "Take into account in the meshing process.");
 }
 
 //******************************************************************************

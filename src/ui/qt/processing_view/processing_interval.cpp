@@ -69,10 +69,10 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 	};
 
 	QString dmax("dmax: ");
-	QString before_lmin ("before.lmin: ");
-	QString before_lambda ("before.lambda: ");
-	QString after_lmin("after.lmin: ");
-	QString after_lambda("after.lambda: ");
+	QString before_lmin ("Before.lmin: ");
+	QString before_lambda ("Before.Smoothness: ");
+	QString after_lmin("After.lmin: ");
+	QString after_lambda("After.Smoothness: ");
 	if(interval) {
 		auto const& state = interval->get_current_state();
 		dmax += QString::number(state.dmax);
