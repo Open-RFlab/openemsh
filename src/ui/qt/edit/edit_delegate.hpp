@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <QPersistentModelIndex>
 #include <QStyledItemDelegate>
 
 namespace ui::qt {
@@ -22,6 +23,10 @@ public:
 
 protected:
 	bool eventFilter(QObject* editor, QEvent* event) override;
+
+private:
+	QPersistentModelIndex normal_index;
+	QPersistentModelIndex policy_index;
 };
 
 } // namespace ui::qt

@@ -7,6 +7,8 @@
 #include <QComboBox>
 #include <QEvent>
 #include <QKeyEvent>
+#include <QStandardItem>
+#include <QStandardItemModel>
 #include <QString>
 #include <QStringList>
 
@@ -82,6 +84,8 @@ static_assert(AllPolicy[key(Policy::THIRDS)] == Policy::THIRDS);
 //******************************************************************************
 EditDelegate::EditDelegate(QObject* parent)
 : QStyledItemDelegate(parent)
+, normal_index(QModelIndex()) // Init at first paint().
+, policy_index(QModelIndex()) // Init at first paint().
 {}
 
 //******************************************************************************
@@ -95,7 +99,27 @@ QWidget* EditDelegate::createEditor(QWidget* parent, QStyleOptionViewItem const&
 	};
 
 	if(type == qMetaTypeId<Normal>()) {
-		return handle_enum(AllNormal);
+		auto* cb = handle_enum(AllNormal);
+		if(policy_index.isValid()) {
+			auto policy = policy_index.data(Qt::UserRole + 1).value<Policy>();
+			switch(policy) {
+			case Policy::ONELINE: [[fallthrough]];
+			case Policy::HALFS: {
+				auto* m = static_cast<QStandardItemModel*>(cb->model());
+				m->item(key(Normal::NONE))->setEnabled(true);
+				m->item(key(Normal::MIN))->setEnabled(false);
+				m->item(key(Normal::MAX))->setEnabled(false);
+			} break;
+			case Policy::THIRDS: {
+				auto* m = static_cast<QStandardItemModel*>(cb->model());
+				m->item(key(Normal::NONE))->setEnabled(false);
+				m->item(key(Normal::MIN))->setEnabled(true);
+				m->item(key(Normal::MAX))->setEnabled(true);
+			} break;
+			default: break;
+			}
+		}
+		return cb;
 	} else if(type == qMetaTypeId<Policy>()) {
 		return handle_enum(AllPolicy);
 	} else {
@@ -135,6 +159,25 @@ void EditDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, QMod
 		handle_enum(AllNormal);
 	} else if(type == qMetaTypeId<Policy>()) {
 		handle_enum(AllPolicy);
+		if(normal_index.isValid()) {
+			auto policy = model->data(index, Qt::UserRole + 1).value<Policy>();
+			switch(policy) {
+			case Policy::ONELINE: [[fallthrough]];
+			case Policy::HALFS: {
+				model->setData(normal_index, QVariant::fromValue(Normal::NONE), Qt::UserRole + 1);
+				auto* item = static_cast<QStandardItem*>(static_cast<QStandardItemModel*>(model)->itemFromIndex(normal_index));
+				item->setEditable(false);
+			} break;
+			case Policy::THIRDS: {
+				if(model->data(normal_index, Qt::UserRole + 1).value<Normal>() == Normal::NONE) {
+					model->setData(normal_index, QVariant::fromValue(Normal::MIN), Qt::UserRole + 1);
+					auto* item = static_cast<QStandardItem*>(static_cast<QStandardItemModel*>(model)->itemFromIndex(normal_index));
+					item->setEditable(true);
+				}
+			} break;
+			default: break;
+			}
+		}
 	}
 
 	QStyledItemDelegate::setModelData(editor, model, index);
@@ -154,8 +197,10 @@ void EditDelegate::paint(QPainter* painter, QStyleOptionViewItem const& option, 
 
 	if(type == qMetaTypeId<Normal>()) {
 		handle_enum.operator()<Normal>();
+		unconst(this)->normal_index = index;
 	} else if(type == qMetaTypeId<Policy>()) {
 		handle_enum.operator()<Policy>();
+		unconst(this)->policy_index = index;
 	}
 
 	QStyledItemDelegate::paint(painter, option, index);
