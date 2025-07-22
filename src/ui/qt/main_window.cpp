@@ -495,7 +495,7 @@ void MainWindow::keyPressEvent(QKeyEvent* event) {
 	} else if(event->key() == Qt::Key_Period) {
 		ui->tb_show_no_mesh->click();
 	} else if(event->key() == Qt::Key_PageUp) {
-		if(auto* b = ui->bg_plane->checkedButton()
+		if(auto const* b = ui->bg_plane->checkedButton()
 		; b == ui->tb_plane_xy) {
 			ui->tb_plane_zx->click();
 		} else if(b == ui->tb_plane_zx) {
@@ -504,7 +504,7 @@ void MainWindow::keyPressEvent(QKeyEvent* event) {
 			ui->tb_plane_xy->click();
 		}
 	} else if(event->key() == Qt::Key_PageDown) {
-		if(auto* b = ui->bg_plane->checkedButton()
+		if(auto const* b = ui->bg_plane->checkedButton()
 		; b == ui->tb_plane_xy) {
 			ui->tb_plane_yz->click();
 		} else if(b == ui->tb_plane_zx) {

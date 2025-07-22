@@ -197,7 +197,7 @@ void StructureView::make_current_state() {
 		std::make_unique<StructureScene>(style_selector, this).release() }};
 
 	populate(scenes);
-	if(auto* current_scene = static_cast<StructureScene*>(scene()); current_scene)
+	if(auto const* current_scene = static_cast<StructureScene*>(scene()); current_scene)
 		for(auto* scene : scenes)
 			scene->set_mesh_visibility(current_scene->get_mesh_visibility());
 

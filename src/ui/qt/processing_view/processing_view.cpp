@@ -96,7 +96,7 @@ void ProcessingView::set_display_plane(domain::Plane plane) {
 //******************************************************************************
 void ProcessingView::set_wire_style(nodegraph::Wire::Style style) {
 	wire_style = style;
-	for(auto& [t, state] : states)
+	for(auto const& [t, state] : states)
 		state.scene->set_wire_style(style);
 }
 
@@ -118,7 +118,7 @@ void ProcessingView::make_current_state() {
 
 	populate(scene);
 	scene->init();
-	if(auto* current_scene = static_cast<ProcessingScene*>(this->scene()); current_scene)
+	if(auto const* current_scene = static_cast<ProcessingScene*>(this->scene()); current_scene)
 		scene->set_display_mode(current_scene->get_display_mode());
 	scene->set_display_view_axes(axes_displayed_on_structure_view);
 	scene->set_display_plane(plane_displayed_on_structure_view);

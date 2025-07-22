@@ -80,7 +80,7 @@ struct FutureConditional : CLI::Validator {
 //******************************************************************************
 template<InvocableR<void> F>
 struct JustDo : CLI::Validator {
-	JustDo(F const& func) {
+	explicit JustDo(F const& func) {
 		name_ = "JustDo";
 		func_ = [func](string const&) {
 			func();
