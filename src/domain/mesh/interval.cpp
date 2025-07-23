@@ -162,7 +162,7 @@ vector<Coord> find_ls(double d, double lambda, double dmax, Coord s) {
 /// - The last space between adjacent lines should not be less than dmax/lambda.
 
 ///*****************************************************************************
-bool is_ls_valid_for_dmax_lmin_lambda(vector<Coord> ls, double d, double lambda, double dmax, size_t lmin) {
+bool is_ls_valid_for_dmax_lmin_lambda(vector<Coord> const& ls, double d, double lambda, double dmax, size_t lmin) {
 	if(d > dmax
 	|| ls.size() < lmin
 	|| ls.empty())

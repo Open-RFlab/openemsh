@@ -101,20 +101,21 @@ QWidget* EditDelegate::createEditor(QWidget* parent, QStyleOptionViewItem const&
 		return widget;
 	};
 
-	if(type == qMetaTypeId<Normal>()) {
-		auto* cb = handle_enum(AllNormal);
+	auto const bound_normal_choice_by_current_policy = [&](auto const* cb) {
 		if(policy_index.isValid()) {
 			auto policy = policy_index.data(Qt::UserRole + 1).value<Policy>();
 			switch(policy) {
 			case Policy::ONELINE: [[fallthrough]];
 			case Policy::HALFS: {
-				auto* m = static_cast<QStandardItemModel*>(cb->model());
+				// Actually made uneditable since there is no choice,
+				// in enforce_coherent_normal_regarding_current_policy().
+				auto const* m = static_cast<QStandardItemModel*>(cb->model());
 				m->item(key(Normal::NONE))->setEnabled(true);
 				m->item(key(Normal::MIN))->setEnabled(false);
 				m->item(key(Normal::MAX))->setEnabled(false);
 			} break;
 			case Policy::THIRDS: {
-				auto* m = static_cast<QStandardItemModel*>(cb->model());
+				auto const* m = static_cast<QStandardItemModel*>(cb->model());
 				m->item(key(Normal::NONE))->setEnabled(false);
 				m->item(key(Normal::MIN))->setEnabled(true);
 				m->item(key(Normal::MAX))->setEnabled(true);
@@ -122,6 +123,11 @@ QWidget* EditDelegate::createEditor(QWidget* parent, QStyleOptionViewItem const&
 			default: break;
 			}
 		}
+	};
+
+	if(type == qMetaTypeId<Normal>()) {
+		auto* cb = handle_enum(AllNormal);
+		bound_normal_choice_by_current_policy(cb);
 		return cb;
 	} else if(type == qMetaTypeId<Policy>()) {
 		return handle_enum(AllPolicy);
@@ -136,7 +142,7 @@ void EditDelegate::setEditorData(QWidget* editor, QModelIndex const& index) cons
 
 	auto const handle_enum = [&]<Enum E>() {
 		auto* cb = static_cast<QComboBox*>(editor);
-		cb->setCurrentIndex(key(index.data(Qt::UserRole + 1).value<E>()));
+		cb->setCurrentIndex((int) key(index.data(Qt::UserRole + 1).value<E>()));
 	};
 
 	if(type == qMetaTypeId<Normal>()) {
@@ -153,34 +159,38 @@ void EditDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, QMod
 	auto const type = index.data(Qt::UserRole + 1).typeId();
 
 	auto const handle_enum = [&]<Enum E, std::size_t N>(std::array<E, N> const& all) {
-		auto* cb = static_cast<QComboBox*>(editor);
+		auto const* cb = static_cast<QComboBox*>(editor);
 		model->setData(index, QVariant::fromValue(all[cb->currentIndex()]), Qt::UserRole + 1);
 		model->setData(index, cb->currentText(), Qt::EditRole);
 	};
 
-	if(type == qMetaTypeId<Normal>()) {
-		handle_enum(AllNormal);
-	} else if(type == qMetaTypeId<Policy>()) {
-		handle_enum(AllPolicy);
+	auto const enforce_coherent_normal_regarding_current_policy = [&]() {
 		if(normal_index.isValid()) {
 			auto policy = model->data(index, Qt::UserRole + 1).value<Policy>();
 			switch(policy) {
 			case Policy::ONELINE: [[fallthrough]];
 			case Policy::HALFS: {
 				model->setData(normal_index, QVariant::fromValue(Normal::NONE), Qt::UserRole + 1);
-				auto* item = static_cast<QStandardItem*>(static_cast<QStandardItemModel*>(model)->itemFromIndex(normal_index));
+				auto* item = static_cast<QStandardItemModel*>(model)->itemFromIndex(normal_index);
 				item->setEditable(false);
 			} break;
 			case Policy::THIRDS: {
 				if(model->data(normal_index, Qt::UserRole + 1).value<Normal>() == Normal::NONE) {
 					model->setData(normal_index, QVariant::fromValue(Normal::MIN), Qt::UserRole + 1);
-					auto* item = static_cast<QStandardItem*>(static_cast<QStandardItemModel*>(model)->itemFromIndex(normal_index));
+					auto* item = static_cast<QStandardItemModel*>(model)->itemFromIndex(normal_index);
 					item->setEditable(true);
 				}
 			} break;
 			default: break;
 			}
 		}
+	};
+
+	if(type == qMetaTypeId<Normal>()) {
+		handle_enum(AllNormal);
+	} else if(type == qMetaTypeId<Policy>()) {
+		handle_enum(AllPolicy);
+		enforce_coherent_normal_regarding_current_policy();
 	}
 
 	QStyledItemDelegate::setModelData(editor, model, index);

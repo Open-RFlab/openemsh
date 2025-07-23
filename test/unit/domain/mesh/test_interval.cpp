@@ -18,7 +18,7 @@
 /// @test Coord Interval::s(Interval::Side const& side) const @todo
 /// @test Coord Interval::s(Interval::Side const& side, double d) const @todo
 /// @test std::vector<Coord> find_ls(double d, double lambda, double dmax, Coord s)
-/// @test bool is_ls_valid_for_dmax_lmin_lambda(std::vector<Coord> ls, double d, double lambda, double dmax, size_t lmin)
+/// @test bool is_ls_valid_for_dmax_lmin_lambda(std::vector<Coord> const& ls, double d, double lambda, double dmax, size_t lmin)
 /// @test void Interval::update_ls() @todo
 /// @test void Interval::update_ls(Interval::Side& side) @todo
 /// @test double find_dmax(Interval::Side const& side, double dmax)
@@ -246,7 +246,7 @@ SCENARIO("std::vector<Coord> find_ls(double d, double lambda, double dmax, Coord
 }
 
 //******************************************************************************
-SCENARIO("bool is_ls_valid_for_dmax_lmin_lambda(std::vector<Coord> ls, double d, double lambda, double dmax, size_t lmin)", "[interval]") {
+SCENARIO("bool is_ls_valid_for_dmax_lmin_lambda(std::vector<Coord> const& ls, double d, double lambda, double dmax, size_t lmin)", "[interval]") {
 	GIVEN("An empty ls vector") {
 		THEN("Should not be valid, disregarding lmin") {
 			REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda({}, 1.0, 2.0, 3.0, 2));

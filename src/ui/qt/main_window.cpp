@@ -26,6 +26,10 @@
 namespace ui::qt {
 
 //******************************************************************************
+using DisplayMode = ProcessingScene::DisplayMode;
+using MeshVisibility = StructureScene::MeshVisibility;
+
+//******************************************************************************
 MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 : QMainWindow(parent)
 , ui(std::make_unique<Ui::MainWindow>())
@@ -168,47 +172,47 @@ void MainWindow::on_a_vertical_layout_triggered() {
 
 //******************************************************************************
 void MainWindow::on_tb_show_all_mesh_clicked() {
-	ui->structure_view->set_mesh_visibility(StructureScene::MeshVisibility::FULL);
+	ui->structure_view->set_mesh_visibility(MeshVisibility::FULL);
 	ui->processing_view->set_display_view_axes({ true, true });
 	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_horizontal_mesh_clicked() {
-	ui->structure_view->set_mesh_visibility(StructureScene::MeshVisibility::HORIZONTAL);
+	ui->structure_view->set_mesh_visibility(MeshVisibility::HORIZONTAL);
 	ui->processing_view->set_display_view_axes({ true, false });
 	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_vertical_mesh_clicked() {
-	ui->structure_view->set_mesh_visibility(StructureScene::MeshVisibility::VERTICAL);
+	ui->structure_view->set_mesh_visibility(MeshVisibility::VERTICAL);
 	ui->processing_view->set_display_view_axes({ false, true });
 	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_no_mesh_clicked() {
-	ui->structure_view->set_mesh_visibility(StructureScene::MeshVisibility::NONE);
+	ui->structure_view->set_mesh_visibility(MeshVisibility::NONE);
 	ui->processing_view->set_display_view_axes({ false, false });
 	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_selected_clicked() {
-	ui->processing_view->set_display_mode(ProcessingScene::DisplayMode::SELECTED_CHAIN);
+	ui->processing_view->set_display_mode(DisplayMode::SELECTED_CHAIN);
 	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_displayed_clicked() {
-	ui->processing_view->set_display_mode(ProcessingScene::DisplayMode::STRUCTURE_VIEW);
+	ui->processing_view->set_display_mode(DisplayMode::STRUCTURE_VIEW);
 	ui->processing_view->fit();
 }
 
 //******************************************************************************
 void MainWindow::on_tb_show_everything_clicked() {
-	ui->processing_view->set_display_mode(ProcessingScene::DisplayMode::EVERYTHING);
+	ui->processing_view->set_display_mode(DisplayMode::EVERYTHING);
 	ui->processing_view->fit();
 }
 
@@ -437,17 +441,17 @@ void MainWindow::update_navigation_buttons_visibility() {
 //******************************************************************************
 void MainWindow::update_show_buttons_pressing() {
 	switch(ui->structure_view->get_mesh_visibility()) {
-	case StructureScene::MeshVisibility::NONE: ui->tb_show_no_mesh->setChecked(true); break;
-	case StructureScene::MeshVisibility::VERTICAL: ui->tb_show_vertical_mesh->setChecked(true); break;
-	case StructureScene::MeshVisibility::HORIZONTAL: ui->tb_show_horizontal_mesh->setChecked(true); break;
-	case StructureScene::MeshVisibility::FULL: ui->tb_show_all_mesh->setChecked(true); break;
+	case MeshVisibility::NONE: ui->tb_show_no_mesh->setChecked(true); break;
+	case MeshVisibility::VERTICAL: ui->tb_show_vertical_mesh->setChecked(true); break;
+	case MeshVisibility::HORIZONTAL: ui->tb_show_horizontal_mesh->setChecked(true); break;
+	case MeshVisibility::FULL: ui->tb_show_all_mesh->setChecked(true); break;
 	default: unreachable();
 	}
 
 	switch(ui->processing_view->get_display_mode()) {
-	case ProcessingScene::DisplayMode::EVERYTHING: ui->tb_show_everything->setChecked(true); break;
-	case ProcessingScene::DisplayMode::STRUCTURE_VIEW: ui->tb_show_displayed->setChecked(true); break;
-	case ProcessingScene::DisplayMode::SELECTED_CHAIN: ui->tb_show_selected->setChecked(true); break;
+	case DisplayMode::EVERYTHING: ui->tb_show_everything->setChecked(true); break;
+	case DisplayMode::STRUCTURE_VIEW: ui->tb_show_displayed->setChecked(true); break;
+	case DisplayMode::SELECTED_CHAIN: ui->tb_show_selected->setChecked(true); break;
 	default: unreachable();
 	}
 }

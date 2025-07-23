@@ -47,37 +47,21 @@ optional<Step> next(Step step) {
 //******************************************************************************
 set<Step> that_and_after(Step step) {
 	set<Step> out;
+
+	using enum Step;
 	switch(step) {
-	case Step::DETECT_CONFLICT_EIP:
-		out.emplace(Step::DETECT_CONFLICT_EIP);
-		[[fallthrough]];
-	case Step::DETECT_CONFLICT_CE:
-		out.emplace(Step::DETECT_CONFLICT_CE);
-		[[fallthrough]];
-	case Step::DETECT_NON_CONFLICTING_EDGES:
-		out.emplace(Step::DETECT_NON_CONFLICTING_EDGES);
-		[[fallthrough]];
-	case Step::ADD_FIXED_MLP:
-		out.emplace(Step::ADD_FIXED_MLP);
-		[[fallthrough]];
-	case Step::SOLVE_ALL_EIP:
-		out.emplace(Step::SOLVE_ALL_EIP);
-		[[fallthrough]];
-	case Step::SOLVE_ALL_CE:
-		out.emplace(Step::SOLVE_ALL_CE);
-		[[fallthrough]];
-	case Step::DETECT_AND_SOLVE_TCMLP:
-		out.emplace(Step::DETECT_AND_SOLVE_TCMLP);
-		[[fallthrough]];
-	case Step::DETECT_INTERVALS:
-		out.emplace(Step::DETECT_INTERVALS);
-		[[fallthrough]];
-	case Step::MESH:
-		out.emplace(Step::MESH);
-		break;
-	default:
-		unreachable();
+	case DETECT_CONFLICT_EIP:          out.emplace(DETECT_CONFLICT_EIP);          [[fallthrough]];
+	case DETECT_CONFLICT_CE:           out.emplace(DETECT_CONFLICT_CE);           [[fallthrough]];
+	case DETECT_NON_CONFLICTING_EDGES: out.emplace(DETECT_NON_CONFLICTING_EDGES); [[fallthrough]];
+	case ADD_FIXED_MLP:                out.emplace(ADD_FIXED_MLP);                [[fallthrough]];
+	case SOLVE_ALL_EIP:                out.emplace(SOLVE_ALL_EIP);                [[fallthrough]];
+	case SOLVE_ALL_CE:                 out.emplace(SOLVE_ALL_CE);                 [[fallthrough]];
+	case DETECT_AND_SOLVE_TCMLP:       out.emplace(DETECT_AND_SOLVE_TCMLP);       [[fallthrough]];
+	case DETECT_INTERVALS:             out.emplace(DETECT_INTERVALS);             [[fallthrough]];
+	case MESH:                         out.emplace(MESH);                         break;
+	default: unreachable();
 	}
+
 	return out;
 }
 

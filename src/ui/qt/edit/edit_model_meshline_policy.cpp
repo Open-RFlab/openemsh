@@ -14,12 +14,14 @@
 
 #include "edit_model_meshline_policy.hpp"
 
-#define BR "<br/>"
-
 Q_DECLARE_METATYPE(domain::MeshlinePolicy::Policy)
 Q_DECLARE_METATYPE(domain::MeshlinePolicy::Normal)
 
 namespace ui::qt {
+
+//******************************************************************************
+using Normal = domain::MeshlinePolicy::Normal;
+using Policy = domain::MeshlinePolicy::Policy;
 
 //******************************************************************************
 EditModelMeshlinePolicy::EditModelMeshlinePolicy(domain::MeshlinePolicy* meshline_policy, QObject* parent)
@@ -30,8 +32,8 @@ EditModelMeshlinePolicy::EditModelMeshlinePolicy(domain::MeshlinePolicy* meshlin
 	setRowCount(4);
 
 	make_row(0, "Policy", state.policy,
-		"<b>ONELINE:</b> One meshline at the policy position." BR
-		"<b>HALFS:</b> Two lines centered around the policy position." BR
+		"<b>ONELINE:</b> One meshline at the policy position.<br/>"
+		"<b>HALFS:</b> Two lines centered around the policy position.<br/>"
 		"<b>THIRDS:</b> Two lines placed around (2d/3 in Normal direction, d/3 the other side) the policy position.");
 	make_row(1, "Normal", state.normal,
 		"Direction associated with Policy.");
@@ -40,7 +42,7 @@ EditModelMeshlinePolicy::EditModelMeshlinePolicy(domain::MeshlinePolicy* meshlin
 //	make_row(3, "res_factor", QString::number(state.res_factor), "");
 	make_row(3, "d", QString::number(state.d),
 		"Desired distance between policy lines (HALFS|THIRDS) or "
-		"between policy line and adjacent lines (ONELINE)." BR
+		"between policy line and adjacent lines (ONELINE).<br/>"
 		"Can be decreased by the meshing algorithm.");
 }
 
@@ -50,27 +52,27 @@ void EditModelMeshlinePolicy::commit() {
 
 	auto const are_policy_and_normal_compatible = [&state]() {
 		switch(state.policy) {
-		case domain::MeshlinePolicy::Policy::ONELINE: [[fallthrough]];
-		case domain::MeshlinePolicy::Policy::HALFS:
+		case Policy::ONELINE: [[fallthrough]];
+		case Policy::HALFS:
 			switch(state.normal) {
-			case domain::MeshlinePolicy::Normal::MIN: [[fallthrough]];
-			case domain::MeshlinePolicy::Normal::MAX: return false;
-			case domain::MeshlinePolicy::Normal::NONE: return true;
+			case Normal::MIN: [[fallthrough]];
+			case Normal::MAX: return false;
+			case Normal::NONE: return true;
 			default: unreachable();
 			}
-		case domain::MeshlinePolicy::Policy::THIRDS:
+		case Policy::THIRDS:
 			switch(state.normal) {
-			case domain::MeshlinePolicy::Normal::MIN: [[fallthrough]];
-			case domain::MeshlinePolicy::Normal::MAX: return true;
-			case domain::MeshlinePolicy::Normal::NONE: return false;
+			case Normal::MIN: [[fallthrough]];
+			case Normal::MAX: return true;
+			case Normal::NONE: return false;
 			default: unreachable();
 			}
 		default:unreachable();
 		}
 	};
 
-	state.policy = item(0, V)->data().value<domain::MeshlinePolicy::Policy>();
-	state.normal = item(1, V)->data().value<domain::MeshlinePolicy::Normal>();
+	state.policy = item(0, V)->data().value<Policy>();
+	state.normal = item(1, V)->data().value<Normal>();
 
 	std::array does_succeed = {
 		are_policy_and_normal_compatible(),

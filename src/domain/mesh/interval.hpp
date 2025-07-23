@@ -100,6 +100,6 @@ double find_dmax(Interval::Side const& a, Interval::Side const& b, double dmax);
 std::vector<Coord> find_ls(double d, double lambda, double dmax, Coord s);
 
 //******************************************************************************
-bool is_ls_valid_for_dmax_lmin_lambda(std::vector<Coord> ls, double d, double lambda, double dmax, size_t lmin);
+bool is_ls_valid_for_dmax_lmin_lambda(std::vector<Coord> const& ls, double d, double lambda, double dmax, size_t lmin);
 
 } // namespace domain
