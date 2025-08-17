@@ -6,6 +6,9 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
 
+    # Known to work version, nixpkgs is often broken for cross compilation.
+    nixpkgs-mingw.url = "github:NixOS/nixpkgs/58a1abdbae3217ca6b702f03d3b35125d88a2994";
+
     nix-filter.url = "github:numtide/nix-filter";
 
     flake-utils.url = "github:numtide/flake-utils";
@@ -25,6 +28,7 @@
 
   outputs = { self
   , nixpkgs
+  , nixpkgs-mingw
   , nix-filter
   , cmake-utils
   , flake-utils
@@ -40,6 +44,47 @@
       cmake-utils.overlays.pkgs
       self.overlays.pkgs
     ];
+
+    pkgs-mingw = nixpkgs-mingw.legacyPackages.${system}.appendOverlays [
+      cmake-utils.overlays.pkgs
+      self.overlays.pkgs
+    ];
+
+    wineWrapper = package: pkgs.stdenvNoCC.mkDerivation {
+      inherit (package) pname version meta;
+      doCheck = false;
+      dontUnpack = true;
+      dontBuild = true;
+      installPhase =
+      let
+        script = ''
+          #!/bin/sh
+          exec ${pkgs.wine64}/bin/wine64 ${package}/bin/${package.pname}.exe "$@"
+        '';
+      in ''
+        mkdir -p $out/bin
+        printf '${script}' > $out/bin/${package.pname}
+        chmod +x $out/bin/${package.pname}
+#        mkdir -p $out/share
+#        ${pkgs.xorg.lndir}/bin/lndir -silent ${package}/share $out/share
+      '';
+    };
+
+    zipWrapper = package: pkgs.stdenvNoCC.mkDerivation {
+      inherit (package) pname version meta;
+      doCheck = false;
+      dontUnpack = true;
+      nativeBuildInputs = [ pkgs.zip ];
+      buildPhase = ''
+        cp -rL ${package} ${package.name}
+        chmod -R ug+w ${package.name}
+        zip -r ${package.name}.zip ${package.name}/*
+      '';
+      installPhase = ''
+        mkdir -p $out
+        mv ${package.name}.zip $out/
+      '';
+    };
 
   in {
     devShells = {
@@ -77,6 +122,9 @@
     packages = {
       default = pkgs.openemsh;
       openemsh = pkgs.openemsh;
+      openemshMingw64 = pkgs-mingw.openemshMingw64;
+      openemshMingw64Zip = zipWrapper pkgs-mingw.openemshMingw64;
+      openemshWine64 = wineWrapper pkgs-mingw.openemshMingw64;
     };
   }) // {
     overlays = {
@@ -86,7 +134,12 @@
           stdenv = prev.llvmPackages_13.stdenv;
         };
 
-        inherit (prev.python310Packages) cairosvg;
+        openemshMingw64 = prev.pkgsCross.mingwW64.qt6.callPackage ./default.nix {
+          inherit lib;
+          inherit (final) texlive;
+        };
+
+        inherit (prev.python3Packages) cairosvg;
 
         csxcad = (prev.csxcad.overrideAttrs (new: old: {
           version = "0.6.3";

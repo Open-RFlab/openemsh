@@ -1,6 +1,5 @@
 { lib
-, pkgs ? import <nixpkgs> {}
-, stdenv ? pkgs.stdenv
+, stdenv
 , cmake
 , cmake-utils
 , git
@@ -11,10 +10,8 @@
 , wrapQtAppsHook
 }:
 
-with pkgs;
-
 stdenv.mkDerivation {
-  name = "openemsh";
+  pname = "openemsh";
   version = "0.0.0";
 
   src = lib.nix-filter {
@@ -54,6 +51,13 @@ stdenv.mkDerivation {
     unset NIX_HARDENING_ENABLE
     export CPM_DISABLE=ON
   '';
+
+  postInstall = lib.optionals stdenv.hostPlatform.isWindows ''
+    mkdir -p $out/bin/platforms
+    ln -t $out/bin/platforms -s ${qtbase}/lib/qt-6/plugins/platforms/qwindows.dll
+  '';
+
+  dontWrapQtApps = stdenv.hostPlatform.isWindows;
 
   QT_XCB_GL_INTEGRATION = "none";
 
