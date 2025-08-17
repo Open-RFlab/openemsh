@@ -68,7 +68,7 @@ target_link_libraries( openemsh
 	pugixml::shared
 	)
 
-add_executable( openemsh_bin )
+add_executable( openemsh_bin WIN32 )
 
 target_sources( openemsh_bin
 	PRIVATE
@@ -117,6 +117,7 @@ target_sources( openemsh_bin
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/style.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/resources.qrc"
 	"${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/openemsh.rc"
 	)
 
 target_compile_definitions( openemsh_bin
@@ -167,9 +168,16 @@ install(
 
 set_target_properties( openemsh_bin
 	PROPERTIES
+	OUTPUT_NAME "openemsh"
+	POSITION_INDEPENDENT_CODE ON
 	AUTOMOC ON
 	AUTORCC ON
 	AUTOUIC ON
+	)
+
+install(
+	TARGETS openemsh_bin openemsh
+	RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
 	)
 
 if( CMakeUtils_FOUND )

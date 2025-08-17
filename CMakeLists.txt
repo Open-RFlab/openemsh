@@ -18,18 +18,6 @@ if( NOT CMAKE_BUILD_TYPE )
 endif()
 message( STATUS "Build type: ${CMAKE_BUILD_TYPE}" )
 
-#[[
-set( CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
-	OWNER_READ
-	OWNER_WRITE
-	OWNER_EXECUTE
-	GROUP_READ
-	GROUP_EXECUTE
-	WORLD_READ
-	WORLD_EXECUTE
-	)
-#]]
-
 option( CPM_DISABLE "Don't use CPM to retrieve dependencies" "$ENV{CPM_DISABLE}" )
 
 if( NOT CPM_DISABLE )
@@ -108,6 +96,18 @@ if( CMakeUtils_FOUND )
 	set( COVERAGE_GLOBAL_ONLY ON )
 	include( CMakeUtils )
 endif()
+
+include( GNUInstallDirs )
+
+set( CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
+	OWNER_READ
+	OWNER_WRITE
+	OWNER_EXECUTE
+	GROUP_READ
+	GROUP_EXECUTE
+	WORLD_READ
+	WORLD_EXECUTE
+	)
 
 add_subdirectory( "${CMAKE_SOURCE_DIR}/src" )
 add_subdirectory( "${CMAKE_SOURCE_DIR}/test" )
