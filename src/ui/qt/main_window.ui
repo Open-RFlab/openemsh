@@ -622,6 +622,7 @@
    <addaction name="m_help"/>
    <addaction name="a_about"/>
   </widget>
+
   <widget class="QToolBar" name="toolBar">
    <property name="allowedAreas">
     <set>Qt::TopToolBarArea</set>
@@ -647,6 +648,7 @@
    <addaction name="a_undo"/>
    <addaction name="a_redo"/>
   </widget>
+
   <action name="a_about">
    <property name="text">
     <string>About</string>
@@ -686,7 +688,7 @@
   </action>
   <action name="a_file_open">
    <property name="text">
-    <string>🗋</string>
+    <string>Open</string>
    </property>
    <property name="toolTip">
     <string>Open CSX file</string>
@@ -697,7 +699,7 @@
   </action>
   <action name="a_file_save">
    <property name="text">
-    <string>🗎</string>
+    <string>Save</string>
    </property>
    <property name="toolTip">
     <string>Save mesh overwriting input CSX file</string>
@@ -708,7 +710,7 @@
   </action>
   <action name="a_file_save_as">
    <property name="text">
-    <string>🗎</string>
+    <string>Save as...</string>
    </property>
    <property name="toolTip">
     <string>Save mesh as...</string>
@@ -719,7 +721,7 @@
   </action>
   <action name="a_edit">
    <property name="text">
-    <string>🖉</string>
+    <string>Edit</string>
    </property>
    <property name="toolTip">
     <string>Edit parameters</string>
@@ -730,7 +732,7 @@
   </action>
   <action name="a_mesh_next">
    <property name="text">
-    <string>⏭</string>
+    <string>Next</string>
    </property>
    <property name="toolTip">
     <string>Run the next meshing step</string>
@@ -741,7 +743,7 @@
   </action>
   <action name="a_mesh_prev">
    <property name="text">
-    <string>⏮</string>
+    <string>Prev</string>
    </property>
    <property name="toolTip">
     <string>Go back to previous meshing step</string>
@@ -752,7 +754,7 @@
   </action>
   <action name="a_undo">
    <property name="text">
-    <string>↶</string>
+    <string>Undo</string>
    </property>
    <property name="toolTip">
     <string>Undo</string>
@@ -763,7 +765,7 @@
   </action>
   <action name="a_redo">
    <property name="text">
-    <string>↷</string>
+    <string>Redo</string>
    </property>
    <property name="toolTip">
     <string>Redo</string>
