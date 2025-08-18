@@ -8,6 +8,7 @@
 , pugixml
 , qtbase
 , wrapQtAppsHook
+, withPortabilityTweaks ? false
 }:
 
 stdenv.mkDerivation {
@@ -44,7 +45,8 @@ stdenv.mkDerivation {
   ];
 
   cmakeFlags = [
-    "-DCPM_DISABLE=ON"
+    (lib.cmakeBool "CPM_DISABLE" true)
+    (lib.cmakeBool "OEMSH_PORTABILITY_TWEAKS" withPortabilityTweaks)
   ];
 
   shellHook = ''

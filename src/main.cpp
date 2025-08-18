@@ -22,6 +22,11 @@ int main(int argc, char* argv[]) {
 		oemsh.write();
 	} else {
 		QApplication a(argc, argv);
+
+#ifdef OEMSH_PORTABILITY_TWEAKS
+		a.setAttribute(Qt::AA_DontUseNativeDialogs);
+#endif // OEMSH_PORTABILITY_TWEAKS
+
 		// Avoid a stold() bug introduced by QApplication() performing setlocale(LC_ALL, "")
 		setlocale(LC_NUMERIC, "C");
 		ui::qt::MainWindow w(oemsh);

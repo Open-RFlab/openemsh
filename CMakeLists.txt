@@ -19,6 +19,7 @@ endif()
 message( STATUS "Build type: ${CMAKE_BUILD_TYPE}" )
 
 option( CPM_DISABLE "Don't use CPM to retrieve dependencies" "$ENV{CPM_DISABLE}" )
+option( OEMSH_PORTABILITY_TWEAKS "Enable some portability tweaks" OFF )
 
 if( NOT CPM_DISABLE )
 	message( STATUS "Downloading dependencies with CPM" )

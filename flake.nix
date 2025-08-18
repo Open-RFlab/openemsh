@@ -125,7 +125,7 @@
       openemsh = pkgs.openemsh;
       openemshMingw64 = pkgs-mingw.openemshMingw64;
       openemshMingw64Zip = zipWrapper pkgs-mingw.openemshMingw64;
-      openemshWine64 = wineWrapper pkgs-mingw.openemshMingw64;
+      openemshWine64 = wineWrapper (pkgs-mingw.openemshMingw64.override { withPortabilityTweaks = true; });
     };
   }) // {
     overlays = {
