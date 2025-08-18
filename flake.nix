@@ -132,7 +132,6 @@
       pkgs = final: prev: {
         openemsh = prev.qt6.callPackage ./default.nix {
           inherit lib;
-          stdenv = prev.llvmPackages_13.stdenv;
         };
 
         openemshMingw64 = prev.pkgsCross.mingwW64.qt6.callPackage ./default.nix {
