@@ -48,7 +48,7 @@ StructureConflictColinearEdges::StructureConflictColinearEdges(domain::ViewAxis 
 	setData(DataKeys::TYPE, "ConflictColinearEdges");
 	setData(DataKeys::ID, (qulonglong) conflict->id);
 	setData(DataKeys::ENTITY, DataKeys::set_entity(conflict));
-//	setData(DataKeys::NAME, conflict->name.c_str());
+//	setData(DataKeys::NAME, QString::fromStdString(conflict->name));
 }
 
 //******************************************************************************

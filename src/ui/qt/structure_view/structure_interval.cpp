@@ -54,7 +54,7 @@ StructureInterval::StructureInterval(domain::ViewAxis axis, domain::Interval con
 	setData(DataKeys::TYPE, "Interval");
 	setData(DataKeys::ID, (qulonglong) interval->id);
 	setData(DataKeys::ENTITY, DataKeys::set_entity(interval));
-//	setData(DataKeys::NAME, interval->name.c_str());
+//	setData(DataKeys::NAME, QString::fromStdString(interval->name));
 }
 
 //******************************************************************************

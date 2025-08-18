@@ -294,7 +294,7 @@ ParserFromCsx::~ParserFromCsx() = default;
 //******************************************************************************
 void ParserFromCsx::parse() {
 	pugi::xml_document doc;
-	pugi::xml_parse_result res = doc.load_file(input.c_str());
+	pugi::xml_parse_result res = doc.load_file(input.native().c_str());
 
 	if(res.status != pugi::status_ok) {
 		cerr << res.description() << endl;

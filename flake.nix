@@ -46,6 +46,7 @@
     ];
 
     pkgs-mingw = nixpkgs-mingw.legacyPackages.${system}.appendOverlays [
+      (final: prev: { inherit (pkgs) cli11; })
       cmake-utils.overlays.pkgs
       self.overlays.pkgs
     ];

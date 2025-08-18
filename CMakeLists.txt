@@ -41,7 +41,7 @@ if( NOT CPM_DISABLE )
 	CPMAddPackage(
 		NAME pugixml
 		GITHUB_REPOSITORY zeux/pugixml
-		VERSION 1.12.1
+		VERSION 1.15
 		OPTIONS
 			"BUILD_SHARED_LIBS ON"
 		)
@@ -51,7 +51,7 @@ if( NOT CPM_DISABLE )
 	CPMAddPackage(
 		NAME CLI11
 		GITHUB_REPOSITORY CLIUtils/CLI11
-		VERSION 2.3.1
+		VERSION 2.5.0
 		)
 
 	set( CLI11_DIR "${CLI11_BINARY_DIR}" )
@@ -69,7 +69,7 @@ if( pugixml_FOUND )
 	message( STATUS "Found pugixml: ${pugixml_DIR} ${PUGIXML_VERSION}" )
 endif()
 
-find_package( CLI11 REQUIRED )
+find_package( CLI11 2.4.0 REQUIRED )
 if( CLI11_FOUND )
 	message( STATUS "Found CLI11: ${CLI11_DIR} ${CLI11_VERSION}" )
 endif()

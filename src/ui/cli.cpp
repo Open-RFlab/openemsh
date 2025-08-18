@@ -4,7 +4,6 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#include <CLI/CLI.hpp>
 //#include <CLI/App.hpp>
 //#include <CLI/Config.hpp>
 //#include <CLI/Formatter.hpp>
@@ -18,6 +17,10 @@
 #include "utils/unreachable.hpp"
 
 #include "cli.hpp"
+
+// As of 2.4.0, including this before "cli.hpp" seems to do some nasty side
+// effects with "relation.hpp" "IN" and "OUT" enumerators. (MinGW)
+#include <CLI/CLI.hpp>
 
 // TODO CLI --board
 // TODO CLI --structure -zx -yz -xy
@@ -105,8 +108,15 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app::OpenEMSH::Params params;
 	vector<function<void (domain::Params&)>> domain_overrides;
 
+	CLI::App app("OpenEMSH mesher");
+
+#ifdef _WIN32
+	argv = app.ensure_utf8(argv);
+#endif // _WIN32
+
+	app.name(argv[0]);
+
 //	auto fmt = make_shared<CliFormatter>();
-	CLI::App app("OpenEMSH mesher", argv[0]);
 //	app.formatter(fmt);
 
 	app.set_help_flag("-h,--help", "Display help and exit.");

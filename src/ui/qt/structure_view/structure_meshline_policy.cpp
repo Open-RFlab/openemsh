@@ -96,7 +96,7 @@ StructureMeshlinePolicy::StructureMeshlinePolicy(domain::ViewAxis axis, domain::
 	setData(DataKeys::TYPE, "MeshlinePolicy");
 	setData(DataKeys::ID, (qulonglong) meshline_policy->id);
 	setData(DataKeys::ENTITY, DataKeys::set_entity(meshline_policy));
-//	setData(DataKeys::NAME, meshline_policy->name.c_str());
+//	setData(DataKeys::NAME, QString::fromStdString(meshline_policy->name));
 }
 
 //******************************************************************************

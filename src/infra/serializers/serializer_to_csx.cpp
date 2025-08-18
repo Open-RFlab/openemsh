@@ -57,7 +57,7 @@ SerializerToCsx::SerializerToCsx(filesystem::path const& input, filesystem::path
 //******************************************************************************
 void SerializerToCsx::visit(Board& board) {
 	pugi::xml_document doc;
-	pugi::xml_parse_result const res = doc.load_file(input.c_str());
+	pugi::xml_parse_result const res = doc.load_file(input.native().c_str());
 
 	if(res.status != pugi::status_ok) {
 		cerr << res.description() << endl;
@@ -91,5 +91,5 @@ void SerializerToCsx::visit(Board& board) {
 		add_meshlines_to_xml_doc(Z);
 
 	cerr << "output: " << output << endl;
-	doc.save_file(output.c_str());
+	doc.save_file(output.native().c_str());
 }

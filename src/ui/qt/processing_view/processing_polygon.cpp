@@ -49,7 +49,7 @@ ProcessingPolygon::ProcessingPolygon(domain::Polygon const* polygon, QGraphicsIt
 
 	setData(DataKeys::TYPE, "Polygon");
 	setData(DataKeys::ID, (qulonglong) polygon->id);
-	setData(DataKeys::NAME, polygon->name.c_str());
+	setData(DataKeys::NAME, QString::fromStdString(polygon->name));
 	setData(DataKeys::ENTITY, DataKeys::set_entity(polygon));
 	retrieve_highlightable_children();
 }
