@@ -1,0 +1,4 @@
+name: Release Windows
+
+on:
+  workflow_dispatch:
