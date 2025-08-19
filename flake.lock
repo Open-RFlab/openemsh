@@ -10,11 +10,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1733826552,
-        "narHash": "sha256-A+wd21QaeVZf4R/MkL52tnF4tUqAqaeEVytWEf2RZuk=",
+        "lastModified": 1755572725,
+        "narHash": "sha256-YYOcjrYqytxoWvxWRaTsys2BQcd1C7wn0Et6Qe98pJM=",
         "owner": "conformism",
         "repo": "cmake-utils",
-        "rev": "5d9ae4e7ec85050bfcb798c6d2bc98a1ecf04e58",
+        "rev": "9cb1962902ef3a78c84702237bec4e846fe321b7",
         "type": "github"
       },
       "original": {
