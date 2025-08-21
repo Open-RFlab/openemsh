@@ -7,6 +7,8 @@ on:
 
 env:
   PACKAGE: ${{ github.event.repository.name }}
+  NIXPKGS_ALLOW_BROKEN: 1
+  NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM: 1
 
 jobs:
   run:
@@ -16,6 +18,8 @@ jobs:
     steps:
     - name: Chekout
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: 'Dependencies: Nix'
       uses: cachix/install-nix-action@v26
@@ -26,9 +30,6 @@ jobs:
       uses: DeterminateSystems/magic-nix-cache-action@v4
 
     - name: Build
-      env:
-        NIXPKGS_ALLOW_BROKEN: 1
-        NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM: 1
       run: nix build -L --no-update-lock-file --show-trace --impure .#${{ env.PACKAGE }}Mingw64Zip
 
     - name: Extract informations
@@ -36,8 +37,10 @@ jobs:
       shell: bash
       run: |
         echo "upload_url=$(curl -sL ${{ github.api_url }}/repos/${{ github.repository }}/releases/tags/${{ github.ref_name }}} | jq -r '.upload_url')" >> $GITHUB_OUTPUT
+        echo "version=$(nix derivation show --impure .#${{ env.PACKAGE }}Mingw64 | jq -r 'to_entries | .[0].value.env.version')" >> $GITHUB_OUTPUT
+        echo "git_describe=$(git describe --tags --dirty --abbrev=7 | sed 's/-/+/')" >> $GITHUB_OUTPUT
 
-    - name: Deploy .zip on Github
+    - name: Deploy .zip as Github release asset
       if: ${{ github.event_name == 'release' }}
       uses: actions/upload-release-asset@v1
       env:
@@ -48,9 +51,17 @@ jobs:
         asset_name: ${{ env.PACKAGE }}-${{ github.ref_name }}-x86_64-w64-mingw32.zip
         asset_content_type: application/zip
 
-    - name: Fail
+    - name: Deploy .zip as Github workflow artifact
       if: ${{ github.event_name != 'release' }}
-      uses: actions/github-script@v7
+      uses: actions/upload-artifact@v4
       with:
-        script: |
-          core.setFailed("Trigger event: ${{ github.event_name }} (should be release), Git ref: ${{ github.ref_name }}")
+        # TODO Currently no way not to double zip.
+        # https://github.com/actions/upload-artifact/issues/39
+        name: ${{ env.PACKAGE }}-x86_64-w64-mingw32-${{ steps.extract.outputs.git_describe }}.zip
+        path: result/${{ env.PACKAGE }}-x86_64-w64-mingw32-${{ steps.extract.outputs.version }}.zip
+        retention-days: 90
+
+    - name: Warn for manual trigger
+      if: ${{ github.event_name != 'release' }}
+      run: |
+        echo "::warning title=Manual trigger::Package is uploaded as workflow artifact instead of release asset.%0AGit ref: ${{ github.ref_name }}%0AGit describe: ${{ steps.extract.outputs.git_describe }}"
