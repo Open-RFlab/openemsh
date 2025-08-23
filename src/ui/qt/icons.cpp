@@ -10,6 +10,7 @@
 #include <QString>
 #include <QStyleHints>
 #include <QTransform>
+#include <QtGlobal>
 
 #include "structure_view/structure_conflict_colinear_edges.hpp"
 #include "structure_view/structure_conflict_too_close_meshline_policies.hpp"
@@ -40,11 +41,15 @@ QPixmap make_pixmap(Drawer const& draw) {
 	QPixmap icon(size, size);
 	icon.fill(Qt::transparent);
 	QPainter painter(&icon);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
 	switch(QGuiApplication::styleHints()->colorScheme()) {
 	default: [[fallthrough]];
 	case Qt::ColorScheme::Light: painter.setPen(Qt::black); break;
 	case Qt::ColorScheme::Dark: painter.setPen(Qt::white); break;
 	}
+#else
+	painter.setPen(Qt::black);
+#endif
 	draw(size, painter);
 	return icon;
 };
@@ -76,6 +81,7 @@ QPixmap apply(QTransform const& transform, QPixmap const& pixmap) {
 }
 
 //******************************************************************************
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
 #define PIXMAP_MAKER_DEF(NAME, FUNC) \
 	QPixmap const& Icons::NAME() { \
 		switch(QGuiApplication::styleHints()->colorScheme()) { \
@@ -90,6 +96,13 @@ QPixmap apply(QTransform const& transform, QPixmap const& pixmap) {
 		} \
 		} \
 	}
+#else
+#define PIXMAP_MAKER_DEF(NAME, FUNC) \
+	QPixmap const& Icons::NAME() { \
+		static QPixmap const light = FUNC; \
+		return light; \
+	}
+#endif
 
 //******************************************************************************
 PIXMAP_MAKER_DEF(edge,              make_pixmap(draw_icon_from_text("/")))
