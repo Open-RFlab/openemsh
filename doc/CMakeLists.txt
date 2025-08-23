@@ -1,5 +1,19 @@
 add_custom_target( doc )
 
+file( ARCHIVE_CREATE
+	OUTPUT "${CMAKE_BINARY_DIR}/doc/changelog.gz"
+	PATHS "${CMAKE_SOURCE_DIR}/CHANGELOG"
+	FORMAT raw
+	COMPRESSION GZip
+	COMPRESSION_LEVEL 9
+	)
+
+install(
+	FILES "${CMAKE_BINARY_DIR}/doc/changelog.gz"
+	DESTINATION "${CMAKE_INSTALL_DOCDIR}"
+	CONFIGURATIONS Release
+	)
+
 if( D2 )
 
 	set( D2_INDIVIDUAL_STEPS_FILES

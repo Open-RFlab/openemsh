@@ -13,7 +13,10 @@
 
 stdenv.mkDerivation {
   pname = "openemsh";
-  version = "0.0.0";
+  version =
+  let
+    firstLine = builtins.elemAt (lib.strings.split "\n" (builtins.readFile ./CHANGELOG)) 0;
+  in builtins.elemAt (builtins.match "^[^ ]+ \\((.*)\\)$" firstLine) 0;
 
   src = lib.nix-filter {
     root = ./.;
@@ -26,6 +29,7 @@ stdenv.mkDerivation {
       "test"
       "CMakeLists.txt"
       "CMakePresets.json"
+      "CHANGELOG"
     ];
   };
 

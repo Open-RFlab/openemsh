@@ -1,8 +1,26 @@
 cmake_minimum_required( VERSION 3.16 )
 
+# PROJECT_VERSION_LONG : <V>.<V>.<V>+<N>+g<H> (Debian native compatible `git describe --tags`)
+# PROJECT_VERSION : <V>.<V>.<V>.<N>
+file( STRINGS "${CMAKE_SOURCE_DIR}/CHANGELOG" PROJECT_VERSION
+	LIMIT_COUNT 1
+	)
+string( REGEX REPLACE
+	"^[^ ]+ \\((.*)\\)$" "\\1"
+	PROJECT_VERSION_LONG "${PROJECT_VERSION}"
+	)
+string( REGEX REPLACE
+	"[\\+~-]" "."
+	PROJECT_VERSION "${PROJECT_VERSION}"
+	)
+string( REGEX REPLACE
+	"^[^ ]+ \\(([0-9]+(\\.[0-9]+)?(\\.[0-9]+)?(\\.[0-9]+)?).*\\)$" "\\1"
+	PROJECT_VERSION "${PROJECT_VERSION}"
+	)
+
 project( openemsh
 	LANGUAGES CXX
-	VERSION 0.0.0
+	VERSION "${PROJECT_VERSION}"
 	DESCRIPTION "openEMS mesher"
 	HOMEPAGE_URL "https://github.com/Open-RFlab/openemsh"
 	)
