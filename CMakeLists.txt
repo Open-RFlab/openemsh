@@ -113,6 +113,7 @@ set( CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
 add_subdirectory( "${CMAKE_SOURCE_DIR}/src" )
 add_subdirectory( "${CMAKE_SOURCE_DIR}/test" )
 add_subdirectory( "${CMAKE_SOURCE_DIR}/icon" )
+add_subdirectory( "${CMAKE_SOURCE_DIR}/pack" )
 add_subdirectory( "${CMAKE_SOURCE_DIR}/doc" )
 
 if( CMakeUtils_FOUND )

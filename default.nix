@@ -22,6 +22,7 @@ stdenv.mkDerivation {
       "src"
       "doc"
       "icon"
+      "pack"
       "test"
       "CMakeLists.txt"
       "CMakePresets.json"

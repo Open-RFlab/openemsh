@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=OpenEMSH
+TryExec=openemsh
+Exec=bash -c "F="%f" && test -n "$F" && openemsh -G -i $F || openemsh"
+Icon=openemsh
+Type=Application
+Comment=OpenEMS mesher draft
+Categories=Education;Electronics;

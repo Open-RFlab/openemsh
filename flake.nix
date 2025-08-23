@@ -66,8 +66,8 @@
         mkdir -p $out/bin
         printf '${script}' > $out/bin/${package.pname}
         chmod +x $out/bin/${package.pname}
-#        mkdir -p $out/share
-#        ${pkgs.xorg.lndir}/bin/lndir -silent ${package}/share $out/share
+        mkdir -p $out/share
+        ${pkgs.xorg.lndir}/bin/lndir -silent ${package}/share $out/share
       '';
     };
 

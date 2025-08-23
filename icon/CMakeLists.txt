@@ -37,3 +37,19 @@ if( CMakeUtils_Icon_FOUND )
 		COMMENT "Copying icon png and ico files back to ${CMAKE_CURRENT_SOURCE_DIR}/"
 		)
 endif()
+
+foreach( I IN ITEMS 256 128 64 48 32 22 16 )
+	install(
+		FILES "${CMAKE_SOURCE_DIR}/icon/openemsh.${I}.png"
+		DESTINATION "${CMAKE_INSTALL_DATADIR}/icons/hicolor/${I}x${I}/apps"
+		RENAME "openemsh.png"
+		CONFIGURATIONS Release
+		)
+endforeach()
+
+install(
+	FILES "${CMAKE_SOURCE_DIR}/icon/openemsh.svg"
+	DESTINATION "${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps"
+	RENAME "openemsh.svg"
+	CONFIGURATIONS Release
+	)
