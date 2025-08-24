@@ -29,16 +29,24 @@ jobs:
     - name: Setup Nix cache
       uses: DeterminateSystems/magic-nix-cache-action@v4
 
-    - name: Build
-      run: nix build -L --no-update-lock-file --show-trace --impure .#${{ env.PACKAGE }}Mingw64Zip
-
     - name: Extract informations
       id: extract
       shell: bash
       run: |
         echo "upload_url=$(curl -sL ${{ github.api_url }}/repos/${{ github.repository }}/releases/tags/${{ github.ref_name }}} | jq -r '.upload_url')" >> $GITHUB_OUTPUT
-        echo "version=$(nix derivation show --impure .#${{ env.PACKAGE }}Mingw64 | jq -r 'to_entries | .[0].value.env.version')" >> $GITHUB_OUTPUT
-        echo "git_describe=$(git describe --tags --dirty --abbrev=7 | sed 's/-/+/')" >> $GITHUB_OUTPUT
+        echo "version=$(git describe --tags --abbrev=7 | sed 's/-/+/g')" >> $GITHUB_OUTPUT
+
+    - name: Update CHANGELOG
+      if: ${{ github.event_name != 'release' }}
+      run: |
+        OLD_VERSION="$(head -1 CHANGELOG | sed -E 's/^\S+ \((\S+)\)$/\1/')"
+        tool/changelog_add_upstream_entry.sh CHANGELOG
+        ADDED_LINES="$(git diff --numstat CHANGELOG | awk '{print $1}')"
+        [ "${ADDED_LINES}" != 0 ] && \
+        echo "::warning file=CHANGELOG,line=1,endLine=${ADDED_LINES},title=Manualy triggered release::Version: ${{ steps.extract.outputs.version }} (last was: ${OLD_VERSION})"
+
+    - name: Build
+      run: nix build -L --no-update-lock-file --show-trace --impure .#${{ env.PACKAGE }}Mingw64Zip
 
     - name: Deploy .zip as Github release asset
       if: ${{ github.event_name == 'release' }}
@@ -57,11 +65,6 @@ jobs:
       with:
         # TODO Currently no way not to double zip.
         # https://github.com/actions/upload-artifact/issues/39
-        name: ${{ env.PACKAGE }}-x86_64-w64-mingw32-${{ steps.extract.outputs.git_describe }}.zip
-        path: result/${{ env.PACKAGE }}-x86_64-w64-mingw32-${{ steps.extract.outputs.version }}.zip
         retention-days: 90
-
-    - name: Warn for manual trigger
-      if: ${{ github.event_name != 'release' }}
-      run: |
-        echo "::warning title=Manual trigger::Package is uploaded as workflow artifact instead of release asset.%0AGit ref: ${{ github.ref_name }}%0AGit describe: ${{ steps.extract.outputs.git_describe }}"
+        name: ${{ env.PACKAGE }}-x86_64-w64-mingw32-${{ steps.extract.outputs.version }}.zip
+        path: result/${{ env.PACKAGE }}-x86_64-w64-mingw32-${{ steps.extract.outputs.version }}.zip

@@ -2,3 +2,69 @@ name: Release Debian
 
 on:
   workflow_dispatch:
+  release:
+    types: published
+
+env:
+  PACKAGE: ${{ github.event.repository.name }}
+  OBS_USER: thomaslepoix
+  OBS_PROJECT: home:${OBS_USER}:open-rflab
+
+jobs:
+  run:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Chekout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 'Dependencies: Nix'
+      uses: cachix/install-nix-action@v26
+      with:
+        nix_path: nixpkgs=channel:nixos-unstable
+
+    - name: Setup Nix cache
+      uses: DeterminateSystems/magic-nix-cache-action@v4
+
+    - name: Extract informations
+      id: extract
+      shell: bash
+      run: |
+        echo "upload_url=$(curl -sL ${{ github.api_url }}/repos/${{ github.repository }}/releases/tags/${{ github.ref_name }}} | jq -r '.upload_url')" >> $GITHUB_OUTPUT
+        echo "version=$(git describe --tags --abbrev=7 | sed 's/-/+/g')" >> $GITHUB_OUTPUT
+
+    - name: Update CHANGELOG
+      if: ${{ github.event_name != 'release' }}
+      run: |
+        OLD_VERSION="$(head -1 CHANGELOG | sed -E 's/^\S+ \((\S+)\)$/\1/')"
+        tool/changelog_add_upstream_entry.sh CHANGELOG
+        ADDED_LINES="$(git diff --numstat CHANGELOG | awk '{print $1}')"
+        [ "${ADDED_LINES}" != 0 ] && \
+        echo "::warning file=CHANGELOG,line=1,endLine=${ADDED_LINES},title=Manualy triggered release::Version: ${{ steps.extract.outputs.version }} (last was: ${OLD_VERSION})"
+
+    - name: Package
+      run: nix build -L --no-update-lock-file --show-trace .#${{ env.PACKAGE }}DebSource
+
+    - name: Deploy source package as Github workflow artifact
+      uses: actions/upload-artifact@v4
+      with:
+        retention-days: 90
+        name: ${{ env.PACKAGE }}_${{ steps.extract.outputs.version }}.deb-src
+        path: |
+          result/${{ env.PACKAGE }}_${{ steps.extract.outputs.version }}.dsc
+          result/${{ env.PACKAGE }}_${{ steps.extract.outputs.version }}.tar.xz
+
+    - name: Deploy source package on OBS
+      run: |
+        FILES={
+        FILES+=result/${{ env.PACKAGE }}_${{ steps.extract.outputs.version }}.dsc,
+        FILES+=result/${{ env.PACKAGE }}_${{ steps.extract.outputs.version }}.tar.xz
+        FILES+=}
+        curl \
+          --fail-with-body \
+          --user ${{ env.OBS_USER }}:${{ secrets.OBS_PASSWORD }} \
+          https://api.opensuse.org/source/${{ env.OBS_PROJECT }}/${{ env.PACKAGE }}/ \
+          -T "${FILES}"

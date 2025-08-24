@@ -10,6 +10,7 @@
 [![SonarCloud quality gate](https://sonarcloud.io/api/project_badges/measure?project=Open-RFlab_openemsh&metric=alert_status)](https://sonarcloud.io/dashboard?id=Open-RFlab_openemsh)
 [![SonarCloud coverage](https://sonarcloud.io/api/project_badges/measure?project=Open-RFlab_openemsh&metric=coverage)](https://sonarcloud.io/dashboard?id=Open-RFlab_openemsh)
 
+[![Package Debian](https://img.shields.io/github/actions/workflow/status/Open-RFlab/openemsh/release_debian.yml?label=package&logo=debian)](https://software.opensuse.org/download.html?project=home:thomaslepoix:open-rflab&package=openemsh)
 [![Package Windows](https://img.shields.io/github/actions/workflow/status/Open-RFlab/openemsh/release_windows.yml?label=package&logo=mingww64)](https://github.com/Open-RFlab/openemsh/releases)
 
 # OpenEMSH : OpenEMS Mesher [WIP]
