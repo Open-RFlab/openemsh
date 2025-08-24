@@ -23,6 +23,7 @@ stdenv.mkDerivation {
     include = [
       "cmake"
       "src"
+      "debian"
       "doc"
       "icon"
       "pack"

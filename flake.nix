@@ -87,6 +87,35 @@
       '';
     };
 
+    debianSource = package: { distributions ? [ "unstable" ], metadata ? [ "urgency=medium" ] }:
+    pkgs.stdenvNoCC.mkDerivation {
+      inherit (package) version meta src;
+      pname = "${package.pname}-deb-source";
+      doCheck = false;
+      nativeBuildInputs = [ pkgs.dpkg ];
+      unpackPhase = ''
+        cp -r ${package.src} ${package.name}
+        chmod -R u+w ${package.name}
+      '';
+      patchPhase = ''
+        mv ${package.name}/pack/debian ${package.name}/debian
+        # Add APT stuff and reformat timestamps
+        # https://manpages.debian.org/testing/dpkg-dev/deb-changelog.5.en.html
+        sed < ${package.name}/CHANGELOG -E \
+          -e 's/^(\S+ \(\S+\))$/\1 ${toString distributions}; ${lib.strings.concatStringsSep "," metadata}/g' \
+          -e 's/^( -- .+ <\S+@\S+>  )([0-9]{1,2} [a-zA-Z]{3} [0-9]{4})$/echo "\1$(date -R --date "\2")"/e' \
+        > ${package.name}/debian/changelog
+        cat ${package.name}/debian/changelog
+      '';
+      buildPhase = ''
+        dpkg-source -b ${package.name}
+      '';
+      installPhase = ''
+        mkdir -p $out
+        mv ${package.pname}_${package.version}.* $out/
+      '';
+    };
+
   in {
     devShells = {
       default = pkgs.mkShell {
@@ -126,6 +155,7 @@
       openemshMingw64 = pkgs-mingw.openemshMingw64;
       openemshMingw64Zip = zipWrapper pkgs-mingw.openemshMingw64;
       openemshWine64 = wineWrapper (pkgs-mingw.openemshMingw64.override { withPortabilityTweaks = true; });
+      openemshDebSource = debianSource pkgs.openemsh {};
     };
   }) // {
     overlays = {

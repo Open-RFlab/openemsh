@@ -1,0 +1,24 @@
+Source: openemsh
+Section: electronics
+Priority: optional
+Maintainer: Thomas Lepoix <thomas.lepoix@protonmail.ch>
+Uploaders: Thomas Lepoix <thomas.lepoix@protonmail.ch>
+Homepage: https://github.com/Open-RFlab/openemsh
+Vcs-Git: https://github.com/Open-RFlab/openemsh
+Vcs-Browser: https://github.com/Open-RFlab/openemsh
+Build-Depends:
+ debhelper,
+ gcc (>= 13),
+ cmake,
+ qt6-base-dev,
+ libcli11-dev (>= 2.4),
+ libpugixml-dev
+# texlive-xetex
+# fonts-lato
+
+Package: openemsh
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Suggests: openems, octave-openems, python3-openems
+Enhances: openems, octave-openems, python3-openems
+Description: OpenEMS mesher draft
