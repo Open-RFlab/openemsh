@@ -1,0 +1,4 @@
+name: Release Debian
+
+on:
+  workflow_dispatch:
