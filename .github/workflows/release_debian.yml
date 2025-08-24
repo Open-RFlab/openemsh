@@ -41,9 +41,8 @@ jobs:
       run: |
         OLD_VERSION="$(head -1 CHANGELOG | sed -E 's/^\S+ \((\S+)\)$/\1/')"
         tool/changelog_add_upstream_entry.sh CHANGELOG
-        ADDED_LINES="$(git diff --numstat CHANGELOG | awk '{print $1}')"
-        [ "${ADDED_LINES}" != 0 ] && \
-        echo "::warning file=CHANGELOG,line=1,endLine=${ADDED_LINES},title=Manualy triggered release::Version: ${{ steps.extract.outputs.version }} (last was: ${OLD_VERSION})"
+        [ "${OLD_VERSION}" != "${{ steps.extract.outputs.version }}" ] && \
+        echo "::warning title=Version updated::Version: ${OLD_VERSION} -> ${{ steps.extract.outputs.version }}%0AGit ref: ${{ github.ref_name }}"
 
     - name: Package
       run: nix build -L --no-update-lock-file --show-trace .#${{ env.PACKAGE }}DebSource
