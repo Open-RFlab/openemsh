@@ -1,4 +1,10 @@
 
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/changelog.hpp.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/generated/changelog.hpp"
+	@ONLY
+	)
+
 add_library( openemsh SHARED )
 
 target_sources( openemsh
@@ -147,7 +153,8 @@ target_compile_options( openemsh_bin
 
 target_include_directories( openemsh_bin
 	PRIVATE
-	${CMAKE_CURRENT_SOURCE_DIR}
+	"${CMAKE_CURRENT_SOURCE_DIR}"
+	"${CMAKE_CURRENT_BINARY_DIR}/generated"
 	)
 
 target_link_libraries( openemsh_bin

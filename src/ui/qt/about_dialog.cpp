@@ -4,9 +4,9 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-//#include <QRegularExpression>
+#include <QRegularExpression>
 
-//#include "changelog.hpp"
+#include "changelog.hpp"
 
 #include "ui_about_dialog.h"
 #include "about_dialog.hpp"
@@ -25,15 +25,14 @@ AboutDialog::AboutDialog(QWidget* parent)
 	// here than using a fixed size in px, that actually works there.
 	ui->l_title->setText(QString("<span style='font-size:x-large; font-weight:bold;'>") + ui->l_title->text() + "</span>");
 
-//	static QString const changelog_md(QString(changelog.data())
-//		.replace(QRegularExpression("  \\*"), "-")                                    // Bullet points
-//		.replace(QRegularExpression("    \\*"), "  -")                                // Bullet points
-//		.replace(QRegularExpression("#([0-9]+)"), "[#\\1](" OEMSH_BUGREPORT "/\\1)")   // Issues
-//		.replace(QRegularExpression(" -- ([^<]+)<.*> +(.*)"), "*\\1 - \\2*\n\n---")   // Signature/Date line
-//		.replace(QRegularExpression("(openemsh \\([0-9.]+\\))"), "### \\1")       // Release title line
-//		.replace(QRegularExpression("  \\[ (.*) \\]"), "#### \\1"));                  // Category line
-
-//	ui->tb_changelog->setMarkdown(changelog_md);
+	static QString const changelog_md(QString(changelog.data())
+		.replace(QRegularExpression("  \\*"), "-")                                    // Bullet points
+		.replace(QRegularExpression("    \\*"), "  -")                                // Bullet points
+		.replace(QRegularExpression("#([0-9]+)"), "[#\\1](" OEMSH_BUGREPORT "/\\1)")  // Issues
+		.replace(QRegularExpression(" -- ([^<]+)<.*> +(.*)"), "*\\1 - \\2*\n\n---")   // Signature/Date line
+		.replace(QRegularExpression("(\\S+ \\([0-9.]+\\))"), "### \\1")               // Release title line
+		.replace(QRegularExpression("  \\[ (.*) \\]"), "#### \\1"));                  // Category line
+	ui->tb_changelog->setMarkdown(changelog_md);
 	//ui->tb_changelog->setPlainText(changelog_md); // For converter debug.
 
 	ui->tb_contact->setMarkdown(

@@ -29,7 +29,7 @@ message( STATUS "Version: ${PROJECT_VERSION}" )
 set( OEMSH_BUGREPORT    "https://github.com/Open-RFlab/openemsh/issues" )
 set( OEMSH_FUNDING      "https://liberapay.com/thomaslepoix" )
 set( OEMSH_OEMS_MESHING "https://wiki.openems.de/index.php/FDTD_Mesh.html" )
-#file( READ "${CMAKE_SOURCE_DIR}/CHANGELOG" OEMSH_CHANGELOG )
+file( READ "${CMAKE_SOURCE_DIR}/CHANGELOG" OEMSH_CHANGELOG )
 
 if( NOT CMAKE_BUILD_TYPE )
 	set( CMAKE_BUILD_TYPE "Release" )
