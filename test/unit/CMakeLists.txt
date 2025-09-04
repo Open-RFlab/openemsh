@@ -37,7 +37,7 @@ if( Catch2_FOUND )
 		PRIVATE
 		UNITTEST
 		$<$<CONFIG:Debug>:DEBUG>
-		QRFL_UNITTEST_DIR="${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/openemsh_unittest.dir"
+		OEMSH_UNITTEST_DIR="${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/openemsh_unittest.dir"
 		)
 
 	target_compile_features( openemsh_unittest

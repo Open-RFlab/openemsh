@@ -47,11 +47,11 @@ SCENARIO("string SerializerToPlantuml::run(Board& board)", "[serializer_to_plant
 			}
 
 			AND_WHEN("Writing it to a file") {
-				std::ofstream out(QRFL_UNITTEST_DIR"/lpf.puml");
+				std::ofstream out(OEMSH_UNITTEST_DIR "/lpf.puml");
 				out << puml;
 				THEN("Should create a file") {
-					INFO(QRFL_UNITTEST_DIR "/lpf.puml");
-					REQUIRE(std::filesystem::is_regular_file(QRFL_UNITTEST_DIR "/lpf.puml"));
+					INFO(OEMSH_UNITTEST_DIR "/lpf.puml");
+					REQUIRE(std::filesystem::is_regular_file(OEMSH_UNITTEST_DIR "/lpf.puml"));
 				}
 			}
 		}
@@ -74,11 +74,11 @@ SCENARIO("string SerializerToPlantuml::run(Board& board)", "[serializer_to_plant
 			}
 
 			AND_WHEN("Writing it to a file") {
-				std::ofstream out(QRFL_UNITTEST_DIR"/stub.puml");
+				std::ofstream out(OEMSH_UNITTEST_DIR "/stub.puml");
 				out << puml;
 				THEN("Should create a file") {
-					INFO(QRFL_UNITTEST_DIR "/stub.puml");
-					REQUIRE(std::filesystem::is_regular_file(QRFL_UNITTEST_DIR "/stub.puml"));
+					INFO(OEMSH_UNITTEST_DIR "/stub.puml");
+					REQUIRE(std::filesystem::is_regular_file(OEMSH_UNITTEST_DIR "/stub.puml"));
 				}
 			}
 		}
