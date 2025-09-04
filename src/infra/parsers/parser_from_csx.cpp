@@ -165,11 +165,11 @@ void ParserFromCsx::Pimpl::parse_primitive_box(pugi::xml_node const& node, strin
 		node_p2.attribute("Y").as_double(),
 		node_p2.attribute("Z").as_double());
 	if(params.with_yz)
-		board.add_polygon_from_box(YZ, type.value(), name, { p1.y, p1.z }, { p2.y, p2.z });
+		board.add_polygon_from_box(YZ, type.value(), name, { p1.x, p2.x }, { p1.y, p1.z }, { p2.y, p2.z });
 	if(params.with_zx)
-		board.add_polygon_from_box(ZX, type.value(), name, { p1.z, p1.x }, { p2.z, p2.x });
+		board.add_polygon_from_box(ZX, type.value(), name, { p1.y, p2.y }, { p1.z, p1.x }, { p2.z, p2.x });
 	if(params.with_xy)
-		board.add_polygon_from_box(XY, type.value(), name, { p1.x, p1.y }, { p2.x, p2.y });
+		board.add_polygon_from_box(XY, type.value(), name, { p1.z, p2.z }, { p1.x, p1.y }, { p2.x, p2.y });
 	// TODO if property == ConductingSheet : add_fixed_meshline_policy()
 }
 
@@ -196,7 +196,7 @@ void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, s
 
 	Bounding2D bounding(detect_bounding(points));
 
-	board.add_polygon(plane.value(), type.value(), name, std::move(points));
+	board.add_polygon(plane.value(), type.value(), name, { elevation, elevation + length }, std::move(points));
 	if(length == 0) {
 		board.add_fixed_meshline_policy(normal.value(), elevation);
 //		switch(plane.value()) {

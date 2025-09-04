@@ -88,24 +88,24 @@ void Board::Builder::add_fixed_meshline_policy(Axis const axis, Coord const coor
 }
 
 //******************************************************************************
-void Board::Builder::add_polygon(Plane const plane, Polygon::Type const type, string const& name, initializer_list<Point> points) {
-	polygons[plane].push_back(make_shared<Polygon>(plane, type, name, from_init_list(points), Caretaker::singleton().get_history_root()));
+void Board::Builder::add_polygon(Plane plane, Polygon::Type type, string const& name, Polygon::RangeZ const& z_placement, initializer_list<Point> points) {
+	polygons[plane].push_back(make_shared<Polygon>(plane, type, name, z_placement, from_init_list(points), Caretaker::singleton().get_history_root()));
 }
 
 //******************************************************************************
-void Board::Builder::add_polygon(Plane const plane, Polygon::Type const type, string const& name, vector<unique_ptr<Point const>>&& points) {
-	polygons[plane].push_back(make_shared<Polygon>(plane, type, name, std::move(points), Caretaker::singleton().get_history_root()));
+void Board::Builder::add_polygon(Plane plane, Polygon::Type type, string const& name, Polygon::RangeZ const& z_placement, vector<unique_ptr<Point const>>&& points) {
+	polygons[plane].push_back(make_shared<Polygon>(plane, type, name, z_placement, std::move(points), Caretaker::singleton().get_history_root()));
 }
 
 //******************************************************************************
-void Board::Builder::add_polygon_from_box(Plane const plane, Polygon::Type const type, string const& name, Point const p1, Point const p3) {
+void Board::Builder::add_polygon_from_box(Plane plane, Polygon::Type type, string const& name, Polygon::RangeZ const& z_placement, Point const p1, Point const p3) {
 	vector<unique_ptr<Point const>> points(4);
 	points[0] = make_unique<Point const>(p1.x, p1.y);
 	points[1] = make_unique<Point const>(p1.x, p3.y);
 	points[2] = make_unique<Point const>(p3.x, p3.y);
 	points[3] = make_unique<Point const>(p3.x, p1.y);
 
-	polygons[plane].push_back(make_shared<Polygon>(plane, type, name, std::move(points), Caretaker::singleton().get_history_root()));
+	polygons[plane].push_back(make_shared<Polygon>(plane, type, name, z_placement, std::move(points), Caretaker::singleton().get_history_root()));
 }
 
 //******************************************************************************
@@ -167,6 +167,9 @@ void Board::detect_edges_in_polygons(Plane const plane) {
 	for(auto const& poly_a : get_current_state().polygons[plane]) {
 		for(auto const& poly_b : get_current_state().polygons[plane]) {
 			if(poly_b == poly_a)
+				continue;
+
+			if(!does_overlap(poly_b->z_placement, poly_a->z_placement))
 				continue;
 
 			for(auto const& edge_a : poly_a->edges) {

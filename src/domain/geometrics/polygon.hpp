@@ -55,6 +55,11 @@ public:
 		SUBSTRATE
 	} const type;
 
+	struct RangeZ {
+		Coord min;
+		Coord max;
+	} const z_placement;
+
 	Plane const plane;
 	Bounding2D const bounding;
 	std::string const name;
@@ -66,7 +71,7 @@ public:
 	///*************************************************************************
 	std::vector<std::shared_ptr<Edge>> const edges;
 
-	Polygon(Plane plane, Type type, std::string const& name, std::vector<std::unique_ptr<Point const>>&& points, Timepoint* t);
+	Polygon(Plane plane, Type type, std::string const& name, RangeZ const& z_placement, std::vector<std::unique_ptr<Point const>>&& points, Timepoint* t);
 	~Polygon() override;
 
 //	relation::PolygonEdge relation_to(Edge const* edge);
@@ -84,5 +89,8 @@ Bounding2D detect_bounding(std::vector<std::unique_ptr<Point const>> const& poin
 
 //******************************************************************************
 std::vector<std::shared_ptr<Edge>> detect_edges(std::vector<std::unique_ptr<Point const>> const& points, Plane plane, Timepoint* t);
+
+//******************************************************************************
+bool does_overlap(Polygon::RangeZ const& a, Polygon::RangeZ const& b) noexcept;
 
 } // namespace domain

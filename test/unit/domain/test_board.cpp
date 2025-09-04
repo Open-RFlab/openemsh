@@ -16,9 +16,9 @@
 #include "domain/board.hpp"
 
 /// @test void sort_points_by_vector_orientation(std::vector<Point>& points, Point const& vector)
-/// @test void Board::Builder::add_polygon(std::string const& name, std::initializer_list<Point> points)
-/// @test void Board::Builder::add_polygon(std::string const& name, std::vector<std::unique_ptr<Point const>>&& points)
-/// @test void Board::Builder::add_polygon_from_box(std::string const& name, Point const p1, Point const p3)
+/// @test void Board::Builder::add_polygon(Plane plane, std::string const& name, Polygon::RangeZ const& z_placement, std::initializer_list<Point> points)
+/// @test void Board::Builder::add_polygon(Plane plane, std::string const& name, Polygon::RangeZ const& z_placement, std::vector<std::unique_ptr<Point const>>&& points)
+/// @test void Board::Builder::add_polygon_from_box(Plane plane, std::string const& name, Polygon::RangeZ const& z_placement, Point const p1, Point const p3)
 /// @test std::unique_ptr<Board> Board::Builder::build()
 /// @test void Board::detect_edges_in_polygons()
 /// @test void Board::detect_colinear_edges()
@@ -136,12 +136,12 @@ SCENARIO("void sort_points_by_vector_orientation(std::vector<Point>& points, Poi
 
 
 //******************************************************************************
-SCENARIO("void Board::Builder::add_polygon(std::string const& name, std::initializer_list<Point> points)", "[board]") {
+SCENARIO("void Board::Builder::add_polygon(Plane plane, std::string const& name, Polygon::RangeZ const& z_placement, std::initializer_list<Point> points)", "[board]") {
 	GIVEN("A Board Builder") {
 		Board::Builder b;
 		REQUIRE(b.polygons[XY].empty());
 		WHEN("Adding a polygon as an initializer_list of Points") {
-			b.add_polygon(XY, Polygon::Type::SHAPE, "MS13", {
+			b.add_polygon(XY, Polygon::Type::SHAPE, "MS13", { 0, 0 }, {
 				{ 70.3673, -42.8674 },
 				{ 62.1753, -42.8674 },
 				{ 62.1753, -43.9276 },
@@ -163,7 +163,7 @@ SCENARIO("void Board::Builder::add_polygon(std::string const& name, std::initial
 }
 
 //******************************************************************************
-SCENARIO("void Board::Builder::add_polygon(std::string const& name, std::vector<std::unique_ptr<Point const>>&& points)", "[board]") {
+SCENARIO("void Board::Builder::add_polygon(Plane plane, std::string const& name, Polygon::RangeZ const& z_placement, std::vector<std::unique_ptr<Point const>>&& points)", "[board]") {
 	GIVEN("A Board Builder") {
 		Board::Builder b;
 		REQUIRE(b.polygons[XY].empty());
@@ -175,8 +175,8 @@ SCENARIO("void Board::Builder::add_polygon(std::string const& name, std::vector<
 				{ 66.2713, -43.9276 },
 				{ 66.2713, -43.9514 },
 				{ 70.3673, -43.9514 }}));
-			b.add_polygon(XY, Polygon::Type::SHAPE, "MS13", std::move(points));
-			b.add_polygon(XY, Polygon::Type::SHAPE, "MS15", from_init_list<Point>({
+			b.add_polygon(XY, Polygon::Type::SHAPE, "MS13", { 0, 0 }, std::move(points));
+			b.add_polygon(XY, Polygon::Type::SHAPE, "MS15", { 0, 0 }, from_init_list<Point>({
 				{ 70.3673, -42.8674 },
 				{ 62.1753, -42.8674 },
 				{ 62.1753, -43.9276 },
@@ -205,12 +205,12 @@ SCENARIO("void Board::Builder::add_polygon(std::string const& name, std::vector<
 }
 
 //******************************************************************************
-SCENARIO("void Board::Builder::add_polygon_from_box(std::string const& name, Point const p1, Point const p3)", "[board]") {
+SCENARIO("void Board::Builder::add_polygon_from_box(Plane plane, std::string const& name, Polygon::RangeZ const& z_placement, Point const p1, Point const p3)", "[board]") {
 	GIVEN("A Board Builder") {
 		Board::Builder b;
 		REQUIRE(b.polygons[XY].empty());
 		WHEN("Adding a rectangle polygon as a box of opposite Points") {
-			b.add_polygon_from_box(XY, Polygon::Type::SHAPE, "MS1", { 16.1, -26.5 }, { 20.6, -26 });
+			b.add_polygon_from_box(XY, Polygon::Type::SHAPE, "MS1", { 0, 0 }, { 16.1, -26.5 }, { 20.6, -26 });
 			THEN("Should add a Polygon in the inner vector") {
 				REQUIRE(b.polygons[XY].size() == 1);
 				REQUIRE(b.polygons[XY][0]->name == "MS1");
@@ -228,15 +228,15 @@ SCENARIO("std::unique_ptr<Board> Board::Builder::build()", "[board]") {
 	GIVEN("A Board Builder previously fed of polygons") {
 		Board::Builder b;
 		REQUIRE(b.polygons[XY].empty());
-		b.add_polygon_from_box(XY, Polygon::Type::SHAPE, "MS1", { 16.1, -26.5 }, { 20.6, -26 });
-		b.add_polygon(XY, Polygon::Type::SHAPE, "MS15", from_init_list<Point>({
+		b.add_polygon_from_box(XY, Polygon::Type::SHAPE, "MS1", { 0, 0 }, { 16.1, -26.5 }, { 20.6, -26 });
+		b.add_polygon(XY, Polygon::Type::SHAPE, "MS15", { 0, 0 }, from_init_list<Point>({
 			{ 70.3673, -42.8674 },
 			{ 62.1753, -42.8674 },
 			{ 62.1753, -43.9276 },
 			{ 66.2713, -43.9276 },
 			{ 66.2713, -43.9514 },
 			{ 70.3673, -43.9514 }}));
-		b.add_polygon(XY, Polygon::Type::SHAPE, "MS13", {
+		b.add_polygon(XY, Polygon::Type::SHAPE, "MS13", { 0, 0 }, {
 			{ 70.3673, -42.8674 },
 			{ 62.1753, -42.8674 },
 			{ 62.1753, -43.9276 },
@@ -284,8 +284,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 2 }, { 2, 3 }, { 3, 3 }, { 3, 2 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 2 }, { 2, 3 }, { 3, 3 }, { 3, 2 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
@@ -361,8 +361,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 2 }, { 3, 2 }, { 3, 4 }, { 1, 4 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 1 }, { 4, 1 }, { 4, 3 }, { 2, 3 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 2 }, { 3, 2 }, { 3, 4 }, { 1, 4 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 1 }, { 4, 1 }, { 4, 3 }, { 2, 3 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
@@ -439,8 +439,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 3 }, { 2, 3 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 3 }, { 2, 3 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
@@ -517,8 +517,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 3 }, { 3, 2 }, { 5, 4 }, { 4, 5 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 3 }, { 3, 2 }, { 5, 4 }, { 4, 5 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
@@ -608,8 +608,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
@@ -661,8 +661,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 2 }, { 2, 2 }, { 2, 3 }, { 1, 3 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 2 }, { 2, 2 }, { 2, 3 }, { 1, 3 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
@@ -675,8 +675,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 2, 1 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }, { 4, 3 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 2, 1 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }, { 4, 3 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
@@ -687,13 +687,32 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 	}
 
 	GIVEN("A board holding two complex polygons") {
-		WHEN("Polygons overlap by many segments") {
+		WHEN("Polygons overlap by many segments but not by Z placement") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 1 }, from_init_list<Point>({
 					{ 1, 1 }, { 10, 1 }, { 10, 10 }, { 1, 10 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 2, 3 }, from_init_list<Point>({
+					{ 11, 4 }, { 9, 3 }, { 13, 2 }, { 5, 2 },
+					{ 5, 11 }, { 4, 11.3 }, { 3, 10 }, { 2, 10 },
+					{ 2.3, 12 }, { 6, 11.3 }, { 6, 9 }, { 10, 10 },
+					{ 11, 9 }, { 9, 7 }, { 10, 6.3 }, { 10, 5 }}), t));
+				b = std::make_unique<Board>(std::move(tmp), Params(), t);
+			}
+			b->detect_edges_in_polygons();
+			THEN("There should not be any conflict registered") {
+				REQUIRE_FALSE(b->conflict_manager->get_current_state().all_edge_in_polygons[XY].size());
+			}
+		}
+
+		WHEN("Polygons overlap by many segments and by Z placement") {
+			std::unique_ptr<Board> b;
+			{
+				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({
+					{ 1, 1 }, { 10, 1 }, { 10, 10 }, { 1, 10 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({
 					{ 11, 4 }, { 9, 3 }, { 13, 2 }, { 5, 2 },
 					{ 5, 11 }, { 4, 11.3 }, { 3, 10 }, { 2, 10 },
 					{ 2.3, 12 }, { 6, 11.3 }, { 6, 9 }, { 10, 10 },
@@ -829,9 +848,9 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 0.5, 3 }, { 2, 3 }, { 2, 4 }, { 0.5, 4 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 3, 5 }, { 2, 5 }, { 2, 6 }, { 3, 6 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 0.5, 3 }, { 2, 3 }, { 2, 4 }, { 0.5, 4 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 3, 5 }, { 2, 5 }, { 2, 6 }, { 3, 6 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_colinear_edges();
@@ -872,9 +891,9 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 3, 0.5 }, { 3, 2 }, { 4, 2 }, { 4, 0.5 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 5, 3 }, { 5, 2 }, { 6, 2 }, { 6, 3 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 3, 0.5 }, { 3, 2 }, { 4, 2 }, { 4, 0.5 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 5, 3 }, { 5, 2 }, { 6, 2 }, { 6, 3 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_colinear_edges();
@@ -915,9 +934,9 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 1, 2 }, { 2, 2 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 5, 5 }, { 5, 6 }, { 6, 6 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 1, 2 }, { 2, 2 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 5, 5 }, { 5, 6 }, { 6, 6 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_colinear_edges();
@@ -937,8 +956,8 @@ SCENARIO("void Board::detect_non_conflicting_edges()", "[board]") {
 		std::unique_ptr<Board> b;
 		{
 			PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-			tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 1, 1 }, { 1, 2 }, { 2, 2 }}), t));
-			tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }}), t));
+			tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 1, 2 }, { 2, 2 }}), t));
+			tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }}), t));
 			b = std::make_unique<Board>(std::move(tmp), Params(), t);
 		}
 		REQUIRE(b->get_current_state().edges[XY].size() == 6);

@@ -15,10 +15,11 @@ namespace domain {
 using namespace std;
 
 //******************************************************************************
-Polygon::Polygon(Plane const plane, Type const type, string const& name, vector<unique_ptr<Point const>>&& points, Timepoint* t)
+Polygon::Polygon(Plane const plane, Type const type, string const& name, RangeZ const& z_placement, vector<unique_ptr<Point const>>&& points, Timepoint* t)
 : Originator(t)
 , rotation(detect_rotation(points))
 , type(type)
+, z_placement(z_placement)
 , plane(plane)
 , bounding(detect_bounding(points))
 , name(name)
@@ -191,6 +192,15 @@ relation::PolygonPoint Polygon::relation_to(Point const& point) const noexcept {
 		return relation::PolygonPoint::IN;
 	else
 		return relation::PolygonPoint::OUT;
+}
+
+/// Check if two Z ranges overlap or just touch each other.
+///*****************************************************************************
+bool does_overlap(Polygon::RangeZ const& a, Polygon::RangeZ const& b) noexcept {
+	return (b.min >= a.min && b.min <= a.max)
+	    || (b.max >= a.min && b.max <= a.max)
+	    || (a.min >= b.min && a.min <= b.max)
+	    || (a.max >= b.min && a.max <= b.max);
 }
 
 } // namespace domain
