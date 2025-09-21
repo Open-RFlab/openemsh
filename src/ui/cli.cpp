@@ -167,7 +167,7 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 //		"Desired mesh resolution for substrate / ground plane regions."
 //	)->group("Mesher options");
 
-	app.add_option_function<decltype(domain::Params::proximity_limit)>("--proximity_limit",
+	app.add_option_function<decltype(domain::Params::proximity_limit)>("--proximity-limit",
 		make_overrider<&domain::Params::proximity_limit>(domain_overrides),
 		"Distance under which two adjacent lines trigger a conflict."
 	)->group("Mesher options");

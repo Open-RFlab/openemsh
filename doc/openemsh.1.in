@@ -1,0 +1,119 @@
+.TH OpenEMSH "1" "February 2021" "@PROJECT_VERSION_LONG@" "User Commands"
+
+.SH NAME
+OpenEMSH \- OpenEMS mesher
+
+.SH SYNOPSIS
+\fBopenemsh\fR [\fIOPTION\fR] ...
+.br
+\fBopenemsh\fR [\fB-i\fR \fICSX_FILE\fR] [\fIOPTION\fR] ...
+.br
+\fBopenemsh\fR [\fB-i\fR \fICSX_FILE\fR] [\fB-G\fR] [\fIOPTION\fR] ...
+
+.SH DESCRIPTION
+\fBOpenEMSH\fR is a mesher for the FDTD solver \fBOpenEMS\fR (with a H at the end, it looks like mesh poorly written).
+.PP
+It can be used in one-shot command line mode, or in graphical mode, which allows further meshing customization.
+
+.SH OPTIONS
+.SS Generic options
+.TP
+\fB-h\fR, \fB--help\fR
+Display help and exit.
+.TP
+    \fB--version\fR
+Display version information and exit.
+.TP
+\fB-v\fR, \fB--verbose\fR
+Verbose mode.
+.TP
+\fB-G\fR
+GUI mode (no arguments equals to \fB-G\fR)
+.TP
+\fB-i\fR \fIFILENAME\fR
+Input CSX XML file.
+.TP
+\fB-o\fR \fIFILENAME\fR
+Output CSX XML file. If different from input, will copy and extend it.
+.TP
+\fB-f\fR, \fB--force\fR
+Allow overwriting a file.
+.TP
+    \fB--output-format\fR \fIFORMAT\fR
+Output format.
+
+\fIFORMAT\fR can be:
+.PD 0
+.RS
+.TP
+	\fBcsx\fR            : CSX XML (default)
+.TP
+	\fBplantuml\fR       : PlantUML debug diagram, similar to GUI Processing View
+.TP
+	\fBprettyprint\fR    : Textual debug output
+.RE
+.PD
+.SS Input options
+.TP
+    \fB--ground\fR \fITEXT\fR ...
+Declare properties to be ground planes ('Name' XML field).
+.TP
+    \fB--no-yz\fR
+Don't process YZ plane.
+.TP
+    \fB--no-zx\fR
+Don't process ZX plane.
+.TP
+    \fB--no-xy\fR
+Don't process XY plane.
+.SS Output options
+.TP
+    \fB--no-x\fR
+Don't include X axis meshlines in output.
+.TP
+    \fB--no-y\fR
+Don't include Y axis meshlines in output.
+.TP
+    \fB--no-z\fR
+Don't include Z axis meshlines in output.
+.TP
+    \fB--meshlines\fR \fIBOOL\fR
+Include regular meshlines in output. Default is \fBtrue\fR.
+.TP
+    \fB--policy-lines\fR \fIBOOL\fR
+Include meshline policies in output. Default is \fBfalse\fR.
+.SS Mesher options
+.TP
+    \fB--proximity-limit\fR \fIFLOAT\fR
+Distance under which two adjacent lines trigger a conflict.
+.TP
+    \fB--dmax\fR \fIFLOAT\fR
+Maximum distance between two adjacent lines.
+.TP
+    \fB--lmin\fR \fIUINT\fR
+Minimum line number per interval half.
+.TP
+    \fB--smoothness\fR \fIFLOAT\fR
+Smoothness factor. Bounded to ]\fB1\fR;\fB2\fR]. Default is \fB2\fR.
+
+.SH NOTES
+Currently, diagonals and circular shapes are not supported.
+
+.SH SEE ALSO
+@OEMSH_OEMS_MESHING@
+.PP
+.BR AppCSXCAD (7),
+
+.SH REPORTING BUGS
+@OEMSH_BUGREPORT@
+
+.SH FUNDING
+@OEMSH_FUNDING@
+
+.SH COPYRIGHT
+Copyright \(co 2021 Thomas Lepoix <thomas.lepoix@protonmail.ch>
+.PP
+This software is distributed under the terms of the GPL-3 license.
+
+.SH AUTHORS
+Written by Thomas Lepoix <thomas.lepoix@protonmail.ch>.

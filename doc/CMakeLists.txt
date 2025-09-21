@@ -1,7 +1,27 @@
 add_custom_target( doc )
 
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/openemsh.1.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/openemsh.1"
+	@ONLY
+	)
+
 file( ARCHIVE_CREATE
-	OUTPUT "${CMAKE_BINARY_DIR}/doc/changelog.gz"
+	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/openemsh.1.gz"
+	PATHS "${CMAKE_CURRENT_BINARY_DIR}/openemsh.1"
+	FORMAT raw
+	COMPRESSION GZip
+	COMPRESSION_LEVEL 9
+	)
+
+install(
+	FILES "${CMAKE_CURRENT_BINARY_DIR}/openemsh.1.gz"
+	DESTINATION "${CMAKE_INSTALL_MANDIR}/man1"
+	CONFIGURATIONS Release
+	)
+
+file( ARCHIVE_CREATE
+	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/changelog.gz"
 	PATHS "${CMAKE_SOURCE_DIR}/CHANGELOG"
 	FORMAT raw
 	COMPRESSION GZip
@@ -9,7 +29,7 @@ file( ARCHIVE_CREATE
 	)
 
 install(
-	FILES "${CMAKE_BINARY_DIR}/doc/changelog.gz"
+	FILES "${CMAKE_CURRENT_BINARY_DIR}/changelog.gz"
 	DESTINATION "${CMAKE_INSTALL_DOCDIR}"
 	CONFIGURATIONS Release
 	)
