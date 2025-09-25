@@ -13,46 +13,46 @@ std::shared_ptr<domain::Board> create_stub() {
 	using RangeZ = Polygon::RangeZ;
 
 	Board::Builder builder;
-	builder.add_polygon_from_box(XY, Type::SHAPE, "MS1", RangeZ { 0, 0 }, { 31.1, -44.8024 }, { 51.3539, -42.0164 });
-	builder.add_polygon_from_box(XY, Type::SHAPE, "MS2", RangeZ { 0, 0 }, { 120.029, -44.8024 }, { 140.283, -42.0164 });
-	builder.add_polygon_from_box(XY, Type::SHAPE, "MS3", RangeZ { 0, 0 }, { 51.6077, -42.0164 }, { 51.3539, -31 });
-	builder.add_polygon_from_box(XY, Type::SHAPE, "MS4", RangeZ { 0, 0 }, { 120.024, -42.0164 }, { 119.78, -31 });
-	builder.add_polygon_from_box(XY, Type::SHAPE, "MS5", RangeZ { 0, 0 }, { 109.208, -43.9276 }, { 119.775, -42.8913 });
-	builder.add_polygon_from_box(XY, Type::SHAPE, "MS6", RangeZ { 0, 0 }, { 51.6077, -43.9276 }, { 62.1753, -42.8913 });
-	builder.add_polygon_from_box(XY, Type::SHAPE, "MS7", RangeZ { 0, 0 }, { 70.3673, -42.8674 }, { 62.1753, -33.2952 });
-	builder.add_polygon_from_box(XY, Type::SHAPE, "MS8", RangeZ { 0, 0 }, { 109.208, -42.8674 }, { 101.016, -33.2952 });
-	builder.add_polygon_from_box(XY, Type::SHAPE, "MS9", RangeZ { 0, 0 }, { 90.96, -42.8674 }, { 80.4229, -33.1334 });
-	builder.add_polygon_from_box(XY, Type::SHAPE, "MS10", RangeZ { 0, 0 }, { 70.3673, -43.9514 }, { 80.4229, -42.8674 });
-	builder.add_polygon_from_box(XY, Type::SHAPE, "MS11", RangeZ { 0, 0 }, { 90.96, -43.9514 }, { 101.016, -42.8674 });
-	builder.add_polygon(XY, Type::SHAPE, "MS12", RangeZ { 0, 0 }, {
+	builder.add_polygon_from_box(XY, Type::SHAPE, "MS1", 0, RangeZ { 0, 0 }, { 31.1, -44.8024 }, { 51.3539, -42.0164 });
+	builder.add_polygon_from_box(XY, Type::SHAPE, "MS2", 0, RangeZ { 0, 0 }, { 120.029, -44.8024 }, { 140.283, -42.0164 });
+	builder.add_polygon_from_box(XY, Type::SHAPE, "MS3", 0, RangeZ { 0, 0 }, { 51.6077, -42.0164 }, { 51.3539, -31 });
+	builder.add_polygon_from_box(XY, Type::SHAPE, "MS4", 0, RangeZ { 0, 0 }, { 120.024, -42.0164 }, { 119.78, -31 });
+	builder.add_polygon_from_box(XY, Type::SHAPE, "MS5", 0, RangeZ { 0, 0 }, { 109.208, -43.9276 }, { 119.775, -42.8913 });
+	builder.add_polygon_from_box(XY, Type::SHAPE, "MS6", 0, RangeZ { 0, 0 }, { 51.6077, -43.9276 }, { 62.1753, -42.8913 });
+	builder.add_polygon_from_box(XY, Type::SHAPE, "MS7", 0, RangeZ { 0, 0 }, { 70.3673, -42.8674 }, { 62.1753, -33.2952 });
+	builder.add_polygon_from_box(XY, Type::SHAPE, "MS8", 0, RangeZ { 0, 0 }, { 109.208, -42.8674 }, { 101.016, -33.2952 });
+	builder.add_polygon_from_box(XY, Type::SHAPE, "MS9", 0, RangeZ { 0, 0 }, { 90.96, -42.8674 }, { 80.4229, -33.1334 });
+	builder.add_polygon_from_box(XY, Type::SHAPE, "MS10", 0, RangeZ { 0, 0 }, { 70.3673, -43.9514 }, { 80.4229, -42.8674 });
+	builder.add_polygon_from_box(XY, Type::SHAPE, "MS11", 0, RangeZ { 0, 0 }, { 90.96, -43.9514 }, { 101.016, -42.8674 });
+	builder.add_polygon(XY, Type::SHAPE, "MS12", 0, RangeZ { 0, 0 }, {
 		{ 51.6077, -42.0164 },
 		{ 51.3539, -42.0164 },
 		{ 51.3539, -44.8024 },
 		{ 51.4808, -44.8024 },
 		{ 51.4808, -43.9276 },
 		{ 51.6077, -43.9276 }});
-	builder.add_polygon(XY, Type::SHAPE, "MS13", RangeZ { 0, 0 }, {
+	builder.add_polygon(XY, Type::SHAPE, "MS13", 0, RangeZ { 0, 0 }, {
 		{ 70.3673, -42.8674 },
 		{ 62.1753, -42.8674 },
 		{ 62.1753, -43.9276 },
 		{ 66.2713, -43.9276 },
 		{ 66.2713, -43.9514 },
 		{ 70.3673, -43.9514 }});
-	builder.add_polygon(XY, Type::SHAPE, "MS14", RangeZ { 0, 0 }, {
+	builder.add_polygon(XY, Type::SHAPE, "MS14", 0, RangeZ { 0, 0 }, {
 		{ 90.96, -42.8674 },
 		{ 80.4229, -42.8674 },
 		{ 80.4229, -43.9514 },
 		{ 85.6915, -43.9514 },
 		{ 85.6915, -43.9514 },
 		{ 90.96, -43.9514 }});
-	builder.add_polygon(XY, Type::SHAPE, "MS15", RangeZ { 0, 0 }, {
+	builder.add_polygon(XY, Type::SHAPE, "MS15", 0, RangeZ { 0, 0 }, {
 		{ 109.208, -42.8674 },
 		{ 101.016, -42.8674 },
 		{ 101.016, -43.9514 },
 		{ 105.112, -43.9514 },
 		{ 105.112, -43.9276 },
 		{ 109.208, -43.9276 }});
-	builder.add_polygon(XY, Type::SHAPE, "MS16", RangeZ { 0, 0 }, {
+	builder.add_polygon(XY, Type::SHAPE, "MS16", 0, RangeZ { 0, 0 }, {
 		{ 120.029, -42.0164 },
 		{ 119.775, -42.0164 },
 		{ 119.775, -43.9276 },

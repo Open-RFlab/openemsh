@@ -257,10 +257,10 @@ SCENARIO("void ConflictManager::add_edge_in_polygon(Edge* a, Polygon* polygon, R
 	Timepoint* t = Caretaker::singleton().get_history_root();
 	GIVEN("A conflict manager, an edge and some polygons") {
 		ConflictManager cm(t);
-		Polygon p(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({
+		Polygon p(XY, Polygon::Type::SHAPE, "", 0, { 0, 0 }, from_init_list<Point>({
 			{ 3, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }, { 1, 3 },
 			{ 2, 3 }, { 2, 5 }, { 5, 5 }, { 5, 2 }, { 3, 2 }}), t);
-		Polygon q(XY, Polygon::Type::SHAPE, "", from_init_list<Point>({{ 0, 0 }, { 0, 8 }, { 8, 8 }, { 8, 0 }}), t);
+		Polygon q(XY, Polygon::Type::SHAPE, "", 0, { 0, 0 }, from_init_list<Point>({{ 0, 0 }, { 0, 8 }, { 8, 8 }, { 8, 0 }}), t);
 		WHEN("A vertical edge that is in a polygon is reported as partially in this polygon") {
 			Point a0(4, 1), a1(4, 7);
 			Edge a(XY, &a0, &a1, t);

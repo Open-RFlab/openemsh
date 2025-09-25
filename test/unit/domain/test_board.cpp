@@ -141,7 +141,7 @@ SCENARIO("void Board::Builder::add_polygon(Plane plane, std::string const& name,
 		Board::Builder b;
 		REQUIRE(b.polygons[XY].empty());
 		WHEN("Adding a polygon as an initializer_list of Points") {
-			b.add_polygon(XY, Polygon::Type::SHAPE, "MS13", { 0, 0 }, {
+			b.add_polygon(XY, Polygon::Type::SHAPE, "MS13", 0, { 0, 0 }, {
 				{ 70.3673, -42.8674 },
 				{ 62.1753, -42.8674 },
 				{ 62.1753, -43.9276 },
@@ -175,8 +175,8 @@ SCENARIO("void Board::Builder::add_polygon(Plane plane, std::string const& name,
 				{ 66.2713, -43.9276 },
 				{ 66.2713, -43.9514 },
 				{ 70.3673, -43.9514 }}));
-			b.add_polygon(XY, Polygon::Type::SHAPE, "MS13", { 0, 0 }, std::move(points));
-			b.add_polygon(XY, Polygon::Type::SHAPE, "MS15", { 0, 0 }, from_init_list<Point>({
+			b.add_polygon(XY, Polygon::Type::SHAPE, "MS13", 0, { 0, 0 }, std::move(points));
+			b.add_polygon(XY, Polygon::Type::SHAPE, "MS15", 0, { 0, 0 }, from_init_list<Point>({
 				{ 70.3673, -42.8674 },
 				{ 62.1753, -42.8674 },
 				{ 62.1753, -43.9276 },
@@ -210,7 +210,7 @@ SCENARIO("void Board::Builder::add_polygon_from_box(Plane plane, std::string con
 		Board::Builder b;
 		REQUIRE(b.polygons[XY].empty());
 		WHEN("Adding a rectangle polygon as a box of opposite Points") {
-			b.add_polygon_from_box(XY, Polygon::Type::SHAPE, "MS1", { 0, 0 }, { 16.1, -26.5 }, { 20.6, -26 });
+			b.add_polygon_from_box(XY, Polygon::Type::SHAPE, "MS1", 0, { 0, 0 }, { 16.1, -26.5 }, { 20.6, -26 });
 			THEN("Should add a Polygon in the inner vector") {
 				REQUIRE(b.polygons[XY].size() == 1);
 				REQUIRE(b.polygons[XY][0]->name == "MS1");
@@ -228,15 +228,15 @@ SCENARIO("std::unique_ptr<Board> Board::Builder::build()", "[board]") {
 	GIVEN("A Board Builder previously fed of polygons") {
 		Board::Builder b;
 		REQUIRE(b.polygons[XY].empty());
-		b.add_polygon_from_box(XY, Polygon::Type::SHAPE, "MS1", { 0, 0 }, { 16.1, -26.5 }, { 20.6, -26 });
-		b.add_polygon(XY, Polygon::Type::SHAPE, "MS15", { 0, 0 }, from_init_list<Point>({
+		b.add_polygon_from_box(XY, Polygon::Type::SHAPE, "MS1", 0, { 0, 0 }, { 16.1, -26.5 }, { 20.6, -26 });
+		b.add_polygon(XY, Polygon::Type::SHAPE, "MS15", 0, { 0, 0 }, from_init_list<Point>({
 			{ 70.3673, -42.8674 },
 			{ 62.1753, -42.8674 },
 			{ 62.1753, -43.9276 },
 			{ 66.2713, -43.9276 },
 			{ 66.2713, -43.9514 },
 			{ 70.3673, -43.9514 }}));
-		b.add_polygon(XY, Polygon::Type::SHAPE, "MS13", { 0, 0 }, {
+		b.add_polygon(XY, Polygon::Type::SHAPE, "MS13", 0, { 0, 0 }, {
 			{ 70.3673, -42.8674 },
 			{ 62.1753, -42.8674 },
 			{ 62.1753, -43.9276 },
@@ -284,8 +284,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 2 }, { 2, 3 }, { 3, 3 }, { 3, 2 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 2 }, { 2, 3 }, { 3, 3 }, { 3, 2 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
@@ -361,8 +361,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 2 }, { 3, 2 }, { 3, 4 }, { 1, 4 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 1 }, { 4, 1 }, { 4, 3 }, { 2, 3 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 2 }, { 3, 2 }, { 3, 4 }, { 1, 4 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 1 }, { 4, 1 }, { 4, 3 }, { 2, 3 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
@@ -439,8 +439,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 3 }, { 2, 3 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 3 }, { 2, 3 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
@@ -517,8 +517,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 3 }, { 3, 2 }, { 5, 4 }, { 4, 5 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 4, 1 }, { 4, 4 }, { 1, 4 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 3 }, { 3, 2 }, { 5, 4 }, { 4, 5 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
@@ -608,8 +608,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 2 }, { 4, 2 }, { 4, 4 }, { 1, 4 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
@@ -661,8 +661,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 2 }, { 2, 2 }, { 2, 3 }, { 1, 3 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 2 }, { 2, 2 }, { 2, 3 }, { 1, 3 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 2, 1 }, { 3, 1 }, { 3, 2 }, { 2, 2 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
@@ -675,8 +675,8 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 2, 1 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }, { 4, 3 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 2, 1 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }, { 4, 3 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_edges_in_polygons();
@@ -691,9 +691,9 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 1 }, from_init_list<Point>({
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 1 }, from_init_list<Point>({
 					{ 1, 1 }, { 10, 1 }, { 10, 10 }, { 1, 10 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 2, 3 }, from_init_list<Point>({
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 2, 3 }, from_init_list<Point>({
 					{ 11, 4 }, { 9, 3 }, { 13, 2 }, { 5, 2 },
 					{ 5, 11 }, { 4, 11.3 }, { 3, 10 }, { 2, 10 },
 					{ 2.3, 12 }, { 6, 11.3 }, { 6, 9 }, { 10, 10 },
@@ -706,13 +706,176 @@ SCENARIO("void Board::detect_edges_in_polygons()", "[board]") {
 			}
 		}
 
-		WHEN("Polygons overlap by many segments and by Z placement") {
+		WHEN("Polygons overlap by many segments, by Z placement and are of different priority") {
+			THEN("In one case") {
+				std::unique_ptr<Board> b;
+				{
+					PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
+					tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 1, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({
+						{ 1, 1 }, { 10, 1 }, { 10, 10 }, { 1, 10 }}), t));
+					tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 2, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({
+						{ 11, 4 }, { 9, 3 }, { 13, 2 }, { 5, 2 },
+						{ 5, 11 }, { 4, 11.3 }, { 3, 10 }, { 2, 10 },
+						{ 2.3, 12 }, { 6, 11.3 }, { 6, 9 }, { 10, 10 },
+						{ 11, 9 }, { 9, 7 }, { 10, 6.3 }, { 10, 5 }}), t));
+					b = std::make_unique<Board>(std::move(tmp), Params(), t);
+				}
+				b->detect_edges_in_polygons();
+				THEN("2 EDGE_IN_POLYGON conflicts should be registered") {
+					REQUIRE(b->conflict_manager->get_current_state().all_edge_in_polygons[XY].size() == 2);
+					for(std::shared_ptr<ConflictEdgeInPolygon> const& c : b->conflict_manager->get_current_state().all_edge_in_polygons[XY])
+						REQUIRE(c->kind == Conflict::Kind::EDGE_IN_POLYGON);
+					AND_THEN("The registered conflicts should be between the right edges and polygons") {
+						std::array<bool, 2> are_conflicts_registered;
+						are_conflicts_registered.fill(false);
+						for(std::shared_ptr<ConflictEdgeInPolygon> const& c : b->conflict_manager->get_current_state().all_edge_in_polygons[XY]) {
+							if(c->edge == b->get_current_state().polygons[XY][0]->edges[2].get()) {
+								are_conflicts_registered[0] = true;
+								REQUIRE(c->get_current_state().overlaps.size() == 4);
+								std::array<bool, 4> are_overlaps_registered;
+								are_overlaps_registered.fill(false);
+								for(auto const& overlap : c->get_current_state().overlaps) {
+									if(std::get<POLYGON>(overlap) == b->get_current_state().polygons[XY][1].get()
+									&& std::get<RANGE>(overlap) == Range({ 10, 2 }, { 10, 2.75 })
+									&& std::get<EDGE>(overlap) == std::nullopt)
+										are_overlaps_registered[0] = true;
+									else if(std::get<POLYGON>(overlap) == b->get_current_state().polygons[XY][1].get()
+									     && std::get<RANGE>(overlap) == Range({ 10, 3.5 }, { 10, 5 })
+									     && std::get<EDGE>(overlap) == std::nullopt)
+										are_overlaps_registered[1] = true;
+									else if(std::get<POLYGON>(overlap) == b->get_current_state().polygons[XY][1].get()
+									     && std::get<RANGE>(overlap) == Range({ 10, 5 }, { 10, 6.3 })
+									     && std::get<EDGE>(overlap) == b->get_current_state().polygons[XY][1]->edges[15].get())
+										are_overlaps_registered[2] = true;
+									else if(std::get<POLYGON>(overlap) == b->get_current_state().polygons[XY][1].get()
+									     && std::get<RANGE>(overlap) == Range({ 10, 8 }, { 10, 10 })
+									     && std::get<EDGE>(overlap) == std::nullopt)
+										are_overlaps_registered[3] = true;
+								}
+								for(bool is_overlap_registered : are_overlaps_registered)
+									REQUIRE(is_overlap_registered);
+							} else if(c->edge == b->get_current_state().polygons[XY][0]->edges[3].get()) {
+								are_conflicts_registered[1] = true;
+								REQUIRE(c->get_current_state().overlaps.size() == 2);
+								std::array<bool, 2> are_overlaps_registered;
+								are_overlaps_registered.fill(false);
+								for(auto const& overlap : c->get_current_state().overlaps) {
+									if(std::get<POLYGON>(overlap) == b->get_current_state().polygons[XY][1].get()
+									&& std::get<RANGE>(overlap) == Range({ 5, 10 }, { 6, 10 })
+									&& std::get<EDGE>(overlap) == std::nullopt)
+										are_overlaps_registered[0] = true;
+									else if(std::get<POLYGON>(overlap) == b->get_current_state().polygons[XY][1].get()
+									     && std::get<RANGE>(overlap) == Range({ 3, 10 }, { 2, 10 })
+									     && std::get<EDGE>(overlap) == b->get_current_state().polygons[XY][1]->edges[7].get())
+										are_overlaps_registered[1] = true;
+								}
+								for(bool is_overlap_registered : are_overlaps_registered)
+									REQUIRE(is_overlap_registered);
+							}
+						}
+						for(bool is_conflict_registered : are_conflicts_registered)
+							REQUIRE(is_conflict_registered);
+					}
+				}
+			}
+			THEN("In the other case") {
+				std::unique_ptr<Board> b;
+				{
+					PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
+					tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 2, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({
+						{ 1, 1 }, { 10, 1 }, { 10, 10 }, { 1, 10 }}), t));
+					tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 1, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({
+						{ 11, 4 }, { 9, 3 }, { 13, 2 }, { 5, 2 },
+						{ 5, 11 }, { 4, 11.3 }, { 3, 10 }, { 2, 10 },
+						{ 2.3, 12 }, { 6, 11.3 }, { 6, 9 }, { 10, 10 },
+						{ 11, 9 }, { 9, 7 }, { 10, 6.3 }, { 10, 5 }}), t));
+					b = std::make_unique<Board>(std::move(tmp), Params(), t);
+				}
+				b->detect_edges_in_polygons();
+				THEN("10 EDGE_IN_POLYGON conflicts should be registered") {
+					REQUIRE(b->conflict_manager->get_current_state().all_edge_in_polygons[XY].size() == 10);
+					for(std::shared_ptr<ConflictEdgeInPolygon> const& c : b->conflict_manager->get_current_state().all_edge_in_polygons[XY])
+						REQUIRE(c->kind == Conflict::Kind::EDGE_IN_POLYGON);
+					AND_THEN("The registered conflicts should be between the right edges and polygons") {
+						std::array<bool, 10> are_conflicts_registered;
+						are_conflicts_registered.fill(false);
+						for(std::shared_ptr<ConflictEdgeInPolygon> const& c : b->conflict_manager->get_current_state().all_edge_in_polygons[XY]) {
+							if(c->edge == b->get_current_state().polygons[XY][1]->edges[1].get()) {
+								are_conflicts_registered[0] = true;
+								REQUIRE(c->get_current_state().overlaps.size() == 1);
+								REQUIRE(std::get<POLYGON>(c->get_current_state().overlaps[0]) == b->get_current_state().polygons[XY][0].get());
+								REQUIRE(std::get<RANGE>(c->get_current_state().overlaps[0]) == Range({ 10, 3.5 }, { 9, 3 }));
+								REQUIRE(std::get<EDGE>(c->get_current_state().overlaps[0]) == std::nullopt);
+							} else if(c->edge == b->get_current_state().polygons[XY][1]->edges[2].get()) {
+								are_conflicts_registered[1] = true;
+								REQUIRE(c->get_current_state().overlaps.size() == 1);
+								REQUIRE(std::get<POLYGON>(c->get_current_state().overlaps[0]) == b->get_current_state().polygons[XY][0].get());
+								REQUIRE(std::get<RANGE>(c->get_current_state().overlaps[0]) == Range({ 9, 3 }, { 10, 2.75 }));
+								REQUIRE(std::get<EDGE>(c->get_current_state().overlaps[0]) == std::nullopt);
+							} else if(c->edge == b->get_current_state().polygons[XY][1]->edges[3].get()) {
+								are_conflicts_registered[2] = true;
+								REQUIRE(c->get_current_state().overlaps.size() == 1);
+								REQUIRE(std::get<POLYGON>(c->get_current_state().overlaps[0]) == b->get_current_state().polygons[XY][0].get());
+								REQUIRE(std::get<RANGE>(c->get_current_state().overlaps[0]) == Range({ 10, 2 }, { 5, 2 }));
+								REQUIRE(std::get<EDGE>(c->get_current_state().overlaps[0]) == std::nullopt);
+							} else if(c->edge == b->get_current_state().polygons[XY][1]->edges[4].get()) {
+								are_conflicts_registered[3] = true;
+								REQUIRE(c->get_current_state().overlaps.size() == 1);
+								REQUIRE(std::get<POLYGON>(c->get_current_state().overlaps[0]) == b->get_current_state().polygons[XY][0].get());
+								REQUIRE(std::get<RANGE>(c->get_current_state().overlaps[0]) == Range({ 5, 2 }, { 5, 10 }));
+								REQUIRE(std::get<EDGE>(c->get_current_state().overlaps[0]) == std::nullopt);
+							} else if(c->edge == b->get_current_state().polygons[XY][1]->edges[7].get()) {
+								are_conflicts_registered[4] = true;
+								REQUIRE(c->get_current_state().overlaps.size() == 1);
+								REQUIRE(std::get<POLYGON>(c->get_current_state().overlaps[0]) == b->get_current_state().polygons[XY][0].get());
+								REQUIRE(std::get<RANGE>(c->get_current_state().overlaps[0]) == Range({ 3, 10 }, { 2, 10 }));
+								REQUIRE(std::get<EDGE>(c->get_current_state().overlaps[0]) == b->get_current_state().polygons[XY][0]->edges[3].get());
+							} else if(c->edge == b->get_current_state().polygons[XY][1]->edges[10].get()) {
+								are_conflicts_registered[5] = true;
+								REQUIRE(c->get_current_state().overlaps.size() == 1);
+								REQUIRE(std::get<POLYGON>(c->get_current_state().overlaps[0]) == b->get_current_state().polygons[XY][0].get());
+								REQUIRE(std::get<RANGE>(c->get_current_state().overlaps[0]) == Range({ 6, 10 }, { 6, 9 }));
+								REQUIRE(std::get<EDGE>(c->get_current_state().overlaps[0]) == std::nullopt);
+							} else if(c->edge == b->get_current_state().polygons[XY][1]->edges[11].get()) {
+								are_conflicts_registered[6] = true;
+								REQUIRE(c->get_current_state().overlaps.size() == 1);
+								REQUIRE(std::get<POLYGON>(c->get_current_state().overlaps[0]) == b->get_current_state().polygons[XY][0].get());
+								REQUIRE(std::get<RANGE>(c->get_current_state().overlaps[0]) == Range({ 6, 9 }, { 10, 10 }));
+								REQUIRE(std::get<EDGE>(c->get_current_state().overlaps[0]) == std::nullopt);
+							} else if(c->edge == b->get_current_state().polygons[XY][1]->edges[13].get()) {
+								are_conflicts_registered[7] = true;
+								REQUIRE(c->get_current_state().overlaps.size() == 1);
+								REQUIRE(std::get<POLYGON>(c->get_current_state().overlaps[0]) == b->get_current_state().polygons[XY][0].get());
+								REQUIRE(std::get<RANGE>(c->get_current_state().overlaps[0]) == Range({ 10, 8 }, { 9, 7 }));
+								REQUIRE(std::get<EDGE>(c->get_current_state().overlaps[0]) == std::nullopt);
+							} else if(c->edge == b->get_current_state().polygons[XY][1]->edges[14].get()) {
+								are_conflicts_registered[8] = true;
+								REQUIRE(c->get_current_state().overlaps.size() == 1);
+								REQUIRE(std::get<POLYGON>(c->get_current_state().overlaps[0]) == b->get_current_state().polygons[XY][0].get());
+								REQUIRE(std::get<RANGE>(c->get_current_state().overlaps[0]) == Range({ 9, 7 }, { 10, 6.3 }));
+								REQUIRE(std::get<EDGE>(c->get_current_state().overlaps[0]) == std::nullopt);
+							} else if(c->edge == b->get_current_state().polygons[XY][1]->edges[15].get()) {
+								are_conflicts_registered[9] = true;
+								REQUIRE(c->get_current_state().overlaps.size() == 1);
+								REQUIRE(std::get<POLYGON>(c->get_current_state().overlaps[0]) == b->get_current_state().polygons[XY][0].get());
+								REQUIRE(std::get<RANGE>(c->get_current_state().overlaps[0]) == Range({ 10, 6.3 }, { 10, 5 }));
+								REQUIRE(std::get<EDGE>(c->get_current_state().overlaps[0]) == b->get_current_state().polygons[XY][0]->edges[2].get());
+							}
+						}
+						for(bool is_conflict_registered : are_conflicts_registered)
+							REQUIRE(is_conflict_registered);
+					}
+				}
+			}
+		}
+
+		WHEN("Polygons overlap by many segments, by Z placement and are of same priority") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({
 					{ 1, 1 }, { 10, 1 }, { 10, 10 }, { 1, 10 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({
 					{ 11, 4 }, { 9, 3 }, { 13, 2 }, { 5, 2 },
 					{ 5, 11 }, { 4, 11.3 }, { 3, 10 }, { 2, 10 },
 					{ 2.3, 12 }, { 6, 11.3 }, { 6, 9 }, { 10, 10 },
@@ -848,9 +1011,9 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 0.5, 3 }, { 2, 3 }, { 2, 4 }, { 0.5, 4 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 3, 5 }, { 2, 5 }, { 2, 6 }, { 3, 6 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 0.5, 3 }, { 2, 3 }, { 2, 4 }, { 0.5, 4 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 3, 5 }, { 2, 5 }, { 2, 6 }, { 3, 6 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_colinear_edges();
@@ -891,9 +1054,9 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 3, 0.5 }, { 3, 2 }, { 4, 2 }, { 4, 0.5 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 5, 3 }, { 5, 2 }, { 6, 2 }, { 6, 3 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 3, 0.5 }, { 3, 2 }, { 4, 2 }, { 4, 0.5 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 5, 3 }, { 5, 2 }, { 6, 2 }, { 6, 3 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_colinear_edges();
@@ -934,9 +1097,9 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 			std::unique_ptr<Board> b;
 			{
 				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 1, 2 }, { 2, 2 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }}), t));
-				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 5, 5 }, { 5, 6 }, { 6, 6 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 1, 2 }, { 2, 2 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }}), t));
+				tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 5, 5 }, { 5, 6 }, { 6, 6 }}), t));
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
 			b->detect_colinear_edges();
@@ -956,8 +1119,8 @@ SCENARIO("void Board::detect_non_conflicting_edges()", "[board]") {
 		std::unique_ptr<Board> b;
 		{
 			PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-			tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 1, 2 }, { 2, 2 }}), t));
-			tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }}), t));
+			tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 1, 1 }, { 1, 2 }, { 2, 2 }}), t));
+			tmp[XY].push_back(std::make_shared<Polygon>(XY, Polygon::Type::SHAPE, "", 0, Polygon::RangeZ { 0, 0 }, from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }}), t));
 			b = std::make_unique<Board>(std::move(tmp), Params(), t);
 		}
 		REQUIRE(b->get_current_state().edges[XY].size() == 6);

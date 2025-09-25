@@ -154,6 +154,7 @@ void ParserFromCsx::Pimpl::parse_primitive_box(pugi::xml_node const& node, strin
 	if(!type.has_value() || type.value() == Polygon::Type::SUBSTRATE) // TODO
 		return;
 
+	size_t priority = node.attribute("Priority").as_uint();
 	pugi::xml_node node_p1 = node.child("P1");
 	pugi::xml_node node_p2 = node.child("P2");
 	Point3D p1(
@@ -165,11 +166,11 @@ void ParserFromCsx::Pimpl::parse_primitive_box(pugi::xml_node const& node, strin
 		node_p2.attribute("Y").as_double(),
 		node_p2.attribute("Z").as_double());
 	if(params.with_yz)
-		board.add_polygon_from_box(YZ, type.value(), name, { p1.x, p2.x }, { p1.y, p1.z }, { p2.y, p2.z });
+		board.add_polygon_from_box(YZ, type.value(), name, priority, { p1.x, p2.x }, { p1.y, p1.z }, { p2.y, p2.z });
 	if(params.with_zx)
-		board.add_polygon_from_box(ZX, type.value(), name, { p1.y, p2.y }, { p1.z, p1.x }, { p2.z, p2.x });
+		board.add_polygon_from_box(ZX, type.value(), name, priority, { p1.y, p2.y }, { p1.z, p1.x }, { p2.z, p2.x });
 	if(params.with_xy)
-		board.add_polygon_from_box(XY, type.value(), name, { p1.z, p2.z }, { p1.x, p1.y }, { p2.x, p2.y });
+		board.add_polygon_from_box(XY, type.value(), name, priority, { p1.z, p2.z }, { p1.x, p1.y }, { p2.x, p2.y });
 	// TODO if property == ConductingSheet : add_fixed_meshline_policy()
 }
 
@@ -180,6 +181,7 @@ void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, s
 	if(!type.has_value() || type.value() == Polygon::Type::SUBSTRATE) // TODO
 		return;
 
+	size_t priority = node.attribute("Priority").as_uint();
 	double elevation = node.attribute("Elevation").as_double(); // offset in normdir
 	double length = node.attribute("Length").as_double(); // height in normdir
 	size_t normdir = node.attribute("NormDir").as_uint(); // (0->x, 1->y, 2->z)
@@ -196,9 +198,9 @@ void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, s
 
 	Bounding2D bounding(detect_bounding(points));
 
-	board.add_polygon(plane.value(), type.value(), name, { elevation, elevation + length }, std::move(points));
+	board.add_polygon(plane.value(), type.value(), name, priority, { elevation, elevation + length }, std::move(points));
 	if(length == 0) {
-		board.add_fixed_meshline_policy(normal.value(), elevation);
+//		board.add_fixed_meshline_policy(normal.value(), elevation);
 //		switch(plane.value()) {
 //		case YZ:
 //			board.add_fixed_meshline_policy(Y, elevation);
@@ -216,42 +218,46 @@ void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, s
 //			unreachable();
 //		}
 	} else {
-/*
 		switch(plane.value()) {
 		case YZ:
 			if(params.with_zx)
-				board.add_polygon_from_box(ZX, name,
+				board.add_polygon_from_box(ZX, type.value(), name, priority,
+					{ bounding[XMIN], bounding[XMAX] },
 					{ bounding[YMIN], elevation },
 					{ bounding[YMAX], elevation + length });
 			if(params.with_xy)
-				board.add_polygon_from_box(XY, name,
+				board.add_polygon_from_box(XY, type.value(), name, priority,
+					{ bounding[YMIN], bounding[YMAX] },
 					{ elevation, bounding[XMIN] },
 					{ elevation + length, bounding[XMAX] });
 			break;
 		case ZX:
 			if(params.with_xy)
-				board.add_polygon_from_box(XY, name,
+				board.add_polygon_from_box(XY, type.value(), name, priority,
+					{ bounding[XMIN], bounding[XMAX] },
 					{ bounding[YMIN], elevation },
 					{ bounding[YMAX], elevation + length });
 			if(params.with_yz)
-				board.add_polygon_from_box(YZ, name,
+				board.add_polygon_from_box(YZ, type.value(), name, priority,
+					{ bounding[YMIN], bounding[YMAX] },
 					{ elevation, bounding[XMIN] },
 					{ elevation + length, bounding[XMAX] });
 			break;
 		case XY:
 			if(params.with_yz)
-				board.add_polygon_from_box(YZ, name,
+				board.add_polygon_from_box(YZ, type.value(), name, priority,
+					{ bounding[XMIN], bounding[XMAX] },
 					{ bounding[YMIN], elevation },
 					{ bounding[YMAX], elevation + length });
 			if(params.with_zx)
-				board.add_polygon_from_box(ZX, name,
+				board.add_polygon_from_box(ZX, type.value(), name, priority,
+					{ bounding[YMIN], bounding[YMAX] },
 					{ elevation, bounding[XMIN] },
 					{ elevation + length, bounding[XMAX] });
 			break;
 		default:
 			unreachable();
 		}
-*/
 	}
 }
 

@@ -56,9 +56,9 @@ public:
 	public:
 
 		void add_fixed_meshline_policy(Axis axis, Coord coord);
-		void add_polygon(Plane plane, Polygon::Type type, std::string const& name, std::initializer_list<Point> points);
-		void add_polygon(Plane plane, Polygon::Type type, std::string const& name, std::vector<std::unique_ptr<Point const>>&& points);
-		void add_polygon_from_box(Plane plane, Polygon::Type type, std::string const& name, Point const p1, Point const p3);
+		void add_polygon(Plane plane, Polygon::Type type, std::string const& name, std::size_t priority, Polygon::RangeZ const& z_placement, std::initializer_list<Point> points);
+		void add_polygon(Plane plane, Polygon::Type type, std::string const& name, std::size_t priority, Polygon::RangeZ const& z_placement, std::vector<std::unique_ptr<Point const>>&& points);
+		void add_polygon_from_box(Plane plane, Polygon::Type type, std::string const& name, std::size_t priority, Polygon::RangeZ const& z_placement, Point const p1, Point const p3);
 
 		[[nodiscard]] std::shared_ptr<Board> build(Params&& params = Params());
 
