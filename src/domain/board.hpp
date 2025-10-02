@@ -56,9 +56,9 @@ public:
 	public:
 
 		void add_fixed_meshline_policy(Axis axis, Coord coord);
-		void add_polygon(Plane plane, Polygon::Type type, std::string const& name, std::size_t priority, Polygon::RangeZ const& z_placement, std::initializer_list<Point> points);
-		void add_polygon(Plane plane, Polygon::Type type, std::string const& name, std::size_t priority, Polygon::RangeZ const& z_placement, std::vector<std::unique_ptr<Point const>>&& points);
-		void add_polygon_from_box(Plane plane, Polygon::Type type, std::string const& name, std::size_t priority, Polygon::RangeZ const& z_placement, Point const p1, Point const p3);
+		void add_polygon(Plane plane, std::shared_ptr<Material> const& material, std::string const& name, std::size_t priority, Polygon::RangeZ const& z_placement, std::initializer_list<Point> points);
+		void add_polygon(Plane plane, std::shared_ptr<Material> const& material, std::string const& name, std::size_t priority, Polygon::RangeZ const& z_placement, std::vector<std::unique_ptr<Point const>>&& points);
+		void add_polygon_from_box(Plane plane, std::shared_ptr<Material> const& material, std::string const& name, std::size_t priority, Polygon::RangeZ const& z_placement, Point const p1, Point const p3);
 
 		[[nodiscard]] std::shared_ptr<Board> build(Params&& params = Params());
 
@@ -78,11 +78,13 @@ public:
 
 	/// Mesh resolution independant detection tasks
 	///*************************************************************************
+	void adjust_edges_to_materials(Plane const plane);
 	void detect_edges_in_polygons(Plane const plane);
 	void detect_colinear_edges(Plane plane);
 	void detect_non_conflicting_edges(Plane const plane);
 	void add_fixed_meshline_policies(Axis axis);
 
+	void adjust_edges_to_materials();
 	void detect_edges_in_polygons();
 	void detect_colinear_edges();
 	void detect_non_conflicting_edges();
@@ -104,6 +106,9 @@ public:
 	std::vector<std::shared_ptr<ConflictEdgeInPolygon>> const& get_conflicts_edge_in_polygons(Plane const plane) const;
 	std::vector<std::shared_ptr<ConflictColinearEdges>> const& get_conflicts_colinear_edges(Axis const axis) const;
 	std::vector<std::shared_ptr<ConflictTooCloseMeshlinePolicies>> const& get_conflicts_too_close_meshline_policies(Axis const axis) const;
+
+private:
+	std::shared_ptr<Material> find_ambient_material(Plane plane, std::shared_ptr<Polygon> const& current_polygon, Segment const& segment) const;
 };
 
 #ifdef UNITTEST

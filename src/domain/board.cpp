@@ -88,24 +88,24 @@ void Board::Builder::add_fixed_meshline_policy(Axis const axis, Coord const coor
 }
 
 //******************************************************************************
-void Board::Builder::add_polygon(Plane plane, Polygon::Type type, string const& name, size_t priority, Polygon::RangeZ const& z_placement, initializer_list<Point> points) {
-	polygons[plane].push_back(make_shared<Polygon>(plane, type, name, priority, z_placement, from_init_list(points), Caretaker::singleton().get_history_root()));
+void Board::Builder::add_polygon(Plane plane, shared_ptr<Material> const& material, string const& name, size_t priority, Polygon::RangeZ const& z_placement, initializer_list<Point> points) {
+	polygons[plane].push_back(make_shared<Polygon>(plane, material, name, priority, z_placement, from_init_list(points), Caretaker::singleton().get_history_root()));
 }
 
 //******************************************************************************
-void Board::Builder::add_polygon(Plane plane, Polygon::Type type, string const& name, size_t priority, Polygon::RangeZ const& z_placement, vector<unique_ptr<Point const>>&& points) {
-	polygons[plane].push_back(make_shared<Polygon>(plane, type, name, priority, z_placement, std::move(points), Caretaker::singleton().get_history_root()));
+void Board::Builder::add_polygon(Plane plane, shared_ptr<Material> const& material, string const& name, size_t priority, Polygon::RangeZ const& z_placement, vector<unique_ptr<Point const>>&& points) {
+	polygons[plane].push_back(make_shared<Polygon>(plane, material, name, priority, z_placement, std::move(points), Caretaker::singleton().get_history_root()));
 }
 
 //******************************************************************************
-void Board::Builder::add_polygon_from_box(Plane plane, Polygon::Type type, string const& name, size_t priority, Polygon::RangeZ const& z_placement, Point const p1, Point const p3) {
+void Board::Builder::add_polygon_from_box(Plane plane, shared_ptr<Material> const& material, string const& name, size_t priority, Polygon::RangeZ const& z_placement, Point const p1, Point const p3) {
 	vector<unique_ptr<Point const>> points(4);
 	points[0] = make_unique<Point const>(p1.x, p1.y);
 	points[1] = make_unique<Point const>(p1.x, p3.y);
 	points[2] = make_unique<Point const>(p3.x, p3.y);
 	points[3] = make_unique<Point const>(p3.x, p1.y);
 
-	polygons[plane].push_back(make_shared<Polygon>(plane, type, name, priority, z_placement, std::move(points), Caretaker::singleton().get_history_root()));
+	polygons[plane].push_back(make_shared<Polygon>(plane, material, name, priority, z_placement, std::move(points), Caretaker::singleton().get_history_root()));
 }
 
 //******************************************************************************
@@ -158,6 +158,66 @@ Board::Board(
 	for(auto const& plane : AllPlane)
 		for(auto const& polygon : get_current_state().polygons[plane])
 			get_caretaker().take_care_of(polygon);
+}
+
+/// Check among all Polygons that match segment and current_polygon->z_placement.
+/// Choose Material following this rule: CONDUCTOR>DIELECTRIC>AIR
+///*****************************************************************************
+shared_ptr<Material> Board::find_ambient_material(Plane plane, shared_ptr<Polygon> const& current_polygon, Segment const& segment) const {
+	Bounding2D const segment_bounding = bounding(segment);
+
+	vector<shared_ptr<Material>> materials;
+	for(shared_ptr<Polygon> const& polygon : get_current_state().polygons[plane]) {
+		if(polygon->material
+		&& polygon != current_polygon
+		&& does_overlap(polygon->z_placement, current_polygon->z_placement)
+		&& does_overlap(polygon->bounding, segment_bounding))
+			materials.push_back(shared_ptr<Material>(polygon->material));
+	}
+
+	ranges::sort(materials, [](auto const& a, auto const& b) {
+		return *a < *b;
+	});
+
+	if(!materials.empty())
+		return materials.back();
+	else
+		// TODO if no material return Board::background_material
+		return {};
+}
+
+//******************************************************************************
+void Board::adjust_edges_to_materials(Plane const plane) {
+	for(shared_ptr<Polygon> const& polygon : get_current_state().polygons[plane]) {
+		for(shared_ptr<Edge> const& edge : polygon->edges) {
+			auto const& inner_material = polygon->material;
+			auto const& immediate_ambient_outer_material = [&]() -> shared_ptr<Material> {
+				Point const translate_x(2 * equality_tolerance, 0);
+				Point const translate_y(0, 2 * equality_tolerance);
+				switch(edge->normal) {
+				case Normal::NONE:
+					return {};
+				case Normal::XMIN:
+					return find_ambient_material(plane, polygon, Range(edge->p0() - translate_x, edge->p1() - translate_x));
+				case Normal::XMAX:
+					return find_ambient_material(plane, polygon, Range(edge->p0() + translate_x, edge->p1() + translate_x));
+				case Normal::YMIN:
+					return find_ambient_material(plane, polygon, Range(edge->p0() - translate_y, edge->p1() - translate_y));
+				case Normal::YMAX:
+					return find_ambient_material(plane, polygon, Range(edge->p0() + translate_y, edge->p1() + translate_y));
+				default:
+					::unreachable();
+				}
+			} ();
+
+			if(immediate_ambient_outer_material
+			&& *immediate_ambient_outer_material > *inner_material) {
+				auto state = edge->get_current_state();
+				state.to_reverse = true;
+				edge->set_next_state(state);
+			}
+		}
+	}
 }
 
 /// Detect all EDGE_IN_POLYGON. Will also detect some COLINEAR_EDGES.
@@ -318,14 +378,13 @@ void Board::detect_non_conflicting_edges(Plane const plane) {
 	for(Edge* edge : get_current_state().edges[plane]) {
 		optional<Coord> const coord = domain::coord(edge->p0(), edge->axis);
 		optional<Axis> const axis = transpose(plane, edge->axis);
-		optional<MeshlinePolicy::Normal> const normal = cast(edge->normal);
-		if(coord && axis && normal && edge->get_current_state().conflicts.empty()) {
+		if(coord && axis && edge->get_current_state().conflicts.empty()) {
 			auto [t, state_e] = edge->make_next_state();
 			state_e.meshline_policy = line_policy_manager->add_meshline_policy(
 				{ edge },
 				axis.value(),
 				MeshlinePolicy::Policy::THIRDS,
-				normal.value(),
+				cast(edge->normal),
 				coord.value(),
 				state_e.to_mesh,
 				t);
@@ -339,6 +398,12 @@ void Board::add_fixed_meshline_policies(Axis axis) {
 	auto* t = next_timepoint();
 	for(auto const& create_meshline_policy : fixed_meshline_policy_creators[axis])
 		create_meshline_policy(this, t);
+}
+
+//******************************************************************************
+void Board::adjust_edges_to_materials() {
+	for(auto const& plane : AllPlane)
+		adjust_edges_to_materials(plane);
 }
 
 //******************************************************************************

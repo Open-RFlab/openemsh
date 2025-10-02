@@ -23,6 +23,7 @@ if( Catch2_FOUND )
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/mesh/test_meshline_policy.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_conflict_manager.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_meshline_policy_manager.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_material.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/test_board.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/infra/serializers/test_serializer_to_plantuml.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/infra/utils/test_to_string.cpp"

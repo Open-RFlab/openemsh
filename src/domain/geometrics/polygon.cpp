@@ -15,11 +15,18 @@ namespace domain {
 using namespace std;
 
 //******************************************************************************
-Polygon::Polygon(Plane const plane, Type const type, string const& name, RangeZ const& z_placement, vector<unique_ptr<Point const>>&& points, Timepoint* t)
+Polygon::RangeZ::RangeZ(Coord const& a, Coord const& b)
+: min(a < b ? a : b)
+, max(a > b ? a : b)
+{}
+
+//******************************************************************************
+Polygon::Polygon(Plane const plane, shared_ptr<Material> const& material, string const& name, size_t priority, RangeZ const& z_placement, vector<unique_ptr<Point const>>&& points, Timepoint* t)
 : Originator(t)
 , rotation(detect_rotation(points))
-, type(type)
 , z_placement(z_placement)
+, priority(priority)
+, material(material)
 , plane(plane)
 , bounding(detect_bounding(points))
 , name(name)

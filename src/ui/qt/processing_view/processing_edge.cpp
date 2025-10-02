@@ -53,15 +53,24 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 
 	QString normal("Normal: ");
 	QString to_mesh("To mesh: ");
+	QString to_reverse("To reverse: ");
 	if(edge) {
 		normal += QString::fromStdString(to_string(edge->normal));
 		to_mesh += (edge->get_current_state().to_mesh ? "true" : "false");
+		to_reverse += (edge->get_current_state().to_reverse ? "true" : "false");
 	}
 
 	auto* text_normal = new nodegraph::Text(normal, this);
 	text_normal->setFlag(QGraphicsItem::ItemIsSelectable);
 	text_normal->setAcceptedMouseButtons(Qt::NoButton);
 	text_normal->locate_text_params = [this]() -> auto& {
+		return locate_processing_edge_params().main;
+	};
+
+	auto* text_to_reverse = new nodegraph::Text(to_reverse, this);
+	text_to_reverse->setFlag(QGraphicsItem::ItemIsSelectable);
+	text_to_reverse->setAcceptedMouseButtons(Qt::NoButton);
+	text_to_reverse->locate_text_params = [this]() -> auto& {
 		return locate_processing_edge_params().main;
 	};
 
@@ -96,6 +105,7 @@ ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
 	v_box1->addStretch();
 	v_box2->addItem(text_normal);
 	v_box2->addItem(text_to_mesh);
+	v_box2->addItem(text_to_reverse);
 	v_box3->addStretch();
 	v_box3->addItem(output_port);
 	v_box3->addStretch();

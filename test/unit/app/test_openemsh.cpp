@@ -16,6 +16,13 @@ using namespace app;
 
 //******************************************************************************
 SCENARIO("optional<Step> next(Step step)", "[app][openemsh]") {
+	WHEN("Running for ADJUST_EDGE_TO_MATERIAL") {
+		THEN("Should return DETECT_CONFLICT_EIP") {
+			std::optional<Step> a = next(Step::ADJUST_EDGE_TO_MATERIAL);
+			REQUIRE(a.has_value());
+			REQUIRE(a.value() == Step::DETECT_CONFLICT_EIP);
+		}
+	}
 	WHEN("Running for DETECT_CONFLICT_EIP") {
 		THEN("Should return DETECT_CONFLICT_CE") {
 			std::optional<Step> a = next(Step::DETECT_CONFLICT_EIP);
@@ -82,6 +89,22 @@ SCENARIO("optional<Step> next(Step step)", "[app][openemsh]") {
 
 //******************************************************************************
 SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
+	WHEN("Running for ADJUST_EDGE_TO_MATERIAL") {
+		THEN("Should return all Steps except those coming before ADJUST_EDGE_TO_MATERIAL") {
+			REQUIRE(that_and_after(Step::ADJUST_EDGE_TO_MATERIAL) == std::set<Step> {
+				Step::ADJUST_EDGE_TO_MATERIAL,
+				Step::DETECT_CONFLICT_EIP,
+				Step::DETECT_CONFLICT_CE,
+				Step::DETECT_NON_CONFLICTING_EDGES,
+				Step::ADD_FIXED_MLP,
+				Step::SOLVE_ALL_EIP,
+				Step::SOLVE_ALL_CE,
+				Step::DETECT_AND_SOLVE_TCMLP,
+				Step::DETECT_INTERVALS,
+				Step::MESH
+			});
+		}
+	}
 	WHEN("Running for DETECT_CONFLICT_EIP") {
 		THEN("Should return all Steps except those coming before DETECT_CONFLICT_EIP") {
 			REQUIRE(that_and_after(Step::DETECT_CONFLICT_EIP) == std::set<Step> {

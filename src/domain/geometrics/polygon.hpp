@@ -14,6 +14,7 @@
 #include "domain/conflicts/i_conflict_origin.hpp"
 #include "domain/mesh/i_meshline_origin.hpp"
 #include "domain/utils/entity_visitor.hpp"
+#include "domain/material.hpp"
 #include "utils/entity.hpp"
 #include "utils/state_management.hpp"
 #include "bounding.hpp"
@@ -48,18 +49,14 @@ public:
 		COLINEAR
 	} const rotation;
 
-	enum class Type {
-		SHAPE,
-		PORT,
-		GROUND,
-		SUBSTRATE
-	} const type;
-
 	struct RangeZ {
 		Coord min;
 		Coord max;
+		RangeZ(Coord const& a, Coord const& b);
 	} const z_placement;
 
+	std::size_t const priority; /// At 3D overlap, the higher is selected.
+	std::shared_ptr<Material> material;
 	Plane const plane;
 	Bounding2D const bounding;
 	std::string const name;
@@ -71,7 +68,7 @@ public:
 	///*************************************************************************
 	std::vector<std::shared_ptr<Edge>> const edges;
 
-	Polygon(Plane plane, Type type, std::string const& name, RangeZ const& z_placement, std::vector<std::unique_ptr<Point const>>&& points, Timepoint* t);
+	Polygon(Plane plane, std::shared_ptr<Material> const& material, std::string const& name, std::size_t priority, RangeZ const& z_placement, std::vector<std::unique_ptr<Point const>>&& points, Timepoint* t);
 	~Polygon() override;
 
 //	relation::PolygonEdge relation_to(Edge const* edge);

@@ -116,30 +116,38 @@ StructureEdge* StructureScene::add(domain::Edge const* edge) {
 StructurePolygon* StructureScene::add(domain::Polygon const* polygon) {
 	auto* item = new StructurePolygon(polygon, polygons);
 	index[polygon] = item;
-	switch(polygon->type) {
-	case domain::Polygon::Type::SHAPE:
-		item->locate_structure_polygon_params = [this]() -> auto& {
-			return style_selector.get_polygon_shape();
-		};
-		break;
-	case domain::Polygon::Type::PORT:
-		item->locate_structure_polygon_params = [this]() -> auto& {
-			return style_selector.get_polygon_port();
-		};
-		break;
-	case domain::Polygon::Type::GROUND:
-		item->locate_structure_polygon_params = [this]() -> auto& {
-			return style_selector.get_polygon_ground();
-		};
-		break;
-	case domain::Polygon::Type::SUBSTRATE:
-		item->locate_structure_polygon_params = [this]() -> auto& {
-			return style_selector.get_polygon_substrate();
-		};
-		break;
-	default:
-		unreachable();
-	}
+//	switch(polygon->material->type) {
+//	case domain::Material::Type::CONDUCTOR:
+//		item->locate_structure_polygon_params = [this]() -> auto& {
+//			return style_selector.get_polygon_shape();
+//		};
+//		break;
+//	case domain::Material::Type::PORT:
+//		item->locate_structure_polygon_params = [this]() -> auto& {
+//			return style_selector.get_polygon_port();
+//		};
+//		break;
+//	case domain::Material::Type::GROUND:
+//		item->locate_structure_polygon_params = [this]() -> auto& {
+//			return style_selector.get_polygon_ground();
+//		};
+//		break;
+//	case domain::Material::Type::DIELECTRIC:
+//		item->locate_structure_polygon_params = [this]() -> auto& {
+//			return style_selector.get_polygon_substrate();
+//		};
+//		break;
+//	case domain::Material::Type::AIR:
+//		item->locate_structure_polygon_params = [this]() -> auto& {
+//			return style_selector.get_polygon_substrate();
+//		};
+//		break;
+//	default:
+//		unreachable();
+//	}
+	item->locate_structure_polygon_params = [this]() -> auto& {
+		return style_selector.get_polygon_shape();
+	};
 	return item;
 }
 

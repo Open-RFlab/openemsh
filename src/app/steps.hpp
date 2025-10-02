@@ -10,6 +10,7 @@ namespace app {
 
 //******************************************************************************
 enum class Step {
+	ADJUST_EDGE_TO_MATERIAL,
 	DETECT_CONFLICT_EIP,
 	DETECT_CONFLICT_CE,
 	DETECT_NON_CONFLICTING_EDGES,
