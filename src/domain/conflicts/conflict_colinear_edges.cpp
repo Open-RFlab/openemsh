@@ -40,7 +40,11 @@ void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manage
 		if(!edge->get_current_state().to_mesh)
 			continue;
 
-		switch(edge->normal) {
+		Normal const normal = edge->get_current_state().to_reverse
+		              ? reverse(edge->normal)
+		              : edge->normal;
+
+		switch(normal) {
 		case Normal::XMIN:
 		case Normal::YMIN:
 		case Normal::ZMIN:

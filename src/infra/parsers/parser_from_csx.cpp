@@ -5,10 +5,12 @@
 ///*****************************************************************************
 
 #include <map>
+#include <optional>
 #include <iostream>
 
 #include <pugixml.hpp>
 
+#include "domain/material.hpp"
 #include "domain/geometrics/bounding.hpp"
 #include "domain/geometrics/polygon.hpp"
 #include "domain/geometrics/space.hpp"
@@ -51,14 +53,13 @@ public:
 
 	Pimpl(ParserFromCsx::Params const& params);
 
-	void parse_property(pugi::xml_node const& node);
+	shared_ptr<Material> parse_property(pugi::xml_node const& node);
 
-	void parse_primitive(pugi::xml_node const& node);
-	void parse_primitive_box(pugi::xml_node const& node, std::string name);
-	void parse_primitive_linpoly(pugi::xml_node const& node, std::string name);
+	bool parse_primitive(pugi::xml_node const& node, shared_ptr<Material> const& material);
+	void parse_primitive_box(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
+	void parse_primitive_linpoly(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 
 private:
-	optional<Polygon::Type> which_material_is(pugi::xml_node const& primitive_node);
 };
 
 //******************************************************************************
@@ -67,22 +68,26 @@ ParserFromCsx::Pimpl::Pimpl(ParserFromCsx::Params const& params)
 {}
 
 //******************************************************************************
-void ParserFromCsx::Pimpl::parse_property(pugi::xml_node const& node) {
-	cerr << node.name() << endl;
-
-	// TODO try to guess kind TRACK GROUND SUBSTRATE to disable EIP detection
+shared_ptr<Material> ParserFromCsx::Pimpl::parse_property(pugi::xml_node const& node) {
 	string name(node.attribute("Name").as_string());
 
 	if(node.name() == "Material"s) {
+		// https://github.com/thliebig/openEMS-Project/discussions/347
+		// Currently do not take care of Isotropy=false
+		// as_double() selects the first term and ditch the part after
+		bool isotropy = node.attribute("Isotropy").as_bool();
 		pugi::xml_node property = node.child("Property");
-		double epsilon = node.attribute("Epsilon").as_double(); // TODO optional
-		double mue = node.attribute("Mue").as_double(); // TODO optional
-		double kappa = node.attribute("Kappa").as_double(); // TODO optional
-		double sigma = node.attribute("Sigma").as_double(); // TODO optional
+		double epsilon = property.attribute("Epsilon").as_double(Material::default_epsilon);
+		double mue = property.attribute("Mue").as_double(Material::default_mue);
+		double kappa = property.attribute("Kappa").as_double(Material::default_kappa);
+		double sigma = property.attribute("Sigma").as_double(Material::default_sigma);
+		return make_shared<Material>(Material::deduce_type(epsilon, mue, kappa), name);
 	} else if(node.name() == "Metal"s) {
+		return make_shared<Material>(Material::Type::CONDUCTOR, name);
 	} else if(node.name() == "ConductingSheet"s) {
 		double conductivity = node.attribute("Conductivity").as_double();
 		double thickness = node.attribute("Thickness").as_double();
+		return make_shared<Material>(Material::Type::CONDUCTOR, name);
 	} else if(node.name() == "LumpedElement"s) {
 	} else if(node.name() == "Excitation"s) {
 	} else if(node.name() == "ProbeBox"s) {
@@ -93,67 +98,38 @@ void ParserFromCsx::Pimpl::parse_property(pugi::xml_node const& node) {
 	} else if(node.name() == "Unknown"s) {
 	} else if(node.name() == "DiscMaterial"s) {
 	}
+
+	return shared_ptr<Material>();
 }
 
 //******************************************************************************
-void ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node) {
-	cerr << node.name() << endl;
+bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_ptr<Material> const& material) {
 
 	string property_name(node.parent().parent().attribute("Name").as_string());
 	string name(property_name + "::" + to_string(primitives_ids.at(node)));
 
 	using pugi::char_t;
-	if(node.name() == "Box"s)
-		parse_primitive_box(node, name);
-	else if(node.name() == "LinPoly"s)
-		parse_primitive_linpoly(node, name);
-	else if(node.name() == "Polyhedron"s) {}
-	else if(node.name() == "Polygon"s) {}
-	else if(node.name() == "RotPoly"s) {}
-	else if(node.name() == "Sphere"s) {}
-	else if(node.name() == "Cylinder"s) {}
-	else if(node.name() == "Wire"s) {}
-	else if(node.name() == "CylindricalShell"s) {}
-	else if(node.name() == "User-Defined"s) {}
-	else if(node.name() == "Curve"s) {}
-
-}
-
-//******************************************************************************
-optional<Polygon::Type> ParserFromCsx::Pimpl::which_material_is(pugi::xml_node const& primitive_node) {
-	string property(primitive_node.parent().parent().name());
-	string property_name(primitive_node.parent().parent().attribute("Name").as_string());
-
-	if(contains(params.grounds, property_name)) {
-		return Polygon::Type::GROUND;
-	} else {
-		if(property == "Material") {
-			return Polygon::Type::SUBSTRATE;
-		} else if(property == "Metal"
-			|| property == "ConductingSheet") {
-			return Polygon::Type::SHAPE;
-		} else if(property == "LumpedElement") {
-		} else if(property == "Excitation") {
-		} else if(property == "ProbeBox") {
-		} else if(property == "DumpBox") {
-		} else if(property == "DebyeMaterial") {
-		} else if(property == "LorentzMaterial") {
-		} else if(property == "ResBox") {
-		} else if(property == "Unknown") {
-		} else if(property == "DiscMaterial") {
-		}
+	if(node.name() == "Box"s) {
+		parse_primitive_box(node, material, name);
+		return true;
+	} else if(node.name() == "LinPoly"s) {
+		parse_primitive_linpoly(node, material, name);
+		return true;
+	} else if(node.name() == "Polyhedron"s) {
+	} else if(node.name() == "Polygon"s) {
+	} else if(node.name() == "RotPoly"s) {
+	} else if(node.name() == "Sphere"s) {
+	} else if(node.name() == "Cylinder"s) {
+	} else if(node.name() == "Wire"s) {
+	} else if(node.name() == "CylindricalShell"s) {
+	} else if(node.name() == "User-Defined"s) {
+	} else if(node.name() == "Curve"s) {
 	}
-
-	return nullopt;
+	return false;
 }
 
 //******************************************************************************
-void ParserFromCsx::Pimpl::parse_primitive_box(pugi::xml_node const& node, string name) {
-	auto const type = which_material_is(node);
-//	if(!type.has_value() || type.value() != Polygon::Type::SHAPE) // TODO
-	if(!type.has_value() || type.value() == Polygon::Type::SUBSTRATE) // TODO
-		return;
-
+void ParserFromCsx::Pimpl::parse_primitive_box(pugi::xml_node const& node, shared_ptr<Material> const& material, string name) {
 	size_t priority = node.attribute("Priority").as_uint();
 	pugi::xml_node node_p1 = node.child("P1");
 	pugi::xml_node node_p2 = node.child("P2");
@@ -166,21 +142,16 @@ void ParserFromCsx::Pimpl::parse_primitive_box(pugi::xml_node const& node, strin
 		node_p2.attribute("Y").as_double(),
 		node_p2.attribute("Z").as_double());
 	if(params.with_yz)
-		board.add_polygon_from_box(YZ, type.value(), name, priority, { p1.x, p2.x }, { p1.y, p1.z }, { p2.y, p2.z });
+		board.add_polygon_from_box(YZ, material, name, priority, { p1.x, p2.x }, { p1.y, p1.z }, { p2.y, p2.z });
 	if(params.with_zx)
-		board.add_polygon_from_box(ZX, type.value(), name, priority, { p1.y, p2.y }, { p1.z, p1.x }, { p2.z, p2.x });
+		board.add_polygon_from_box(ZX, material, name, priority, { p1.y, p2.y }, { p1.z, p1.x }, { p2.z, p2.x });
 	if(params.with_xy)
-		board.add_polygon_from_box(XY, type.value(), name, priority, { p1.z, p2.z }, { p1.x, p1.y }, { p2.x, p2.y });
+		board.add_polygon_from_box(XY, material, name, priority, { p1.z, p2.z }, { p1.x, p1.y }, { p2.x, p2.y });
 	// TODO if property == ConductingSheet : add_fixed_meshline_policy()
 }
 
 //******************************************************************************
-void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, string name) {
-	auto const type = which_material_is(node);
-//	if(!type.has_value() || type.value() != Polygon::Type::SHAPE) // TODO
-	if(!type.has_value() || type.value() == Polygon::Type::SUBSTRATE) // TODO
-		return;
-
+void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, shared_ptr<Material> const& material, string name) {
 	size_t priority = node.attribute("Priority").as_uint();
 	double elevation = node.attribute("Elevation").as_double(); // offset in normdir
 	double length = node.attribute("Length").as_double(); // height in normdir
@@ -198,7 +169,7 @@ void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, s
 
 	Bounding2D bounding(detect_bounding(points));
 
-	board.add_polygon(plane.value(), type.value(), name, priority, { elevation, elevation + length }, std::move(points));
+	board.add_polygon(plane.value(), material, name, priority, { elevation, elevation + length }, std::move(points));
 	if(length == 0) {
 //		board.add_fixed_meshline_policy(normal.value(), elevation);
 //		switch(plane.value()) {
@@ -221,36 +192,36 @@ void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, s
 		switch(plane.value()) {
 		case YZ:
 			if(params.with_zx)
-				board.add_polygon_from_box(ZX, type.value(), name, priority,
+				board.add_polygon_from_box(ZX, material, name, priority,
 					{ bounding[XMIN], bounding[XMAX] },
 					{ bounding[YMIN], elevation },
 					{ bounding[YMAX], elevation + length });
 			if(params.with_xy)
-				board.add_polygon_from_box(XY, type.value(), name, priority,
+				board.add_polygon_from_box(XY, material, name, priority,
 					{ bounding[YMIN], bounding[YMAX] },
 					{ elevation, bounding[XMIN] },
 					{ elevation + length, bounding[XMAX] });
 			break;
 		case ZX:
 			if(params.with_xy)
-				board.add_polygon_from_box(XY, type.value(), name, priority,
+				board.add_polygon_from_box(XY, material, name, priority,
 					{ bounding[XMIN], bounding[XMAX] },
 					{ bounding[YMIN], elevation },
 					{ bounding[YMAX], elevation + length });
 			if(params.with_yz)
-				board.add_polygon_from_box(YZ, type.value(), name, priority,
+				board.add_polygon_from_box(YZ, material, name, priority,
 					{ bounding[YMIN], bounding[YMAX] },
 					{ elevation, bounding[XMIN] },
 					{ elevation + length, bounding[XMAX] });
 			break;
 		case XY:
 			if(params.with_yz)
-				board.add_polygon_from_box(YZ, type.value(), name, priority,
+				board.add_polygon_from_box(YZ, material, name, priority,
 					{ bounding[XMIN], bounding[XMAX] },
 					{ bounding[YMIN], elevation },
 					{ bounding[YMAX], elevation + length });
 			if(params.with_zx)
-				board.add_polygon_from_box(ZX, type.value(), name, priority,
+				board.add_polygon_from_box(ZX, material, name, priority,
 					{ bounding[YMIN], bounding[YMAX] },
 					{ elevation, bounding[XMIN] },
 					{ elevation + length, bounding[XMAX] });
@@ -322,11 +293,13 @@ void ParserFromCsx::parse() {
 
 	pugi::xpath_node properties = doc.select_node("/openEMS/ContinuousStructure/Properties");
 	for(auto const& node : properties.node().children()) {
-		pimpl->parse_property(node);
+		auto material = pimpl->parse_property(node);
 
 		pugi::xml_node primitives = node.child("Primitives");
-		for(auto const& node : primitives.children())
-			pimpl->parse_primitive(node);
+		for(auto const& node : primitives.children()) {
+			if(material)
+				pimpl->parse_primitive(node, material);
+		}
 
 	}
 }

@@ -21,6 +21,8 @@ using namespace std;
 //******************************************************************************
 optional<Step> next(Step step) {
 	switch(step) {
+	case Step::ADJUST_EDGE_TO_MATERIAL:
+		return Step::DETECT_CONFLICT_EIP;
 	case Step::DETECT_CONFLICT_EIP:
 		return Step::DETECT_CONFLICT_CE;
 	case Step::DETECT_CONFLICT_CE:
@@ -50,6 +52,7 @@ set<Step> that_and_after(Step step) {
 
 	using enum Step;
 	switch(step) {
+	case ADJUST_EDGE_TO_MATERIAL:      out.emplace(ADJUST_EDGE_TO_MATERIAL);      [[fallthrough]];
 	case DETECT_CONFLICT_EIP:          out.emplace(DETECT_CONFLICT_EIP);          [[fallthrough]];
 	case DETECT_CONFLICT_CE:           out.emplace(DETECT_CONFLICT_CE);           [[fallthrough]];
 	case DETECT_NON_CONFLICTING_EDGES: out.emplace(DETECT_NON_CONFLICTING_EDGES); [[fallthrough]];
@@ -131,6 +134,7 @@ void OpenEMSH::run(std::set<Step> const& steps) const {
 	};
 
 	using enum Step;
+	handle(ADJUST_EDGE_TO_MATERIAL,      [&] { board->adjust_edges_to_materials(); });
 	handle(DETECT_CONFLICT_EIP,          [&] { board->detect_edges_in_polygons(); });
 	handle(DETECT_CONFLICT_CE,           [&] { board->detect_colinear_edges(); });
 	handle(DETECT_NON_CONFLICTING_EDGES, [&] { board->detect_non_conflicting_edges(); });
@@ -147,6 +151,7 @@ void OpenEMSH::run(std::set<Step> const& steps) const {
 //******************************************************************************
 void OpenEMSH::run_all_steps() const {
 	run({
+		Step::ADJUST_EDGE_TO_MATERIAL,
 		Step::DETECT_CONFLICT_EIP,
 		Step::DETECT_CONFLICT_CE,
 		Step::DETECT_NON_CONFLICTING_EDGES,
@@ -168,7 +173,7 @@ void OpenEMSH::run_next_step() const {
 		; step)
 			run({ step.value() });
 	} else {
-		run({ Step::DETECT_CONFLICT_EIP });
+		run({ Step::ADJUST_EDGE_TO_MATERIAL });
 	}
 }
 

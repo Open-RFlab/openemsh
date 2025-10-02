@@ -42,6 +42,7 @@ struct EdgeState final
 , public IConflictSolutionState
 , public IMeshLineOriginState {
 	bool to_mesh = true;
+	bool to_reverse = false;
 };
 
 //******************************************************************************

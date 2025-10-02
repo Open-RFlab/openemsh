@@ -424,6 +424,12 @@ void MainWindow::run(app::Step from) {
 }
 
 //******************************************************************************
+void MainWindow::run() {
+	oemsh.run_all_steps();
+	make_current_state_view();
+}
+
+//******************************************************************************
 void MainWindow::handle_edition_from(app::Step from, std::function<void ()> const& edit) {
 	oemsh.go_before(from);
 	edit();

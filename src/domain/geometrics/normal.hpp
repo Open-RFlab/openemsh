@@ -21,4 +21,7 @@ enum class Normal {
 	NONE
 };
 
+//******************************************************************************
+Normal reverse(Normal normal) noexcept;
+
 } // namespace domain

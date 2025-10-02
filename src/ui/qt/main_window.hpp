@@ -39,7 +39,8 @@ private:
 	void go_to_current_state();
 	void make_current_state_view();
 	void go_to_or_make_current_state();
-	void run(app::Step from = app::Step::DETECT_CONFLICT_EIP);
+	void run(app::Step from);
+	void run();
 
 private slots:
 	void on_a_about_triggered();
