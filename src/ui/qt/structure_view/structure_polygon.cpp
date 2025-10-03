@@ -8,6 +8,8 @@
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
 
+#include <limits>
+
 #include "domain/geometrics/point.hpp"
 #include "domain/geometrics/polygon.hpp"
 #include "utils/default_locator.hpp"
@@ -45,6 +47,31 @@ StructurePolygon::StructurePolygon(domain::Polygon const* polygon, QGraphicsItem
 //******************************************************************************
 int StructurePolygon::type() const {
 	return Type;
+}
+
+//******************************************************************************
+void StructurePolygon::hoverEnterEvent(QGraphicsSceneHoverEvent* event) {
+	if(!isSelected())
+		setZValue(std::numeric_limits<qreal>::max());
+	QGraphicsItem::hoverEnterEvent(event);
+}
+
+//******************************************************************************
+void StructurePolygon::hoverLeaveEvent(QGraphicsSceneHoverEvent* event) {
+	if(!isSelected())
+		setZValue(0);
+	QGraphicsItem::hoverLeaveEvent(event);
+}
+
+//******************************************************************************
+QVariant StructurePolygon::itemChange(GraphicsItemChange change, QVariant const& value) {
+	if(change == ItemSelectedChange) {
+		if(value.toBool())
+			setZValue(std::numeric_limits<qreal>::max());
+		else
+			setZValue(0);
+	}
+	return QGraphicsItem::itemChange(change, value);
 }
 
 //******************************************************************************

@@ -41,7 +41,12 @@ public:
 	explicit StructurePolygon(domain::Polygon const* polygon, QGraphicsItem* parent = nullptr);
 
 	int type() const override;
+
+protected:
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;
+	void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
+	void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
+	QVariant itemChange(GraphicsItemChange change, QVariant const& value) override;
 
 private:
 	domain::Polygon const* const polygon;
