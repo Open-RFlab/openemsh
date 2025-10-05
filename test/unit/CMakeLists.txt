@@ -11,6 +11,7 @@ if( Catch2_FOUND )
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/test_bounding.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/test_space.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/test_coord.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/test_normal.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/test_point.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/test_segment.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/test_edge.cpp"

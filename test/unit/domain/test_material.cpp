@@ -8,10 +8,63 @@
 
 #include "domain/material.hpp"
 
+/// @test std::strong_ordering Material::operator<=>(Material const& other) const noexcept
 /// @test Material::Type Material::deduce_type(double epsilon, double mue, double kappa)
 ///*****************************************************************************
 
 using namespace domain;
+
+//******************************************************************************
+SCENARIO("std::strong_ordering Material::operator<=>(Material const& other) const noexcept", "[domain][material]") {
+	Material conductor(Material::Type::CONDUCTOR, "");
+	Material dielectric(Material::Type::DIELECTRIC, "");
+	Material air(Material::Type::AIR, "");
+	WHEN("Comparing CONDUCTOR to CONDUCTOR") {
+		THEN("Should return equivalent") {
+			REQUIRE(conductor <=> conductor == std::strong_ordering::equivalent);
+		}
+	}
+	WHEN("Comparing CONDUCTOR to DIELECTRIC") {
+		THEN("Should return greater") {
+			REQUIRE(conductor <=> dielectric == std::strong_ordering::greater);
+		}
+	}
+	WHEN("Comparing CONDUCTOR to AIR") {
+		THEN("Should return greater") {
+			REQUIRE(conductor <=> air == std::strong_ordering::greater);
+		}
+	}
+	WHEN("Comparing DIELECTRIC to CONDUCTOR") {
+		THEN("Should return less") {
+			REQUIRE(dielectric <=> conductor == std::strong_ordering::less);
+		}
+	}
+	WHEN("Comparing DIELECTRIC to DIELECTRIC") {
+		THEN("Should return equivalent") {
+			REQUIRE(dielectric <=> dielectric == std::strong_ordering::equivalent);
+		}
+	}
+	WHEN("Comparing DIELECTRIC to AIR") {
+		THEN("Should return greater") {
+			REQUIRE(dielectric <=> air == std::strong_ordering::greater);
+		}
+	}
+	WHEN("Comparing AIR to CONDUCTOR") {
+		THEN("Should return less") {
+			REQUIRE(air <=> conductor == std::strong_ordering::less);
+		}
+	}
+	WHEN("Comparing AIR to DIELECTRIC") {
+		THEN("Should return less") {
+			REQUIRE(air <=> dielectric == std::strong_ordering::less);
+		}
+	}
+	WHEN("Comparing AIR to AIR") {
+		THEN("Should return equivalent") {
+			REQUIRE(air <=> air == std::strong_ordering::equivalent);
+		}
+	}
+}
 
 // Use materials from
 // https://github.com/VolkerMuehlhaus/openems_ihp_sg13g2/blob/820044c/workflow/output/run_dual_dipole_data/sub-1/run_dual_dipole.xml

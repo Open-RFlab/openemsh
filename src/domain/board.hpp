@@ -108,7 +108,7 @@ public:
 	std::vector<std::shared_ptr<ConflictTooCloseMeshlinePolicies>> const& get_conflicts_too_close_meshline_policies(Axis const axis) const;
 
 private:
-	std::shared_ptr<Material> find_ambient_material(Plane plane, std::shared_ptr<Polygon> const& current_polygon, Segment const& segment) const;
+	std::shared_ptr<Material> find_ambient_material(Plane plane, Segment const& segment, std::shared_ptr<Polygon> const& current_polygon = nullptr) const;
 };
 
 #ifdef UNITTEST

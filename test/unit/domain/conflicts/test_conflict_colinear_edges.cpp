@@ -89,6 +89,34 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 			}
 		}
 
+		WHEN("Two edges normals are Normal::XMIN, one is Normal::XMAX but to reverse and one is not to mesh") {
+			auto state_a = a.get_current_state();
+			auto state_b = b.get_current_state();
+			auto state_c = c.get_current_state();
+			auto state_d = d.get_current_state();
+			state_a.to_mesh = true;
+			state_b.to_mesh = true;
+			state_c.to_mesh = false;
+			state_d.to_mesh = true;
+			state_d.to_reverse = true;
+			a.set_next_state(state_a);
+			b.set_next_state(state_b);
+			c.set_next_state(state_c);
+			d.set_next_state(state_d);
+			cce.auto_solve(mpm);
+			THEN("Should add a thirds meshline policy in the meshline policy manager") {
+				REQUIRE(mpm.get_current_state().line_policies[Y].size() == 0);
+				REQUIRE(mpm.get_current_state().line_policies[X].size() == 1);
+				REQUIRE(mpm.get_current_state().line_policies[X][0].get() == cce.get_current_state().solution);
+				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().origins.size() == 1);
+				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().origins[0] == &cce);
+				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().policy == MeshlinePolicy::Policy::THIRDS);
+				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().normal == MeshlinePolicy::Normal::MIN);
+				REQUIRE(mpm.get_current_state().line_policies[X][0]->coord == 1);
+				REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().is_enabled);
+			}
+		}
+
 		WHEN("Two edges normals are Normal::XMIN, and two are not to mesh") {
 			auto state_a = a.get_current_state();
 			auto state_b = b.get_current_state();
@@ -235,6 +263,34 @@ SCENARIO("void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_pol
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().origins[0] == &cce);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().policy == MeshlinePolicy::Policy::HALFS);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().normal == MeshlinePolicy::Normal::NONE);
+				REQUIRE(mpm.get_current_state().line_policies[Y][0]->coord == 1);
+				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().is_enabled);
+			}
+		}
+
+		WHEN("Two edges normals are Normal::YMIN, one is Normal::YMAX but to reverse and one is not to mesh") {
+			auto state_a = a.get_current_state();
+			auto state_b = b.get_current_state();
+			auto state_c = c.get_current_state();
+			auto state_d = d.get_current_state();
+			state_a.to_mesh = true;
+			state_b.to_mesh = true;
+			state_c.to_mesh = false;
+			state_d.to_mesh = true;
+			state_d.to_reverse = true;
+			a.set_next_state(state_a);
+			b.set_next_state(state_b);
+			c.set_next_state(state_c);
+			d.set_next_state(state_d);
+			cce.auto_solve(mpm);
+			THEN("Should add a thirds meshline policy in the meshline policy manager") {
+				REQUIRE(mpm.get_current_state().line_policies[Y].size() == 1);
+				REQUIRE(mpm.get_current_state().line_policies[X].size() == 0);
+				REQUIRE(mpm.get_current_state().line_policies[Y][0].get() == cce.get_current_state().solution);
+				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().origins.size() == 1);
+				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().origins[0] == &cce);
+				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().policy == MeshlinePolicy::Policy::THIRDS);
+				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().normal == MeshlinePolicy::Normal::MIN);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->coord == 1);
 				REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().is_enabled);
 			}

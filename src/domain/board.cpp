@@ -163,14 +163,15 @@ Board::Board(
 /// Check among all Polygons that match segment and current_polygon->z_placement.
 /// Choose Material following this rule: CONDUCTOR>DIELECTRIC>AIR
 ///*****************************************************************************
-shared_ptr<Material> Board::find_ambient_material(Plane plane, shared_ptr<Polygon> const& current_polygon, Segment const& segment) const {
+shared_ptr<Material> Board::find_ambient_material(Plane plane, Segment const& segment, shared_ptr<Polygon> const& current_polygon) const {
 	Bounding2D const segment_bounding = bounding(segment);
 
 	vector<shared_ptr<Material>> materials;
 	for(shared_ptr<Polygon> const& polygon : get_current_state().polygons[plane]) {
 		if(polygon->material
-		&& polygon != current_polygon
-		&& does_overlap(polygon->z_placement, current_polygon->z_placement)
+		&& (!current_polygon // Bypass self & z_overlap checks if not relevant.
+			|| (polygon != current_polygon
+			&& does_overlap(polygon->z_placement, current_polygon->z_placement)))
 		&& does_overlap(polygon->bounding, segment_bounding))
 			materials.push_back(shared_ptr<Material>(polygon->material));
 	}
@@ -198,13 +199,13 @@ void Board::adjust_edges_to_materials(Plane const plane) {
 				case Normal::NONE:
 					return {};
 				case Normal::XMIN:
-					return find_ambient_material(plane, polygon, Range(edge->p0() - translate_x, edge->p1() - translate_x));
+					return find_ambient_material(plane, Range(edge->p0() - translate_x, edge->p1() - translate_x), polygon);
 				case Normal::XMAX:
-					return find_ambient_material(plane, polygon, Range(edge->p0() + translate_x, edge->p1() + translate_x));
+					return find_ambient_material(plane, Range(edge->p0() + translate_x, edge->p1() + translate_x), polygon);
 				case Normal::YMIN:
-					return find_ambient_material(plane, polygon, Range(edge->p0() - translate_y, edge->p1() - translate_y));
+					return find_ambient_material(plane, Range(edge->p0() - translate_y, edge->p1() - translate_y), polygon);
 				case Normal::YMAX:
-					return find_ambient_material(plane, polygon, Range(edge->p0() + translate_y, edge->p1() + translate_y));
+					return find_ambient_material(plane, Range(edge->p0() + translate_y, edge->p1() + translate_y), polygon);
 				default:
 					::unreachable();
 				}
@@ -378,13 +379,16 @@ void Board::detect_non_conflicting_edges(Plane const plane) {
 	for(Edge* edge : get_current_state().edges[plane]) {
 		optional<Coord> const coord = domain::coord(edge->p0(), edge->axis);
 		optional<Axis> const axis = transpose(plane, edge->axis);
+		Normal const normal = edge->get_current_state().to_reverse
+		                    ? reverse(edge->normal)
+		                    : edge->normal;
 		if(coord && axis && edge->get_current_state().conflicts.empty()) {
 			auto [t, state_e] = edge->make_next_state();
 			state_e.meshline_policy = line_policy_manager->add_meshline_policy(
 				{ edge },
 				axis.value(),
 				MeshlinePolicy::Policy::THIRDS,
-				cast(edge->normal),
+				cast(normal),
 				coord.value(),
 				state_e.to_mesh,
 				t);

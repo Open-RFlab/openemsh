@@ -21,6 +21,8 @@
 /// @test void Board::Builder::add_polygon(Plane plane, std::string const& name, Polygon::RangeZ const& z_placement, std::vector<std::unique_ptr<Point const>>&& points)
 /// @test void Board::Builder::add_polygon_from_box(Plane plane, std::string const& name, Polygon::RangeZ const& z_placement, Point const p1, Point const p3)
 /// @test std::unique_ptr<Board> Board::Builder::build()
+/// @test std::shared_ptr<Material> Board::find_ambient_material(Plane plane, Segment const& segment, std::shared_ptr<Polygon> const& current_polygon) const
+/// @test void Board::adjust_edges_to_materials()
 /// @test void Board::detect_edges_in_polygons()
 /// @test void Board::detect_colinear_edges()
 /// @test void Board::detect_non_conflicting_edges()
@@ -276,6 +278,276 @@ SCENARIO("std::unique_ptr<Board> Board::Builder::build()", "[board]") {
 
 			THEN("The Builder should be empty") {
 				REQUIRE(b.polygons[XY].empty());
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("std::shared_ptr<Material> Board::find_ambient_material(Plane plane, Segment const& segment, std::shared_ptr<Polygon> const& current_polygon) const", "[board]") {
+	Timepoint* t = Caretaker::singleton().get_history_root();
+	GIVEN("A board holding some polygons of each Material type, all overlapping in plane, some overlapping in normal axis") {
+		auto conductor = std::make_shared<Material>(Material::Type::CONDUCTOR, "");
+		auto dielectric = std::make_shared<Material>(Material::Type::DIELECTRIC, "");
+		auto air = std::make_shared<Material>(Material::Type::AIR, "");
+		std::unique_ptr<Board> b;
+		auto x = std::make_shared<Polygon>(XY, conductor, "", 0, Polygon::RangeZ { 0, 3 }, from_init_list<Point>({{ 1, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }}), t);
+		auto y = std::make_shared<Polygon>(XY, dielectric, "", 0, Polygon::RangeZ { 2, 4 }, from_init_list<Point>({{ 2, 2 }, { 2, 5 }, { 5, 5 }, { 5, 2 }}), t);
+		auto z = std::make_shared<Polygon>(XY, air, "", 0, Polygon::RangeZ { 5, 6 }, from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }, { 4, 3 }}), t);
+		{
+			PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
+			tmp[XY].push_back(x);
+			tmp[XY].push_back(y);
+			b = std::make_unique<Board>(std::move(tmp), Params(), t);
+		}
+		WHEN("Looking for absolute ambient Material outside of any Polygon") {
+			THEN("Should not return any Material") {
+				REQUIRE_FALSE(b->find_ambient_material(XY, Range({ 10, 10 }, { 11, 11 })));
+			}
+		}
+		WHEN("Looking for absolute ambient Material inside the overlap of all Polygons") {
+			auto material = b->find_ambient_material(XY, Range({ 3.5, 3.2 }, { 3.5, 3.8 }));
+			THEN("Should return CONDUCTOR Material") {
+				REQUIRE(material);
+				REQUIRE(material->type == Material::Type::CONDUCTOR);
+			}
+		}
+		WHEN("Looking for ambient Material inside the overlap of all Polygons") {
+			AND_WHEN("Relative to CONDUCTOR Material Polygon") {
+				auto material = b->find_ambient_material(XY, Range({ 3.5, 3.2 }, { 3.5, 3.8 }), x);
+				THEN("Should return DIELECTRIC Material") {
+					REQUIRE(material);
+					REQUIRE(material->type == Material::Type::DIELECTRIC);
+				}
+			}
+			AND_WHEN("Relative to DIELECTRIC Material Polygon") {
+				auto material = b->find_ambient_material(XY, Range({ 3.5, 3.2 }, { 3.5, 3.8 }), y);
+				THEN("Should return CONDUCTOR Material") {
+					REQUIRE(material);
+					REQUIRE(material->type == Material::Type::CONDUCTOR);
+				}
+			}
+			AND_WHEN("Relative to AIR Material Polygon") {
+				THEN("Should not return any Material because no overlap in normal axis") {
+					REQUIRE_FALSE(b->find_ambient_material(XY, Range({ 3.5, 3.2 }, { 3.5, 3.8 }), z));
+				}
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("void Board::adjust_edges_to_materials()", "[board]") {
+	Timepoint* t = Caretaker::singleton().get_history_root();
+	auto conductor = std::make_shared<Material>(Material::Type::CONDUCTOR, "");
+	auto dielectric = std::make_shared<Material>(Material::Type::DIELECTRIC, "");
+	auto air = std::make_shared<Material>(Material::Type::AIR, "");
+	std::unique_ptr<Board> b;
+
+	auto const make_polygons = [&b, &t](auto& x_m, std::size_t x_p, auto&& x_z, auto&& x, auto& y_m, std::size_t y_p, auto&& y_z, auto&& y) {
+		PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
+		tmp[XY].push_back(std::make_shared<Polygon>(XY, x_m, "", x_p, x_z, std::move(x), t));
+		tmp[XY].push_back(std::make_shared<Polygon>(XY, y_m, "", y_p, y_z, std::move(y), t));
+		b = std::make_unique<Board>(std::move(tmp), Params(), t);
+	};
+
+	GIVEN("A board holding two Polygons that does not overlap") {
+		make_polygons(
+			conductor, 0, Polygon::RangeZ { 0, 3 }, from_init_list<Point>({{ 1, 1 }, { 2, 1 }, { 2, 2 }, { 1, 2 }}),
+			air, 0, Polygon::RangeZ { 2, 4 }, from_init_list<Point>({{ 3, 3 }, { 4, 3 }, { 4, 4 }, { 3, 4 }}));
+		b->adjust_edges_to_materials();
+		THEN("Should not adjust any edge") {
+			for(auto const& edge : b->get_current_state().edges[XY]) {
+				REQUIRE_FALSE(edge->get_current_state().to_reverse);
+			}
+		}
+	}
+	GIVEN("A board holding two Polygons that overlap partially") {
+		make_polygons(
+			conductor, 0, Polygon::RangeZ { 0, 3 }, from_init_list<Point>({{ 1, 1 }, { 3, 1 }, { 3, 3 }, { 1, 3 }}),
+			air, 0, Polygon::RangeZ { 2, 4 }, from_init_list<Point>({{ 2, 2 }, { 4, 2 }, { 4, 4 }, { 2, 4 }}));
+		b->adjust_edges_to_materials();
+		THEN("The 2 overlapping edges of the AIR Polygon should be marked for Normal reverse") {
+			REQUIRE_FALSE(b->get_current_state().polygons[XY][0]->edges[0]->get_current_state().to_reverse);
+			REQUIRE_FALSE(b->get_current_state().polygons[XY][0]->edges[1]->get_current_state().to_reverse);
+			REQUIRE_FALSE(b->get_current_state().polygons[XY][0]->edges[2]->get_current_state().to_reverse);
+			REQUIRE_FALSE(b->get_current_state().polygons[XY][0]->edges[3]->get_current_state().to_reverse);
+			REQUIRE(b->get_current_state().polygons[XY][1]->edges[0]->get_current_state().to_reverse);
+			REQUIRE(b->get_current_state().polygons[XY][1]->edges[1]->get_current_state().to_reverse);
+			REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[2]->get_current_state().to_reverse);
+			REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[3]->get_current_state().to_reverse);
+		}
+	}
+	GIVEN("A board holding a corner-bent Polygon completly inside another Polygon") {
+		auto inner = from_init_list<Point>({{ 2, 2 }, { 5, 2 }, { 5, 4 }, { 4, 5 }, { 2, 5 }});
+		auto outer = from_init_list<Point>({{ 1, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }});
+		WHEN("Polygons overlap in normal axis") {
+			Polygon::RangeZ i_z = { 0, 3 };
+			Polygon::RangeZ o_z = { 2, 4 };
+			WHEN("Outer Polygon is of CONDUCTOR Material") {
+				auto& o_m = conductor;
+				AND_WHEN("Inner Polygon is of CONDUCTOR Material") {
+					auto& i_m = conductor;
+					make_polygons(i_m, 0, i_z, inner, o_m, 0, o_z, outer);
+					b->adjust_edges_to_materials();
+					THEN("Should not adjust any edge") {
+						for(auto const& edge : b->get_current_state().edges[XY]) {
+							REQUIRE_FALSE(edge->get_current_state().to_reverse);
+						}
+					}
+				}
+				AND_WHEN("Inner Polygon is of DIELECTRIC Material") {
+					auto& i_m = dielectric;
+					make_polygons(i_m, 0, i_z, inner, o_m, 0, o_z, outer);
+					b->adjust_edges_to_materials();
+					THEN("Inner Polygon orthogonal edges should be marked for Normal reverse") {
+						REQUIRE(b->get_current_state().polygons[XY][0]->edges[0]->get_current_state().to_reverse);
+						REQUIRE(b->get_current_state().polygons[XY][0]->edges[1]->get_current_state().to_reverse);
+						REQUIRE(b->get_current_state().polygons[XY][0]->edges[2]->get_current_state().to_reverse);
+						REQUIRE(b->get_current_state().polygons[XY][0]->edges[3]->direction == Edge::Direction::NONE);
+						REQUIRE_FALSE(b->get_current_state().polygons[XY][0]->edges[3]->get_current_state().to_reverse);
+						REQUIRE(b->get_current_state().polygons[XY][0]->edges[4]->get_current_state().to_reverse);
+						REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[0]->get_current_state().to_reverse);
+						REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[1]->get_current_state().to_reverse);
+						REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[2]->get_current_state().to_reverse);
+						REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[3]->get_current_state().to_reverse);
+					}
+				}
+				AND_WHEN("Inner Polygon is of AIR Material") {
+					auto& i_m = air;
+					WHEN("Inner Polygon is of superior priority than outer") {
+						make_polygons(i_m, 3, i_z, inner, o_m, 2, o_z, outer);
+						b->adjust_edges_to_materials();
+						THEN("Inner Polygon orthogonal edges should be marked for Normal reverse") {
+							REQUIRE(b->get_current_state().polygons[XY][0]->edges[0]->get_current_state().to_reverse);
+							REQUIRE(b->get_current_state().polygons[XY][0]->edges[1]->get_current_state().to_reverse);
+							REQUIRE(b->get_current_state().polygons[XY][0]->edges[2]->get_current_state().to_reverse);
+							REQUIRE(b->get_current_state().polygons[XY][0]->edges[3]->direction == Edge::Direction::NONE);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][0]->edges[3]->get_current_state().to_reverse);
+							REQUIRE(b->get_current_state().polygons[XY][0]->edges[4]->get_current_state().to_reverse);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[0]->get_current_state().to_reverse);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[1]->get_current_state().to_reverse);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[2]->get_current_state().to_reverse);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[3]->get_current_state().to_reverse);
+						}
+					}
+					WHEN("Inner Polygon is of inferior priority than outer") {
+						make_polygons(i_m, 0, i_z, inner, o_m, 0, o_z, outer);
+						b->adjust_edges_to_materials();
+						THEN("Inner Polygon orthogonal edges should be marked for Normal reverse") {
+							REQUIRE(b->get_current_state().polygons[XY][0]->edges[0]->get_current_state().to_reverse);
+							REQUIRE(b->get_current_state().polygons[XY][0]->edges[1]->get_current_state().to_reverse);
+							REQUIRE(b->get_current_state().polygons[XY][0]->edges[2]->get_current_state().to_reverse);
+							REQUIRE(b->get_current_state().polygons[XY][0]->edges[3]->direction == Edge::Direction::NONE);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][0]->edges[3]->get_current_state().to_reverse);
+							REQUIRE(b->get_current_state().polygons[XY][0]->edges[4]->get_current_state().to_reverse);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[0]->get_current_state().to_reverse);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[1]->get_current_state().to_reverse);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[2]->get_current_state().to_reverse);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[3]->get_current_state().to_reverse);
+						}
+					}
+					WHEN("Both Polygons are of the same priority") {
+						make_polygons(i_m, 2, i_z, inner, o_m, 3, o_z, outer);
+						b->adjust_edges_to_materials();
+						THEN("Inner Polygon orthogonal edges should be marked for Normal reverse") {
+							REQUIRE(b->get_current_state().polygons[XY][0]->edges[0]->get_current_state().to_reverse);
+							REQUIRE(b->get_current_state().polygons[XY][0]->edges[1]->get_current_state().to_reverse);
+							REQUIRE(b->get_current_state().polygons[XY][0]->edges[2]->get_current_state().to_reverse);
+							REQUIRE(b->get_current_state().polygons[XY][0]->edges[3]->direction == Edge::Direction::NONE);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][0]->edges[3]->get_current_state().to_reverse);
+							REQUIRE(b->get_current_state().polygons[XY][0]->edges[4]->get_current_state().to_reverse);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[0]->get_current_state().to_reverse);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[1]->get_current_state().to_reverse);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[2]->get_current_state().to_reverse);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[3]->get_current_state().to_reverse);
+						}
+					}
+				}
+			}
+			WHEN("Outer Polygon is of DIELECTRIC Material") {
+				auto& o_m = dielectric;
+				AND_WHEN("Inner Polygon is of CONDUCTOR Material") {
+					auto& i_m = conductor;
+					make_polygons(i_m, 0, i_z, inner, o_m, 0, o_z, outer);
+					b->adjust_edges_to_materials();
+					THEN("Should not adjust any edge") {
+						for(auto const& edge : b->get_current_state().edges[XY]) {
+							REQUIRE_FALSE(edge->get_current_state().to_reverse);
+						}
+					}
+				}
+				AND_WHEN("Inner Polygon is of DIELECTRIC Material") {
+					auto& i_m = dielectric;
+					make_polygons(i_m, 0, i_z, inner, o_m, 0, o_z, outer);
+					b->adjust_edges_to_materials();
+					THEN("Should not adjust any edge") {
+						for(auto const& edge : b->get_current_state().edges[XY]) {
+							REQUIRE_FALSE(edge->get_current_state().to_reverse);
+						}
+					}
+				}
+				AND_WHEN("Inner Polygon is of AIR Material") {
+					auto& i_m = air;
+					make_polygons(i_m, 0, i_z, inner, o_m, 0, o_z, outer);
+					b->adjust_edges_to_materials();
+					THEN("Inner Polygon orthogonal edges should be marked for Normal reverse") {
+						REQUIRE(b->get_current_state().polygons[XY][0]->edges[0]->get_current_state().to_reverse);
+						REQUIRE(b->get_current_state().polygons[XY][0]->edges[1]->get_current_state().to_reverse);
+						REQUIRE(b->get_current_state().polygons[XY][0]->edges[2]->get_current_state().to_reverse);
+						REQUIRE(b->get_current_state().polygons[XY][0]->edges[3]->direction == Edge::Direction::NONE);
+						REQUIRE_FALSE(b->get_current_state().polygons[XY][0]->edges[3]->get_current_state().to_reverse);
+						REQUIRE(b->get_current_state().polygons[XY][0]->edges[4]->get_current_state().to_reverse);
+						REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[0]->get_current_state().to_reverse);
+						REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[1]->get_current_state().to_reverse);
+						REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[2]->get_current_state().to_reverse);
+						REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[3]->get_current_state().to_reverse);
+					}
+				}
+			}
+			WHEN("Outer Polygon is of AIR Material") {
+				auto& o_m = air;
+				AND_WHEN("Inner Polygon is of CONDUCTOR Material") {
+					auto& i_m = conductor;
+					make_polygons(i_m, 0, i_z, inner, o_m, 0, o_z, outer);
+					b->adjust_edges_to_materials();
+					THEN("Should not adjust any edge") {
+						for(auto const& edge : b->get_current_state().edges[XY]) {
+							REQUIRE_FALSE(edge->get_current_state().to_reverse);
+						}
+					}
+				}
+				AND_WHEN("Inner Polygon is of DIELECTRIC Material") {
+					auto& i_m = dielectric;
+					make_polygons(i_m, 0, i_z, inner, o_m, 0, o_z, outer);
+					b->adjust_edges_to_materials();
+					THEN("Should not adjust any edge") {
+						for(auto const& edge : b->get_current_state().edges[XY]) {
+							REQUIRE_FALSE(edge->get_current_state().to_reverse);
+						}
+					}
+				}
+				AND_WHEN("Inner Polygon is of AIR Material") {
+					auto& i_m = air;
+					make_polygons(i_m, 0, i_z, inner, o_m, 0, o_z, outer);
+					b->adjust_edges_to_materials();
+					THEN("Should not adjust any edge") {
+						for(auto const& edge : b->get_current_state().edges[XY]) {
+							REQUIRE_FALSE(edge->get_current_state().to_reverse);
+						}
+					}
+				}
+			}
+		}
+		WHEN("Polygons do not overlap in normal axis") {
+			Polygon::RangeZ i_z = { 0, 2 };
+			Polygon::RangeZ o_z = { 3, 4 };
+			make_polygons(air, 0, i_z, inner, conductor, 0, o_z, outer);
+			b->adjust_edges_to_materials();
+			THEN("Should not adjust any edge") {
+				for(auto const& edge : b->get_current_state().edges[XY]) {
+					REQUIRE_FALSE(edge->get_current_state().to_reverse);
+				}
 			}
 		}
 	}
@@ -1123,7 +1395,7 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 SCENARIO("void Board::detect_non_conflicting_edges()", "[board]") {
 	Timepoint* t = Caretaker::singleton().get_history_root();
 	auto material = std::make_shared<Material>(Material::Type::CONDUCTOR, "");
-	GIVEN("Some conflicting edges and some non conflicting edges") {
+	GIVEN("Some conflicting edges and some non conflicting edges, with some to revert") {
 		std::unique_ptr<Board> b;
 		{
 			PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
@@ -1133,12 +1405,15 @@ SCENARIO("void Board::detect_non_conflicting_edges()", "[board]") {
 		}
 		REQUIRE(b->get_current_state().edges[XY].size() == 6);
 		auto state_e0 = b->get_current_state().edges[XY][0]->get_current_state();
+		auto state_e1 = b->get_current_state().edges[XY][1]->get_current_state();
 		auto state_e4 = b->get_current_state().edges[XY][4]->get_current_state();
 		auto state_e5 = b->get_current_state().edges[XY][5]->get_current_state();
 		state_e0.conflicts.push_back(nullptr);
 		state_e4.conflicts.push_back(nullptr);
 		state_e5.conflicts.push_back(nullptr);
+		state_e1.to_reverse = true;
 		b->get_current_state().edges[XY][0]->set_next_state(state_e0);
+		b->get_current_state().edges[XY][1]->set_next_state(state_e1);
 		b->get_current_state().edges[XY][4]->set_next_state(state_e4);
 		b->get_current_state().edges[XY][5]->set_next_state(state_e5);
 		b->detect_non_conflicting_edges();
@@ -1159,10 +1434,14 @@ SCENARIO("void Board::detect_non_conflicting_edges()", "[board]") {
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[X][0].get() == b->get_current_state().edges[XY][1]->get_current_state().meshline_policy);
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[X][0]->get_current_state().origins.size() == 1);
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[X][0]->get_current_state().origins[0] == b->get_current_state().edges[XY][1]);
+			REQUIRE(b->line_policy_manager->get_current_state().line_policies[X][0]->get_current_state().policy == MeshlinePolicy::Policy::THIRDS);
+			REQUIRE(b->line_policy_manager->get_current_state().line_policies[X][0]->get_current_state().normal == MeshlinePolicy::Normal::MAX);
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y].size() == 1);
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y][0].get() == b->get_current_state().edges[XY][2]->get_current_state().meshline_policy);
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y][0]->get_current_state().origins.size() == 1);
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y][0]->get_current_state().origins[0] == b->get_current_state().edges[XY][2]);
+			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y][0]->get_current_state().policy == MeshlinePolicy::Policy::THIRDS);
+			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y][0]->get_current_state().normal == MeshlinePolicy::Normal::MAX);
 		}
 	}
 }
