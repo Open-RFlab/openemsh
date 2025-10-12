@@ -35,23 +35,23 @@ strong_ordering Material::operator<=>(Material const& other) const noexcept {
 		case Type::CONDUCTOR: return strong_ordering::equivalent;
 		case Type::DIELECTRIC: return strong_ordering::greater;
 		case Type::AIR: return strong_ordering::greater;
-		default: unreachable();
+		default: ::unreachable();
 		}
 	case Type::DIELECTRIC:
 		switch(other.type) {
 		case Type::CONDUCTOR: return strong_ordering::less;
 		case Type::DIELECTRIC: return strong_ordering::equivalent;
 		case Type::AIR: return strong_ordering::greater;
-		default: unreachable();
+		default: ::unreachable();
 		}
 	case Type::AIR:
 		switch(other.type) {
 		case Type::CONDUCTOR: return strong_ordering::less;
 		case Type::DIELECTRIC: return strong_ordering::less;
 		case Type::AIR: return strong_ordering::equivalent;
-		default: unreachable();
+		default: ::unreachable();
 		}
-	default: unreachable();
+	default: ::unreachable();
 	}
 }
 

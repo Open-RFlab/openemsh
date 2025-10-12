@@ -82,7 +82,7 @@ Polygon::Rotation detect_rotation(T const& points) noexcept {
 	else if(area < 0)
 		return Polygon::Rotation::CW;
 	else
-		unreachable();
+		::unreachable();
 }
 
 //******************************************************************************

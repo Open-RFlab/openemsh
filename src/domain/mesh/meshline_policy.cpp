@@ -69,7 +69,7 @@ MeshlinePolicy::Normal cast(Normal const normal) noexcept {
 	case Normal::NONE:
 		return MeshlinePolicy::Normal::NONE;
 	default:
-		unreachable();
+		::unreachable();
 	}
 }
 

@@ -23,7 +23,7 @@ string to_xml_node(Axis const axis) noexcept {
 	case X: return "XLines";
 	case Y: return "YLines";
 	case Z: return "ZLines";
-	default: unreachable();
+	default: ::unreachable();
 	}
 }
 

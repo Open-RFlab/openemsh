@@ -24,7 +24,7 @@ Point Point3D::get_projection(Plane plane) const {
 	case YZ: return { y, z };
 	case ZX: return { z, x };
 	case XY: return { x, y };
-	default: unreachable();
+	default: ::unreachable();
 	}
 }
 

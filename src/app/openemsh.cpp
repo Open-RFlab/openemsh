@@ -42,7 +42,7 @@ optional<Step> next(Step step) {
 	case Step::MESH:
 		return nullopt;
 	default:
-		unreachable();
+		::unreachable();
 	}
 }
 
@@ -62,7 +62,7 @@ set<Step> that_and_after(Step step) {
 	case DETECT_AND_SOLVE_TCMLP:       out.emplace(DETECT_AND_SOLVE_TCMLP);       [[fallthrough]];
 	case DETECT_INTERVALS:             out.emplace(DETECT_INTERVALS);             [[fallthrough]];
 	case MESH:                         out.emplace(MESH);                         break;
-	default: unreachable();
+	default: ::unreachable();
 	}
 
 	return out;
@@ -120,7 +120,7 @@ void OpenEMSH::write() const {
 		cerr << SerializerToPrettyprint::run(*board);
 		break;
 	default:
-		unreachable();
+		::unreachable();
 	};
 }
 

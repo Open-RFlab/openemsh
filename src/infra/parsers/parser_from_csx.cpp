@@ -186,7 +186,7 @@ void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, s
 //			board.add_fixed_meshline_policy(Y, elevation);
 //			break;
 //		default:
-//			unreachable();
+//			::unreachable();
 //		}
 	} else {
 		switch(plane.value()) {
@@ -227,7 +227,7 @@ void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, s
 					{ elevation + length, bounding[XMAX] });
 			break;
 		default:
-			unreachable();
+			::unreachable();
 		}
 	}
 }

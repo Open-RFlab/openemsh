@@ -59,7 +59,7 @@ Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Glo
 				return d;
 			}
 		} ();
-		default: unreachable();
+		default: ::unreachable();
 		}
 	}),
 	.after = Side(after, global_params->get_current_state().lmin, global_params->get_current_state().lambda, calc_h(before->coord, after->coord), [after](double d) noexcept {
@@ -76,7 +76,7 @@ Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Glo
 				return d;
 			}
 		} ();
-		default: unreachable();
+		default: ::unreachable();
 		}
 	})
 })

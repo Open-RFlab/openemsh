@@ -9,22 +9,13 @@
 #include <cstdlib>
 #endif
 
-/// @brief Backport of C++23 std::unreachable.
-///*****************************************************************************
+#include <utility>
+
+//******************************************************************************
 [[noreturn]] inline void unreachable() {
-#ifndef DEBUG
-
-#ifdef __GNUC__ // GCC, Clang, ICC
-	__builtin_unreachable();
-#else
-#ifdef _MSC_VER // MSVC
-	__assume(false);
-#endif
-#endif
-
-#else // DEBUG
-
+#ifdef DEBUG
 	std::abort();
-
-#endif // DEBUG
+#else
+	std::unreachable();
+#endif
 }

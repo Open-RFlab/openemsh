@@ -223,14 +223,14 @@ optional<Axis> transpose(Plane const plane, Segment::Axis const axis) noexcept {
 		case YZ: return Z;
 		case ZX: return X;
 		case XY: return Y;
-		default: unreachable();
+		default: ::unreachable();
 		}
 	case Segment::Axis::V:
 		switch(plane) {
 		case YZ: return Y;
 		case ZX: return Z;
 		case XY: return X;
-		default: unreachable();
+		default: ::unreachable();
 		}
 	default:
 		return nullopt;
