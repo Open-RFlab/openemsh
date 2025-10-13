@@ -18,7 +18,7 @@ namespace ui::qt {
 
 //******************************************************************************
 ProcessingConflictEdgeInPolygon::ProcessingConflictEdgeInPolygon(domain::ConflictEdgeInPolygon const* conflict, QGraphicsItem* parent)
-: nodegraph::Node("ConflictEdgeInPolygon", parent)
+: nodegraph::Node("ConflictEdgeInPolygon - " + (conflict ? QString::number(conflict->id) : QString()), parent)
 , locate_processing_conflict_eip_params(default_locator<Params>)
 , conflict(conflict)
 {

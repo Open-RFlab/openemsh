@@ -17,7 +17,7 @@ namespace ui::qt {
 
 //******************************************************************************
 ProcessingConflictColinearEdges::ProcessingConflictColinearEdges(domain::ConflictColinearEdges const* conflict, QGraphicsItem* parent)
-: nodegraph::Node("ConflictColinearEdges", parent)
+: nodegraph::Node("ConflictColinearEdges - " + (conflict ? QString::number(conflict->id) : QString()), parent)
 , locate_processing_conflict_ce_params(default_locator<Params>)
 , conflict(conflict)
 {

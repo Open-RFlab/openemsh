@@ -20,7 +20,7 @@ namespace ui::qt {
 
 //******************************************************************************
 ProcessingMeshline::ProcessingMeshline(domain::Meshline const* meshline, QGraphicsItem* parent)
-: nodegraph::Node("Meshline", parent)
+: nodegraph::Node("Meshline - " + (meshline ? QString::number(meshline->id) : QString()), parent)
 , locate_processing_meshline_params(default_locator<Params>)
 , meshline(meshline)
 {

@@ -18,7 +18,7 @@ namespace ui::qt {
 
 //******************************************************************************
 ProcessingConflictTooCloseMeshlinePolicies::ProcessingConflictTooCloseMeshlinePolicies(domain::ConflictTooCloseMeshlinePolicies const* conflict, QGraphicsItem* parent)
-: nodegraph::Node("ConflictTooCloseMeshlinePolicies", parent)
+: nodegraph::Node("ConflictTooCloseMeshlinePolicies - " + (conflict ? QString::number(conflict->id) : QString()), parent)
 , locate_processing_conflict_tcmlp_params(default_locator<Params>)
 , conflict(conflict)
 {

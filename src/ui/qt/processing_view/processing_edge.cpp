@@ -20,7 +20,7 @@ namespace ui::qt {
 
 //******************************************************************************
 ProcessingEdge::ProcessingEdge(domain::Edge const* edge, QGraphicsItem* parent)
-: nodegraph::Node("Edge", parent)
+: nodegraph::Node("Edge - " + (edge ? QString::number(edge->id) : QString()), parent)
 , locate_processing_edge_params(default_locator<Params>)
 , edge(edge)
 {

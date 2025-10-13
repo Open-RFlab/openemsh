@@ -24,7 +24,7 @@ namespace ui::qt {
 
 //******************************************************************************
 ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const* meshline_policy, QGraphicsItem* parent)
-: nodegraph::Node("MeshlinePolicy", parent)
+: nodegraph::Node("MeshlinePolicy - " + (meshline_policy ? QString::number(meshline_policy->id) : QString()), parent)
 , locate_processing_meshline_policy_params(default_locator<Params>)
 , meshline_policy(meshline_policy)
 {

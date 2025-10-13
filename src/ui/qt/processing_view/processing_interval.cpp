@@ -19,7 +19,7 @@ namespace ui::qt {
 
 //******************************************************************************
 ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphicsItem* parent)
-: nodegraph::Node("Interval", parent)
+: nodegraph::Node("Interval - " + (interval ? QString::number(interval->id) : QString()), parent)
 , locate_processing_interval_params(default_locator<Params>)
 , interval(interval)
 {

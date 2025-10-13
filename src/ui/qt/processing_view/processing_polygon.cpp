@@ -18,7 +18,7 @@ namespace ui::qt {
 
 //******************************************************************************
 ProcessingPolygon::ProcessingPolygon(domain::Polygon const* polygon, QGraphicsItem* parent)
-: nodegraph::Container("Polygon " + (polygon ? QString::fromStdString(polygon->name) : QString()), QSizeF(50, 10), parent)
+: nodegraph::Container("Polygon - " + (polygon ? QString::number(polygon->id) + " - " + QString::fromStdString(polygon->name) : QString()), QSizeF(50, 10), parent)
 , locate_processing_polygon_params(default_locator<Params>)
 , polygon(polygon)
 {
