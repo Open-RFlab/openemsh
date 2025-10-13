@@ -12,6 +12,7 @@
 #include "domain/geometrics/normal.hpp"
 #include "domain/mesh/meshline_policy.hpp"
 #include "domain/meshline_policy_manager.hpp"
+#include "domain/material.hpp"
 
 //******************************************************************************
 std::string to_string(domain::Edge::Direction direction) noexcept;
@@ -22,3 +23,4 @@ std::string to_string(domain::Segment::Axis axis) noexcept;
 std::string to_string(domain::Axis axis) noexcept;
 std::string to_string(domain::Normal normal) noexcept;
 std::string to_string(domain::Plane plane) noexcept;
+std::string to_string(domain::Material::Type type) noexcept;

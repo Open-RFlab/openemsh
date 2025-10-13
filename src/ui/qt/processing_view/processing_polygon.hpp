@@ -34,6 +34,7 @@ public:
 		nodegraph::Node::Params const& node = default_locator<nodegraph::Node::Params>();
 		nodegraph::Port::Params const& port = default_locator<nodegraph::Port::Params>();
 		nodegraph::Text::Params const& title = default_locator<nodegraph::Text::Params>();
+		nodegraph::Text::Params const& main = default_locator<nodegraph::Text::Params>();
 		nodegraph::Rect::Params const& nested_zone = default_locator<nodegraph::Rect::Params>();
 	};
 

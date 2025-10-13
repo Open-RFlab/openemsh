@@ -9,6 +9,7 @@
 #include "domain/geometrics/polygon.hpp"
 #include "ui/qt/data_keys.hpp"
 #include "ui/qt/utils/nodegraph/rect.hpp"
+#include "infra/utils/to_string.hpp"
 #include "processing_edge.hpp"
 
 #include "processing_polygon.hpp"
@@ -40,7 +41,34 @@ ProcessingPolygon::ProcessingPolygon(domain::Polygon const* polygon, QGraphicsIt
 		return locate_processing_polygon_params().port;
 	};
 
+	QString type("Type: ");
+	QString priority("Priority: ");
+	if(polygon) {
+		if(polygon->material) {
+			type += QString::fromStdString(to_string(polygon->material->type));
+		}
+		priority += QString::number(polygon->priority);
+	}
+
+	auto* text_type = new nodegraph::Text(type, this);
+	text_type->setFlag(QGraphicsItem::ItemIsSelectable);
+	text_type->setAcceptedMouseButtons(Qt::NoButton);
+	text_type->locate_text_params = [this]() -> auto& {
+		return locate_processing_polygon_params().main;
+	};
+
+	auto* text_priority = new nodegraph::Text(priority, this);
+	text_priority->setFlag(QGraphicsItem::ItemIsSelectable);
+	text_priority->setAcceptedMouseButtons(Qt::NoButton);
+	text_priority->locate_text_params = [this]() -> auto& {
+		return locate_processing_polygon_params().main;
+	};
+
 	auto* h_box = new QGraphicsLinearLayout(Qt::Horizontal, layout());
+	auto* v_box = new QGraphicsLinearLayout(Qt::Vertical, h_box);
+	layout()->insertItem(1, v_box);
+	v_box->addItem(text_type);
+	v_box->addItem(text_priority);
 	layout()->addItem(h_box);
 	h_box->addStretch();
 	h_box->addItem(output_port);

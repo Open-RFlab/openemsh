@@ -335,6 +335,7 @@ MAKER_DEF(ProcessingStyleSelector, polygon) {
 		.node = get_node(),
 		.port = get_port_normal(),
 		.title = get_title(),
+		.main = get_text_normal(),
 		.nested_zone = get_nested_zone()
 	};
 }

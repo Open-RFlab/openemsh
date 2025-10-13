@@ -16,6 +16,7 @@
 /// @test std::string to_string(Segment::Axis const axis) noexcept
 /// @test std::string to_string(Axis const axis) noexcept
 /// @test std::string to_string(Plane const plane) noexcept
+/// @test std::string to_string(domain::Material::Type type) noexcept
 ///*****************************************************************************
 
 using namespace domain;
@@ -81,4 +82,11 @@ SCENARIO("std::string to_string(Plane const plane) noexcept", "[to_string]") {
 	REQUIRE(to_string(YZ) == "YZ");
 	REQUIRE(to_string(ZX) == "ZX");
 	REQUIRE(to_string(XY) == "XY");
+}
+
+//******************************************************************************
+SCENARIO("std::string to_string(domain::Material::Type type) noexcept", "[to_string]") {
+	REQUIRE(to_string(Material::Type::CONDUCTOR) == "CONDUCTOR");
+	REQUIRE(to_string(Material::Type::DIELECTRIC) == "DIELECTRIC");
+	REQUIRE(to_string(Material::Type::AIR) == "AIR");
 }
