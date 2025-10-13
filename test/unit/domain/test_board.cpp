@@ -25,7 +25,7 @@
 /// @test void Board::adjust_edges_to_materials()
 /// @test void Board::detect_edges_in_polygons()
 /// @test void Board::detect_colinear_edges()
-/// @test void Board::detect_non_conflicting_edges()
+/// @test void Board::detect_individual_edges()
 ///*****************************************************************************
 
 using namespace domain;
@@ -1537,9 +1537,11 @@ SCENARIO("void Board::detect_colinear_edges()", "[board]") {
 }
 
 //******************************************************************************
-SCENARIO("void Board::detect_non_conflicting_edges()", "[board]") {
+SCENARIO("void Board::detect_individual_edges()", "[board]") {
 	Timepoint* t = Caretaker::singleton().get_history_root();
 	auto material = std::make_shared<Material>(Material::Type::CONDUCTOR, "");
+	ConflictColinearEdges cce(X, nullptr, nullptr, t);
+	ConflictEdgeInPolygon ceip(XY, nullptr, nullptr, {{ 0, 0 }, { 0, 0 }}, std::nullopt, t);
 	GIVEN("Some conflicting edges and some non conflicting edges, with some to revert") {
 		std::unique_ptr<Board> b;
 		{
@@ -1554,15 +1556,15 @@ SCENARIO("void Board::detect_non_conflicting_edges()", "[board]") {
 		auto state_e4 = b->get_current_state().edges[XY][4]->get_current_state();
 		auto state_e5 = b->get_current_state().edges[XY][5]->get_current_state();
 		state_e0.conflicts.push_back(nullptr);
-		state_e4.conflicts.push_back(nullptr);
-		state_e5.conflicts.push_back(nullptr);
+		state_e4.conflicts.push_back(&cce);
+		state_e5.conflicts.push_back(&ceip);
 		state_e1.to_reverse = true;
 		b->get_current_state().edges[XY][0]->set_next_state(state_e0);
 		b->get_current_state().edges[XY][1]->set_next_state(state_e1);
 		b->get_current_state().edges[XY][4]->set_next_state(state_e4);
 		b->get_current_state().edges[XY][5]->set_next_state(state_e5);
-		b->detect_non_conflicting_edges();
-		THEN("Should add a thirds meshline policy in the meshline policy manager for each orthogonal and non conflicting edge") {
+		b->detect_individual_edges();
+		THEN("Should add a thirds meshline policy in the meshline policy manager for each orthogonal and non colinear edge") {
 			REQUIRE(b->get_current_state().edges[XY][0]->get_current_state().conflicts.size() == 1);
 			REQUIRE(b->get_current_state().edges[XY][1]->get_current_state().conflicts.size() == 0);
 			REQUIRE(b->get_current_state().edges[XY][2]->get_current_state().conflicts.size() == 0);
@@ -1574,19 +1576,24 @@ SCENARIO("void Board::detect_non_conflicting_edges()", "[board]") {
 			REQUIRE(b->get_current_state().edges[XY][2]->get_current_state().meshline_policy);
 			REQUIRE_FALSE(b->get_current_state().edges[XY][3]->get_current_state().meshline_policy);
 			REQUIRE_FALSE(b->get_current_state().edges[XY][4]->get_current_state().meshline_policy);
-			REQUIRE_FALSE(b->get_current_state().edges[XY][5]->get_current_state().meshline_policy);
+			REQUIRE(b->get_current_state().edges[XY][5]->get_current_state().meshline_policy);
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[X].size() == 1);
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[X][0].get() == b->get_current_state().edges[XY][1]->get_current_state().meshline_policy);
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[X][0]->get_current_state().origins.size() == 1);
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[X][0]->get_current_state().origins[0] == b->get_current_state().edges[XY][1]);
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[X][0]->get_current_state().policy == MeshlinePolicy::Policy::THIRDS);
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[X][0]->get_current_state().normal == MeshlinePolicy::Normal::MAX);
-			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y].size() == 1);
+			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y].size() == 2);
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y][0].get() == b->get_current_state().edges[XY][2]->get_current_state().meshline_policy);
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y][0]->get_current_state().origins.size() == 1);
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y][0]->get_current_state().origins[0] == b->get_current_state().edges[XY][2]);
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y][0]->get_current_state().policy == MeshlinePolicy::Policy::THIRDS);
 			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y][0]->get_current_state().normal == MeshlinePolicy::Normal::MAX);
+			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y][1].get() == b->get_current_state().edges[XY][5]->get_current_state().meshline_policy);
+			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y][1]->get_current_state().origins.size() == 1);
+			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y][1]->get_current_state().origins[0] == b->get_current_state().edges[XY][5]);
+			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y][1]->get_current_state().policy == MeshlinePolicy::Policy::THIRDS);
+			REQUIRE(b->line_policy_manager->get_current_state().line_policies[Y][1]->get_current_state().normal == MeshlinePolicy::Normal::MAX);
 		}
 	}
 }

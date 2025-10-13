@@ -31,15 +31,8 @@ SCENARIO("optional<Step> next(Step step)", "[app][openemsh]") {
 		}
 	}
 	WHEN("Running for DETECT_CONFLICT_CE") {
-		THEN("Should return DETECT_NON_CONFLICTING_EDGES") {
 			std::optional<Step> a = next(Step::DETECT_CONFLICT_CE);
-			REQUIRE(a.has_value());
-			REQUIRE(a.value() == Step::DETECT_NON_CONFLICTING_EDGES);
-		}
-	}
-	WHEN("Running for DETECT_NON_CONFLICTING_EDGES") {
 		THEN("Should return ADD_FIXED_MLP") {
-			std::optional<Step> a = next(Step::DETECT_NON_CONFLICTING_EDGES);
 			REQUIRE(a.has_value());
 			REQUIRE(a.value() == Step::ADD_FIXED_MLP);
 		}
@@ -59,8 +52,15 @@ SCENARIO("optional<Step> next(Step step)", "[app][openemsh]") {
 		}
 	}
 	WHEN("Running for SOLVE_ALL_CE") {
-		THEN("Should return DETECT_AND_SOLVE_TCMLP") {
+		THEN("Should return DETECT_INDIVIDUAL_EDGES") {
 			std::optional<Step> a = next(Step::SOLVE_ALL_CE);
+			REQUIRE(a.has_value());
+			REQUIRE(a.value() == Step::DETECT_INDIVIDUAL_EDGES);
+		}
+	}
+	WHEN("Running for DETECT_INDIVIDUAL_EDGES") {
+		THEN("Should return DETECT_AND_SOLVE_TCMLP") {
+			std::optional<Step> a = next(Step::DETECT_INDIVIDUAL_EDGES);
 			REQUIRE(a.has_value());
 			REQUIRE(a.value() == Step::DETECT_AND_SOLVE_TCMLP);
 		}
@@ -95,10 +95,10 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::ADJUST_EDGE_TO_MATERIAL,
 				Step::DETECT_CONFLICT_EIP,
 				Step::DETECT_CONFLICT_CE,
-				Step::DETECT_NON_CONFLICTING_EDGES,
 				Step::ADD_FIXED_MLP,
 				Step::SOLVE_ALL_EIP,
 				Step::SOLVE_ALL_CE,
+				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
 				Step::MESH
@@ -110,10 +110,10 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 			REQUIRE(that_and_after(Step::DETECT_CONFLICT_EIP) == std::set<Step> {
 				Step::DETECT_CONFLICT_EIP,
 				Step::DETECT_CONFLICT_CE,
-				Step::DETECT_NON_CONFLICTING_EDGES,
 				Step::ADD_FIXED_MLP,
 				Step::SOLVE_ALL_EIP,
 				Step::SOLVE_ALL_CE,
+				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
 				Step::MESH
@@ -124,23 +124,10 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 		THEN("Should return all Steps except those coming before DETECT_CONFLICT_CE") {
 			REQUIRE(that_and_after(Step::DETECT_CONFLICT_CE) == std::set<Step> {
 				Step::DETECT_CONFLICT_CE,
-				Step::DETECT_NON_CONFLICTING_EDGES,
 				Step::ADD_FIXED_MLP,
 				Step::SOLVE_ALL_EIP,
 				Step::SOLVE_ALL_CE,
-				Step::DETECT_AND_SOLVE_TCMLP,
-				Step::DETECT_INTERVALS,
-				Step::MESH
-			});
-		}
-	}
-	WHEN("Running for DETECT_NON_CONFLICTING_EDGES") {
-		THEN("Should return all Steps except those coming before DETECT_NON_CONFLICTING_EDGES") {
-			REQUIRE(that_and_after(Step::DETECT_NON_CONFLICTING_EDGES) == std::set<Step> {
-				Step::DETECT_NON_CONFLICTING_EDGES,
-				Step::ADD_FIXED_MLP,
-				Step::SOLVE_ALL_EIP,
-				Step::SOLVE_ALL_CE,
+				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
 				Step::MESH
@@ -153,6 +140,7 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::ADD_FIXED_MLP,
 				Step::SOLVE_ALL_EIP,
 				Step::SOLVE_ALL_CE,
+				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
 				Step::MESH
@@ -164,6 +152,7 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 			REQUIRE(that_and_after(Step::SOLVE_ALL_EIP) == std::set<Step> {
 				Step::SOLVE_ALL_EIP,
 				Step::SOLVE_ALL_CE,
+				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
 				Step::MESH
@@ -174,6 +163,17 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 		THEN("Should return all Steps except those coming before SOLVE_ALL_CE") {
 			REQUIRE(that_and_after(Step::SOLVE_ALL_CE) == std::set<Step> {
 				Step::SOLVE_ALL_CE,
+				Step::DETECT_INDIVIDUAL_EDGES,
+				Step::DETECT_AND_SOLVE_TCMLP,
+				Step::DETECT_INTERVALS,
+				Step::MESH
+			});
+		}
+	}
+	WHEN("Running for DETECT_INDIVIDUAL_EDGES") {
+		THEN("Should return all Steps except those coming before DETECT_INDIVIDUAL_EDGES") {
+			REQUIRE(that_and_after(Step::DETECT_INDIVIDUAL_EDGES) == std::set<Step> {
+				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
 				Step::MESH

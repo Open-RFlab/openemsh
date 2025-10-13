@@ -83,13 +83,13 @@ public:
 	void adjust_edges_to_materials(Plane const plane);
 	void detect_edges_in_polygons(Plane const plane);
 	void detect_colinear_edges(Plane plane);
-	void detect_non_conflicting_edges(Plane const plane);
+	void detect_individual_edges(Plane const plane);
 	void add_fixed_meshline_policies(Axis axis);
 
 	void adjust_edges_to_materials();
 	void detect_edges_in_polygons();
 	void detect_colinear_edges();
-	void detect_non_conflicting_edges();
+	void detect_individual_edges();
 	void add_fixed_meshline_policies();
 
 	/// Mesh resolution dependant detection tasks

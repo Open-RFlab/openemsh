@@ -23,9 +23,9 @@ SCENARIO("string SerializerToPlantuml::run(Board& board)", "[serializer_to_plant
 	auto const auto_mesh = [](auto& board) {
 		board->detect_edges_in_polygons();
 		board->detect_colinear_edges();
-		board->detect_non_conflicting_edges();
 		board->auto_solve_all_edge_in_polygon();
 		board->auto_solve_all_colinear_edges();
+		board->detect_individual_edges();
 		board->detect_and_solve_too_close_meshline_policies();
 		board->detect_intervals();
 		board->mesh();

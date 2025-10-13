@@ -384,14 +384,17 @@ void Board::detect_colinear_edges(Plane const plane) {
 }
 
 //******************************************************************************
-void Board::detect_non_conflicting_edges(Plane const plane) {
+void Board::detect_individual_edges(Plane const plane) {
 	for(Edge* edge : get_current_state().edges[plane]) {
 		optional<Coord> const coord = domain::coord(edge->p0(), edge->axis);
 		optional<Axis> const axis = transpose(plane, edge->axis);
 		Normal const normal = edge->get_current_state().to_reverse
 		                    ? reverse(edge->normal)
 		                    : edge->normal;
-		if(coord && axis && edge->get_current_state().conflicts.empty()) {
+		if(coord && axis
+		&& (edge->get_current_state().conflicts.empty()
+		   || ranges::none_of(edge->get_current_state().conflicts, [](auto const& conflict) { return conflict ? conflict->kind == Conflict::Kind::COLINEAR_EDGES : false; }))
+		&& edge->get_current_state().to_mesh) {
 			auto [t, state_e] = edge->make_next_state();
 			state_e.meshline_policy = line_policy_manager->add_meshline_policy(
 				{ edge },
@@ -432,9 +435,9 @@ void Board::detect_colinear_edges() {
 }
 
 //******************************************************************************
-void Board::detect_non_conflicting_edges() {
+void Board::detect_individual_edges() {
 	for(auto const& plane : AllPlane)
-		detect_non_conflicting_edges(plane);
+		detect_individual_edges(plane);
 }
 
 //******************************************************************************

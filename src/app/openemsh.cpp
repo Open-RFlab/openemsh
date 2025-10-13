@@ -26,14 +26,14 @@ optional<Step> next(Step step) {
 	case Step::DETECT_CONFLICT_EIP:
 		return Step::DETECT_CONFLICT_CE;
 	case Step::DETECT_CONFLICT_CE:
-		return Step::DETECT_NON_CONFLICTING_EDGES;
-	case Step::DETECT_NON_CONFLICTING_EDGES:
 		return Step::ADD_FIXED_MLP;
 	case Step::ADD_FIXED_MLP:
 		return Step::SOLVE_ALL_EIP;
 	case Step::SOLVE_ALL_EIP:
 		return Step::SOLVE_ALL_CE;
 	case Step::SOLVE_ALL_CE:
+		return Step::DETECT_INDIVIDUAL_EDGES;
+	case Step::DETECT_INDIVIDUAL_EDGES:
 		return Step::DETECT_AND_SOLVE_TCMLP;
 	case Step::DETECT_AND_SOLVE_TCMLP:
 		return Step::DETECT_INTERVALS;
@@ -52,16 +52,16 @@ set<Step> that_and_after(Step step) {
 
 	using enum Step;
 	switch(step) {
-	case ADJUST_EDGE_TO_MATERIAL:      out.emplace(ADJUST_EDGE_TO_MATERIAL);      [[fallthrough]];
-	case DETECT_CONFLICT_EIP:          out.emplace(DETECT_CONFLICT_EIP);          [[fallthrough]];
-	case DETECT_CONFLICT_CE:           out.emplace(DETECT_CONFLICT_CE);           [[fallthrough]];
-	case DETECT_NON_CONFLICTING_EDGES: out.emplace(DETECT_NON_CONFLICTING_EDGES); [[fallthrough]];
-	case ADD_FIXED_MLP:                out.emplace(ADD_FIXED_MLP);                [[fallthrough]];
-	case SOLVE_ALL_EIP:                out.emplace(SOLVE_ALL_EIP);                [[fallthrough]];
-	case SOLVE_ALL_CE:                 out.emplace(SOLVE_ALL_CE);                 [[fallthrough]];
-	case DETECT_AND_SOLVE_TCMLP:       out.emplace(DETECT_AND_SOLVE_TCMLP);       [[fallthrough]];
-	case DETECT_INTERVALS:             out.emplace(DETECT_INTERVALS);             [[fallthrough]];
-	case MESH:                         out.emplace(MESH);                         break;
+	case ADJUST_EDGE_TO_MATERIAL: out.emplace(ADJUST_EDGE_TO_MATERIAL); [[fallthrough]];
+	case DETECT_CONFLICT_EIP:     out.emplace(DETECT_CONFLICT_EIP);     [[fallthrough]];
+	case DETECT_CONFLICT_CE:      out.emplace(DETECT_CONFLICT_CE);      [[fallthrough]];
+	case ADD_FIXED_MLP:           out.emplace(ADD_FIXED_MLP);           [[fallthrough]];
+	case SOLVE_ALL_EIP:           out.emplace(SOLVE_ALL_EIP);           [[fallthrough]];
+	case SOLVE_ALL_CE:            out.emplace(SOLVE_ALL_CE);            [[fallthrough]];
+	case DETECT_INDIVIDUAL_EDGES: out.emplace(DETECT_INDIVIDUAL_EDGES); [[fallthrough]];
+	case DETECT_AND_SOLVE_TCMLP:  out.emplace(DETECT_AND_SOLVE_TCMLP);  [[fallthrough]];
+	case DETECT_INTERVALS:        out.emplace(DETECT_INTERVALS);        [[fallthrough]];
+	case MESH:                    out.emplace(MESH);                    break;
 	default: ::unreachable();
 	}
 
@@ -134,16 +134,16 @@ void OpenEMSH::run(std::set<Step> const& steps) const {
 	};
 
 	using enum Step;
-	handle(ADJUST_EDGE_TO_MATERIAL,      [&] { board->adjust_edges_to_materials(); });
-	handle(DETECT_CONFLICT_EIP,          [&] { board->detect_edges_in_polygons(); });
-	handle(DETECT_CONFLICT_CE,           [&] { board->detect_colinear_edges(); });
-	handle(DETECT_NON_CONFLICTING_EDGES, [&] { board->detect_non_conflicting_edges(); });
-	handle(ADD_FIXED_MLP,                [&] { board->add_fixed_meshline_policies(); });
-	handle(SOLVE_ALL_EIP,                [&] { board->auto_solve_all_edge_in_polygon(); });
-	handle(SOLVE_ALL_CE,                 [&] { board->auto_solve_all_colinear_edges(); });
-	handle(DETECT_AND_SOLVE_TCMLP,       [&] { board->detect_and_solve_too_close_meshline_policies(); });
-	handle(DETECT_INTERVALS,             [&] { board->detect_intervals(); });
-	handle(MESH,                         [&] { board->mesh(); });
+	handle(ADJUST_EDGE_TO_MATERIAL, [&] { board->adjust_edges_to_materials(); });
+	handle(DETECT_CONFLICT_EIP,     [&] { board->detect_edges_in_polygons(); });
+	handle(DETECT_CONFLICT_CE,      [&] { board->detect_colinear_edges(); });
+	handle(ADD_FIXED_MLP,           [&] { board->add_fixed_meshline_policies(); });
+	handle(SOLVE_ALL_EIP,           [&] { board->auto_solve_all_edge_in_polygon(); });
+	handle(SOLVE_ALL_CE,            [&] { board->auto_solve_all_colinear_edges(); });
+	handle(DETECT_INDIVIDUAL_EDGES, [&] { board->detect_individual_edges(); });
+	handle(DETECT_AND_SOLVE_TCMLP,  [&] { board->detect_and_solve_too_close_meshline_policies(); });
+	handle(DETECT_INTERVALS,        [&] { board->detect_intervals(); });
+	handle(MESH,                    [&] { board->mesh(); });
 
 	Caretaker::singleton().remember_current_timepoint();
 }
@@ -154,10 +154,10 @@ void OpenEMSH::run_all_steps() const {
 		Step::ADJUST_EDGE_TO_MATERIAL,
 		Step::DETECT_CONFLICT_EIP,
 		Step::DETECT_CONFLICT_CE,
-		Step::DETECT_NON_CONFLICTING_EDGES,
 		Step::ADD_FIXED_MLP,
 		Step::SOLVE_ALL_EIP,
 		Step::SOLVE_ALL_CE,
+		Step::DETECT_INDIVIDUAL_EDGES,
 		Step::DETECT_AND_SOLVE_TCMLP,
 		Step::DETECT_INTERVALS,
 		Step::MESH
