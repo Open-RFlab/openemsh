@@ -9,6 +9,8 @@
 #include <array>
 //#include <initializer_list>
 #include <memory>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 #include "conflicts/conflict.hpp"
@@ -108,7 +110,8 @@ public:
 	std::vector<std::shared_ptr<ConflictTooCloseMeshlinePolicies>> const& get_conflicts_too_close_meshline_policies(Axis const axis) const;
 
 private:
-	std::shared_ptr<Material> find_ambient_material(Plane plane, Segment const& segment, std::shared_ptr<Polygon> const& current_polygon = nullptr) const;
+	std::shared_ptr<Material> find_ambient_material(Plane plane, Segment const& segment) const;
+	std::pair<std::shared_ptr<Material>, std::remove_const_t<decltype(Polygon::priority)>> find_ambient_material(Plane plane, Segment const& segment, std::shared_ptr<Polygon> const& current_polygon) const;
 };
 
 #ifdef UNITTEST

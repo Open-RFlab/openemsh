@@ -21,7 +21,7 @@
 /// @test void Board::Builder::add_polygon(Plane plane, std::string const& name, Polygon::RangeZ const& z_placement, std::vector<std::unique_ptr<Point const>>&& points)
 /// @test void Board::Builder::add_polygon_from_box(Plane plane, std::string const& name, Polygon::RangeZ const& z_placement, Point const p1, Point const p3)
 /// @test std::unique_ptr<Board> Board::Builder::build()
-/// @test std::shared_ptr<Material> Board::find_ambient_material(Plane plane, Segment const& segment, std::shared_ptr<Polygon> const& current_polygon) const
+/// @test std::pair<std::shared_ptr<Material>, std::remove_const_t<decltype(Polygon::priority)>> Board::find_ambient_material(Plane plane, Segment const& segment, std::shared_ptr<Polygon> const& current_polygon) const
 /// @test void Board::adjust_edges_to_materials()
 /// @test void Board::detect_edges_in_polygons()
 /// @test void Board::detect_colinear_edges()
@@ -284,28 +284,86 @@ SCENARIO("std::unique_ptr<Board> Board::Builder::build()", "[board]") {
 }
 
 //******************************************************************************
-SCENARIO("std::shared_ptr<Material> Board::find_ambient_material(Plane plane, Segment const& segment, std::shared_ptr<Polygon> const& current_polygon) const", "[board]") {
+SCENARIO("std::pair<std::shared_ptr<Material>, std::remove_const_t<decltype(Polygon::priority)>> Board::find_ambient_material(Plane plane, Segment const& segment, std::shared_ptr<Polygon> const& current_polygon) const", "[board]") {
 	Timepoint* t = Caretaker::singleton().get_history_root();
+	std::unique_ptr<Board> b;
+	GIVEN("A board holding some polygons of each Material type, for some prioriries, all overlapping in plane and normal axis") {
+		Polygon::RangeZ z = { 0, 3 };
+		auto a0x = std::make_shared<Material>(Material::Type::AIR, "");
+		auto c0 = std::make_shared<Material>(Material::Type::CONDUCTOR, "");
+		auto d0 = std::make_shared<Material>(Material::Type::DIELECTRIC, "");
+		auto a0 = std::make_shared<Material>(Material::Type::AIR, "");
+		auto c1 = std::make_shared<Material>(Material::Type::CONDUCTOR, "");
+		auto d1 = std::make_shared<Material>(Material::Type::DIELECTRIC, "");
+		auto a1 = std::make_shared<Material>(Material::Type::AIR, "");
+		auto c2 = std::make_shared<Material>(Material::Type::CONDUCTOR, "");
+		auto d2 = std::make_shared<Material>(Material::Type::DIELECTRIC, "");
+		auto a2 = std::make_shared<Material>(Material::Type::AIR, "");
+		auto px = std::make_shared<Polygon>(XY, a0x, "", 0, z, from_init_list<Point>({{ 2, 2 }, { 2, 5 }, { 5, 5 }, { 5, 2 }}), t);
+		auto pc0 = std::make_shared<Polygon>(XY, c0, "", 0, z, from_init_list<Point>({{ 1, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }}), t);
+		auto pd0 = std::make_shared<Polygon>(XY, d0, "", 0, z, from_init_list<Point>({{ 1, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }}), t);
+		auto pa0 = std::make_shared<Polygon>(XY, a0, "", 0, z, from_init_list<Point>({{ 1, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }}), t);
+		auto pc1 = std::make_shared<Polygon>(XY, c1, "", 1, z, from_init_list<Point>({{ 1, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }}), t);
+		auto pd1 = std::make_shared<Polygon>(XY, d1, "", 1, z, from_init_list<Point>({{ 1, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }}), t);
+		auto pa1 = std::make_shared<Polygon>(XY, a1, "", 1, z, from_init_list<Point>({{ 1, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }}), t);
+		auto pc2 = std::make_shared<Polygon>(XY, c2, "", 2, z, from_init_list<Point>({{ 1, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }}), t);
+		auto pd2 = std::make_shared<Polygon>(XY, d2, "", 2, z, from_init_list<Point>({{ 1, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }}), t);
+		auto pa2 = std::make_shared<Polygon>(XY, a2, "", 2, z, from_init_list<Point>({{ 1, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }}), t);
+		WHEN("Looking for ambient Material inside the overlap of all Polygons relative to one of AIR Material with the lower priority") {
+			{
+				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
+				tmp[XY].push_back(px);
+				tmp[XY].push_back(pc0);
+				tmp[XY].push_back(pd0);
+				tmp[XY].push_back(pa0);
+				tmp[XY].push_back(pc1);
+				tmp[XY].push_back(pd1);
+				tmp[XY].push_back(pa1);
+				tmp[XY].push_back(pc2);
+				tmp[XY].push_back(pd2);
+				tmp[XY].push_back(pa2);
+				b = std::make_unique<Board>(std::move(tmp), Params(), t);
+			}
+			auto [material, priority] = b->find_ambient_material(XY, Range({ 3.5, 3.2 }, { 3.5, 3.8 }), px);
+			THEN("Should the CONDUCTOR Material of the Polygon with the highest priority") {
+				REQUIRE(material);
+				REQUIRE(material->type == Material::Type::CONDUCTOR);
+				REQUIRE(material.get() == c2.get());
+				REQUIRE(priority == pc2->priority);
+			}
+		}
+	}
+
 	GIVEN("A board holding some polygons of each Material type, all overlapping in plane, some overlapping in normal axis") {
 		auto conductor = std::make_shared<Material>(Material::Type::CONDUCTOR, "");
 		auto dielectric = std::make_shared<Material>(Material::Type::DIELECTRIC, "");
 		auto air = std::make_shared<Material>(Material::Type::AIR, "");
-		std::unique_ptr<Board> b;
-		auto x = std::make_shared<Polygon>(XY, conductor, "", 0, Polygon::RangeZ { 0, 3 }, from_init_list<Point>({{ 1, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }}), t);
-		auto y = std::make_shared<Polygon>(XY, dielectric, "", 0, Polygon::RangeZ { 2, 4 }, from_init_list<Point>({{ 2, 2 }, { 2, 5 }, { 5, 5 }, { 5, 2 }}), t);
-		auto z = std::make_shared<Polygon>(XY, air, "", 0, Polygon::RangeZ { 5, 6 }, from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }, { 4, 3 }}), t);
-		{
-			PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-			tmp[XY].push_back(x);
-			tmp[XY].push_back(y);
-			b = std::make_unique<Board>(std::move(tmp), Params(), t);
-		}
+		auto x0 = std::make_shared<Polygon>(XY, conductor, "", 0, Polygon::RangeZ { 0, 3 }, from_init_list<Point>({{ 1, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }}), t);
+		auto y0 = std::make_shared<Polygon>(XY, dielectric, "", 0, Polygon::RangeZ { 2, 4 }, from_init_list<Point>({{ 2, 2 }, { 2, 5 }, { 5, 5 }, { 5, 2 }}), t);
+		auto z0 = std::make_shared<Polygon>(XY, air, "", 0, Polygon::RangeZ { 5, 6 }, from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }, { 4, 3 }}), t);
+		auto x1 = std::make_shared<Polygon>(XY, conductor, "", 1, Polygon::RangeZ { 0, 3 }, from_init_list<Point>({{ 1, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }}), t);
+		auto y1 = std::make_shared<Polygon>(XY, dielectric, "", 1, Polygon::RangeZ { 2, 4 }, from_init_list<Point>({{ 2, 2 }, { 2, 5 }, { 5, 5 }, { 5, 2 }}), t);
+		auto z1 = std::make_shared<Polygon>(XY, air, "", 1, Polygon::RangeZ { 5, 6 }, from_init_list<Point>({{ 3, 3 }, { 3, 4 }, { 4, 4 }, { 4, 3 }}), t);
 		WHEN("Looking for absolute ambient Material outside of any Polygon") {
+			{
+				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
+				tmp[XY].push_back(x0);
+				tmp[XY].push_back(y0);
+				tmp[XY].push_back(z0);
+				b = std::make_unique<Board>(std::move(tmp), Params(), t);
+			}
 			THEN("Should not return any Material") {
 				REQUIRE_FALSE(b->find_ambient_material(XY, Range({ 10, 10 }, { 11, 11 })));
 			}
 		}
 		WHEN("Looking for absolute ambient Material inside the overlap of all Polygons") {
+			{
+				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
+				tmp[XY].push_back(x0);
+				tmp[XY].push_back(y0);
+				tmp[XY].push_back(z0);
+				b = std::make_unique<Board>(std::move(tmp), Params(), t);
+			}
 			auto material = b->find_ambient_material(XY, Range({ 3.5, 3.2 }, { 3.5, 3.8 }));
 			THEN("Should return CONDUCTOR Material") {
 				REQUIRE(material);
@@ -314,22 +372,109 @@ SCENARIO("std::shared_ptr<Material> Board::find_ambient_material(Plane plane, Se
 		}
 		WHEN("Looking for ambient Material inside the overlap of all Polygons") {
 			AND_WHEN("Relative to CONDUCTOR Material Polygon") {
-				auto material = b->find_ambient_material(XY, Range({ 3.5, 3.2 }, { 3.5, 3.8 }), x);
-				THEN("Should return DIELECTRIC Material") {
-					REQUIRE(material);
-					REQUIRE(material->type == Material::Type::DIELECTRIC);
+				WHEN("Relative to a Polygon with inferior priority than others") {
+					{
+						PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
+						tmp[XY].push_back(x0);
+						tmp[XY].push_back(y1);
+						tmp[XY].push_back(z1);
+						b = std::make_unique<Board>(std::move(tmp), Params(), t);
+					}
+					auto [material, priority] = b->find_ambient_material(XY, Range({ 3.5, 3.2 }, { 3.5, 3.8 }), x0);
+					THEN("Should return DIELECTRIC Material") {
+						REQUIRE(material);
+						REQUIRE(material->type == Material::Type::DIELECTRIC);
+						REQUIRE(priority == 1);
+					}
+				}
+				WHEN("Relative to a Polygon with the same priority than others") {
+					{
+						PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
+						tmp[XY].push_back(x0);
+						tmp[XY].push_back(y0);
+						tmp[XY].push_back(z0);
+						b = std::make_unique<Board>(std::move(tmp), Params(), t);
+					}
+					auto [material, priority] = b->find_ambient_material(XY, Range({ 3.5, 3.2 }, { 3.5, 3.8 }), x0);
+					THEN("Should return DIELECTRIC Material") {
+						REQUIRE(material);
+						REQUIRE(material->type == Material::Type::DIELECTRIC);
+						REQUIRE(priority == 0);
+					}
+				}
+				WHEN("Relative to a Polygon with superior priority than others") {
+					{
+						PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
+						tmp[XY].push_back(x1);
+						tmp[XY].push_back(y0);
+						tmp[XY].push_back(z0);
+						b = std::make_unique<Board>(std::move(tmp), Params(), t);
+					}
+					auto [material, priority] = b->find_ambient_material(XY, Range({ 3.5, 3.2 }, { 3.5, 3.8 }), x1);
+					THEN("Should return DIELECTRIC Material") {
+						REQUIRE(material);
+						REQUIRE(material->type == Material::Type::DIELECTRIC);
+						REQUIRE(priority == 0);
+					}
 				}
 			}
 			AND_WHEN("Relative to DIELECTRIC Material Polygon") {
-				auto material = b->find_ambient_material(XY, Range({ 3.5, 3.2 }, { 3.5, 3.8 }), y);
-				THEN("Should return CONDUCTOR Material") {
-					REQUIRE(material);
-					REQUIRE(material->type == Material::Type::CONDUCTOR);
+				WHEN("Relative to a Polygon with inferior priority than others") {
+					{
+						PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
+						tmp[XY].push_back(x1);
+						tmp[XY].push_back(y0);
+						tmp[XY].push_back(z1);
+						b = std::make_unique<Board>(std::move(tmp), Params(), t);
+					}
+					auto [material, priority] = b->find_ambient_material(XY, Range({ 3.5, 3.2 }, { 3.5, 3.8 }), y0);
+					THEN("Should return CONDUCTOR Material") {
+						REQUIRE(material);
+						REQUIRE(material->type == Material::Type::CONDUCTOR);
+						REQUIRE(priority == 1);
+					}
+				}
+				WHEN("Relative to a Polygon with the same priority than others") {
+					{
+						PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
+						tmp[XY].push_back(x0);
+						tmp[XY].push_back(y0);
+						tmp[XY].push_back(z0);
+						b = std::make_unique<Board>(std::move(tmp), Params(), t);
+					}
+					auto [material, priority] = b->find_ambient_material(XY, Range({ 3.5, 3.2 }, { 3.5, 3.8 }), y0);
+					THEN("Should return CONDUCTOR Material") {
+						REQUIRE(material);
+						REQUIRE(material->type == Material::Type::CONDUCTOR);
+						REQUIRE(priority == 0);
+					}
+				}
+				WHEN("Relative to a Polygon with superior priority than others") {
+					{
+						PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
+						tmp[XY].push_back(x0);
+						tmp[XY].push_back(y1);
+						tmp[XY].push_back(z0);
+						b = std::make_unique<Board>(std::move(tmp), Params(), t);
+					}
+					auto [material, priority] = b->find_ambient_material(XY, Range({ 3.5, 3.2 }, { 3.5, 3.8 }), y1);
+					THEN("Should return CONDUCTOR Material") {
+						REQUIRE(material);
+						REQUIRE(material->type == Material::Type::CONDUCTOR);
+						REQUIRE(priority == 0);
+					}
 				}
 			}
 			AND_WHEN("Relative to AIR Material Polygon") {
+				{
+					PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
+					tmp[XY].push_back(x0);
+					tmp[XY].push_back(y0);
+					tmp[XY].push_back(z0);
+					b = std::make_unique<Board>(std::move(tmp), Params(), t);
+				}
 				THEN("Should not return any Material because no overlap in normal axis") {
-					REQUIRE_FALSE(b->find_ambient_material(XY, Range({ 3.5, 3.2 }, { 3.5, 3.8 }), z));
+					REQUIRE_FALSE(b->find_ambient_material(XY, Range({ 3.5, 3.2 }, { 3.5, 3.8 }), z0).first);
 				}
 			}
 		}
@@ -362,7 +507,7 @@ SCENARIO("void Board::adjust_edges_to_materials()", "[board]") {
 			}
 		}
 	}
-	GIVEN("A board holding two Polygons that overlap partially") {
+	GIVEN("A board holding two Polygons that overlap partially both in plane and normal axis") {
 		make_polygons(
 			conductor, 0, Polygon::RangeZ { 0, 3 }, from_init_list<Point>({{ 1, 1 }, { 3, 1 }, { 3, 3 }, { 1, 3 }}),
 			air, 0, Polygon::RangeZ { 2, 4 }, from_init_list<Point>({{ 2, 2 }, { 4, 2 }, { 4, 4 }, { 2, 4 }}));
@@ -431,7 +576,7 @@ SCENARIO("void Board::adjust_edges_to_materials()", "[board]") {
 							REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[3]->get_current_state().to_reverse);
 						}
 					}
-					WHEN("Inner Polygon is of inferior priority than outer") {
+					WHEN("Both Polygons are of the same priority") {
 						make_polygons(i_m, 0, i_z, inner, o_m, 0, o_z, outer);
 						b->adjust_edges_to_materials();
 						THEN("Inner Polygon orthogonal edges should be marked for Normal reverse") {
@@ -447,16 +592,16 @@ SCENARIO("void Board::adjust_edges_to_materials()", "[board]") {
 							REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[3]->get_current_state().to_reverse);
 						}
 					}
-					WHEN("Both Polygons are of the same priority") {
+					WHEN("Inner Polygon is of inferior priority than outer") {
 						make_polygons(i_m, 2, i_z, inner, o_m, 3, o_z, outer);
 						b->adjust_edges_to_materials();
-						THEN("Inner Polygon orthogonal edges should be marked for Normal reverse") {
-							REQUIRE(b->get_current_state().polygons[XY][0]->edges[0]->get_current_state().to_reverse);
-							REQUIRE(b->get_current_state().polygons[XY][0]->edges[1]->get_current_state().to_reverse);
-							REQUIRE(b->get_current_state().polygons[XY][0]->edges[2]->get_current_state().to_reverse);
+						THEN("Inner Polygon orthogonal edges should not be marked for Normal reverse") {
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][0]->edges[0]->get_current_state().to_reverse);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][0]->edges[1]->get_current_state().to_reverse);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][0]->edges[2]->get_current_state().to_reverse);
 							REQUIRE(b->get_current_state().polygons[XY][0]->edges[3]->direction == Edge::Direction::NONE);
 							REQUIRE_FALSE(b->get_current_state().polygons[XY][0]->edges[3]->get_current_state().to_reverse);
-							REQUIRE(b->get_current_state().polygons[XY][0]->edges[4]->get_current_state().to_reverse);
+							REQUIRE_FALSE(b->get_current_state().polygons[XY][0]->edges[4]->get_current_state().to_reverse);
 							REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[0]->get_current_state().to_reverse);
 							REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[1]->get_current_state().to_reverse);
 							REQUIRE_FALSE(b->get_current_state().polygons[XY][1]->edges[2]->get_current_state().to_reverse);

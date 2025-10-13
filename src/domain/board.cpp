@@ -160,24 +160,33 @@ Board::Board(
 			get_caretaker().take_care_of(polygon);
 }
 
+//******************************************************************************
+shared_ptr<Material> Board::find_ambient_material(Plane plane, Segment const& segment) const {
+	return find_ambient_material(plane, segment, nullptr).first;
+}
+
 /// Check among all Polygons that match segment and current_polygon->z_placement.
 /// Choose Material following this rule: CONDUCTOR>DIELECTRIC>AIR
 ///*****************************************************************************
-shared_ptr<Material> Board::find_ambient_material(Plane plane, Segment const& segment, shared_ptr<Polygon> const& current_polygon) const {
+pair<shared_ptr<Material>, remove_const_t<decltype(Polygon::priority)>> Board::find_ambient_material(Plane plane, Segment const& segment, shared_ptr<Polygon> const& current_polygon) const {
 	Bounding2D const segment_bounding = bounding(segment);
 
-	vector<shared_ptr<Material>> materials;
+	vector<pair<shared_ptr<Material>, remove_const_t<decltype(Polygon::priority)>>> materials;
 	for(shared_ptr<Polygon> const& polygon : get_current_state().polygons[plane]) {
 		if(polygon->material
 		&& (!current_polygon // Bypass self & z_overlap checks if not relevant.
-			|| (polygon != current_polygon
-			&& does_overlap(polygon->z_placement, current_polygon->z_placement)))
+		   || (polygon != current_polygon
+		   && does_overlap(polygon->z_placement, current_polygon->z_placement)))
 		&& does_overlap(polygon->bounding, segment_bounding))
-			materials.push_back(shared_ptr<Material>(polygon->material));
+			materials.emplace_back(shared_ptr<Material>(polygon->material), polygon->priority);
 	}
 
 	ranges::sort(materials, [](auto const& a, auto const& b) {
-		return *a < *b;
+		auto const& [material_a, priority_a] = a;
+		auto const& [material_b, priority_b] = b;
+		return priority_a != priority_b
+		     ? priority_a < priority_b
+		     : *material_a < *material_b;
 	});
 
 	if(!materials.empty())
@@ -192,7 +201,7 @@ void Board::adjust_edges_to_materials(Plane const plane) {
 	for(shared_ptr<Polygon> const& polygon : get_current_state().polygons[plane]) {
 		for(shared_ptr<Edge> const& edge : polygon->edges) {
 			auto const& inner_material = polygon->material;
-			auto const& immediate_ambient_outer_material = [&]() -> shared_ptr<Material> {
+			auto const& [immediate_ambient_outer_material, outer_priority] = [&]() -> pair<shared_ptr<Material>, remove_const_t<decltype(Polygon::priority)>> {
 				Point const translate_x(2 * equality_tolerance, 0);
 				Point const translate_y(0, 2 * equality_tolerance);
 				switch(edge->normal) {
