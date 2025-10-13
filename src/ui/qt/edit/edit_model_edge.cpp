@@ -20,9 +20,10 @@ EditModelEdge::EditModelEdge(domain::Edge* edge, QObject* parent)
 , edge(edge)
 {
 	auto const& state = edge->get_current_state();
-	setRowCount(1);
+	setRowCount(2);
 
 	make_row(0, "To mesh", state.to_mesh, "Take into account in the meshing process.");
+	make_row(1, "To reverse", state.to_mesh, "Swap in-side and out-side.");
 }
 
 //******************************************************************************
@@ -30,7 +31,8 @@ void EditModelEdge::commit() {
 	auto state = edge->get_current_state();
 
 	std::array does_succeed = {
-		try_to_bool(item(0, V)->checkState(), state.to_mesh)
+		try_to_bool(item(0, V)->checkState(), state.to_mesh),
+		try_to_bool(item(1, V)->checkState(), state.to_reverse)
 	};
 
 	if(std::ranges::all_of(does_succeed, is_true)) {
