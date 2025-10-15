@@ -28,6 +28,14 @@ Material::Material(Type type, string const& name)
 {}
 
 //******************************************************************************
+Material::Material(Type type, string const& name, optional<Color> const& fill_color, optional<Color> const& edge_color)
+: type(type)
+, name(name)
+, fill_color(fill_color)
+, edge_color(edge_color)
+{}
+
+//******************************************************************************
 strong_ordering Material::operator<=>(Material const& other) const noexcept {
 	switch(type) {
 	case Type::CONDUCTOR:

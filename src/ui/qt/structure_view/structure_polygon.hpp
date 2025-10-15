@@ -50,6 +50,7 @@ protected:
 
 private:
 	domain::Polygon const* const polygon;
+	bool has_color = false;
 };
 
 } // namespace ui::qt

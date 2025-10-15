@@ -7,6 +7,7 @@
 #pragma once
 
 #include <compare>
+#include <optional>
 #include <string>
 
 namespace domain {
@@ -23,9 +24,15 @@ public:
 		AIR
 	} const type;
 
+	// https://github.com/thliebig/CSXCAD/blob/master/src/CSProperties.h#L61
+	struct Color {
+		unsigned char r, g, b, a;
+	};
+
 	std::strong_ordering operator<=>(Material const& other) const noexcept;
 
 	Material(Type type, std::string const& name);
+	Material(Type type, std::string const& name, std::optional<Color> const& fill_color, std::optional<Color> const& edge_color);
 
 	// https://wiki.openems.de/index.php/Material_Property.html
 	// Epsilon: relative electric permittivity (must be >=1)
@@ -41,6 +48,8 @@ public:
 	static Type deduce_type(double epsilon, double mue, double kappa);
 
 	std::string const name;
+	std::optional<Color> const fill_color;
+	std::optional<Color> const edge_color;
 };
 
 } // namespace domain

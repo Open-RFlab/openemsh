@@ -71,6 +71,21 @@ ParserFromCsx::Pimpl::Pimpl(ParserFromCsx::Params const& params)
 shared_ptr<Material> ParserFromCsx::Pimpl::parse_property(pugi::xml_node const& node) {
 	string name(node.attribute("Name").as_string());
 
+	auto const parse_color = [](pugi::xml_node const& node) -> optional<Material::Color> {
+		if(node)
+			return Material::Color {
+				static_cast<unsigned char>(node.attribute("R").as_uint()),
+				static_cast<unsigned char>(node.attribute("G").as_uint()),
+				static_cast<unsigned char>(node.attribute("B").as_uint()),
+				static_cast<unsigned char>(node.attribute("a").as_uint())
+			};
+		else
+			return nullopt;
+	};
+
+	auto fill = parse_color(node.child("FillColor"));
+	auto edge = parse_color(node.child("EdgeColor"));
+
 	if(node.name() == "Material"s) {
 		// https://github.com/thliebig/openEMS-Project/discussions/347
 		// Currently do not take care of Isotropy=false
@@ -81,13 +96,13 @@ shared_ptr<Material> ParserFromCsx::Pimpl::parse_property(pugi::xml_node const& 
 		double mue = property.attribute("Mue").as_double(Material::default_mue);
 		double kappa = property.attribute("Kappa").as_double(Material::default_kappa);
 		double sigma = property.attribute("Sigma").as_double(Material::default_sigma);
-		return make_shared<Material>(Material::deduce_type(epsilon, mue, kappa), name);
+		return make_shared<Material>(Material::deduce_type(epsilon, mue, kappa), name, fill, edge);
 	} else if(node.name() == "Metal"s) {
-		return make_shared<Material>(Material::Type::CONDUCTOR, name);
+		return make_shared<Material>(Material::Type::CONDUCTOR, name, fill, edge);
 	} else if(node.name() == "ConductingSheet"s) {
 		double conductivity = node.attribute("Conductivity").as_double();
 		double thickness = node.attribute("Thickness").as_double();
-		return make_shared<Material>(Material::Type::CONDUCTOR, name);
+		return make_shared<Material>(Material::Type::CONDUCTOR, name, fill, edge);
 	} else if(node.name() == "LumpedElement"s) {
 	} else if(node.name() == "Excitation"s) {
 	} else if(node.name() == "ProbeBox"s) {

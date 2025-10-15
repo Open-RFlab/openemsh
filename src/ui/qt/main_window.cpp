@@ -19,6 +19,7 @@
 #include "utils/state_management.hpp"
 #include "utils/unreachable.hpp"
 #include "about_dialog.hpp"
+#include "settings.hpp"
 
 #include "ui_main_window.h"
 #include "main_window.hpp"
@@ -53,6 +54,10 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 		}
 		ui->m_style->addAction(action);
 	}
+
+	Settings::singleton() = {
+		.does_use_material_color = ui->a_does_use_csx_properties_color->isChecked()
+	};
 }
 
 //******************************************************************************
@@ -369,6 +374,12 @@ void MainWindow::on_a_redo_triggered() {
 	Caretaker::singleton().redo();
 	go_to_or_make_current_state();
 	QGuiApplication::restoreOverrideCursor();
+}
+
+//******************************************************************************
+void MainWindow::on_a_does_use_csx_properties_color_triggered() {
+	Settings::singleton().does_use_material_color = ui->a_does_use_csx_properties_color->isChecked();
+	ui->structure_view->viewport()->update();
 }
 
 //******************************************************************************

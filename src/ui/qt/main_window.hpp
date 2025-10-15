@@ -76,6 +76,7 @@ private slots:
 	void on_a_mesh_next_triggered();
 	void on_a_undo_triggered();
 	void on_a_redo_triggered();
+	void on_a_does_use_csx_properties_color_triggered();
 
 	void edit_global_params();
 	void handle_edition_from(app::Step from, std::function<void ()> const& edit);

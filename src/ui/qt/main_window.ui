@@ -616,7 +616,17 @@
      </property>
      <widget class="QActionGroup" name="ag_styles"/>
     </widget>
+    <widget class="QMenu" name="m_settings">
+     <property name="title">
+      <string>Settings</string>
+     </property>
+     <property name="toolTipsVisible">
+      <bool>true</bool>
+     </property>
+     <addaction name="a_does_use_csx_properties_color"/>
+    </widget>
     <addaction name="m_style"/>
+    <addaction name="m_settings"/>
    </widget>
    <addaction name="m_view"/>
    <addaction name="m_help"/>
@@ -772,6 +782,20 @@
    </property>
    <property name="icon">
     <iconset theme="QIcon::ThemeIcon::EditRedo"/>
+   </property>
+  </action>
+  <action name="a_does_use_csx_properties_color">
+   <property name="text">
+    <string>Use CSX Properties colors</string>
+   </property>
+   <property name="toolTip">
+    <string>In Structure View, draw selected shapes using color from CSX Properties, if available</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
    </property>
   </action>
  </widget>
