@@ -15,6 +15,7 @@
 
 #include "utils/concepts.hpp"
 #include "utils/unreachable.hpp"
+#include "progress.hpp"
 
 #include "cli.hpp"
 
@@ -25,7 +26,7 @@
 // TODO CLI --board
 // TODO CLI --structure -zx -yz -xy
 
-namespace ui {
+namespace ui::cli {
 
 using namespace std;
 
@@ -214,7 +215,13 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 			apply(to_override);
 	};
 
+	if(params.verbose)
+		Progress::singleton().register_impl_builder(
+			[](size_t max, string const& message) {
+				return make_unique<ProgressBar>(max, message);
+			});
+
 	return params;
 }
 
-} // namespace ui
+} // namespace ui::cli

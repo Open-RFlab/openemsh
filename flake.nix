@@ -162,6 +162,7 @@
       pkgs = final: prev: {
         openemsh = prev.qt6.callPackage ./default.nix {
           inherit lib;
+          inherit (final) indicators;
         };
 
         openemshMingw64 = prev.pkgsCross.mingwW64.qt6.callPackage ./default.nix {
@@ -170,6 +171,52 @@
         };
 
         inherit (prev.python3Packages) cairosvg;
+
+        indicators = prev.callPackage (
+        { lib, stdenv, fetchpatch, fetchFromGitHub, cmake, ninja }:
+        stdenv.mkDerivation rec {
+          pname = "indicators";
+#          version = "2.3";
+          version = "master";
+
+          src = fetchFromGitHub {
+            owner = "p-ranav";
+            repo = "indicators";
+#            rev = "v${version}";
+            rev = version;
+#            hash = "sha256-FA07UbuhsA7HThbyxHxS+V4H5ha0LAXU7sukVfPVpdg=";
+            hash = "sha256-1/Ut6Qilabqq2az5mu3r5vIUV7aXan26wglaY4SDU1U=";
+          };
+
+          patches = [
+            (fetchpatch {
+              # https://github.com/p-ranav/indicators/pull/130
+              url = "https://github.com/p-ranav/indicators/pull/130.patch";
+              hash = "sha256-OEF6CnCPMBCETm5MEtF1DmbNCs+UK54lSE4e1S6zAmc=";
+            })
+#            (fetchpatch {
+#              # https://github.com/p-ranav/indicators/pull/133
+#              url = "https://github.com/p-ranav/indicators/pull/133.patch";
+#              hash = "sha256-A3HZnBE8JNKMZprmmIZNLfa8eyCzSBKhvmpmNhiIgK0=";
+#            })
+          ];
+
+          nativeBuildInputs = [ cmake ninja ];
+
+          cmakeFlags = [
+            "-DBUILD_SHARED_LIBS=ON"
+            "-DINDICATORS_SAMPLES=OFF"
+            "-DINDICATORS_DEMO=OFF"
+            "-DINDICATORS_TESTS=OFF"
+          ];
+
+          meta = with lib; {
+            description = "Activity Indicators for Modern C++";
+            homepage = "https://github.com/p-ranav/indicators";
+            license = licenses.mit;
+            maintainers = with maintainers; [];
+          };
+        }) {};
 
         csxcad = (prev.csxcad.overrideAttrs (new: old: {
           version = "0.6.3";

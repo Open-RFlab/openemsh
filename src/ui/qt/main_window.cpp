@@ -19,6 +19,7 @@
 #include "utils/state_management.hpp"
 #include "utils/unreachable.hpp"
 #include "about_dialog.hpp"
+#include "progress.hpp"
 #include "settings.hpp"
 
 #include "ui_main_window.h"
@@ -44,6 +45,11 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 	ui->setupUi(this);
 
 	// TODO Init StructureView & ProcessingView stuff from buttons default values
+
+	Progress::singleton().register_impl_builder(
+		[this](std::size_t max, std::string const& message) {
+			return make_unique<ProgressBar>(ui->statusBar, max, message);
+		});
 
 	for(auto const& style : Style::available_styles) {
 		auto* const action = new QAction(style.name, ui->ag_styles);

@@ -93,6 +93,13 @@ if( CLI11_FOUND )
 	message( STATUS "Found CLI11: ${CLI11_DIR} ${CLI11_VERSION}" )
 endif()
 
+# TODO match indicators and spdlog
+# https://github.com/bkryza/clang-uml/blob/fc3fc12/src/common/generators/progress_indicator.cc
+find_package( indicators REQUIRED )
+if( indicators_FOUND )
+	message( STATUS "Found indicators: ${indicators_DIR} ${indicators_VERSION}" )
+endif()
+
 find_package( Qt6
 	COMPONENTS
 	Core          REQUIRED

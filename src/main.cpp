@@ -9,12 +9,12 @@
 #include <cstdlib>
 
 #include "app/openemsh.hpp"
-#include "ui/cli.hpp"
+#include "ui/cli/cli.hpp"
 #include "ui/qt/main_window.hpp"
 
 //******************************************************************************
 int main(int argc, char* argv[]) {
-	app::OpenEMSH oemsh(ui::cli(argc, argv));
+	app::OpenEMSH oemsh(ui::cli::cli(argc, argv));
 
 	if(!oemsh.get_params().gui) {
 		oemsh.parse();

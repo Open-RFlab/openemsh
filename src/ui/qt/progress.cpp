@@ -1,0 +1,53 @@
+///*****************************************************************************
+/// @date Feb 2021
+/// @copyright GPL-3.0-or-later
+/// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
+///*****************************************************************************
+
+#include <QLabel>
+#include <QProgressBar>
+#include <QStatusBar>
+#include <QString>
+
+#include "progress.hpp"
+
+using namespace std;
+
+namespace ui::qt {
+
+//******************************************************************************
+ProgressBar::ProgressBar(QStatusBar* status_bar, size_t max, string const& message)
+: status_bar(status_bar)
+, bar(new QProgressBar())
+, label(new QLabel(QString::fromStdString(message)))
+{
+	bar->setRange(0, max);
+	status_bar->addWidget(bar);
+	status_bar->addWidget(label);
+}
+
+//******************************************************************************
+ProgressBar::~ProgressBar() {
+	status_bar->removeWidget(label);
+	status_bar->removeWidget(bar);
+	delete label;
+	delete bar;
+}
+
+//******************************************************************************
+void ProgressBar::tick(size_t i) {
+	bar->setValue(++i);
+}
+
+//******************************************************************************
+void ProgressBar::tick(size_t /*i*/, size_t j) {
+	bar->setValue(++j);
+}
+
+//******************************************************************************
+void ProgressBar::complete() {
+	status_bar->removeWidget(label);
+	status_bar->removeWidget(bar);
+}
+
+} // namespace ui::qt

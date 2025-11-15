@@ -659,6 +659,8 @@
    <addaction name="a_redo"/>
   </widget>
 
+  <widget class="QStatusBar" name="statusBar"/>
+
   <action name="a_about">
    <property name="text">
     <string>About</string>

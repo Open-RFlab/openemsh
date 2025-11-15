@@ -5,6 +5,7 @@
 , git
 , texlive
 , cli11
+, indicators
 , pugixml
 , qtbase
 , wrapQtAppsHook
@@ -46,6 +47,7 @@ stdenv.mkDerivation {
 
   buildInputs = [
     cli11
+    indicators
     (pugixml.override { shared = true; })
     qtbase
   ];

@@ -8,9 +8,9 @@
 
 #include "app/openemsh.hpp"
 
-namespace ui {
+namespace ui::cli {
 
 //******************************************************************************
 app::OpenEMSH::Params cli(int argc, char* argv[]) noexcept(false);
 
-} // namespace ui
+} // namespace ui::cli

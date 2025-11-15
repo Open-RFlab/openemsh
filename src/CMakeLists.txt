@@ -12,6 +12,7 @@ target_sources( openemsh
 	"${CMAKE_CURRENT_SOURCE_DIR}/utils/entity.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/utils/tree_node.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/utils/state_management.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/utils/progress.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/space.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/relation.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/geometrics/bounding.cpp"
@@ -80,7 +81,8 @@ add_executable( openemsh_bin WIN32 )
 
 target_sources( openemsh_bin
 	PRIVATE
-	"${CMAKE_CURRENT_SOURCE_DIR}/ui/cli.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/cli/cli.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/cli/progress.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/highlightable.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/port.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/utils/nodegraph/text.cpp"
@@ -122,6 +124,7 @@ target_sources( openemsh_bin
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/about_dialog.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/icons.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/main_window.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/progress.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/style.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/ui/qt/resources.qrc"
 	"${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
@@ -163,6 +166,7 @@ target_link_libraries( openemsh_bin
 	PRIVATE
 	openemsh
 	CLI11::CLI11
+	indicators::indicators
 	Qt6::Core
 	Qt6::Gui
 	Qt6::Widgets
