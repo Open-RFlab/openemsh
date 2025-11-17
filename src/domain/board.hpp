@@ -108,6 +108,7 @@ public:
 	std::vector<std::shared_ptr<ConflictEdgeInPolygon>> const& get_conflicts_edge_in_polygons(Plane const plane) const;
 	std::vector<std::shared_ptr<ConflictColinearEdges>> const& get_conflicts_colinear_edges(Axis const axis) const;
 	std::vector<std::shared_ptr<ConflictTooCloseMeshlinePolicies>> const& get_conflicts_too_close_meshline_policies(Axis const axis) const;
+	std::size_t get_mesh_cell_number() const;
 
 private:
 	std::shared_ptr<Material> find_ambient_material(Plane plane, Segment const& segment) const;

@@ -212,4 +212,12 @@ vector<shared_ptr<Interval>> const& MeshlinePolicyManager::get_intervals(Axis ax
 	return get_current_state().intervals[axis];
 }
 
+//******************************************************************************
+size_t MeshlinePolicyManager::get_mesh_cell_number() const {
+	size_t n = 1;
+	for(auto const& axis : get_current_state().meshlines)
+		n *= axis.size();
+	return n;
+}
+
 } // namespace domain

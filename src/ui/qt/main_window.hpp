@@ -36,6 +36,8 @@ private:
 	void update_title();
 	void update_navigation_buttons_visibility();
 	void update_show_buttons_pressing();
+	void update_cell_number(bool reset = false);
+
 	void go_to_current_state();
 	void make_current_state_view();
 	void go_to_or_make_current_state();

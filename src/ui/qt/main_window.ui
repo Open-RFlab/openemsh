@@ -659,7 +659,13 @@
    <addaction name="a_redo"/>
   </widget>
 
-  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QStatusBar" name="statusBar">
+   <widget class="QLabel" name="l_cell_number">
+    <property name="text">
+     <string>Mesh cells: </string>
+    </property>
+   </widget>
+  </widget>
 
   <action name="a_about">
    <property name="text">

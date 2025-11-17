@@ -518,4 +518,10 @@ vector<shared_ptr<ConflictTooCloseMeshlinePolicies>> const& Board::get_conflicts
 	return conflict_manager->get_too_close_meshline_policies(axis);
 }
 
+//******************************************************************************
+size_t Board::get_mesh_cell_number() const {
+	return line_policy_manager->get_mesh_cell_number();
+}
+
+
 } // namespace domain

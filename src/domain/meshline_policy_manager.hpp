@@ -69,6 +69,7 @@ public:
 	std::vector<std::shared_ptr<Meshline>> const& get_meshlines(Axis axis) const;
 	std::vector<std::shared_ptr<MeshlinePolicy>> const& get_meshline_policies(Axis axis) const;
 	std::vector<std::shared_ptr<Interval>> const& get_intervals(Axis axis) const;
+	std::size_t get_mesh_cell_number() const;
 };
 
 #ifdef UNITTEST

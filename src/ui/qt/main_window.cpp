@@ -46,6 +46,8 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 
 	// TODO Init StructureView & ProcessingView stuff from buttons default values
 
+	ui->statusBar->addPermanentWidget(ui->l_cell_number);
+
 	Progress::singleton().register_impl_builder(
 		[this](std::size_t max, std::string const& message) {
 			return make_unique<ProgressBar>(ui->statusBar, max, message);
@@ -81,17 +83,27 @@ void MainWindow::parse_and_display() {
 }
 
 //******************************************************************************
+void MainWindow::update_cell_number(bool reset) {
+	static QString const base_str(ui->l_cell_number->text());
+	// TODO space padding every 10^3
+	ui->l_cell_number->setText(reset
+		? base_str
+		: base_str + QString::number(oemsh.get_board().get_mesh_cell_number()));
+}
+
+//******************************************************************************
 void MainWindow::update_title() {
 	static QString const base_title(windowTitle());
 
 	if(!csx_file.isEmpty())
-		setWindowTitle(base_title + " - " + csx_file);
+		setWindowTitle(csx_file + " - " + base_title);
 }
 
 //******************************************************************************
 void MainWindow::clear() {
 	ui->structure_view->clear();
 	ui->processing_view->clear();
+	update_cell_number(true);
 }
 
 //******************************************************************************
@@ -403,6 +415,7 @@ void MainWindow::go_to_current_state() {
 	ui->structure_view->go_to_current_state();
 	ui->processing_view->go_to_current_state();
 	update_navigation_buttons_visibility();
+	update_cell_number();
 	update_show_buttons_pressing();
 	// TODO handle passing selection from a scene to its own future couterpart
 }
@@ -432,6 +445,7 @@ void MainWindow::make_current_state_view() {
 		this, &MainWindow::handle_edition_from);
 
 	update_navigation_buttons_visibility();
+	update_cell_number();
 }
 
 //******************************************************************************
