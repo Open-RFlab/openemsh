@@ -10,11 +10,21 @@
 
 #include "app/openemsh.hpp"
 #include "ui/cli/cli.hpp"
+#include "ui/cli/progress.hpp"
 #include "ui/qt/main_window.hpp"
 
 //******************************************************************************
 int main(int argc, char* argv[]) {
 	app::OpenEMSH oemsh(ui::cli::cli(argc, argv));
+
+	if(oemsh.get_params().verbose)
+		Progress::singleton().register_impl_builder(
+			[&oemsh](std::size_t max, std::string const& message) {
+				return std::make_unique<ui::cli::ProgressBar>(max,
+					std::to_string(app::index(oemsh.get_current_step()))
+					+ "/" + std::to_string(app::index_max())
+					+ " " + message);
+			});
 
 	if(!oemsh.get_params().gui) {
 		oemsh.parse();

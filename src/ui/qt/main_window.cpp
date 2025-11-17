@@ -50,7 +50,10 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 
 	Progress::singleton().register_impl_builder(
 		[this](std::size_t max, std::string const& message) {
-			return make_unique<ProgressBar>(ui->statusBar, max, message);
+			return std::make_unique<ProgressBar>(ui->statusBar, max,
+				QString::number(app::index(this->oemsh.get_current_step()))
+				+ "/" + QString::number(app::index_max())
+				+ " " + QString::fromStdString(message));
 		});
 
 	for(auto const& style : Style::available_styles) {

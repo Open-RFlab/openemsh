@@ -76,6 +76,7 @@ public:
 
 	bool can_run_a_next_step() const;
 	bool can_go_before() const;
+	std::optional<Step> get_current_step() const;
 private:
 	Params params;
 	std::shared_ptr<domain::Board> board;

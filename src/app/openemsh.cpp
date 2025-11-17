@@ -214,6 +214,16 @@ bool OpenEMSH::can_go_before() const {
 }
 
 //******************************************************************************
+optional<Step> OpenEMSH::get_current_step() const {
+	auto& c = Caretaker::singleton();
+	auto* t = c.find_first_ancestor_with_annotation(true);
+	if(auto const* a = c.get_annotation(t); a)
+		return static_cast<Annotation const*>(a)->before_step;
+	else
+		return nullopt;
+}
+
+//******************************************************************************
 Annotation::Annotation(Step before_step)
 : before_step(before_step)
 {}

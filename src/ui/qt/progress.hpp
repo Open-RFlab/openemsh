@@ -7,7 +7,8 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
+
+#include <QString>
 
 #include "utils/progress.hpp"
 
@@ -20,7 +21,7 @@ namespace ui::qt {
 //******************************************************************************
 class ProgressBar final : public Progress::IBar {
 public:
-	ProgressBar(QStatusBar* status_bar, std::size_t max, std::string const& message);
+	ProgressBar(QStatusBar* status_bar, std::size_t max, QString const& message);
 	~ProgressBar() override;
 
 	void tick(std::size_t i) override;

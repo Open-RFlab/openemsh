@@ -15,7 +15,6 @@
 
 #include "utils/concepts.hpp"
 #include "utils/unreachable.hpp"
-#include "progress.hpp"
 
 #include "cli.hpp"
 
@@ -214,12 +213,6 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 		for(auto const& apply : domain_overrides)
 			apply(to_override);
 	};
-
-	if(params.verbose)
-		Progress::singleton().register_impl_builder(
-			[](size_t max, string const& message) {
-				return make_unique<ProgressBar>(max, message);
-			});
 
 	return params;
 }

@@ -7,7 +7,6 @@
 #include <QLabel>
 #include <QProgressBar>
 #include <QStatusBar>
-#include <QString>
 
 #include "progress.hpp"
 
@@ -16,10 +15,10 @@ using namespace std;
 namespace ui::qt {
 
 //******************************************************************************
-ProgressBar::ProgressBar(QStatusBar* status_bar, size_t max, string const& message)
+ProgressBar::ProgressBar(QStatusBar* status_bar, size_t max, QString const& message)
 : status_bar(status_bar)
 , bar(new QProgressBar())
-, label(new QLabel(QString::fromStdString(message)))
+, label(new QLabel(message))
 {
 	bar->setRange(0, max);
 	status_bar->addWidget(bar);
