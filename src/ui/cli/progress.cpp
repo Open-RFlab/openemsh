@@ -4,6 +4,8 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <iostream>
+
 #include <indicators/block_progress_bar.hpp>
 
 #include "progress.hpp"
@@ -31,7 +33,8 @@ ProgressBar::ProgressBar(size_t max, string const& prefix)
 	indicators::option::ShowPercentage { true },
 	indicators::option::ShowElapsedTime { true },
 	indicators::option::PrefixText { prefix },
-	indicators::option::MaxProgress { max }
+	indicators::option::MaxProgress { max },
+	indicators::option::Stream { cerr }
 ))
 , prefix_size(prefix.size())
 , max(to_string(max))
