@@ -134,7 +134,8 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 		{ "plantuml", app::OpenEMSH::Params::OutputFormat::PLANTUML },
 		{ "prettyprint", app::OpenEMSH::Params::OutputFormat::PRETTYPRINT }
 	};
-	app.add_option("--output-format", params.output_format, "Output format.")->transform(CLI::CheckedTransformer(map, CLI::ignore_case));
+	// https://github.com/CLIUtils/CLI11/issues/554#issuecomment-932782337
+	app.add_option("--output-format", params.output_format, "Output format.")->transform(CLI::CheckedTransformer(map, CLI::ignore_case).description(CLI::detail::generate_map(CLI::detail::smart_deref(map), true)));
 
 	app.add_option("--ground", params.grounds, "Declare properties to be ground planes ('Name' XML field).")->group("Input options");
 	app.add_flag("--no-yz", [&params](size_t) { params.with_yz = false; }, "Don't process YZ plane.")->group("Input options");
