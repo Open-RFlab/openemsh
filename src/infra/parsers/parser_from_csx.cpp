@@ -18,6 +18,7 @@
 #include "csxcad_layer/point_3d.hpp"
 
 #include "parser_from_csx.hpp"
+#include "utils/progress.hpp"
 #include "utils/unreachable.hpp"
 #include "utils/vector_utils.hpp"
 
@@ -306,6 +307,10 @@ void ParserFromCsx::parse() {
 			}
 	}
 
+	auto [bar, found, i] = Progress::Bar::build(
+		pimpl->primitives_ids.size(),
+		"Parsing primitives ");
+
 	pugi::xpath_node properties = doc.select_node("/openEMS/ContinuousStructure/Properties");
 	for(auto const& node : properties.node().children()) {
 		auto material = pimpl->parse_property(node);
@@ -313,10 +318,13 @@ void ParserFromCsx::parse() {
 		pugi::xml_node primitives = node.child("Primitives");
 		for(auto const& node : primitives.children()) {
 			if(material)
-				pimpl->parse_primitive(node, material);
+				if(pimpl->parse_primitive(node, material))
+					++found;
+			bar.tick(found, ++i);
 		}
 
 	}
+	bar.complete();
 }
 
 //******************************************************************************

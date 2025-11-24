@@ -13,9 +13,18 @@ using namespace std;
 namespace ui::cli {
 
 //******************************************************************************
+size_t bar_width(size_t prefix_size, size_t postfix_size) {
+	// indicators::option::BarWidth does not take into account percentage nor time
+	// " 100% [000m:00s] " 17 chars
+	return 100 - prefix_size - postfix_size - 19;
+}
+
+//******************************************************************************
 ProgressBar::ProgressBar(size_t max, string const& prefix)
 : bar(make_unique<indicators::BlockProgressBar>(
-//	indicators::option::BarWidth { 100 },
+	// 2 padding for no suffix & no 'm' in elapsed time yet
+	// 2 padding for '100%' vs '0%' regarding whether max is 0
+	indicators::option::BarWidth { bar_width(prefix.size(), 0) + (max ? 4 : 2) },
 	indicators::option::Start { "[" },
 	indicators::option::End { "]" },
 	indicators::option::ForegroundColor { indicators::Color::green },
@@ -24,8 +33,8 @@ ProgressBar::ProgressBar(size_t max, string const& prefix)
 	indicators::option::PrefixText { prefix },
 	indicators::option::MaxProgress { max }
 ))
+, prefix_size(prefix.size())
 , max(to_string(max))
-, prefix(prefix)
 {}
 
 //******************************************************************************
@@ -34,7 +43,7 @@ ProgressBar::~ProgressBar() = default;
 //******************************************************************************
 void ProgressBar::tick(size_t i) {
 	string postfix(to_string(++i) + "/" + max);
-	resize_to_term(postfix);
+	bar->set_option(indicators::option::BarWidth { bar_width(prefix_size, postfix.size()) });
 	bar->set_option(indicators::option::PostfixText { postfix });
 	bar->set_progress(i);
 }
@@ -42,16 +51,9 @@ void ProgressBar::tick(size_t i) {
 //******************************************************************************
 void ProgressBar::tick(size_t i, size_t j) {
 	string postfix(to_string(i) + "/" + to_string(j) + "/" + max);
-	resize_to_term(postfix);
+	bar->set_option(indicators::option::BarWidth { bar_width(prefix_size, postfix.size()) });
 	bar->set_option(indicators::option::PostfixText { postfix });
 	bar->set_progress(j);
-}
-
-//******************************************************************************
-void ProgressBar::resize_to_term(string const& postfix) {
-	// TODO This does not take into account percentage nor time
-	// " 100% [000m:00s] " 17 chars
-	bar->set_option(indicators::option::BarWidth { 100 - prefix.size() - postfix.size() - 19 });
 }
 
 //******************************************************************************

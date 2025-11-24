@@ -7,8 +7,10 @@
 #include <algorithm>
 #include <utility>
 
-#include "utils/unreachable.hpp"
+#include "infra/utils/to_string.hpp"
+#include "utils/progress.hpp"
 #include "utils/signum.hpp"
+#include "utils/unreachable.hpp"
 #include "utils/vector_utils.hpp"
 
 #include "board.hpp"
@@ -198,6 +200,10 @@ pair<shared_ptr<Material>, remove_const_t<decltype(Polygon::priority)>> Board::f
 
 //******************************************************************************
 void Board::adjust_edges_to_materials(Plane const plane) {
+	auto [bar, found, i] = Progress::Bar::build(
+		get_current_state().edges[plane].size(),
+		"["s + to_string(plane) + "] Adjusting Edges to Materials ");
+
 	for(shared_ptr<Polygon> const& polygon : get_current_state().polygons[plane]) {
 		for(shared_ptr<Edge> const& edge : polygon->edges) {
 			auto const& inner_material = polygon->material;
@@ -222,20 +228,29 @@ void Board::adjust_edges_to_materials(Plane const plane) {
 
 			if(immediate_ambient_outer_material
 			&& *immediate_ambient_outer_material > *inner_material) {
+				++found;
 				auto state = edge->get_current_state();
 				state.to_reverse = true;
 				edge->set_next_state(state);
 			}
+			bar.tick(found, ++i);
 		}
 	}
+	bar.complete();
 }
 
 /// Detect all EDGE_IN_POLYGON. Will also detect some COLINEAR_EDGES.
 /// Overlapping edges should be EDGE_IN_POLYGON and not COLINEAR_EDGES.
 ///*****************************************************************************
 void Board::detect_edges_in_polygons(Plane const plane) {
+	auto [bar, found, k] = Progress::Bar::build(
+		get_current_state().polygons[plane].size() * get_current_state().polygons[plane].size(),
+		"["s + to_string(plane) + "] Detecting EDGES_IN_POLYGON conflicts ");
+
 	for(auto const& poly_a : get_current_state().polygons[plane]) {
 		for(auto const& poly_b : get_current_state().polygons[plane]) {
+			++k;
+
 			if(poly_b == poly_a)
 				continue;
 
@@ -281,6 +296,7 @@ void Board::detect_edges_in_polygons(Plane const plane) {
 							if(r->axis == Segment::Axis::POINT)
 								break;
 							ranges.emplace_back(r.value(), relation::PolygonPoint::ON);
+							++found;
 							conflict_manager->add_edge_in_polygon(edge_a.get(), poly_b.get(), r.value(), edge_b.get());
 						}
 						break;
@@ -296,6 +312,7 @@ void Board::detect_edges_in_polygons(Plane const plane) {
 //				&& !ranges.size()
 				&& rel_p0 == relation::PolygonPoint::IN
 				&& rel_p1 == relation::PolygonPoint::IN) {
+					++found;
 					conflict_manager->add_edge_in_polygon(edge_a.get(), poly_b.get());
 				} else if(intersections.size()) {
 					intersections.push_back(edge_a->p0());
@@ -334,9 +351,11 @@ void Board::detect_edges_in_polygons(Plane const plane) {
 						if(range.mid.has_value()
 						&& poly_b->relation_to(range.mid.value()) == relation::PolygonPoint::IN) {
 /*						|| poly_b->relation_to(&range.mid.value()) == relation::PolygonPoint::ON))
-*/							conflict_manager->add_edge_in_polygon(edge_a.get(), poly_b.get(), range.range);
+*/							++found;
+							conflict_manager->add_edge_in_polygon(edge_a.get(), poly_b.get(), range.range);
 //							range.rel_to_poly_b = poly_b->relation_to(&range.mid.value()); //TODO useless
 						} else if(range.rel_to_poly_b == relation::PolygonPoint::IN) {
+							++found;
 							conflict_manager->add_edge_in_polygon(edge_a.get(), poly_b.get(), range.range);
 						}
 					}
@@ -355,36 +374,51 @@ void Board::detect_edges_in_polygons(Plane const plane) {
 				}
 			}
 		}
+		bar.tick(found, k);
 	}
+	bar.complete();
 }
 
 //******************************************************************************
 void Board::detect_colinear_edges(Plane const plane) {
 	auto const& s = get_current_state();
 
+	auto [bar, found, k] = Progress::Bar::build(
+		((s.edges[plane].size() * s.edges[plane].size()) - s.edges[plane].size()) / 2, // AB/BA deduplicated, AA dismissed.
+		"["s + to_string(plane) + "] Detecting COLINEAR_EDGES conflicts ");
+
 	for(size_t i = 0; i < s.edges[plane].size(); ++i) {
 		if(s.edges[plane][i]->axis == Segment::Axis::DIAGONAL)
 //		|| !edges[i]->to_mesh)
 			continue;
 
-		for(size_t j = i + 1; j < s.edges[plane].size(); ++j) {
+		for(size_t j = i + 1; j < s.edges[plane].size(); ++j, ++k) {
 			if(s.edges[plane][j]->axis != s.edges[plane][i]->axis)
 				continue;
 
 			optional<Axis> const axis = transpose(plane, s.edges[plane][i]->axis);
 
 			if(axis) {
-				if(s.edges[plane][i]->axis == Segment::Axis::H && s.edges[plane][i]->p0().y == s.edges[plane][j]->p0().y)
+				if(s.edges[plane][i]->axis == Segment::Axis::H && s.edges[plane][i]->p0().y == s.edges[plane][j]->p0().y) {
 					conflict_manager->add_colinear_edges(s.edges[plane][i], s.edges[plane][j]);
-				else if(s.edges[plane][i]->axis == Segment::Axis::V && s.edges[plane][i]->p0().x == s.edges[plane][j]->p0().x)
+					++found;
+				} else if(s.edges[plane][i]->axis == Segment::Axis::V && s.edges[plane][i]->p0().x == s.edges[plane][j]->p0().x) {
 					conflict_manager->add_colinear_edges(s.edges[plane][i], s.edges[plane][j]);
+					++found;
+				}
 			}
 		}
+		bar.tick(found, k);
 	}
+	bar.complete();
 }
 
 //******************************************************************************
 void Board::detect_individual_edges(Plane const plane) {
+	auto [bar, found, i] = Progress::Bar::build(
+		get_current_state().edges[plane].size(),
+		"["s + to_string(plane) + "] Adding fixed meshline policies ");
+
 	for(Edge* edge : get_current_state().edges[plane]) {
 		optional<Coord> const coord = domain::coord(edge->p0(), edge->axis);
 		optional<Axis> const axis = transpose(plane, edge->axis);
@@ -395,6 +429,7 @@ void Board::detect_individual_edges(Plane const plane) {
 		&& (edge->get_current_state().conflicts.empty()
 		   || ranges::none_of(edge->get_current_state().conflicts, [](auto const& conflict) { return conflict ? conflict->kind == Conflict::Kind::COLINEAR_EDGES : false; }))
 		&& edge->get_current_state().to_mesh) {
+			++found;
 			auto [t, state_e] = edge->make_next_state();
 			state_e.meshline_policy = line_policy_manager->add_meshline_policy(
 				{ edge },
@@ -406,14 +441,23 @@ void Board::detect_individual_edges(Plane const plane) {
 				t);
 			edge->set_state(t, state_e);
 		}
+		bar.tick(found, ++i);
 	}
+	bar.complete();
 }
 
 //******************************************************************************
 void Board::add_fixed_meshline_policies(Axis axis) {
+	auto [bar, i, _] = Progress::Bar::build(
+		fixed_meshline_policy_creators[axis].size(),
+		"["s + to_string(axis) + "] Adding fixed meshline policies ");
+
 	auto* t = next_timepoint();
-	for(auto const& create_meshline_policy : fixed_meshline_policy_creators[axis])
+	for(auto const& create_meshline_policy : fixed_meshline_policy_creators[axis]) {
 		create_meshline_policy(this, t);
+		bar.tick(++i);
+	}
+	bar.complete();
 }
 
 //******************************************************************************

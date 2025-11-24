@@ -10,6 +10,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <tuple>
 #include <vector>
 
 //******************************************************************************
@@ -31,7 +32,11 @@ public:
 		std::vector<std::unique_ptr<IBar>> impls;
 
 	public:
-		Bar(std::size_t max, std::string const& prefix);
+		static std::tuple<Progress::Bar, std::size_t, std::size_t> build(std::size_t max, std::string const& message);
+
+		Bar(std::size_t max, std::string const& message);
+		Bar(Bar&& other);
+		void operator=(Bar&& other);
 		~Bar() override;
 
 		void tick(std::size_t i) override;

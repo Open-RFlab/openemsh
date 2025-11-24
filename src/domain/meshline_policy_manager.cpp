@@ -8,6 +8,8 @@
 #include <limits>
 
 #include "domain/geometrics/normal.hpp"
+#include "infra/utils/to_string.hpp"
+#include "utils/progress.hpp"
 #include "utils/unreachable.hpp"
 #include "utils/vector_utils.hpp"
 #include "conflict_manager.hpp"
@@ -103,15 +105,26 @@ optional<array<MeshlinePolicy*, 2>> detect_closest_meshline_policies(
 
 //******************************************************************************
 void MeshlinePolicyManager::detect_and_solve_too_close_meshline_policies(Axis const axis) {
+	auto possible_max = get_current_state().line_policies[axis].size();
+	auto [bar, found, i] = Progress::Bar::build(
+		possible_max,
+		"["s + to_string(axis) + "] Detecting & solving TCMLP conflicts ");
+
 	while(true) {
+		++i;
 		auto closest = detect_closest_meshline_policies(create_view(get_current_state().line_policies[axis]), global_params->get_current_state().proximity_limit);
 		if(!closest)
 			break;
 
 		ConflictTooCloseMeshlinePolicies* conflict = conflict_manager->add_too_close_meshline_policies(closest->front(), closest->back());
-		if(conflict)
+		if(conflict) {
 			conflict->auto_solve(*this);
+			bar.tick(++found, i);
+		}
 	}
+
+	bar.tick(found, possible_max);
+	bar.complete();
 }
 
 //******************************************************************************
@@ -125,6 +138,12 @@ void MeshlinePolicyManager::detect_intervals(Axis const axis) {
 			return (!a->get_current_state().is_enabled);
 		});
 
+//	// TODO C++26 already implemented
+//	auto [bar, _, _] = Progress::Bar::build(
+	auto [bar, _, __] = Progress::Bar::build(
+		dimension.size(),
+		"["s + to_string(axis) + "] Detecting Intervals ");
+
 	ranges::sort(dimension,
 		[](MeshlinePolicy const* a, MeshlinePolicy const* b) {
 			return a->coord < b->coord;
@@ -134,11 +153,12 @@ void MeshlinePolicyManager::detect_intervals(Axis const axis) {
 		auto const& interval = state.intervals[axis].emplace_back(make_shared<Interval>(
 			dimension[i-1], dimension[i], axis, global_params, t));
 		get_caretaker().take_care_of(interval);
-
+		bar.tick(i);
 		// TODO add links MLP -> I ?
 	}
 
 	set_state(t, state);
+	bar.complete();
 }
 
 //******************************************************************************
@@ -146,6 +166,10 @@ void MeshlinePolicyManager::mesh(Axis const axis) {
 	auto [t, state] = make_next_state();
 
 	auto dimension_view = create_view(state.intervals[axis]);
+
+	auto [bar, i, _] = Progress::Bar::build(
+		dimension_view.size() + state.line_policies[axis].size() + 1,
+		"["s + to_string(axis) + "] Meshing Intervals + Meshline Policies ");
 
 	ranges::sort(dimension_view,
 		[](Interval const* a, Interval const* b) {
@@ -164,6 +188,7 @@ void MeshlinePolicyManager::mesh(Axis const axis) {
 		interval_meshlines.emplace_back(interval->mesh());
 
 		new_size += interval_meshlines.back().size();
+		bar.tick(++i);
 	}
 
 	for(auto const& line_policy : state.line_policies[axis]) {
@@ -173,6 +198,7 @@ void MeshlinePolicyManager::mesh(Axis const axis) {
 			interval_meshlines.emplace_back(std::move(v));
 			++new_size;
 		}
+		bar.tick(++i);
 	}
 
 	state.meshlines[axis].reserve(new_size);
@@ -186,6 +212,7 @@ void MeshlinePolicyManager::mesh(Axis const axis) {
 		});
 
 	set_state(t, state);
+	bar.complete();
 }
 
 //******************************************************************************

@@ -7,6 +7,8 @@
 #include "geometrics/edge.hpp"
 #include "geometrics/polygon.hpp"
 #include "mesh/meshline_policy.hpp"
+#include "infra/utils/to_string.hpp"
+#include "utils/progress.hpp"
 
 #include "conflict_manager.hpp"
 
@@ -199,14 +201,28 @@ ConflictTooCloseMeshlinePolicies* ConflictManager::add_too_close_meshline_polici
 
 //******************************************************************************
 void ConflictManager::auto_solve_all_edge_in_polygon(Plane const plane) {
-	for(auto const& conflict : get_current_state().all_edge_in_polygons[plane])
+	auto [bar, i, _] = Progress::Bar::build(
+		get_current_state().all_edge_in_polygons[plane].size(),
+		"["s + to_string(plane) + "] Solving EDGES_IN_POLYGON conflicts ");
+
+	for(auto const& conflict : get_current_state().all_edge_in_polygons[plane]) {
 		conflict->auto_solve(*line_policy_manager);
+		bar.tick(i++);
+	}
+	bar.complete();
 }
 
 //******************************************************************************
 void ConflictManager::auto_solve_all_colinear_edges(Axis const axis) {
-	for(auto const& conflict : get_current_state().all_colinear_edges[axis])
+	auto [bar, i, _] = Progress::Bar::build(
+		get_current_state().all_colinear_edges[axis].size(),
+		"["s + to_string(axis) + "] Solving COLINEAR_EDGES conflicts ");
+
+	for(auto const& conflict : get_current_state().all_colinear_edges[axis]) {
 		conflict->auto_solve(*line_policy_manager);
+		bar.tick(i++);
+	}
+	bar.complete();
 }
 
 //******************************************************************************

@@ -4,14 +4,33 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <utility>
+
 #include "progress.hpp"
 
 using namespace std;
 
+/// To be used like:
+/// auto [bar, i, j] = Progress::Bar::build(max, message);
+///*****************************************************************************
+tuple<Progress::Bar, size_t, size_t> Progress::Bar::build(size_t max, string const& message) {
+	return { Progress::Bar(max, message), 0, 0 };
+}
+
 //******************************************************************************
-Progress::Bar::Bar(size_t max, string const& prefix) {
+Progress::Bar::Bar(size_t max, string const& message) {
 	for(auto& builder : Progress::singleton().impl_builders)
-		impls.push_back(builder(max, prefix));
+		impls.push_back(builder(max, message));
+}
+
+//******************************************************************************
+Progress::Bar::Bar(Bar&& other)
+: impls(std::move(other.impls))
+{}
+
+//******************************************************************************
+void Progress::Bar::operator=(Bar&& other) {
+	impls = std::move(other.impls);
 }
 
 //******************************************************************************

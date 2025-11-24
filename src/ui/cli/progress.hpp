@@ -29,11 +29,9 @@ public:
 	void complete() override;
 
 private:
-	void resize_to_term(std::string const& postfix);
-
 	std::unique_ptr<indicators::BlockProgressBar> bar;
+	std::size_t prefix_size;
 	std::string max;
-	std::string prefix;
 };
 
 } // namespace ui::cli
