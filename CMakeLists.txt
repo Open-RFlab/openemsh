@@ -74,6 +74,15 @@ if( NOT CPM_DISABLE )
 		)
 
 	set( CLI11_DIR "${CLI11_BINARY_DIR}" )
+
+	CPMAddPackage(
+		NAME indicators
+		GITHUB_REPOSITORY p-ranav/indicators
+		VERSION 2.3
+		PATCHES "https://github.com/p-ranav/indicators/pull/130.patch"
+		)
+
+	set( indicators_DIR "${indicators_BINARY_DIR}" )
 endif()
 
 find_package( CMakeUtils QUIET )
