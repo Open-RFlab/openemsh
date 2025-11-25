@@ -177,7 +177,7 @@
         stdenv.mkDerivation rec {
           pname = "indicators";
 #          version = "2.3";
-          version = "master";
+          version = "3872f37";
 
           src = fetchFromGitHub {
             owner = "p-ranav";

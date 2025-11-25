@@ -78,7 +78,7 @@ if( NOT CPM_DISABLE )
 	CPMAddPackage(
 		NAME indicators
 		GITHUB_REPOSITORY p-ranav/indicators
-		VERSION 2.3
+		GIT_TAG 3872f37
 		PATCHES "https://github.com/p-ranav/indicators/pull/130.patch"
 		)
 
