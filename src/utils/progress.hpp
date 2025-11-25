@@ -35,9 +35,6 @@ public:
 		static std::tuple<Progress::Bar, std::size_t, std::size_t> build(std::size_t max, std::string const& message);
 
 		Bar(std::size_t max, std::string const& message);
-		Bar(Bar&& other);
-		void operator=(Bar&& other);
-		~Bar() override;
 
 		void tick(std::size_t i) override;
 		void tick(std::size_t i, std::size_t j) override;

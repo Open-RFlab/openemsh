@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <cstdint>
-
 #include <QString>
+
+#include <cstdint>
 
 #include "utils/progress.hpp"
 

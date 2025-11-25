@@ -7,6 +7,7 @@
 #include <QApplication>
 
 #include <cstdlib>
+#include <format>
 
 #include "app/openemsh.hpp"
 #include "ui/cli/cli.hpp"
@@ -21,9 +22,10 @@ int main(int argc, char* argv[]) {
 		Progress::singleton().register_impl_builder(
 			[&oemsh](std::size_t max, std::string const& message) {
 				return std::make_unique<ui::cli::ProgressBar>(max,
-					std::to_string(app::index(oemsh.get_current_step()))
-					+ "/" + std::to_string(app::index_max())
-					+ " " + message);
+					std::format("{}/{} {}",
+						app::index(oemsh.get_current_step()),
+						app::index_max(),
+						message));
 			});
 
 	if(!oemsh.get_params().gui) {

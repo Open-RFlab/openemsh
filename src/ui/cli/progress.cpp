@@ -4,9 +4,10 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#include <iostream>
-
 #include <indicators/block_progress_bar.hpp>
+
+#include <iostream>
+#include <format>
 
 #include "progress.hpp"
 
@@ -45,7 +46,7 @@ ProgressBar::~ProgressBar() = default;
 
 //******************************************************************************
 void ProgressBar::tick(size_t i) {
-	string postfix(to_string(++i) + "/" + max);
+	auto postfix = format("{}/{}", ++i, max);
 	bar->set_option(indicators::option::BarWidth { bar_width(prefix_size, postfix.size()) });
 	bar->set_option(indicators::option::PostfixText { postfix });
 	bar->set_progress(i);
@@ -53,7 +54,7 @@ void ProgressBar::tick(size_t i) {
 
 //******************************************************************************
 void ProgressBar::tick(size_t i, size_t j) {
-	string postfix(to_string(i) + "/" + to_string(j) + "/" + max);
+	auto postfix = format("{}/{}/{}", i, j, max);
 	bar->set_option(indicators::option::BarWidth { bar_width(prefix_size, postfix.size()) });
 	bar->set_option(indicators::option::PostfixText { postfix });
 	bar->set_progress(j);

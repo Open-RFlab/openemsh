@@ -10,6 +10,7 @@
 //#include <CLI/Validators.hpp>
 
 #include <cstdlib>
+#include <functional>
 #include <map>
 #include <string>
 
@@ -129,7 +130,7 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app.add_option("-o,--output", params.output, "Output CSX file. If different from input, will copy and extend it.")->check(CLI::Validator((!CLI::ExistingFile)|FutureConditional(params.force,"Cannot overwrite a file without --force"), "FILE", "KO"));
 	app.add_flag("-f,--force", params.force, "Allow overwriting a file.")->trigger_on_parse();
 
-	static std::map<std::string, app::OpenEMSH::Params::OutputFormat> const map {
+	static std::map<std::string, app::OpenEMSH::Params::OutputFormat, std::less<>> const map {
 		{ "csx", app::OpenEMSH::Params::OutputFormat::CSX },
 		{ "plantuml", app::OpenEMSH::Params::OutputFormat::PLANTUML },
 		{ "prettyprint", app::OpenEMSH::Params::OutputFormat::PRETTYPRINT }

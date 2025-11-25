@@ -19,38 +19,26 @@ tuple<Progress::Bar, size_t, size_t> Progress::Bar::build(size_t max, string con
 
 //******************************************************************************
 Progress::Bar::Bar(size_t max, string const& message) {
-	for(auto& builder : Progress::singleton().impl_builders)
+	for(auto const& builder : Progress::singleton().impl_builders)
 		impls.push_back(builder(max, message));
+	impls.shrink_to_fit();
 }
-
-//******************************************************************************
-Progress::Bar::Bar(Bar&& other)
-: impls(std::move(other.impls))
-{}
-
-//******************************************************************************
-void Progress::Bar::operator=(Bar&& other) {
-	impls = std::move(other.impls);
-}
-
-//******************************************************************************
-Progress::Bar::~Bar() = default;
 
 //******************************************************************************
 void Progress::Bar::tick(size_t i) {
-	for(auto& impl : impls)
+	for(auto const& impl : impls)
 		impl->tick(i);
 }
 
 //******************************************************************************
 void Progress::Bar::tick(size_t i, size_t j) {
-	for(auto& impl : impls)
+	for(auto const& impl : impls)
 		impl->tick(i, j);
 }
 
 //******************************************************************************
 void Progress::Bar::complete() {
-	for(auto& impl : impls)
+	for(auto const& impl : impls)
 		impl->complete();
 }
 

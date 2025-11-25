@@ -303,7 +303,7 @@ void ParserFromCsx::parse() {
 		for(auto const& primitive : primitives)
 			for(auto const& node : primitive.node().children()) {
 				pimpl->primitives_ids.emplace(node, id++);
-				cerr << node.name() << endl;
+//				cerr << node.name() << endl;
 			}
 	}
 
@@ -317,9 +317,8 @@ void ParserFromCsx::parse() {
 
 		pugi::xml_node primitives = node.child("Primitives");
 		for(auto const& node : primitives.children()) {
-			if(material)
-				if(pimpl->parse_primitive(node, material))
-					++found;
+			if(material && pimpl->parse_primitive(node, material))
+				++found;
 			bar.tick(found, ++i);
 		}
 

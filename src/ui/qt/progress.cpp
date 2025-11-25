@@ -20,7 +20,7 @@ ProgressBar::ProgressBar(QStatusBar* status_bar, size_t max, QString const& mess
 , bar(new QProgressBar())
 , label(new QLabel(message))
 {
-	bar->setRange(0, max);
+	bar->setRange(0, (int) max);
 	status_bar->addWidget(bar);
 	status_bar->addWidget(label);
 }
@@ -35,12 +35,12 @@ ProgressBar::~ProgressBar() {
 
 //******************************************************************************
 void ProgressBar::tick(size_t i) {
-	bar->setValue(++i);
+	bar->setValue((int) ++i);
 }
 
 //******************************************************************************
 void ProgressBar::tick(size_t /*i*/, size_t j) {
-	bar->setValue(++j);
+	bar->setValue((int) ++j);
 }
 
 //******************************************************************************

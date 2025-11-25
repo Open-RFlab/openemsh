@@ -10,6 +10,8 @@
 #include <QMarginsF>
 #include <QToolButton>
 
+#include <format>
+
 #include "domain/geometrics/space.hpp"
 #include "edit/edit_dialog.hpp"
 #include "edit/edit_model.hpp"
@@ -51,9 +53,10 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 	Progress::singleton().register_impl_builder(
 		[this](std::size_t max, std::string const& message) {
 			return std::make_unique<ProgressBar>(ui->statusBar, max,
-				QString::number(app::index(this->oemsh.get_current_step()))
-				+ "/" + QString::number(app::index_max())
-				+ " " + QString::fromStdString(message));
+				QString::fromStdString(std::format("{}/{} {}",
+					app::index(this->oemsh.get_current_step()),
+					app::index_max(),
+					message)));
 		});
 
 	for(auto const& style : Style::available_styles) {
