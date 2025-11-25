@@ -6,6 +6,8 @@ OpenEMSH \- OpenEMS mesher
 .SH SYNOPSIS
 \fBopenemsh\fR [\fIOPTION\fR] ...
 .br
+\fBopenemsh\fR [\fICSX_FILE\fR] [\fIOPTION\fR] ...
+.br
 \fBopenemsh\fR [\fB-i\fR \fICSX_FILE\fR] [\fIOPTION\fR] ...
 .br
 \fBopenemsh\fR [\fB-i\fR \fICSX_FILE\fR] [\fB-G\fR] [\fIOPTION\fR] ...
@@ -31,7 +33,7 @@ Verbose mode.
 GUI mode (no arguments equals to \fB-G\fR)
 .TP
 \fB-i\fR \fIFILENAME\fR
-Input CSX XML file.
+Input CSX XML file. (is also a positional argument)
 .TP
 \fB-o\fR \fIFILENAME\fR
 Output CSX XML file. If different from input, will copy and extend it.

@@ -124,7 +124,7 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app.set_version_flag("--version", OEMSH_VERSION, "Display version and exit.");
 	app.add_flag("-v,--verbose", params.verbose, "Verbose mode.")->capture_default_str();
 	auto* g = app.add_flag("-G", params.gui, "GUI mode.");
-	auto* i = app.add_option("-i,--input", params.input, "Input CSX file.")->check(CLI::ExistingFile)->required();
+	auto* i = app.add_option("input,-i,--input", params.input, "Input CSX file.")->check(CLI::ExistingFile)->required();
 	g->trigger_on_parse()->check(JustDo([i]() { i->required(false); }));
 //	app.add_option("-o,--output", params.output, "Output CSX file. If different from input, will copy and extend it.")->check((!CLI::ExistingFile)|FutureConditional(params.force,"Cannot overwrite a file without --force"));
 	app.add_option("-o,--output", params.output, "Output CSX file. If different from input, will copy and extend it.")->check(CLI::Validator((!CLI::ExistingFile)|FutureConditional(params.force,"Cannot overwrite a file without --force"), "FILE", "KO"));
