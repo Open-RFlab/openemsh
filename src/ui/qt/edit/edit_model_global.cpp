@@ -26,8 +26,6 @@ EditModelGlobal::EditModelGlobal(domain::GlobalParams* global, QObject* parent)
 	auto const& params = global->get_current_state();
 	setRowCount(4);
 
-//	make_row(0, "metal_res", QString::number(params.metal_res), "");
-//	make_row(1, "substrate_res", QString::number(params.substrate_res), "");
 	make_row(0, "Proximity limit", QString::number(params.proximity_limit),
 		"Distance below which two MeshlinePolicies will be merged.");
 	make_row(1, "Smoothness", QString::number(params.lambda),
@@ -43,8 +41,6 @@ void EditModelGlobal::commit() {
 	domain::Params params;
 
 	std::array does_succeed = {
-//		try_to_double(item(0, V)->text(), params.metal_res),
-//		try_to_double(item(1, V)->text(), params.substrate_res),
 		try_to_double(item(0, V)->text(), params.proximity_limit),
 		try_to_double(item(1, V)->text(), params.lambda),
 		try_to_ulong(item(2, V)->text(), params.lmin),

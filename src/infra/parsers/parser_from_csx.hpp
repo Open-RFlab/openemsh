@@ -27,7 +27,6 @@ public:
 		bool with_yz = true;
 		bool with_zx = true;
 		bool with_xy = true;
-		std::vector<std::string> grounds;
 	};
 
 	~ParserFromCsx();
@@ -35,7 +34,6 @@ public:
 	[[nodiscard]] static std::shared_ptr<domain::Board> run(std::filesystem::path const& input);
 	[[nodiscard]] static std::shared_ptr<domain::Board> run(std::filesystem::path const& input, Params params);
 	[[nodiscard]] static std::shared_ptr<domain::Board> run(std::filesystem::path const& input, Params params, std::function<void (domain::Params&)> const& override_domain_params);
-	[[nodiscard]] static std::shared_ptr<domain::Board> run(std::filesystem::path const& input, std::vector<std::string> ground_names, Params params);
 
 private:
 	ParserFromCsx(std::filesystem::path const& input);

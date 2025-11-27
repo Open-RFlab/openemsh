@@ -40,16 +40,6 @@ public:
 			PRETTYPRINT
 		} output_format = OutputFormat::CSX;
 
-		bool with_step_adjust_edges_to_material = true;
-		bool with_step_detect_edges_in_polygons = true;
-		bool with_step_detect_colinear_edges = true;
-		bool with_step_auto_solve_all_edge_in_polygon = true;
-		bool with_step_auto_solve_all_colinear_edges = true;
-		bool with_step_detect_individual_edges = true;
-		bool with_step_detect_and_solve_too_close_meshline_policies = true;
-		bool with_step_detect_intervals = true;
-		bool with_step_mesh = true;
-
 		std::function<void (domain::Params&)> override_from_cli;
 	};
 

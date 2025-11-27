@@ -14,8 +14,6 @@ namespace domain {
 
 //******************************************************************************
 struct Params {
-	double metal_res;
-	double substrate_res;
 	double proximity_limit = 1; // TODO must be linked to initial d
 	double lambda = 2;
 	std::size_t lmin = 10;

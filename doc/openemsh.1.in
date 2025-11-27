@@ -57,9 +57,6 @@ Output format.
 .PD
 .SS Input options
 .TP
-    \fB--ground\fR \fITEXT\fR ...
-Declare properties to be ground planes ('Name' XML field).
-.TP
     \fB--no-yz\fR
 Don't process YZ plane.
 .TP
@@ -104,7 +101,7 @@ Currently, diagonals and circular shapes are not supported.
 .SH SEE ALSO
 @OEMSH_OEMS_MESHING@
 .PP
-.BR AppCSXCAD (7),
+.BR AppCSXCAD (1),
 
 .SH REPORTING BUGS
 @OEMSH_BUGREPORT@

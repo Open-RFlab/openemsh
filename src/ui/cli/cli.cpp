@@ -138,36 +138,9 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	// https://github.com/CLIUtils/CLI11/issues/554#issuecomment-932782337
 	app.add_option("--output-format", params.output_format, "Output format.")->transform(CLI::CheckedTransformer(map, CLI::ignore_case).description(CLI::detail::generate_map(CLI::detail::smart_deref(map), true)));
 
-	app.add_option("--ground", params.grounds, "Declare properties to be ground planes ('Name' XML field).")->group("Input options");
 	app.add_flag("--no-yz", [&params](size_t) { params.with_yz = false; }, "Don't process YZ plane.")->group("Input options");
 	app.add_flag("--no-zx", [&params](size_t) { params.with_zx = false; }, "Don't process ZX plane.")->group("Input options");
 	app.add_flag("--no-xy", [&params](size_t) { params.with_xy = false; }, "Don't process XY plane.")->group("Input options");
-
-	// TODO processing options
-//	app.add_flag("--step-detect-edges-in-polygons", params.with_step_detect_edges_in_polygons, "Do EdgeInPolygon conflicts detection step.")->group("Processing options");
-//	app.add_flag("--step-detect-colinear-edges", params.with_step_detect_colinear_edges, "Do ColinearEdges conflicts detection step.")->group("Processing options");
-//	app.add_flag("--step-detect-non-conflicting-edges", params.with_step_detect_non_conflicting_edges, "Do non-conflicting edges detection step.")->group("Processing options");
-//	app.add_flag("--step-auto-solve-all-edge-in-polygon", params.with_step_auto_solve_all_edge_in_polygon, "Do EdgeInPolygon conflicts autosolving step.")->group("Processing options");
-//	app.add_flag("--step-auto-solve-all-colinear-edges", params.with_step_auto_solve_all_colinear_edges, "Do ColinearEdges conflicts autosolving step.")->group("Processing options");
-//	app.add_flag("--step-detect-and-solve-too-close-meshline-policies", params.with_step_detect_and_solve_too_close_meshline_policies, "Do TooCloseMeshlinePolicies conflicts detection and autosolving step.")->group("Processing options");
-//	app.add_flag("--step-detect-intervals", params.with_step_detect_intervals, "Do intervals detection step.")->group("Processing options");
-//	app.add_flag("--step-mesh", params.with_step_mesh, "Do intervals meshing step.")->group("Processing options");
-
-	// Mesher options
-//	app.add_option_function<decltype(domain::Params::metal_res)>("--metal_res",
-//		make_overrider<&domain::Params::metal_res>(domain_overrides),
-//		"Desired mesh resolution for metal regions."
-//	)->group("Mesher options");
-
-//	app.add_option_function<decltype(domain::Params::air_res)>("--air_res",
-//		make_overrider<&domain::Params::air_res>(domain_overrides),
-//		"Desired mesh resolution for air regions."
-//	)->group("Mesher options");
-
-//	app.add_option_function<decltype(domain::Params::substrate_res)>("--substrate_res",
-//		make_overrider<&domain::Params::substrate_res>(domain_overrides),
-//		"Desired mesh resolution for substrate / ground plane regions."
-//	)->group("Mesher options");
 
 	app.add_option_function<decltype(domain::Params::proximity_limit)>("--proximity-limit",
 		make_overrider<&domain::Params::proximity_limit>(domain_overrides),
