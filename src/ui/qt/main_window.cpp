@@ -79,6 +79,9 @@ MainWindow::~MainWindow() = default;
 
 //******************************************************************************
 void MainWindow::parse_and_display() {
+	if(csx_file.isEmpty())
+		return;
+
 	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 	update_title();
 	oemsh.parse();
