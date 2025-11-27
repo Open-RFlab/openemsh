@@ -18,10 +18,10 @@ namespace domain {
 using namespace std;
 
 //******************************************************************************
-Interval::Side::Side(MeshlinePolicy* meshline_policy, size_t lmin, double lambda, Coord h, function<double (double)> d_init)
+Interval::Side::Side(MeshlinePolicy* meshline_policy, size_t lmin, double smoothness, Coord h, function<double (double)> d_init)
 : meshline_policy(meshline_policy)
 , lmin(lmin)
-, lambda(lambda)
+, smoothness(smoothness)
 , d_init_(std::move(d_init))
 {
 	if(meshline_policy->get_current_state().d > h) {
@@ -45,7 +45,7 @@ Coord calc_h(Coord const& a, Coord const& b) noexcept {
 Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, GlobalParams* global_params, Timepoint* t)
 : Originator(t, {
 	.dmax = global_params->get_current_state().dmax,
-	.before = Side(before, global_params->get_current_state().lmin, global_params->get_current_state().lambda, calc_h(before->coord, after->coord), [before](double d) noexcept {
+	.before = Side(before, global_params->get_current_state().lmin, global_params->get_current_state().smoothness, calc_h(before->coord, after->coord), [before](double d) noexcept {
 		switch(before->get_current_state().policy) {
 		case MeshlinePolicy::Policy::ONELINE: return 0.0;
 		case MeshlinePolicy::Policy::HALFS: return d / 2.0;
@@ -62,7 +62,7 @@ Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Glo
 		default: ::unreachable();
 		}
 	}),
-	.after = Side(after, global_params->get_current_state().lmin, global_params->get_current_state().lambda, calc_h(before->coord, after->coord), [after](double d) noexcept {
+	.after = Side(after, global_params->get_current_state().lmin, global_params->get_current_state().smoothness, calc_h(before->coord, after->coord), [after](double d) noexcept {
 		switch(after->get_current_state().policy) {
 		case MeshlinePolicy::Policy::ONELINE: return 0.0;
 		case MeshlinePolicy::Policy::HALFS: return d / 2.0;
@@ -101,22 +101,22 @@ Coord Interval::s(Interval::Side const& side, double d) const {
 /// lines (d) is dmax.
 ///
 /// Computation is done regarding d as initial distance between adjacent lines,
-/// lambda as smoothness factor and dmax as limitating maximal distance between
+/// smoothness as smoothness factor and dmax as limitating maximal distance between
 /// adjacent lines.
 ///
 /// If z exceeds 2 * h, we round it to 2 * h.
 ///*****************************************************************************
 /*
-vector<Coord> find_lz(double d, double lambda, double dmax, Coord h) {
-	if(lambda == 1)
+vector<Coord> find_lz(double d, double smoothness, double dmax, Coord h) {
+	if(smoothness == 1)
 		return { numeric_limits<double>::infinity() };
 
-//	double current_d = d; // TODO d * lambda
-	double current_d = d * lambda; // TODO d * lambda
+//	double current_d = d;
+	double current_d = d * smoothness;
 	double current_z = 0;
 	vector<Coord> lz;
 	while(current_d < dmax && current_z < 10 * h) {
-		current_d *= lambda;
+		current_d *= smoothness;
 		if(current_d < dmax) {
 			current_z += current_d;
 			lz.push_back(current_z);
@@ -131,16 +131,16 @@ vector<Coord> find_lz(double d, double lambda, double dmax, Coord h) {
 /// from side's coord) to the middle of the interval (at h from side's coord).
 ///
 /// Computation is done regarding d as initial distance between adjacent lines,
-/// lambda as smoothness factor and dmax as limitating maximal distance between
+/// smoothness as smoothness factor and dmax as limitating maximal distance between
 /// adjacent lines.
 ///*****************************************************************************
-vector<Coord> find_ls(double d, double lambda, double dmax, Coord s) {
+vector<Coord> find_ls(double d, double smoothness, double dmax, Coord s) {
 	double current_d = min(d, dmax);
 	double current_s = 0;
 	vector<Coord> ls;
 	while(current_s < s) {
 		if(current_d < dmax) {
-			current_d *= lambda;
+			current_d *= smoothness;
 			if(current_d > dmax)
 				current_d = dmax;
 		}
@@ -156,30 +156,28 @@ vector<Coord> find_ls(double d, double lambda, double dmax, Coord s) {
 /// Verifiy that ls satisfies the following criteras :
 /// - At least lmin lines in ls.
 /// - No space between adjacent lines should exceed dmax.
-/// - No space between adjacent lines should be more than lambda times bigger
+/// - No space between adjacent lines should be more than smoothness times bigger
 ///   than the previous one.
-
-/// - The last space between adjacent lines should not be less than dmax/lambda.
-
+/// - The last space between adjacent lines should not be less than dmax/smoothness.
 ///*****************************************************************************
-bool is_ls_valid_for_dmax_lmin_lambda(vector<Coord> const& ls, double d, double lambda, double dmax, size_t lmin) {
+bool is_ls_valid_for_dmax_lmin_smoothness(vector<Coord> const& ls, double d, double smoothness, double dmax, size_t lmin) {
 	if(d > dmax
 	|| ls.size() < lmin
 	|| ls.empty())
 		return false;
 
-	if(ls[0] > lambda * d + equality_tolerance
+	if(ls[0] > smoothness * d + equality_tolerance
 	|| ls[0] > dmax + equality_tolerance)
 		return false;
 
 	if(ls.size() >= 2) {
-		if(ls[1] - ls[0] > lambda * ls[0] + equality_tolerance
+		if(ls[1] - ls[0] > smoothness * ls[0] + equality_tolerance
 		|| ls[1] - ls[0] > dmax + equality_tolerance)
 			return false;
 	}
 
 	for(size_t i = 2; i < ls.size(); ++i) {
-		if(ls[i] - ls[i-1] > lambda * (ls[i-1] - ls[i-2]) + equality_tolerance
+		if(ls[i] - ls[i-1] > smoothness * (ls[i-1] - ls[i-2]) + equality_tolerance
 		|| ls[i] - ls[i-1] > dmax + equality_tolerance)
 			return false;
 	}
@@ -195,12 +193,12 @@ double find_dmax(Interval::Side const& side, double dmax) {
 	else
 		return (double) (side.lz[side.ls.size()-1] - side.lz[side.ls.size()-2]);
 	if(side.ls.size())
-		return last_d(side.ls) * side.lambda;
+		return last_d(side.ls) * side.smoothness;
 */
 	if(side.ls.size() > 1)
-		return min(dmax, side.lambda * (double) (side.ls.back() - side.ls[side.ls.size()-2]));
+		return min(dmax, side.smoothness * (double) (side.ls.back() - side.ls[side.ls.size()-2]));
 	else if(side.ls.size() == 1)
-		return min(dmax, side.lambda * (double) side.ls[0]);
+		return min(dmax, side.smoothness * (double) side.ls[0]);
 	else
 		return dmax;
 }
@@ -220,7 +218,7 @@ void Interval::update_ls(IntervalState& state) {
 
 //******************************************************************************
 void Interval::update_ls(Interval::Side& side) {
-	side.ls = find_ls(side.meshline_policy->get_current_state().d, side.lambda, get_current_state().dmax, s(side));
+	side.ls = find_ls(side.meshline_policy->get_current_state().d, side.smoothness, get_current_state().dmax, s(side));
 }
 
 //******************************************************************************
@@ -232,9 +230,9 @@ tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Side const& side,
 
 	size_t counter = 0;
 	bool is_limit_reached = false;
-	while(!is_ls_valid_for_dmax_lmin_lambda(current_ls, current_d, side.lambda, get_current_state().dmax, side.lmin)) {
+	while(!is_ls_valid_for_dmax_lmin_smoothness(current_ls, current_d, side.smoothness, get_current_state().dmax, side.lmin)) {
 		current_d -= current_d / step;
-		current_ls = find_ls(current_d, side.lambda, get_current_state().dmax, s(side, current_d));
+		current_ls = find_ls(current_d, side.smoothness, get_current_state().dmax, s(side, current_d));
 
 		if(counter++ >= iter_limit) {
 			is_limit_reached = true;
@@ -246,10 +244,10 @@ tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Side const& side,
 
 /*
 	size_t i;
-	for(i = 0; i < iter_limit && !check_ls_dmax_lmin_lambda(current_ls, current_d, side.lambda, dmax, side.lmin); ++i) {
+	for(i = 0; i < iter_limit && !check_ls_dmax_lmin_smoothness(current_ls, current_d, side.smoothness, dmax, side.lmin); ++i) {
 
 		current_d -= current_d / step;
-		current_ls = find_ls(current_d, side.lambda, dmax, s(side, current_d));
+		current_ls = find_ls(current_d, side.smoothness, dmax, s(side, current_d));
 	}
 
 	return { current_d, i >= iter_limit };
@@ -267,7 +265,7 @@ tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Side const& side,
 //	bool is_limit_reached = false;
 //	for(;;) {
 //		double next_d = current_d - current_d / step;
-//		auto next_ls = find_ls(next_d, side.lambda, dmax, s(side, next_d));
+//		auto next_ls = find_ls(next_d, side.smoothness, dmax, s(side, next_d));
 //		if(next_ls.size() > nlines)
 //			break;
 //
@@ -283,7 +281,7 @@ tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Side const& side,
 //	size_t i;
 //	for(i = 0; i < iter_limit; ++i) {
 //		double next_d = current_d - current_d / step;
-//		auto next_ls = find_ls(next_d, a.lambda, dmax, s(a, next_d));
+//		auto next_ls = find_ls(next_d, a.smoothness, dmax, s(a, next_d));
 //		if(next_ls.size() > nlines)
 //			break;
 //
@@ -299,9 +297,9 @@ tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Side const& side,
 
 // TODO make the previous line go a step further the m line: ls.size()--
 //******************************************************************************
-tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side const& side, size_t iter_limit) const {
+tuple<double, bool> Interval::adjust_smoothness_for_s(Interval::Side const& side, size_t iter_limit) const {
 	size_t step = 10000;
-	double current_lambda = side.lambda;
+	double current_smoothness = side.smoothness;
 
 	size_t nlines = side.ls.size();
 	vector<Coord> current_ls = side.ls;
@@ -309,12 +307,12 @@ tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side const& side, si
 	size_t counter = 0;
 	bool is_limit_reached = false;
 /*
-	while(current_lambda > 1 && current_ls.size() <= nlines) {
-		current_lambda -= current_lambda / step;
-		if(current_lambda < 1)
-			current_lambda = 1;
+	while(current_smoothness > 1 && current_ls.size() <= nlines) {
+		current_smoothness -= current_smoothness / step;
+		if(current_smoothness < 1)
+			current_smoothness = 1;
 
-		current_ls = find_ls(side.meshline_policy->get_current_state().d, current_lambda, dmax, s(side));
+		current_ls = find_ls(side.meshline_policy->get_current_state().d, current_smoothness, dmax, s(side));
 
 		++counter;
 		if(counter >= iter_limit) {
@@ -324,17 +322,17 @@ tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side const& side, si
 	}
 */
 	for(;;) {
-		double next_lambda = current_lambda - current_lambda / step;
-		if(next_lambda < 1)
-			next_lambda = 1;
+		double next_smoothness = current_smoothness - current_smoothness / step;
+		if(next_smoothness < 1)
+			next_smoothness = 1;
 
-		auto next_ls = find_ls(side.meshline_policy->get_current_state().d, next_lambda, get_current_state().dmax, s(side));
+		auto next_ls = find_ls(side.meshline_policy->get_current_state().d, next_smoothness, get_current_state().dmax, s(side));
 		if(next_ls.size() > nlines)
 			break;
 
-		current_lambda = next_lambda;
+		current_smoothness = next_smoothness;
 
-		if(current_lambda == 1)
+		if(current_smoothness == 1)
 			break;
 
 		if(counter++ >= iter_limit) {
@@ -345,20 +343,20 @@ tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side const& side, si
 
 /*
 	size_t i;
-	for(i = 0; i < iter_limit && (current_lambda > 1 && current_ls.size() <= nlines); ++i) {
-		current_lambda -= current_lambda / step;
-		if(current_lambda < 1)
-			current_lambda = 1;
+	for(i = 0; i < iter_limit && (current_smoothness > 1 && current_ls.size() <= nlines); ++i) {
+		current_smoothness -= current_smoothness / step;
+		if(current_smoothness < 1)
+			current_smoothness = 1;
 
-		current_ls = find_ls(a.meshline_policy->get_current_state().d, current_lambda, dmax, s(a));
+		current_ls = find_ls(a.meshline_policy->get_current_state().d, current_smoothness, dmax, s(a));
 	}
 
 	if(i >= iter_limit)
 		is_limit_reached = true;
-	return { current_lambda, i >= iter_limit };
+	return { current_smoothness, i >= iter_limit };
 */
 
-	return { current_lambda, is_limit_reached };
+	return { current_smoothness, is_limit_reached };
 }
 
 //******************************************************************************
@@ -385,13 +383,13 @@ void Interval::auto_solve_d() {
 }
 
 //******************************************************************************
-void Interval::auto_solve_lambda() {
+void Interval::auto_solve_smoothness() {
 	auto state = get_current_state();
 
 	update_ls(state);
 
-	state.before.lambda = get<0>(adjust_lambda_for_s(state.before));
-	state.after.lambda = get<0>(adjust_lambda_for_s(state.after));
+	state.before.smoothness = get<0>(adjust_smoothness_for_s(state.before));
+	state.after.smoothness = get<0>(adjust_smoothness_for_s(state.after));
 	update_ls(state);
 
 	set_next_state(state);

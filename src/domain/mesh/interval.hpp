@@ -47,11 +47,11 @@ public:
 	struct Side {
 		MeshlinePolicy* const meshline_policy;
 		size_t lmin;      ///< Minimum line number to mesh this half of the interval.
-		double lambda;    ///< Smoothness factor = ]1;2] .
+		double smoothness;    ///< Smoothness factor = ]1;2] .
 		std::function<double (double)> const d_init_;
 		std::vector<Coord> ls; // TODO avoid Coord::operator= -> double
 
-		Side(MeshlinePolicy* meshline_policy, size_t lmin, double lambda, Coord h, std::function<double (double)> d_init);
+		Side(MeshlinePolicy* meshline_policy, size_t lmin, double smoothness, Coord h, std::function<double (double)> d_init);
 
 		double d_init() const;
 	};
@@ -62,7 +62,7 @@ public:
 	Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, GlobalParams* global_params, Timepoint* t);
 
 	void auto_solve_d();
-	void auto_solve_lambda();
+	void auto_solve_smoothness();
 	std::vector<std::shared_ptr<Meshline>> mesh() const;
 
 private:
@@ -76,7 +76,7 @@ private:
 	std::tuple<double, bool> adjust_d_for_dmax_lmin(
 		Side const& side,
 		size_t iter_limit=std::numeric_limits<std::size_t>::max()) const;
-	std::tuple<double, bool> adjust_lambda_for_s(
+	std::tuple<double, bool> adjust_smoothness_for_s(
 		Side const& side,
 		size_t iter_limit=std::numeric_limits<std::size_t>::max()) const;
 };
@@ -97,9 +97,9 @@ double find_dmax(Interval::Side const& side, double dmax);
 double find_dmax(Interval::Side const& a, Interval::Side const& b, double dmax);
 
 //******************************************************************************
-std::vector<Coord> find_ls(double d, double lambda, double dmax, Coord s);
+std::vector<Coord> find_ls(double d, double smoothness, double dmax, Coord s);
 
 //******************************************************************************
-bool is_ls_valid_for_dmax_lmin_lambda(std::vector<Coord> const& ls, double d, double lambda, double dmax, size_t lmin);
+bool is_ls_valid_for_dmax_lmin_smoothness(std::vector<Coord> const& ls, double d, double smoothness, double dmax, size_t lmin);
 
 } // namespace domain

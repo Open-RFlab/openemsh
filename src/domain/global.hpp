@@ -15,7 +15,7 @@ namespace domain {
 //******************************************************************************
 struct Params {
 	double proximity_limit = 1; // TODO must be linked to initial d
-	double lambda = 2;
+	double smoothness = 2;
 	std::size_t lmin = 10;
 	double dmax = 2.5;
 };

@@ -184,7 +184,7 @@ void MeshlinePolicyManager::mesh(Axis const axis) {
 
 	for(auto* interval : dimension_view) {
 		interval->auto_solve_d();
-		interval->auto_solve_lambda();
+		interval->auto_solve_smoothness();
 		interval_meshlines.emplace_back(interval->mesh());
 
 		new_size += interval_meshlines.back().size();

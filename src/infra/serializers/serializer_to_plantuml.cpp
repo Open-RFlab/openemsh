@@ -222,9 +222,9 @@ void SerializerToPlantuml::visit(Interval& interval) {
 		"state \" \" as " + id + "_out <<outputPin>>\n" +
 		id + " : dmax = " + to_string(interval.get_current_state().dmax) + "\n" +
 		id + " : before.lmin = " + to_string(interval.get_current_state().before.lmin) + "\n" +
-		id + " : before.lambda = " + to_string(interval.get_current_state().before.lambda) + "\n" +
+		id + " : before.smoothness = " + to_string(interval.get_current_state().before.smoothness) + "\n" +
 		id + " : after.lmin = " + to_string(interval.get_current_state().after.lmin) + "\n" +
-		id + " : after.lambda = " + to_string(interval.get_current_state().after.lambda) + "\n" +
+		id + " : after.smoothness = " + to_string(interval.get_current_state().after.smoothness) + "\n" +
 		to_string(interval.get_current_state().before.meshline_policy->id) + "_out ------> " + id + "_in1 \n" +
 		to_string(interval.get_current_state().after.meshline_policy->id) + "_out ------> " + id + "_in2 \n"
 		"}\n";

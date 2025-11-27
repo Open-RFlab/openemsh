@@ -157,8 +157,8 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 		"Minimum line number per interval half."
 	)->group("Mesher options");
 
-	app.add_option_function<decltype(domain::Params::lambda)>("--smoothness",
-		make_overrider<&domain::Params::lambda>(domain_overrides),
+	app.add_option_function<decltype(domain::Params::smoothness)>("--smoothness",
+		make_overrider<&domain::Params::smoothness>(domain_overrides),
 		"Smoothness factor ]1;2]."
 	)->group("Mesher options")->check(BoundExclusiveInclusive(1.0, 2.0));
 

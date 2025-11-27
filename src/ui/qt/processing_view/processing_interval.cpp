@@ -70,16 +70,16 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 
 	QString dmax("dmax: ");
 	QString before_lmin ("Before.lmin: ");
-	QString before_lambda ("Before.Smoothness: ");
+	QString before_smoothness ("Before.Smoothness: ");
 	QString after_lmin("After.lmin: ");
-	QString after_lambda("After.Smoothness: ");
+	QString after_smoothness("After.Smoothness: ");
 	if(interval) {
 		auto const& state = interval->get_current_state();
 		dmax += QString::number(state.dmax);
 		before_lmin += QString::number(state.before.lmin);
-		before_lambda += QString::number(state.before.lambda);
+		before_smoothness += QString::number(state.before.smoothness);
 		after_lmin += QString::number(state.after.lmin);
-		after_lambda += QString::number(state.after.lambda);
+		after_smoothness += QString::number(state.after.smoothness);
 		if(state.before.meshline_policy)
 			to_wire.emplace_back(DataKeys::set_to_wire(state.before.meshline_policy, before_port));
 		if(state.after.meshline_policy)
@@ -100,10 +100,10 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 		return locate_processing_interval_params().main;
 	};
 
-	auto* text_before_lambda = new nodegraph::Text(before_lambda, this);
-	text_before_lambda->setFlag(QGraphicsItem::ItemIsSelectable);
-	text_before_lambda->setAcceptedMouseButtons(Qt::NoButton);
-	text_before_lambda->locate_text_params = [this]() -> auto& {
+	auto* text_before_smoothness = new nodegraph::Text(before_smoothness, this);
+	text_before_smoothness->setFlag(QGraphicsItem::ItemIsSelectable);
+	text_before_smoothness->setAcceptedMouseButtons(Qt::NoButton);
+	text_before_smoothness->locate_text_params = [this]() -> auto& {
 		return locate_processing_interval_params().main;
 	};
 
@@ -114,18 +114,18 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 		return locate_processing_interval_params().main;
 	};
 
-	auto* text_after_lambda = new nodegraph::Text(after_lambda, this);
-	text_after_lambda->setFlag(QGraphicsItem::ItemIsSelectable);
-	text_after_lambda->setAcceptedMouseButtons(Qt::NoButton);
-	text_after_lambda->locate_text_params = [this]() -> auto& {
+	auto* text_after_smoothness = new nodegraph::Text(after_smoothness, this);
+	text_after_smoothness->setFlag(QGraphicsItem::ItemIsSelectable);
+	text_after_smoothness->setAcceptedMouseButtons(Qt::NoButton);
+	text_after_smoothness->locate_text_params = [this]() -> auto& {
 		return locate_processing_interval_params().main;
 	};
 
 	v_box2->addItem(text_dmax);
 	v_box2->addItem(text_before_lmin);
-	v_box2->addItem(text_before_lambda);
+	v_box2->addItem(text_before_smoothness);
 	v_box2->addItem(text_after_lmin);
-	v_box2->addItem(text_after_lambda);
+	v_box2->addItem(text_after_smoothness);
 	v_box3->addStretch();
 	v_box3->addItem(output_port);
 	v_box3->addStretch();

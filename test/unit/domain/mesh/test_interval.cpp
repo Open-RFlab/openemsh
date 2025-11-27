@@ -13,27 +13,27 @@
 
 #include "domain/mesh/interval.hpp"
 
-/// @test Interval::Side::Side(MeshlinePolicy* meshline_policy, size_t lmin, double lambda, Coord h, function<double (double)> d_init)
+/// @test Interval::Side::Side(MeshlinePolicy* meshline_policy, size_t lmin, double smoothness, Coord h, function<double (double)> d_init)
 /// @test double Interval::Side::d_init_(double d)
 /// @test Coord Interval::s(Interval::Side const& side) const @todo
 /// @test Coord Interval::s(Interval::Side const& side, double d) const @todo
-/// @test std::vector<Coord> find_ls(double d, double lambda, double dmax, Coord s)
-/// @test bool is_ls_valid_for_dmax_lmin_lambda(std::vector<Coord> const& ls, double d, double lambda, double dmax, size_t lmin)
+/// @test std::vector<Coord> find_ls(double d, double smoothness, double dmax, Coord s)
+/// @test bool is_ls_valid_for_dmax_lmin_smoothness(std::vector<Coord> const& ls, double d, double smoothness, double dmax, size_t lmin)
 /// @test void Interval::update_ls() @todo
 /// @test void Interval::update_ls(Interval::Side& side) @todo
 /// @test double find_dmax(Interval::Side const& side, double dmax)
 /// @test double find_dmax(Interval::Side const& side, Interval::Side const& b, double dmax)
 /// @test std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Side const& side, size_t iter_limit) const
-/// @test std::tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side const& side, size_t iter_limit) const
+/// @test std::tuple<double, bool> Interval::adjust_smoothness_for_s(Interval::Side const& side, size_t iter_limit) const
 /// @test void Interval::auto_solve_d() @todo
-/// @test void Interval::auto_solve_lambda() @todo
+/// @test void Interval::auto_solve_smoothness() @todo
 /// @test std::vector<std::unique_ptr<Meshline>> Interval::mesh() const
 ///*****************************************************************************
 
 using namespace domain;
 
 //******************************************************************************
-SCENARIO("Interval::Side::Side(MeshlinePolicy* meshline_policy, size_t lmin, double lambda, Coord h, function<double (double)> d_init)", "[interval]") {
+SCENARIO("Interval::Side::Side(MeshlinePolicy* meshline_policy, size_t lmin, double smoothness, Coord h, function<double (double)> d_init)", "[interval]") {
 	Timepoint* t = Caretaker::singleton().get_history_root();
 	GIVEN("Two meshline policies") {
 		GlobalParams p(t);
@@ -189,7 +189,7 @@ SCENARIO("double Interval::Side::d_init_(double d)", "[interval]") {
 }
 
 //******************************************************************************
-SCENARIO("std::vector<Coord> find_ls(double d, double lambda, double dmax, Coord s)", "[interval]") {
+SCENARIO("std::vector<Coord> find_ls(double d, double smoothness, double dmax, Coord s)", "[interval]") {
 	GIVEN("d > dmax") {
 		std::vector<Coord> ls = find_ls(4.0, 2.0, 3.0, 10.0);
 		THEN("Coordinates should grow according 'ls[n] = ls[n-1] + dmax' algorithm") {
@@ -205,7 +205,7 @@ SCENARIO("std::vector<Coord> find_ls(double d, double lambda, double dmax, Coord
 
 	GIVEN("dmax will be reached to fill s") {
 		std::vector<Coord> ls = find_ls(0.1, 2.0, 3.0, 10.0);
-		THEN("Coordinates should grow according 'ls[n] = ls[n-1] + ls[n-1] * lambda' algorithm until ls[n] reaches dmax") {
+		THEN("Coordinates should grow according 'ls[n] = ls[n-1] + ls[n-1] * smoothness' algorithm until ls[n] reaches dmax") {
 			REQUIRE(ls.size() == 7);
 			REQUIRE(ls[0] == Coord(0.2));
 			REQUIRE(ls[1] == Coord(0.6));
@@ -223,7 +223,7 @@ SCENARIO("std::vector<Coord> find_ls(double d, double lambda, double dmax, Coord
 
 	GIVEN("dmax will not be reached to fill s") {
 		std::vector<Coord> ls = find_ls(0.1, 2.0, 30.0, 10.0);
-		THEN("Coordinates should grow according 'ls[n] = ls[n-1] + ls[n-1] * lambda' algorithm") {
+		THEN("Coordinates should grow according 'ls[n] = ls[n-1] + ls[n-1] * smoothness' algorithm") {
 			REQUIRE(ls.size() == 6);
 			REQUIRE(ls[0] == Coord(0.2));
 			REQUIRE(ls[1] == Coord(0.6));
@@ -246,11 +246,11 @@ SCENARIO("std::vector<Coord> find_ls(double d, double lambda, double dmax, Coord
 }
 
 //******************************************************************************
-SCENARIO("bool is_ls_valid_for_dmax_lmin_lambda(std::vector<Coord> const& ls, double d, double lambda, double dmax, size_t lmin)", "[interval]") {
+SCENARIO("bool is_ls_valid_for_dmax_lmin_smoothness(std::vector<Coord> const& ls, double d, double smoothness, double dmax, size_t lmin)", "[interval]") {
 	GIVEN("An empty ls vector") {
 		THEN("Should not be valid, disregarding lmin") {
-			REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda({}, 1.0, 2.0, 3.0, 2));
-			REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda({}, 1.0, 2.0, 3.0, 0));
+			REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness({}, 1.0, 2.0, 3.0, 2));
+			REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness({}, 1.0, 2.0, 3.0, 0));
 		}
 	}
 
@@ -258,27 +258,27 @@ SCENARIO("bool is_ls_valid_for_dmax_lmin_lambda(std::vector<Coord> const& ls, do
 		std::vector<Coord> ls { 0.2 };
 		WHEN("There is less than lmin lines") {
 			THEN("Should not be valid") {
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(ls, 0.1, 2.0, 30.0, 10));
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness(ls, 0.1, 2.0, 30.0, 10));
 			}
 		}
 
 		WHEN("A space between two lines, including d exceeds dmax") {
 			THEN("Should not be valid") {
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(ls, 0.1, 2.0, 0.05, 5));
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness(ls, 0.1, 2.0, 0.05, 5));
 			}
 		}
 
-		WHEN("A space between two lines is not between lambda times and 1/lambda times its adjacent spaces, d being the space previous the first ls space") {
+		WHEN("A space between two lines is not between smoothness times and 1/smoothness times its adjacent spaces, d being the space previous the first ls space") {
 			THEN("Should not be valid") {
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(ls, 0.05, 2.0, 30.0, 5));
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness(ls, 0.05, 2.0, 30.0, 5));
 			}
 		}
 
 		WHEN("There is lmin lines or more") {
 			AND_WHEN("No space between two lines exceeds dmax") {
-				AND_WHEN("Every space between two lines is between lambda times and 1/lambda times its adjacent spaces") {
+				AND_WHEN("Every space between two lines is between smoothness times and 1/smoothness times its adjacent spaces") {
 					THEN("Should be valid") {
-						REQUIRE(is_ls_valid_for_dmax_lmin_lambda(ls, 0.1, 2.0, 30.0, 1));
+						REQUIRE(is_ls_valid_for_dmax_lmin_smoothness(ls, 0.1, 2.0, 30.0, 1));
 					}
 				}
 			}
@@ -289,37 +289,37 @@ SCENARIO("bool is_ls_valid_for_dmax_lmin_lambda(std::vector<Coord> const& ls, do
 		std::vector<Coord> ls { 0.2, 0.6, 1.4, 3.0, 6.2, 12.6 };
 		WHEN("There is less than lmin lines") {
 			THEN("Should not be valid") {
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(ls, 0.1, 2.0, 30.0, 10));
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness(ls, 0.1, 2.0, 30.0, 10));
 			}
 		}
 
 		WHEN("A space between two lines, including d exceeds dmax") {
 			THEN("Should not be valid") {
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(ls, 0.1, 2.0, 0.05, 5));
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(ls, 0.1, 2.0, 0.15, 5));
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(ls, 0.1, 2.0, 0.25, 5));
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(ls, 0.1, 2.0, 5.0, 5));
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness(ls, 0.1, 2.0, 0.05, 5));
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness(ls, 0.1, 2.0, 0.15, 5));
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness(ls, 0.1, 2.0, 0.25, 5));
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness(ls, 0.1, 2.0, 5.0, 5));
 			}
 		}
 
-		WHEN("A space between two lines is not between lambda times and 1/lambda times its adjacent spaces, d being the space previous the first ls space") {
+		WHEN("A space between two lines is not between smoothness times and 1/smoothness times its adjacent spaces, d being the space previous the first ls space") {
 			THEN("Should not be valid") {
 				std::vector<Coord> ls1 { 0.3, 0.6, 1.4, 3.0, 6.2, 12.6 };
 				std::vector<Coord> ls2 { 0.2, 1.0, 1.4, 3.0, 6.2, 12.6 };
 				std::vector<Coord> ls3 { 0.2, 0.6, 1.4, 3.0, 6.2, 13.6 };
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(ls, 0.05, 2.0, 30.0, 5));
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(ls1, 0.1, 2.0, 30.0, 5));
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(ls2, 0.1, 2.0, 30.0, 5));
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(ls3, 0.1, 2.0, 30.0, 5));
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness(ls, 0.05, 2.0, 30.0, 5));
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness(ls1, 0.1, 2.0, 30.0, 5));
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness(ls2, 0.1, 2.0, 30.0, 5));
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness(ls3, 0.1, 2.0, 30.0, 5));
 
 			}
 		}
 
 		WHEN("There is lmin lines or more") {
 			AND_WHEN("No space between two lines exceeds dmax") {
-				AND_WHEN("Every space between two lines is between lambda times and 1/lambda times its adjacent spaces") {
+				AND_WHEN("Every space between two lines is between smoothness times and 1/smoothness times its adjacent spaces") {
 					THEN("Should be valid") {
-						REQUIRE(is_ls_valid_for_dmax_lmin_lambda(ls, 0.1, 2.0, 30.0, 5));
+						REQUIRE(is_ls_valid_for_dmax_lmin_smoothness(ls, 0.1, 2.0, 30.0, 5));
 					}
 				}
 			}
@@ -348,7 +348,7 @@ SCENARIO("double find_dmax(Interval::Side const& side, double dmax)", "[interval
 			t);
 		auto state_p = p.get_current_state();
 		auto state_a = a.get_current_state();
-		state_p.lambda = 2;
+		state_p.smoothness = 2;
 		state_a.d = 1;
 		p.set_next_state(state_p);
 		a.set_next_state(state_a);
@@ -365,7 +365,7 @@ SCENARIO("double find_dmax(Interval::Side const& side, double dmax)", "[interval
 			state_i.before.ls = { 3.0 };
 			i.set_next_state(state_i);
 			AND_WHEN("The line coord does not exceed dmax") {
-				THEN("Should return lambda times the line coord") {
+				THEN("Should return smoothness times the line coord") {
 					REQUIRE(i.get_current_state().before.ls.size() == 1);
 					REQUIRE(find_dmax(i.get_current_state().before, 8.0) == 6.0);
 				}
@@ -384,7 +384,7 @@ SCENARIO("double find_dmax(Interval::Side const& side, double dmax)", "[interval
 			state_i.before.ls = { 1.0, 3.0, 6.0 };
 			i.set_next_state(state_i);
 			AND_WHEN("The last space does not exceed dmax") {
-				THEN("Should return lambda times the last space") {
+				THEN("Should return smoothness times the last space") {
 					REQUIRE(i.get_current_state().before.ls.size() == 3);
 					REQUIRE(find_dmax(i.get_current_state().before, 8.0) == 6.0);
 				}
@@ -421,7 +421,7 @@ SCENARIO("double find_dmax(Interval::Side const& side, Interval::Side const& b, 
 			t);
 		auto state_p = p.get_current_state();
 		auto state_a = a.get_current_state();
-		state_p.lambda = 2;
+		state_p.smoothness = 2;
 		state_a.d = 1;
 		p.set_next_state(state_p);
 		a.set_next_state(state_a);
@@ -471,10 +471,10 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 			i.update_ls(state_i);
 			i.set_next_state(state_i);
 			THEN("Initial ls should be conform") {
-				REQUIRE(is_ls_valid_for_dmax_lmin_lambda(
+				REQUIRE(is_ls_valid_for_dmax_lmin_smoothness(
 					i.get_current_state().before.ls,
 					a.get_current_state().d,
-					i.get_current_state().before.lambda,
+					i.get_current_state().before.smoothness,
 					p.get_current_state().dmax,
 					p.get_current_state().lmin));
 			}
@@ -513,10 +513,10 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 			i.update_ls(state_i);
 			i.set_next_state(state_i);
 			THEN("Initial ls should not be conform") {
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness(
 					i.get_current_state().before.ls,
 					a.get_current_state().d,
-					i.get_current_state().before.lambda,
+					i.get_current_state().before.smoothness,
 					p.get_current_state().dmax,
 					p.get_current_state().lmin));
 			}
@@ -530,10 +530,10 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 					auto state_i = i.get_current_state();
 					i.update_ls(state_i);
 					i.set_next_state(state_i);
-					REQUIRE(is_ls_valid_for_dmax_lmin_lambda(
+					REQUIRE(is_ls_valid_for_dmax_lmin_smoothness(
 						i.get_current_state().before.ls,
 						a.get_current_state().d,
-						i.get_current_state().before.lambda,
+						i.get_current_state().before.smoothness,
 						p.get_current_state().dmax,
 						p.get_current_state().lmin));
 				}
@@ -568,10 +568,10 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 			i.update_ls(state_i);
 			i.set_next_state(state_i);
 			THEN("Initial ls should not be conform") {
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness(
 					i.get_current_state().before.ls,
 					a.get_current_state().d,
-					i.get_current_state().before.lambda,
+					i.get_current_state().before.smoothness,
 					p.get_current_state().dmax,
 					p.get_current_state().lmin));
 			}
@@ -585,10 +585,10 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 					auto state_i = i.get_current_state();
 					i.update_ls(state_i);
 					i.set_next_state(state_i);
-					REQUIRE(is_ls_valid_for_dmax_lmin_lambda(
+					REQUIRE(is_ls_valid_for_dmax_lmin_smoothness(
 						i.get_current_state().before.ls,
 						a.get_current_state().d,
-						i.get_current_state().before.lambda,
+						i.get_current_state().before.smoothness,
 						p.get_current_state().dmax,
 						p.get_current_state().lmin));
 				}
@@ -623,10 +623,10 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 			i.update_ls(state_i);
 			i.set_next_state(state_i);
 			THEN("Initial ls should not be conform") {
-				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(
+				REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness(
 					i.get_current_state().before.ls,
 					a.get_current_state().d,
-					i.get_current_state().before.lambda,
+					i.get_current_state().before.smoothness,
 					p.get_current_state().dmax,
 					p.get_current_state().lmin));
 			}
@@ -643,10 +643,10 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 						auto state_i = i.get_current_state();
 						i.update_ls(state_i);
 						i.set_next_state(state_i);
-						REQUIRE(is_ls_valid_for_dmax_lmin_lambda(
+						REQUIRE(is_ls_valid_for_dmax_lmin_smoothness(
 							i.get_current_state().before.ls,
 							a.get_current_state().d,
-							i.get_current_state().before.lambda,
+							i.get_current_state().before.smoothness,
 							p.get_current_state().dmax,
 							p.get_current_state().lmin));
 					}
@@ -665,10 +665,10 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 						auto state_i = i.get_current_state();
 						i.update_ls(state_i);
 						i.set_next_state(state_i);
-						REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_lambda(
+						REQUIRE_FALSE(is_ls_valid_for_dmax_lmin_smoothness(
 							i.get_current_state().before.ls,
 							a.get_current_state().d,
-							i.get_current_state().before.lambda,
+							i.get_current_state().before.smoothness,
 							p.get_current_state().dmax,
 							p.get_current_state().lmin));
 					}
@@ -679,9 +679,9 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 }
 
 //******************************************************************************
-SCENARIO("std::tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side const& side, size_t iter_limit) const", "[interval]") {
+SCENARIO("std::tuple<double, bool> Interval::adjust_smoothness_for_s(Interval::Side const& side, size_t iter_limit) const", "[interval]") {
 	Timepoint* t = Caretaker::singleton().get_history_root();
-	GIVEN("A Side of an Interval with previously computed valid ls with lambda superior to 2") {
+	GIVEN("A Side of an Interval with previously computed valid ls with smoothness superior to 2") {
 		GlobalParams p(t);
 		MeshlinePolicy a(
 			Y,
@@ -701,7 +701,7 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side 
 		auto state_a = a.get_current_state();
 		state_p.dmax = 30.0;
 		state_p.lmin = 5;
-		state_p.lambda = 2;
+		state_p.smoothness = 2;
 		state_a.d = 0.1;
 		p.set_next_state(state_p);
 		a.set_next_state(state_a);
@@ -714,28 +714,28 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side 
 		i.set_next_state(state_i);
 		j.set_next_state(state_j);
 		Coord old_last_space = i.get_current_state().before.ls.back() - i.s(i.get_current_state().before);
-		REQUIRE(is_ls_valid_for_dmax_lmin_lambda(
+		REQUIRE(is_ls_valid_for_dmax_lmin_smoothness(
 			i.get_current_state().before.ls,
 			a.get_current_state().d,
-			i.get_current_state().before.lambda,
+			i.get_current_state().before.smoothness,
 			p.get_current_state().dmax,
 			p.get_current_state().lmin));
-		REQUIRE(is_ls_valid_for_dmax_lmin_lambda(
+		REQUIRE(is_ls_valid_for_dmax_lmin_smoothness(
 			j.get_current_state().before.ls,
 			a.get_current_state().d,
-			j.get_current_state().before.lambda,
+			j.get_current_state().before.smoothness,
 			p.get_current_state().dmax,
 			p.get_current_state().lmin));
 		WHEN("Process iterations are unlimited") {
-			THEN("Side's lambda should be reduced") {
+			THEN("Side's smoothness should be reduced") {
 				{
-					auto [new_lambda, is_limit_reached] = i.adjust_lambda_for_s(i.get_current_state().before);
+					auto [new_smoothness, is_limit_reached] = i.adjust_smoothness_for_s(i.get_current_state().before);
 					auto state_i = i.get_current_state();
-					state_i.before.lambda = new_lambda;
+					state_i.before.smoothness = new_smoothness;
 					i.update_ls(state_i);
 					i.set_next_state(state_i);
 					REQUIRE_FALSE(is_limit_reached);
-					REQUIRE(i.get_current_state().before.lambda < p.get_current_state().lambda);
+					REQUIRE(i.get_current_state().before.smoothness < p.get_current_state().smoothness);
 				}
 
 				AND_THEN("The space between the last ls line and the middle of the Interval should be reduced") {
@@ -743,15 +743,15 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side 
 					REQUIRE(new_last_space < old_last_space);
 
 					AND_WHEN("Process iterations are limited") {
-						THEN("Side's lambda should be reduced") {
+						THEN("Side's smoothness should be reduced") {
 							{
-								auto [new_lambda, is_limit_reached] = j.adjust_lambda_for_s(j.get_current_state().before, 20);
+								auto [new_smoothness, is_limit_reached] = j.adjust_smoothness_for_s(j.get_current_state().before, 20);
 								auto state_j = j.get_current_state();
-								state_j.before.lambda = new_lambda;
+								state_j.before.smoothness = new_smoothness;
 								j.update_ls(state_j);
 								j.set_next_state(state_j);
 								REQUIRE(is_limit_reached);
-								REQUIRE(j.get_current_state().before.lambda < p.get_current_state().lambda);
+								REQUIRE(j.get_current_state().before.smoothness < p.get_current_state().smoothness);
 							}
 
 							AND_THEN("The space between the last ls line and the middle of the Interval should be reduced, but less than if unlimited") {
@@ -766,7 +766,7 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side 
 		}
 	}
 
-	GIVEN("A Side of an Interval with previously computed valid ls with lambda being 1") {
+	GIVEN("A Side of an Interval with previously computed valid ls with smoothness being 1") {
 		GlobalParams p(t);
 		MeshlinePolicy a(
 			Y,
@@ -786,7 +786,7 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side 
 		auto state_a = a.get_current_state();
 		state_p.dmax = 30.0;
 		state_p.lmin = 5;
-		state_p.lambda = 1;
+		state_p.smoothness = 1;
 		state_a.d = 0.1;
 		p.set_next_state(state_p);
 		a.set_next_state(state_a);
@@ -795,20 +795,20 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_lambda_for_s(Interval::Side 
 		i.update_ls(state_i);
 		i.set_next_state(state_i);
 		Coord old_last_space = i.get_current_state().before.ls.back() - i.s(i.get_current_state().before);
-		REQUIRE(is_ls_valid_for_dmax_lmin_lambda(
+		REQUIRE(is_ls_valid_for_dmax_lmin_smoothness(
 			i.get_current_state().before.ls,
 			a.get_current_state().d,
-			i.get_current_state().before.lambda,
+			i.get_current_state().before.smoothness,
 			p.get_current_state().dmax,
 			p.get_current_state().lmin));
-		THEN("Side's lambda should not be reduced") {
-			auto [new_lambda, is_limit_reached] = i.adjust_lambda_for_s(i.get_current_state().before);
+		THEN("Side's smoothness should not be reduced") {
+			auto [new_smoothness, is_limit_reached] = i.adjust_smoothness_for_s(i.get_current_state().before);
 			auto state_i = i.get_current_state();
-			state_i.before.lambda = new_lambda;
+			state_i.before.smoothness = new_smoothness;
 			i.update_ls(state_i);
 			i.set_next_state(state_i);
 			REQUIRE_FALSE(is_limit_reached);
-			REQUIRE(new_lambda == p.get_current_state().lambda);
+			REQUIRE(new_smoothness == p.get_current_state().smoothness);
 
 			AND_THEN("The space between the last ls line and the middle of the Interval should not be reduced") {
 				Coord new_last_space = i.get_current_state().before.ls.back() - i.s(i.get_current_state().before);
@@ -868,7 +868,7 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 			auto state_d = d.get_current_state();
 			state_p.dmax = 2;
 			state_p.lmin = 5;
-			state_p.lambda = 2;
+			state_p.smoothness = 2;
 			state_a.d = 0.1;
 			state_b.d = 0.1;
 			state_c.d = 0.1;
@@ -968,7 +968,7 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 			auto state_b = b.get_current_state();
 			state_p.dmax = 1.5;
 			state_p.lmin = 5;
-			state_p.lambda = 2;
+			state_p.smoothness = 2;
 			state_a.d = 0.1;
 			state_b.d = 0.1;
 			p.set_next_state(state_p);
@@ -1053,7 +1053,7 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 			auto state_d = d.get_current_state();
 			state_p.dmax = 2;
 			state_p.lmin = 5;
-			state_p.lambda = 2;
+			state_p.smoothness = 2;
 			state_a.d = 0.1;
 			state_b.d = 0.1;
 			state_c.d = 0.1;
@@ -1100,7 +1100,7 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 			auto state_b = b.get_current_state();
 			state_p.dmax = 1.5;
 			state_p.lmin = 5;
-			state_p.lambda = 2;
+			state_p.smoothness = 2;
 			state_a.d = 0.1;
 			state_b.d = 0.1;
 			p.set_next_state(state_p);

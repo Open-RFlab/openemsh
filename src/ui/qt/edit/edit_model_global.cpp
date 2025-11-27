@@ -28,7 +28,7 @@ EditModelGlobal::EditModelGlobal(domain::GlobalParams* global, QObject* parent)
 
 	make_row(0, "Proximity limit", QString::number(params.proximity_limit),
 		"Distance below which two MeshlinePolicies will be merged.");
-	make_row(1, "Smoothness", QString::number(params.lambda),
+	make_row(1, "Smoothness", QString::number(params.smoothness),
 		"Smoothness factor <b>]1;2]</b>. Meshing algorithm will decrease it, better to start high.");
 	make_row(2, "lmin", QString::number(params.lmin),
 		"Minimum line number per Interval half.");
@@ -42,7 +42,7 @@ void EditModelGlobal::commit() {
 
 	std::array does_succeed = {
 		try_to_double(item(0, V)->text(), params.proximity_limit),
-		try_to_double(item(1, V)->text(), params.lambda),
+		try_to_double(item(1, V)->text(), params.smoothness),
 		try_to_ulong(item(2, V)->text(), params.lmin),
 		try_to_double(item(3, V)->text(), params.dmax)
 	};
