@@ -109,7 +109,7 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app::OpenEMSH::Params params;
 	vector<function<void (domain::Params&)>> domain_overrides;
 
-	CLI::App app("OpenEMSH mesher");
+	CLI::App app("OpenEMSH - Mesher for the openEMS FDTD solver", "OpenEMSH");
 
 #ifdef _WIN32
 	argv = app.ensure_utf8(argv);
