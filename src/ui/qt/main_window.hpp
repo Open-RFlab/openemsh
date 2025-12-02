@@ -37,6 +37,7 @@ private:
 	void update_navigation_buttons_visibility();
 	void update_show_buttons_pressing();
 	void update_cell_number(bool reset = false);
+	void save_csx_file();
 
 	void go_to_current_state();
 	void make_current_state_view();

@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QGuiApplication>
 #include <QMarginsF>
+#include <QMessageBox>
 #include <QToolButton>
 
 #include <format>
@@ -112,6 +113,7 @@ void MainWindow::update_title() {
 void MainWindow::clear() {
 	ui->structure_view->clear();
 	ui->processing_view->clear();
+	ui->statusBar->clearMessage();
 	update_cell_number(true);
 }
 
@@ -312,21 +314,45 @@ void MainWindow::on_a_file_open_triggered() {
 }
 
 //******************************************************************************
-void MainWindow::on_a_file_save_triggered() {
-	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-
-	if(oemsh.get_params().output.empty())
-		oemsh.set_output(csx_file.toStdString());
-
-	// TODO deduce from csx_file suffix
+void MainWindow::save_csx_file() {
 	oemsh.set_output_format(app::OpenEMSH::Params::OutputFormat::CSX);
 
-	// TODO warn for overwrite?
+	if(oemsh.is_about_overwriting()) {
+		auto res = QMessageBox::warning(this,
+			"",
+			QString("You are about overwriting the file \"%1\", do you want to continue?")
+				.arg(oemsh.get_params().output.generic_string()),
+			QMessageBox::Cancel | QMessageBox::Save);
+		if(res != QMessageBox::Save) {
+			return;
+		}
+	}
 
-	// TODO be sure in this mode, the XML file is edited and stuff like comments won't be discarded
+	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 	oemsh.write();
-
+	ui->statusBar->showMessage("Saved file \"" + csx_file + "\"");
 	QGuiApplication::restoreOverrideCursor();
+}
+
+//******************************************************************************
+void MainWindow::on_a_file_save_triggered() {
+	if(oemsh.get_params().output.empty()) {
+		oemsh.set_output(csx_file.toStdString());
+	} else if(csx_file != oemsh.get_params().output.generic_string()) {
+		auto res = QMessageBox::question(this,
+			"",
+			QString("You are about saving to the file \"%1\" which is different from the input file \"%2\", do you want to continue?")
+				.arg(oemsh.get_params().output.generic_string(), oemsh.get_params().input.generic_string()),
+			QMessageBox::Cancel | QMessageBox::Save);
+		if(res == QMessageBox::Save) {
+			csx_file = QString::fromStdString(oemsh.get_params().output.generic_string());
+		} else {
+			return;
+		}
+	}
+
+	// TODO deduce format from csx_file suffix
+	save_csx_file();
 }
 
 //******************************************************************************
@@ -338,17 +364,13 @@ void MainWindow::on_a_file_save_as_triggered() {
 	dialog.setDefaultSuffix(".csx");
 	dialog.setDirectory(csx_file.isEmpty() ? QString(".") : QFileInfo(csx_file).path());
 	if(dialog.exec()) {
-		QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 		csx_file = dialog.selectedFiles().first();
 		update_title();
 
 		// TODO deduce from filter selected by user
 		// dialog.selectedNameFilter(); // TODO check actual suffix with that ?
-		oemsh.set_output_format(app::OpenEMSH::Params::OutputFormat::CSX);
 		oemsh.set_output(csx_file.toStdString());
-		oemsh.write();
-
-		QGuiApplication::restoreOverrideCursor();
+		save_csx_file();
 	}
 }
 

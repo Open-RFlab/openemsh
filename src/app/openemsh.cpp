@@ -106,6 +106,16 @@ void OpenEMSH::parse() {
 }
 
 //******************************************************************************
+bool OpenEMSH::is_about_overwriting() const {
+	return !params.force
+	&& params.output_format == Params::OutputFormat::CSX
+	&& (filesystem::exists(params.output)
+		|| (params.input == params.output
+		&& board
+		&& board->global_params->get_current_state().has_grid_already));
+}
+
+//******************************************************************************
 void OpenEMSH::write() const {
 	switch(params.output_format) {
 	case Params::OutputFormat::CSX:

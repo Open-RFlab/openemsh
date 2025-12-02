@@ -6,6 +6,7 @@
 
 #include <map>
 #include <optional>
+#include <string_view>
 #include <iostream>
 
 #include <pugixml.hpp>
@@ -51,8 +52,11 @@ public:
 	ParserFromCsx::Params const& params;
 	std::map<pugi::xml_node const, size_t> primitives_ids;
 	Board::Builder board;
+	domain::Params domain_params;
 
 	Pimpl(ParserFromCsx::Params const& params);
+
+	bool parse_grid(pugi::xml_node const& node);
 
 	shared_ptr<Material> parse_property(pugi::xml_node const& node);
 
@@ -67,6 +71,27 @@ private:
 ParserFromCsx::Pimpl::Pimpl(ParserFromCsx::Params const& params)
 : params(params)
 {}
+
+//******************************************************************************
+bool ParserFromCsx::Pimpl::parse_grid(pugi::xml_node const& node) {
+	std::size_t coord_system = node.attribute("CoordSystem").as_uint();
+
+	if(coord_system == 0) {
+		// First step : into bool has_grid_already
+		pugi::xml_node grid = node.child("RectilinearGrid");
+		string_view x_lines = grid.child_value("XLines");
+		string_view y_lines = grid.child_value("YLines");
+		string_view z_lines = grid.child_value("ZLines");
+		domain_params.has_grid_already = !x_lines.empty() || !y_lines.empty() || !z_lines.empty();
+		// TODO Second step : into fixed MLP
+		// TODO Third step : into vizualisable set of meshlines for comparison
+		return true;
+//	} else if(coord_system == 1) {
+	} else {
+		cerr << "Error: unsupported CoordSystem" << endl;
+		return false;
+	}
+}
 
 //******************************************************************************
 shared_ptr<Material> ParserFromCsx::Pimpl::parse_property(pugi::xml_node const& node) {
@@ -296,6 +321,9 @@ void ParserFromCsx::parse() {
 
 	pugi::xpath_node fdtd = doc.select_node("/openEMS/FDTD");
 
+	pugi::xpath_node csx = doc.select_node("/openEMS/ContinuousStructure");
+	pimpl->parse_grid(csx.node())
+
 	{
 		// Primitives' IDs grow disregarding properties.
 		size_t id = 0;
@@ -324,6 +352,7 @@ void ParserFromCsx::parse() {
 
 	}
 	bar.complete();
+	domain_params = std::move(pimpl->domain_params);
 }
 
 //******************************************************************************

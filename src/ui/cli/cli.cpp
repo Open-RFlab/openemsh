@@ -10,6 +10,7 @@
 //#include <CLI/Validators.hpp>
 
 #include <cstdlib>
+#include <format>
 #include <functional>
 #include <map>
 #include <string>
@@ -127,7 +128,8 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	auto* i = app.add_option("input,-i,--input", params.input, "Input CSX file.")->check(CLI::ExistingFile)->required();
 	g->trigger_on_parse()->check(JustDo([i]() { i->required(false); }));
 //	app.add_option("-o,--output", params.output, "Output CSX file. If different from input, will copy and extend it.")->check((!CLI::ExistingFile)|FutureConditional(params.force,"Cannot overwrite a file without --force"));
-	app.add_option("-o,--output", params.output, "Output CSX file. If different from input, will copy and extend it.")->check(CLI::Validator((!CLI::ExistingFile)|FutureConditional(params.force,"Cannot overwrite a file without --force"), "FILE", "KO"));
+//	app.add_option("-o,--output", params.output, "Output CSX file. If different from input, will copy and extend it.")->check(CLI::Validator((!CLI::ExistingFile)|FutureConditional(params.force,"Cannot overwrite a file without --force"), "FILE", "KO"));
+	app.add_option("-o,--output", params.output, "Output CSX file. If different from input, will copy and extend it. (Defaults to input, if provided)")->type_name(format("{}:FILE", CLI::detail::type_name<decltype(params.output)>()));
 	app.add_flag("-f,--force", params.force, "Allow overwriting a file.")->trigger_on_parse();
 
 	static std::map<std::string, app::OpenEMSH::Params::OutputFormat, std::less<>> const map {
@@ -172,6 +174,11 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app.preparse_callback([g](size_t argc) {
 		if(argc == 0)
 			g->force_callback()->default_val(true);
+	});
+
+	app.final_callback([&params]() {
+		if(params.output.empty())
+			params.output = params.input;
 	});
 
 	try {

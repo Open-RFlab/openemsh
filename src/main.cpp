@@ -7,6 +7,7 @@
 #include <QApplication>
 
 #include <cstdlib>
+#include <iostream>
 #include <format>
 
 #include "app/openemsh.hpp"
@@ -30,6 +31,15 @@ int main(int argc, char* argv[]) {
 
 	if(!oemsh.get_params().gui) {
 		oemsh.parse();
+		if(oemsh.is_about_overwriting()) {
+			std::cerr
+				<< std::format(
+					"Error: You are about overwriting the file \"{}\", "
+					"use --force if that is what you want.",
+					oemsh.get_params().output.generic_string())
+				<< std::endl;
+			return EXIT_FAILURE;
+		}
 		oemsh.run_all_steps();
 		oemsh.write();
 	} else {

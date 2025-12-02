@@ -62,6 +62,7 @@ public:
 	void run_from_step(Step step) const;
 	void go_before(Step step) const;
 	void go_before_previous_step() const;
+	bool is_about_overwriting() const;
 	void write() const;
 
 	bool can_run_a_next_step() const;
