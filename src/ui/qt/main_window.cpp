@@ -79,17 +79,25 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 MainWindow::~MainWindow() = default;
 
 //******************************************************************************
-void MainWindow::parse_and_display() {
+bool MainWindow::parse_and_display() {
 	if(csx_file.isEmpty())
-		return;
+		return false;
 
 	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+
+	if(auto res = oemsh.parse()
+	; !res) {
+		QGuiApplication::restoreOverrideCursor();
+		ui->statusBar->showMessage("Error parsing file \"" + csx_file + "\"" + " : " + QString::fromStdString(res.error()));
+		return false;
+	}
+
 	update_title();
-	oemsh.parse();
 	ui->structure_view->init(&oemsh.get_board());
 	ui->processing_view->init(&oemsh.get_board());
 	run();
 	QGuiApplication::restoreOverrideCursor();
+	return true;
 }
 
 //******************************************************************************
@@ -301,15 +309,14 @@ void MainWindow::on_a_file_open_triggered() {
 	dialog.setNameFilter(format_filter_csx);
 	dialog.setDirectory(csx_file.isEmpty() ? QString(".") : QFileInfo(csx_file).path());
 	if(dialog.exec()) {
-		QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 		csx_file = dialog.selectedFiles().first();
 
 		clear();
 		oemsh.set_input(csx_file.toStdString());
-		parse_and_display();
+		if(!parse_and_display())
+			return;
 
 		on_a_fit_triggered();
-		QGuiApplication::restoreOverrideCursor();
 	}
 }
 
@@ -329,8 +336,11 @@ void MainWindow::save_csx_file() {
 	}
 
 	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-	oemsh.write();
-	ui->statusBar->showMessage("Saved file \"" + csx_file + "\"");
+	if(auto res = oemsh.write()
+	; res)
+		ui->statusBar->showMessage("Saved file \"" + csx_file + "\"");
+	else
+		ui->statusBar->showMessage("Failed to save file \"" + csx_file + "\"" + " : " + QString::fromStdString(res.error()));
 	QGuiApplication::restoreOverrideCursor();
 }
 

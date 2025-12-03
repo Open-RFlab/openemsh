@@ -10,6 +10,7 @@
 #include "infra/serializers/serializer_to_plantuml.hpp"
 #include "infra/serializers/serializer_to_prettyprint.hpp"
 #include "utils/concepts.hpp"
+#include "utils/expected_utils.hpp"
 #include "utils/unreachable.hpp"
 
 #include "openemsh.hpp"
@@ -99,10 +100,15 @@ void OpenEMSH::set_output_format(Params::OutputFormat format) {
 }
 
 //******************************************************************************
-void OpenEMSH::parse() {
+expected<void, string> OpenEMSH::parse() {
 	Caretaker::singleton().reset();
-	board = ParserFromCsx::run(params.input, static_cast<ParserFromCsx::Params const&>(params), params.override_from_cli);
+	UNWRAP(
+		ParserFromCsx::run(params.input, static_cast<ParserFromCsx::Params const&>(params), params.override_from_cli),
+		[this](auto& value) {
+			board = value;
+		});
 	Caretaker::singleton().remember_current_timepoint();
+	return {};
 }
 
 //******************************************************************************
@@ -116,10 +122,10 @@ bool OpenEMSH::is_about_overwriting() const {
 }
 
 //******************************************************************************
-void OpenEMSH::write() const {
+expected<void, string> OpenEMSH::write() const {
 	switch(params.output_format) {
 	case Params::OutputFormat::CSX:
-		SerializerToCsx::run(*board, params.input, params.output, static_cast<SerializerToCsx::Params const&>(params));
+		return SerializerToCsx::run(*board, params.input, params.output, static_cast<SerializerToCsx::Params const&>(params));
 		break;
 	case Params::OutputFormat::PLANTUML: {
 //		SerializerToPlantuml::run(*board, static_cast<SerializerToPlantuml::Params const&>(params));
@@ -132,6 +138,7 @@ void OpenEMSH::write() const {
 	default:
 		::unreachable();
 	};
+	return {};
 }
 
 //******************************************************************************

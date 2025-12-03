@@ -28,16 +28,16 @@ string to_xml_node(Axis const axis) noexcept {
 }
 
 //******************************************************************************
-void SerializerToCsx::run(
+expected<void, string> SerializerToCsx::run(
 		Board& board,
 		filesystem::path const& input,
 		filesystem::path const& output) {
 
-	SerializerToCsx::run(board, input, output, {});
+	return SerializerToCsx::run(board, input, output, {});
 }
 
 //******************************************************************************
-void SerializerToCsx::run(
+expected<void, string> SerializerToCsx::run(
 		Board& board,
 		filesystem::path const& input,
 		filesystem::path const& output,
@@ -45,6 +45,10 @@ void SerializerToCsx::run(
 
 	SerializerToCsx serializer(input, output, std::move(params));
 	board.accept(serializer);
+
+	if(serializer.error)
+		return unexpected(serializer.error.value());
+	return {};
 }
 
 //******************************************************************************
@@ -60,7 +64,7 @@ void SerializerToCsx::visit(Board& board) {
 	pugi::xml_parse_result const res = doc.load_file(input.native().c_str());
 
 	if(res.status != pugi::status_ok) {
-		cerr << res.description() << endl;
+		error = res.description();
 		return;
 	}
 

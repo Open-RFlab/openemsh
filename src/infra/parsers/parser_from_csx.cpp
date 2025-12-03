@@ -7,7 +7,6 @@
 #include <map>
 #include <optional>
 #include <string_view>
-#include <iostream>
 
 #include <pugixml.hpp>
 
@@ -19,6 +18,7 @@
 #include "csxcad_layer/point_3d.hpp"
 
 #include "parser_from_csx.hpp"
+#include "utils/expected_utils.hpp"
 #include "utils/progress.hpp"
 #include "utils/unreachable.hpp"
 #include "utils/vector_utils.hpp"
@@ -56,7 +56,7 @@ public:
 
 	Pimpl(ParserFromCsx::Params const& params);
 
-	bool parse_grid(pugi::xml_node const& node);
+	expected<void, string> parse_grid(pugi::xml_node const& node);
 
 	shared_ptr<Material> parse_property(pugi::xml_node const& node);
 
@@ -73,7 +73,7 @@ ParserFromCsx::Pimpl::Pimpl(ParserFromCsx::Params const& params)
 {}
 
 //******************************************************************************
-bool ParserFromCsx::Pimpl::parse_grid(pugi::xml_node const& node) {
+expected<void, string> ParserFromCsx::Pimpl::parse_grid(pugi::xml_node const& node) {
 	std::size_t coord_system = node.attribute("CoordSystem").as_uint();
 
 	if(coord_system == 0) {
@@ -85,12 +85,11 @@ bool ParserFromCsx::Pimpl::parse_grid(pugi::xml_node const& node) {
 		domain_params.has_grid_already = !x_lines.empty() || !y_lines.empty() || !z_lines.empty();
 		// TODO Second step : into fixed MLP
 		// TODO Third step : into vizualisable set of meshlines for comparison
-		return true;
 //	} else if(coord_system == 1) {
 	} else {
-		cerr << "Error: unsupported CoordSystem" << endl;
-		return false;
+		return unexpected("Unsupported CoordSystem");
 	}
+	return {};
 }
 
 //******************************************************************************
@@ -274,21 +273,21 @@ void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, s
 }
 
 //******************************************************************************
-shared_ptr<Board> ParserFromCsx::run(std::filesystem::path const& input) {
+expected<shared_ptr<Board>, string> ParserFromCsx::run(std::filesystem::path const& input) {
 	return ParserFromCsx::run(input, {});
 }
 
 //******************************************************************************
-shared_ptr<Board> ParserFromCsx::run(std::filesystem::path const& input, Params params) {
+expected<shared_ptr<Board>, string> ParserFromCsx::run(std::filesystem::path const& input, Params params) {
 	ParserFromCsx parser(input, std::move(params));
-	parser.parse();
+	TRY(parser.parse());
 	return parser.output();
 }
 
 //******************************************************************************
-shared_ptr<Board> ParserFromCsx::run(std::filesystem::path const& input, Params params, std::function<void (domain::Params&)> const& override_domain_params) {
+expected<shared_ptr<Board>, string> ParserFromCsx::run(std::filesystem::path const& input, Params params, std::function<void (domain::Params&)> const& override_domain_params) {
 	ParserFromCsx parser(input, std::move(params));
-	parser.parse();
+	TRY(parser.parse());
 	override_domain_params(parser.domain_params);
 	return parser.output();
 }
@@ -310,19 +309,18 @@ ParserFromCsx::ParserFromCsx(filesystem::path const& input, Params params)
 ParserFromCsx::~ParserFromCsx() = default;
 
 //******************************************************************************
-void ParserFromCsx::parse() {
+expected<void, string> ParserFromCsx::parse() {
 	pugi::xml_document doc;
 	pugi::xml_parse_result res = doc.load_file(input.native().c_str());
 
 	if(res.status != pugi::status_ok) {
-		cerr << res.description() << endl;
-		return;
+		return unexpected(res.description());
 	}
 
 	pugi::xpath_node fdtd = doc.select_node("/openEMS/FDTD");
 
 	pugi::xpath_node csx = doc.select_node("/openEMS/ContinuousStructure");
-	pimpl->parse_grid(csx.node())
+	TRY(pimpl->parse_grid(csx.node()));
 
 	{
 		// Primitives' IDs grow disregarding properties.
@@ -353,6 +351,7 @@ void ParserFromCsx::parse() {
 	}
 	bar.complete();
 	domain_params = std::move(pimpl->domain_params);
+	return {};
 }
 
 //******************************************************************************

@@ -30,7 +30,15 @@ int main(int argc, char* argv[]) {
 			});
 
 	if(!oemsh.get_params().gui) {
-		oemsh.parse();
+		if(auto res = oemsh.parse(); !res) {
+			std::cerr
+				<< std::format(
+					"Error parsing file \"{}\" : {}",
+					oemsh.get_params().input.generic_string(),
+					res.error())
+				<< std::endl;
+			return EXIT_FAILURE;
+		}
 		if(oemsh.is_about_overwriting()) {
 			std::cerr
 				<< std::format(
@@ -41,7 +49,15 @@ int main(int argc, char* argv[]) {
 			return EXIT_FAILURE;
 		}
 		oemsh.run_all_steps();
-		oemsh.write();
+		if(auto res = oemsh.write(); !res) {
+			std::cerr
+				<< std::format(
+					"Error saving file \"{}\" : {}",
+					oemsh.get_params().output.generic_string(),
+					res.error())
+				<< std::endl;
+			return EXIT_FAILURE;
+		}
 	} else {
 		QApplication a(argc, argv);
 

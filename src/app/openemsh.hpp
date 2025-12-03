@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <expected>
 #include <filesystem>
 #include <functional>
 #include <memory>
@@ -55,7 +56,7 @@ public:
 	// TODO implement validation checks on params here.
 //	void check_x();
 
-	void parse();
+	std::expected<void, std::string> parse();
 	void run(std::set<Step> const& steps) const;
 	void run_all_steps() const;
 	void run_next_step() const;
@@ -63,8 +64,7 @@ public:
 	void go_before(Step step) const;
 	void go_before_previous_step() const;
 	bool is_about_overwriting() const;
-	void write() const;
-
+	std::expected<void, std::string> write() const;
 	bool can_run_a_next_step() const;
 	bool can_go_before() const;
 	std::optional<Step> get_current_step() const;

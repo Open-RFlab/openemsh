@@ -6,7 +6,9 @@
 
 #pragma once
 
+#include <expected>
 #include <filesystem>
+#include <optional>
 #include <string>
 
 #include "domain/utils/entity_visitor.hpp"
@@ -24,11 +26,11 @@ public:
 		bool with_axis_z = true;
 	};
 
-	static void run(
+	static std::expected<void, std::string> run(
 		domain::Board& board,
 		std::filesystem::path const& input,
 		std::filesystem::path const& output);
-	static void run(
+	static std::expected<void, std::string> run(
 		domain::Board& board,
 		std::filesystem::path const& input,
 		std::filesystem::path const& output,
@@ -47,4 +49,5 @@ private:
 	Params const params;
 	std::filesystem::path const input;
 	std::filesystem::path const output;
+	std::optional<std::string> error;
 };

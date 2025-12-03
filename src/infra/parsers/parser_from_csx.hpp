@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <expected>
 #include <filesystem>
 #include <memory>
 #include <string>
@@ -31,15 +32,15 @@ public:
 
 	~ParserFromCsx();
 
-	[[nodiscard]] static std::shared_ptr<domain::Board> run(std::filesystem::path const& input);
-	[[nodiscard]] static std::shared_ptr<domain::Board> run(std::filesystem::path const& input, Params params);
-	[[nodiscard]] static std::shared_ptr<domain::Board> run(std::filesystem::path const& input, Params params, std::function<void (domain::Params&)> const& override_domain_params);
+	[[nodiscard]] static std::expected<std::shared_ptr<domain::Board>, std::string> run(std::filesystem::path const& input);
+	[[nodiscard]] static std::expected<std::shared_ptr<domain::Board>, std::string> run(std::filesystem::path const& input, Params params);
+	[[nodiscard]] static std::expected<std::shared_ptr<domain::Board>, std::string> run(std::filesystem::path const& input, Params params, std::function<void (domain::Params&)> const& override_domain_params);
 
 private:
 	ParserFromCsx(std::filesystem::path const& input);
 	ParserFromCsx(std::filesystem::path const& input, Params params);
 
-	void parse();
+	std::expected<void, std::string> parse();
 	[[nodiscard]] std::shared_ptr<domain::Board> output();
 
 	std::filesystem::path const input;
@@ -49,5 +50,4 @@ private:
 //	std::vector<std::unique_ptr<Polygon>> polygons;
 	class Pimpl;
 	std::unique_ptr<Pimpl> pimpl;
-
 };
