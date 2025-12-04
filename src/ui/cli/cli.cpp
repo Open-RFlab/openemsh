@@ -170,6 +170,7 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app.add_flag("--meshlines", params.with_meshlines, "Include regular meshlines in output.")->group("Output options")->default_str(to_string(params.with_meshlines));
 	app.add_flag("--policy-lines", params.with_meshline_policies, "Include meshline policies in output.")->group("Output options")->default_str(to_string(params.with_meshline_policies));
 //	app.add_flag("--policy-lines", params.with_meshline_policies, "Include meshline policies in output.")->group("Output options")->capture_default_str();
+	app.add_flag("--save-oemsh-params", params.with_oemsh_params, "Include OpenEMSH parameters used for this mesh.")->group("Output options")->default_str(to_string(params.with_oemsh_params));
 
 	app.preparse_callback([g](size_t argc) {
 		if(argc == 0)

@@ -57,7 +57,15 @@ SerializerToCsx::SerializerToCsx(filesystem::path const& input, filesystem::path
 {}
 
 //******************************************************************************
-pugi::xml_node find_or_add_child(pugi::xml_node& node, char const* child) {
+pugi::xml_node find_or_prepend_child(pugi::xml_node& node, char const* child) {
+	if(pugi::xml_node c = node.child(child); c.empty())
+		return node.prepend_child(child);
+	else
+		return c;
+}
+
+//******************************************************************************
+pugi::xml_node find_or_append_child(pugi::xml_node& node, char const* child) {
 	if(pugi::xml_node c = node.child(child); c.empty())
 		return node.append_child(child);
 	else
@@ -74,9 +82,9 @@ void SerializerToCsx::visit(Board& board) {
 		return;
 	}
 
-	pugi::xml_node oems = find_or_add_child(doc, "openEMS");
-	pugi::xml_node csx = find_or_add_child(oems, "ContinuousStructure");
-	pugi::xml_node grid = find_or_add_child(csx, "RectilinearGrid");
+	pugi::xml_node oems = find_or_append_child(doc, "openEMS");
+	pugi::xml_node csx = find_or_append_child(oems, "ContinuousStructure");
+	pugi::xml_node grid = find_or_append_child(csx, "RectilinearGrid");
 	grid.remove_children();
 
 	auto const add_meshlines_to_xml_doc = [this, &grid, &board](Axis const axis) {
@@ -100,6 +108,19 @@ void SerializerToCsx::visit(Board& board) {
 		add_meshlines_to_xml_doc(Y);
 	if(params.with_axis_z)
 		add_meshlines_to_xml_doc(Z);
+
+	if(params.with_oemsh_params) {
+		auto const& p = board.global_params->get_current_state();
+		pugi::xml_node oemsh = find_or_prepend_child(doc, "OpenEMSH");
+		pugi::xml_node global_params = find_or_append_child(oemsh, "GlobalParams");
+		global_params.remove_attributes();
+		global_params.append_attribute("ProximityLimit").set_value(p.proximity_limit);
+		global_params.append_attribute("Smoothness").set_value(p.smoothness);
+		global_params.append_attribute("dmax").set_value(p.dmax);
+		global_params.append_attribute("lmin").set_value(p.lmin);
+	} else {
+		doc.remove_child("OpenEMSH");
+	}
 
 	doc.save_file(output.native().c_str(), "  ");
 }
