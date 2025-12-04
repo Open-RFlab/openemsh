@@ -57,6 +57,12 @@ int main(int argc, char* argv[]) {
 					res.error())
 				<< std::endl;
 			return EXIT_FAILURE;
+		} else if(oemsh.get_params().verbose) {
+			std::cerr
+				<< std::format(
+					"Saved file \"{}\"",
+					oemsh.get_params().output.generic_string())
+				<< std::endl;
 		}
 	} else {
 		QApplication a(argc, argv);
