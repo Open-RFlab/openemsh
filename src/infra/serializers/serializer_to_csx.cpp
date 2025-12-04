@@ -4,8 +4,6 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#include <iostream>
-
 #include <pugixml.hpp>
 
 #include "domain/mesh/meshline.hpp"
@@ -59,6 +57,14 @@ SerializerToCsx::SerializerToCsx(filesystem::path const& input, filesystem::path
 {}
 
 //******************************************************************************
+pugi::xml_node find_or_add_child(pugi::xml_node& node, char const* child) {
+	if(pugi::xml_node c = node.child(child); c.empty())
+		return node.append_child(child);
+	else
+		return c;
+}
+
+//******************************************************************************
 void SerializerToCsx::visit(Board& board) {
 	pugi::xml_document doc;
 	pugi::xml_parse_result const res = doc.load_file(input.native().c_str());
@@ -68,7 +74,10 @@ void SerializerToCsx::visit(Board& board) {
 		return;
 	}
 
-	pugi::xpath_node const grid = doc.select_node("/openEMS/ContinuousStructure/RectilinearGrid");
+	pugi::xml_node oems = find_or_add_child(doc, "openEMS");
+	pugi::xml_node csx = find_or_add_child(oems, "ContinuousStructure");
+	pugi::xml_node grid = find_or_add_child(csx, "RectilinearGrid");
+	grid.remove_children();
 
 	auto const add_meshlines_to_xml_doc = [this, &grid, &board](Axis const axis) {
 		string out;
@@ -82,9 +91,7 @@ void SerializerToCsx::visit(Board& board) {
 		if(!out.empty())
 			out.pop_back();
 
-		cerr << "lines: " << out << endl << endl;
-		grid.node().select_node(to_xml_node(axis).c_str())
-		    .node().text().set(out.c_str());
+		grid.append_child(to_xml_node(axis).c_str()).text().set(out.c_str());
 	};
 
 	if(params.with_axis_x)
@@ -94,6 +101,5 @@ void SerializerToCsx::visit(Board& board) {
 	if(params.with_axis_z)
 		add_meshlines_to_xml_doc(Z);
 
-	cerr << "output: " << output << endl;
-	doc.save_file(output.native().c_str());
+	doc.save_file(output.native().c_str(), "  ");
 }
