@@ -311,9 +311,9 @@ ParserFromCsx::~ParserFromCsx() = default;
 //******************************************************************************
 expected<void, string> ParserFromCsx::parse() {
 	pugi::xml_document doc;
-	pugi::xml_parse_result res = doc.load_file(input.native().c_str());
 
-	if(res.status != pugi::status_ok) {
+	if(auto res = doc.load_file(input.native().c_str())
+	; res.status != pugi::status_ok) {
 		return unexpected(res.description());
 	}
 

@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
 			});
 
 	if(!oemsh.get_params().gui) {
-		if(auto res = oemsh.parse(); !res) {
+		if(auto res = oemsh.parse(); !res.has_value()) {
 			std::cerr
 				<< std::format(
 					"Error parsing file \"{}\" : {}",
@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
 			return EXIT_FAILURE;
 		}
 		oemsh.run_all_steps();
-		if(auto res = oemsh.write(); !res) {
+		if(auto res = oemsh.write(); !res.has_value()) {
 			std::cerr
 				<< std::format(
 					"Error saving file \"{}\" : {}",

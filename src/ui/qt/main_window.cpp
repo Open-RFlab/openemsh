@@ -86,7 +86,7 @@ bool MainWindow::parse_and_display() {
 	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 
 	if(auto res = oemsh.parse()
-	; !res) {
+	; !res.has_value()) {
 		QGuiApplication::restoreOverrideCursor();
 		ui->statusBar->showMessage("Error parsing file \"" + csx_file + "\"" + " : " + QString::fromStdString(res.error()));
 		return false;
@@ -327,8 +327,9 @@ void MainWindow::save_csx_file() {
 	if(oemsh.is_about_overwriting()) {
 		auto res = QMessageBox::warning(this,
 			"",
-			QString("You are about overwriting the file \"%1\", do you want to continue?")
-				.arg(oemsh.get_params().output.generic_string()),
+			QString::fromStdString(std::format(
+				"You are about overwriting the file \"{}\", do you want to continue?",
+				oemsh.get_params().output.generic_string())),
 			QMessageBox::Cancel | QMessageBox::Save);
 		if(res != QMessageBox::Save) {
 			return;
@@ -337,7 +338,7 @@ void MainWindow::save_csx_file() {
 
 	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 	if(auto res = oemsh.write()
-	; res)
+	; res.has_value())
 		ui->statusBar->showMessage("Saved file \"" + csx_file + "\"");
 	else
 		ui->statusBar->showMessage("Failed to save file \"" + csx_file + "\"" + " : " + QString::fromStdString(res.error()));
@@ -348,11 +349,13 @@ void MainWindow::save_csx_file() {
 void MainWindow::on_a_file_save_triggered() {
 	if(oemsh.get_params().output.empty()) {
 		oemsh.set_output(csx_file.toStdString());
-	} else if(csx_file != oemsh.get_params().output.generic_string()) {
+	} else if(csx_file != QString::fromStdString(oemsh.get_params().output.generic_string())) {
 		auto res = QMessageBox::question(this,
 			"",
-			QString("You are about saving to the file \"%1\" which is different from the input file \"%2\", do you want to continue?")
-				.arg(oemsh.get_params().output.generic_string(), oemsh.get_params().input.generic_string()),
+			QString::fromStdString(std::format(
+				"You are about saving to the file \"{}\" which is different from the input file \"{}\", do you want to continue?",
+				oemsh.get_params().output.generic_string(),
+				oemsh.get_params().input.generic_string())),
 			QMessageBox::Cancel | QMessageBox::Save);
 		if(res == QMessageBox::Save) {
 			csx_file = QString::fromStdString(oemsh.get_params().output.generic_string());

@@ -12,16 +12,16 @@
 //******************************************************************************
 #define TRY(x) \
 	{ /* TRY */ \
-		if(auto res = (x); !res.has_value()) \
-			return std::unexpected(std::move(res.error())); \
+		if(auto MACRO_TRY_res = (x); !MACRO_TRY_res.has_value()) \
+			return std::unexpected(std::move(MACRO_TRY_res.error())); \
 	}
 
 // Example: UNWRAP(func(), [&](auto& val) { var = val; });
 //******************************************************************************
 #define UNWRAP(x, unwrap) \
 	{ /* UNWRAP */ \
-		if(auto res = (x); res.has_value()) \
-			unwrap(res.value()); \
+		if(auto MACRO_UNWRAP_res = (x); MACRO_UNWRAP_res.has_value()) \
+			unwrap(MACRO_UNWRAP_res.value()); \
 		else \
-			return std::unexpected(std::move(res.error())); \
+			return std::unexpected(std::move(MACRO_UNWRAP_res.error())); \
 	}
