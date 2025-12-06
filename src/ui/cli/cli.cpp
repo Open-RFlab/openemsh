@@ -16,6 +16,7 @@
 #include <string>
 
 #include "utils/concepts.hpp"
+#include "utils/map_utils.hpp"
 #include "utils/unreachable.hpp"
 
 #include "cli.hpp"
@@ -138,7 +139,7 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 		{ "prettyprint", app::OpenEMSH::Params::OutputFormat::PRETTYPRINT }
 	};
 	// https://github.com/CLIUtils/CLI11/issues/554#issuecomment-932782337
-	app.add_option("--output-format", params.output_format, "Output format.")->transform(CLI::CheckedTransformer(map, CLI::ignore_case).description(CLI::detail::generate_map(CLI::detail::smart_deref(map), true)));
+	app.add_option("--output-format", params.output_format, "Output format.")->transform(CLI::CheckedTransformer(map, CLI::ignore_case).description(CLI::detail::generate_map(CLI::detail::smart_deref(map), true)))->default_str(reverse_kv(map).at(params.output_format));
 
 	app.add_flag("--no-yz", [&params](size_t) { params.with_yz = false; }, "Don't process YZ plane.")->group("Input options");
 	app.add_flag("--no-zx", [&params](size_t) { params.with_zx = false; }, "Don't process ZX plane.")->group("Input options");
@@ -167,10 +168,9 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app.add_flag("--no-x", [&params](size_t) { params.with_axis_x = false; }, "Don't include X axis meshlines in output.")->group("Output options");
 	app.add_flag("--no-y", [&params](size_t) { params.with_axis_y = false; }, "Don't include Y axis meshlines in output.")->group("Output options");
 	app.add_flag("--no-z", [&params](size_t) { params.with_axis_z = false; }, "Don't include Z axis meshlines in output.")->group("Output options");
-	app.add_flag("--meshlines", params.with_meshlines, "Include regular meshlines in output.")->group("Output options")->default_str(to_string(params.with_meshlines));
-	app.add_flag("--policy-lines", params.with_meshline_policies, "Include meshline policies in output.")->group("Output options")->default_str(to_string(params.with_meshline_policies));
-//	app.add_flag("--policy-lines", params.with_meshline_policies, "Include meshline policies in output.")->group("Output options")->capture_default_str();
-	app.add_flag("--save-oemsh-params", params.with_oemsh_params, "Include OpenEMSH parameters used for this mesh.")->group("Output options")->default_str(to_string(params.with_oemsh_params));
+	app.add_flag("--save-oemsh-params", params.with_oemsh_params, "Include OpenEMSH parameters used for this mesh.")->group("Output options");
+	app.add_option("--meshlines", params.with_meshlines, "Include regular meshlines in output.")->group("Output options")->default_str(to_string(params.with_meshlines));
+	app.add_option("--policy-lines", params.with_meshline_policies, "Include meshline policies in output.")->group("Output options")->default_str(to_string(params.with_meshline_policies));
 
 	app.preparse_callback([g](size_t argc) {
 		if(argc == 0)
