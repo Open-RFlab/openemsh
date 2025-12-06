@@ -250,4 +250,12 @@ if( CMakeUtils_FOUND )
 	enable_sanitizers(
 		TARGET openemsh
 		)
+
+	enable_clang_build_analyzer(
+		TARGET openemsh_bin
+		)
+
+	enable_sanitizers(
+		TARGET openemsh_bin
+		)
 endif()
