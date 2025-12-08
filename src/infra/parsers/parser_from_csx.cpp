@@ -56,6 +56,7 @@ public:
 
 	Pimpl(ParserFromCsx::Params const& params);
 
+	void parse_oemsh(pugi::xml_node const& node);
 	expected<void, string> parse_grid(pugi::xml_node const& node);
 
 	shared_ptr<Material> parse_property(pugi::xml_node const& node);
@@ -71,6 +72,15 @@ private:
 ParserFromCsx::Pimpl::Pimpl(ParserFromCsx::Params const& params)
 : params(params)
 {}
+
+//******************************************************************************
+void ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& node) {
+	pugi::xml_node global_params = node.child("GlobalParams");
+	if(auto a = global_params.attribute("ProximityLimit"); a) domain_params.proximity_limit = a.as_double();
+	if(auto a = global_params.attribute("Smoothness"); a) domain_params.smoothness = a.as_double();
+	if(auto a = global_params.attribute("dmax"); a) domain_params.dmax = a.as_double();
+	if(auto a = global_params.attribute("lmin"); a) domain_params.lmin = a.as_uint();
+}
 
 //******************************************************************************
 expected<void, string> ParserFromCsx::Pimpl::parse_grid(pugi::xml_node const& node) {
@@ -316,6 +326,9 @@ expected<void, string> ParserFromCsx::parse() {
 	; res.status != pugi::status_ok) {
 		return unexpected(res.description());
 	}
+
+	pugi::xpath_node oemsh = doc.select_node("/OpenEMSH");
+	pimpl->parse_oemsh(oemsh.node());
 
 	pugi::xpath_node fdtd = doc.select_node("/openEMS/FDTD");
 
