@@ -64,6 +64,7 @@ public:
 	bool parse_primitive(pugi::xml_node const& node, shared_ptr<Material> const& material);
 	void parse_primitive_box(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 	void parse_primitive_linpoly(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
+	void parse_primitive_polygon(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 
 private:
 };
@@ -167,6 +168,8 @@ bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_pt
 		return true;
 	} else if(node.name() == "Polyhedron"s) {
 	} else if(node.name() == "Polygon"s) {
+		parse_primitive_polygon(node, material, name);
+		return true;
 	} else if(node.name() == "RotPoly"s) {
 	} else if(node.name() == "Sphere"s) {
 	} else if(node.name() == "Cylinder"s) {
@@ -280,6 +283,28 @@ void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, s
 			::unreachable();
 		}
 	}
+}
+
+//******************************************************************************
+void ParserFromCsx::Pimpl::parse_primitive_polygon(pugi::xml_node const& node, shared_ptr<Material> const& material, string name) {
+	size_t priority = node.attribute("Priority").as_uint();
+	double elevation = node.attribute("Elevation").as_double(); // offset in normdir
+	size_t normdir = node.attribute("NormDir").as_uint(); // (0->x, 1->y, 2->z)
+	optional<Plane> plane = to_plane(normdir);
+	optional<Axis> normal = to_axis(normdir);
+	if(!plane || !normal)
+		return;
+
+	vector<unique_ptr<Point const>> points;
+	for(auto const& vertex : node.children("Vertex"))
+		points.push_back(make_unique<Point const>(
+			vertex.attribute("X1").as_double(),
+			vertex.attribute("X2").as_double()));
+
+	Bounding2D bounding(detect_bounding(points));
+
+	board.add_polygon(plane.value(), material, name, priority, { elevation, elevation }, std::move(points));
+	board.add_fixed_meshline_policy(normal.value(), elevation);
 }
 
 //******************************************************************************
