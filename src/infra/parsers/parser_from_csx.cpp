@@ -119,35 +119,45 @@ shared_ptr<Material> ParserFromCsx::Pimpl::parse_property(pugi::xml_node const& 
 			return nullopt;
 	};
 
-	auto fill = parse_color(node.child("FillColor"));
-	auto edge = parse_color(node.child("EdgeColor"));
+	auto const parse_material_property = [](pugi::xml_node const& node) -> array<double, 4> {
+		return {
+			node.attribute("Epsilon").as_double(Material::default_epsilon),
+			node.attribute("Mue").as_double(Material::default_mue),
+			node.attribute("Kappa").as_double(Material::default_kappa),
+			node.attribute("Sigma").as_double(Material::default_sigma)
+		};
+	};
 
-	if(node.name() == "Material"s) {
-		// https://github.com/thliebig/openEMS-Project/discussions/347
-		// Currently do not take care of Isotropy=false
-		// as_double() selects the first term and ditch the part after
-		bool isotropy = node.attribute("Isotropy").as_bool();
-		pugi::xml_node property = node.child("Property");
-		double epsilon = property.attribute("Epsilon").as_double(Material::default_epsilon);
-		double mue = property.attribute("Mue").as_double(Material::default_mue);
-		double kappa = property.attribute("Kappa").as_double(Material::default_kappa);
-		double sigma = property.attribute("Sigma").as_double(Material::default_sigma);
-		return make_shared<Material>(Material::deduce_type(epsilon, mue, kappa), name, fill, edge);
-	} else if(node.name() == "Metal"s) {
-		return make_shared<Material>(Material::Type::CONDUCTOR, name, fill, edge);
-	} else if(node.name() == "ConductingSheet"s) {
-		double conductivity = node.attribute("Conductivity").as_double();
-		double thickness = node.attribute("Thickness").as_double();
-		return make_shared<Material>(Material::Type::CONDUCTOR, name, fill, edge);
-	} else if(node.name() == "LumpedElement"s) {
-	} else if(node.name() == "Excitation"s) {
-	} else if(node.name() == "ProbeBox"s) {
-	} else if(node.name() == "DumpBox"s) {
-	} else if(node.name() == "DebyeMaterial"s) {
-	} else if(node.name() == "LorentzMaterial"s) {
-	} else if(node.name() == "ResBox"s) {
-	} else if(node.name() == "Unknown"s) {
-	} else if(node.name() == "DiscMaterial"s) {
+	if(node.name() == "BackgroundMaterial"s) {
+		auto [epsilon, mue, kappa, sigma] = parse_material_property(node);
+		return make_shared<Material>(Material::deduce_type(epsilon, mue, kappa), "BackgroundMaterial");
+	} else {
+		auto fill = parse_color(node.child("FillColor"));
+		auto edge = parse_color(node.child("EdgeColor"));
+
+		if(node.name() == "Material"s) {
+			// https://github.com/thliebig/openEMS-Project/discussions/347
+			// Currently do not take care of Isotropy=false
+			// as_double() selects the first term and ditch the part after
+			bool isotropy = node.attribute("Isotropy").as_bool();
+			auto [epsilon, mue, kappa, sigma] = parse_material_property(node.child("Property"));
+			return make_shared<Material>(Material::deduce_type(epsilon, mue, kappa), name, fill, edge);
+		} else if(node.name() == "Metal"s) {
+			return make_shared<Material>(Material::Type::CONDUCTOR, name, fill, edge);
+		} else if(node.name() == "ConductingSheet"s) {
+			double conductivity = node.attribute("Conductivity").as_double();
+			double thickness = node.attribute("Thickness").as_double();
+			return make_shared<Material>(Material::Type::CONDUCTOR, name, fill, edge);
+		} else if(node.name() == "LumpedElement"s) {
+		} else if(node.name() == "Excitation"s) {
+		} else if(node.name() == "ProbeBox"s) {
+		} else if(node.name() == "DumpBox"s) {
+		} else if(node.name() == "DebyeMaterial"s) {
+		} else if(node.name() == "LorentzMaterial"s) {
+		} else if(node.name() == "ResBox"s) {
+		} else if(node.name() == "Unknown"s) {
+		} else if(node.name() == "DiscMaterial"s) {
+		}
 	}
 
 	return shared_ptr<Material>();
@@ -359,6 +369,8 @@ expected<void, string> ParserFromCsx::parse() {
 
 	pugi::xpath_node csx = doc.select_node("/openEMS/ContinuousStructure");
 	TRY(pimpl->parse_grid(csx.node()));
+
+	pimpl->board.set_background_material(pimpl->parse_property(csx.node().child("BackgroundMaterial")));
 
 	{
 		// Primitives' IDs grow disregarding properties.

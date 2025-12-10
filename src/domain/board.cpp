@@ -5,6 +5,7 @@
 ///*****************************************************************************
 
 #include <algorithm>
+#include <limits>
 #include <set>
 #include <utility>
 
@@ -65,8 +66,14 @@ shared_ptr<Board> Board::Builder::build(Params&& params) {
 	return make_shared<Board>(
 		std::move(polygons),
 		std::move(fixed_meshline_policy_creators),
+		std::move(material),
 		std::move(params),
 		Caretaker::singleton().get_history_root());
+}
+
+//******************************************************************************
+void Board::Builder::set_background_material(shared_ptr<Material> background) {
+	material = background;
 }
 
 // TODO should be in meshline manager?
@@ -146,12 +153,14 @@ Board::Board(PlaneSpace<vector<shared_ptr<Polygon>>>&& polygons, Params&& params
 Board::Board(
 	PlaneSpace<std::vector<std::shared_ptr<Polygon>>>&& polygons,
 	AxisSpace<std::vector<std::function<void (Board*, Timepoint*)>>>&& fixed_meshline_policy_creators,
+	shared_ptr<Material>&& background,
 	Params&& params,
 	Timepoint* t)
 : Originator(t, BoardState(std::move(polygons)))
 , global_params(make_shared<GlobalParams>(std::move(params), t))
 , conflict_manager(make_shared<ConflictManager>(t))
 , line_policy_manager(make_shared<MeshlinePolicyManager>(global_params.get(), t))
+, material(background)
 , fixed_meshline_policy_creators(std::move(fixed_meshline_policy_creators)) {
 
 	conflict_manager->init(line_policy_manager.get());
@@ -196,8 +205,7 @@ pair<shared_ptr<Material>, remove_const_t<decltype(Polygon::priority)>> Board::f
 	if(!materials.empty())
 		return materials.back();
 	else
-		// TODO if no material return Board::background_material
-		return {};
+		return { material, std::numeric_limits<remove_const_t<decltype(Polygon::priority)>>::min() };
 }
 
 //******************************************************************************
