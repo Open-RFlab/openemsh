@@ -362,8 +362,10 @@ expected<void, string> ParserFromCsx::parse() {
 		return unexpected(res.description());
 	}
 
-	pugi::xpath_node oemsh = doc.select_node("/OpenEMSH");
-	pimpl->parse_oemsh(oemsh.node());
+	if(parser_params.read_oemsh_params) {
+		pugi::xpath_node oemsh = doc.select_node("/OpenEMSH");
+		pimpl->parse_oemsh(oemsh.node());
+	}
 
 	pugi::xpath_node fdtd = doc.select_node("/openEMS/FDTD");
 
