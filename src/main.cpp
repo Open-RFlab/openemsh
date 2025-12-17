@@ -12,6 +12,7 @@
 
 #include "app/openemsh.hpp"
 #include "ui/cli/cli.hpp"
+#include "ui/cli/logger.hpp"
 #include "ui/cli/progress.hpp"
 #include "ui/qt/main_window.hpp"
 
@@ -29,40 +30,46 @@ int main(int argc, char* argv[]) {
 						message));
 			});
 
+	Logger::singleton().register_sink(Logger::id("Cli"), std::make_unique<ui::cli::LoggerSink>(oemsh.get_params().verbose));
+
 	if(!oemsh.get_params().gui) {
 		if(auto res = oemsh.parse(); !res.has_value()) {
-			std::cerr
-				<< std::format(
-					"Error parsing file \"{}\" : {}",
+			log({
+				.level = Logger::Level::ERROR,
+				.message = std::format(
+					"Failed to parse file \"{}\" : {}",
 					oemsh.get_params().input.generic_string(),
 					res.error())
-				<< std::endl;
+				});
 			return EXIT_FAILURE;
 		}
 		if(oemsh.is_about_overwriting()) {
-			std::cerr
-				<< std::format(
-					"Error: You are about overwriting the file \"{}\", "
+			log({
+				.level = Logger::Level::ERROR,
+				.message = std::format(
+					"You are about overwriting the file \"{}\", "
 					"use --force if that is what you want.",
 					oemsh.get_params().output.generic_string())
-				<< std::endl;
+				});
 			return EXIT_FAILURE;
 		}
 		oemsh.run_all_steps();
 		if(auto res = oemsh.write(); !res.has_value()) {
-			std::cerr
-				<< std::format(
-					"Error saving file \"{}\" : {}",
+			log({
+				.level = Logger::Level::ERROR,
+				.message = std::format(
+					"Failed to save file \"{}\" : {}",
 					oemsh.get_params().output.generic_string(),
 					res.error())
-				<< std::endl;
+				});
 			return EXIT_FAILURE;
-		} else if(oemsh.get_params().verbose) {
-			std::cerr
-				<< std::format(
+		} else {
+			log({
+				.level = Logger::Level::INFO,
+				.message = std::format(
 					"Saved file \"{}\"",
 					oemsh.get_params().output.generic_string())
-				<< std::endl;
+				});
 		}
 	} else {
 		QApplication a(argc, argv);
