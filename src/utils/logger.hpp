@@ -40,6 +40,8 @@ public:
 		std::set<UserAction> user_actions;
 		std::optional<UserAction> default_user_action;
 		std::string message;
+		std::string informative;
+		std::string details;
 	};
 
 	class ISink {

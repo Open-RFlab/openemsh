@@ -73,6 +73,8 @@ Logger::UserAction LoggerSink::log(Logger::LogEvent const& log) const {
 	} else {
 		QMessageBox message(parent);
 		message.setText(QString::fromStdString(log.message));
+		message.setInformativeText(QString::fromStdString(log.informative));
+		message.setDetailedText(QString::fromStdString(log.details));
 		message.setIcon(to_qt(log.level));
 		message.setStandardButtons(is_interactive
 			? to_qt(log.user_actions)
