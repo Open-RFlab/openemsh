@@ -7,6 +7,7 @@
 #include <format>
 #include <iostream>
 #include <print>
+#include <ranges>
 
 #include "utils/unreachable.hpp"
 
@@ -58,13 +59,11 @@ string to_string(Logger::UserAction action) noexcept {
 
 //******************************************************************************
 string to_string(set<Logger::UserAction> const& actions) noexcept {
-	string ret("[");
-	for(auto const action : actions)
-		ret += to_string(action) + "/";
-	if(!actions.empty())
-		ret.pop_back();
-	ret += "]";
-	return ret;
+	return format("[{}]",
+		actions
+		| views::transform([](auto const& action) { return to_string(action); })
+		| views::join_with("/"s)
+		| ranges::to<string>());
 }
 
 //******************************************************************************
@@ -85,17 +84,19 @@ LoggerSink::LoggerSink(bool verbose)
 Logger::UserAction LoggerSink::log(Logger::LogEvent const& log) const {
 	if(!(log.level == Logger::Level::INFO && !verbose))
 		print(cerr,
-			"{} {}: {}",
+			"{} {}: {}{}{}",
 			to_emoji(log.level),
 			to_string(log.level),
-			log.message);
+			log.message,
+			(log.informative.empty() ? string() : format(" {}", log.informative)),
+			(log.details.empty() ? string() : format("\n{}", log.details)));
 
 	if(is_interactive
 	&& log.level == Logger::Level::QUESTION
 	&& !log.user_actions.empty()) {
 		Logger::UserAction res = Logger::UserAction::NOTHING;
 		do {
-			print(cerr, "{} ? ", to_string(log.user_actions));
+			print(cerr, " {} ? ", to_string(log.user_actions));
 			string ln;
 			getline(cin, ln);
 			res = from_string(ln);

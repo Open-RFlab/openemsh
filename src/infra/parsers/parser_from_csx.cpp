@@ -6,6 +6,8 @@
 
 #include <map>
 #include <optional>
+#include <ranges>
+#include <set>
 #include <string_view>
 
 #include <pugixml.hpp>
@@ -19,6 +21,7 @@
 
 #include "parser_from_csx.hpp"
 #include "utils/expected_utils.hpp"
+#include "utils/logger.hpp"
 #include "utils/progress.hpp"
 #include "utils/unreachable.hpp"
 #include "utils/vector_utils.hpp"
@@ -53,6 +56,9 @@ public:
 	std::map<pugi::xml_node const, size_t> primitives_ids;
 	Board::Builder board;
 	domain::Params domain_params;
+
+	set<string> warning_unsupported_primitives_types;
+	set<string> warning_unsupported_primitives_names;
 
 	Pimpl(ParserFromCsx::Params const& params);
 
@@ -169,6 +175,11 @@ bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_pt
 	string property_name(node.parent().parent().attribute("Name").as_string());
 	string name(property_name + "::" + to_string(primitives_ids.at(node)));
 
+	auto const warn_unsupported = [this](string const& primitive_type, string const& primitive_name) {
+		warning_unsupported_primitives_types.emplace(primitive_type);
+		warning_unsupported_primitives_names.emplace(primitive_name);
+	};
+
 	using pugi::char_t;
 	if(node.name() == "Box"s) {
 		parse_primitive_box(node, material, name);
@@ -176,17 +187,21 @@ bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_pt
 	} else if(node.name() == "LinPoly"s) {
 		parse_primitive_linpoly(node, material, name);
 		return true;
-	} else if(node.name() == "Polyhedron"s) {
 	} else if(node.name() == "Polygon"s) {
 		parse_primitive_polygon(node, material, name);
 		return true;
-	} else if(node.name() == "RotPoly"s) {
-	} else if(node.name() == "Sphere"s) {
-	} else if(node.name() == "Cylinder"s) {
-	} else if(node.name() == "Wire"s) {
-	} else if(node.name() == "CylindricalShell"s) {
-	} else if(node.name() == "User-Defined"s) {
-	} else if(node.name() == "Curve"s) {
+	} else if(node.name() == "Polyhedron"s
+	       || node.name() == "PolyhedronReader"s
+	       || node.name() == "RotPoly"s
+	       || node.name() == "Sphere"s
+	       || node.name() == "Cylinder"s
+	       || node.name() == "CylindricalShell"
+	       || node.name() == "Point"s
+	       || node.name() == "Curve"s
+	       || node.name() == "Wire"s
+	       || node.name() == "MultiBox"s
+	       || node.name() == "User-Defined"s) {
+		warn_unsupported(node.name(), name);
 	}
 	return false;
 }
@@ -403,6 +418,17 @@ expected<void, string> ParserFromCsx::parse() {
 	}
 	bar.complete();
 	domain_params = std::move(pimpl->domain_params);
+
+	if(!pimpl->warning_unsupported_primitives_names.empty()
+	&& !pimpl->warning_unsupported_primitives_types.empty())
+		log({
+			.level = Logger::Level::WARNING,
+			.user_actions = { Logger::UserAction::OK },
+			.message = "Unsupported CSXCAD Primitives:",
+			.informative = pimpl->warning_unsupported_primitives_types | views::join_with(", "s) | ranges::to<string>(),
+			.details = pimpl->warning_unsupported_primitives_names | views::join_with(", "s) | ranges::to<string>()
+			});
+
 	return {};
 }
 
