@@ -382,6 +382,9 @@ expected<void, string> ParserFromCsx::parse() {
 		pimpl->parse_oemsh(oemsh.node());
 	}
 
+	if(!doc.select_node("/openEMS"))
+		return unexpected("No \"/openEMS\" path in CSX XML file");
+
 	pugi::xpath_node fdtd = doc.select_node("/openEMS/FDTD");
 
 	pugi::xpath_node csx = doc.select_node("/openEMS/ContinuousStructure");
