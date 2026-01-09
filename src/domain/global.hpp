@@ -19,6 +19,10 @@ struct Params {
 	double smoothness = 2;
 	std::size_t lmin = 10;
 	double dmax = 2.5;
+
+	std::size_t diagonal_lmin = 2;
+	double diagonal_dmax = 0.2;
+	double consecutive_diagonal_minimal_angle = 20; // Limite between acute / obtuse angles.
 };
 
 //******************************************************************************

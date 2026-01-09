@@ -46,7 +46,7 @@ vector<shared_ptr<Edge>> detect_edges(vector<unique_ptr<Point const>> const& poi
 	vector<shared_ptr<Edge>> edges;
 
 	Point const* prev = points.back().get();
-	for(auto const & point : points) {
+	for(auto const& point : points) {
 		edges.push_back(make_shared<Edge>(plane, prev, point.get(), t));
 		prev = point.get();
 	}

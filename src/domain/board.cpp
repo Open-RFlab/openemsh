@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <utility>
 
+#include "geometrics/bounding.hpp"
 #include "infra/utils/to_string.hpp"
 #include "utils/progress.hpp"
 #include "utils/signum.hpp"
@@ -239,6 +240,58 @@ void Board::adjust_edges_to_materials(Plane const plane) {
 	bar.complete();
 }
 
+//******************************************************************************
+void Board::detect_diagonal_angles(Plane plane) {
+	auto [t, state] = make_next_state();
+
+	auto [bar, found, k] = Progress::Bar::build(
+		state.edges[plane].size() // As many Edges as Polygon::Point
+		+ ((state.edges[plane].size() * state.edges[plane].size()) - state.edges[plane].size()) / 2, // AB/BA deduplicated, AA dismissed.
+		"["s + to_string(plane) + "] Detecting diagonal Angles ");
+
+// TODO calculate Normals (easy in first case, uneasy in second case)
+
+	// Angles of polygons, involving a diagonal edge.
+	for(auto const& polygon : state.polygons[plane]) {
+		size_t p = polygon->edges.size() - 1;
+		for(size_t i = 0; i < polygon->edges.size(); ++i, ++k) {
+			if(polygon->edges[p]->axis == Segment::Axis::DIAGONAL
+			|| polygon->edges[i]->axis == Segment::Axis::DIAGONAL) {
+				++found;
+				state.angles[plane].emplace_back(make_shared<Angle>(*(polygon->points[p]), polygon->edges[p].get(), polygon->edges[i].get(), t));
+			}
+			p = i;
+		}
+		bar.tick(found, k);
+	}
+
+	// Crosses between any diagonal edge and any other edge.
+	for(size_t i = 0; i < state.edges[plane].size(); ++i) {
+		auto* edge_a = state.edges[plane][i];
+		if(edge_a->axis != Segment::Axis::DIAGONAL) {
+			k += (state.edges[plane].size() - i - 1);
+			bar.tick(found, k);
+			continue;
+		}
+
+		for(size_t j = i + 1; j < state.edges[plane].size(); ++j, ++k) {
+			auto* edge_b = state.edges[plane][j];
+
+			relation::SegmentSegment rel = edge_a->relation_to(*edge_b);
+			if(rel == relation::SegmentSegment::CROSSING) {
+				if(optional<Point> p = intersection(*edge_a, *edge_b)) {
+					++found;
+					state.angles[plane].emplace_back(make_shared<Angle>(p.value(), edge_a, edge_b, t));
+				}
+			}
+		}
+		bar.tick(found, k);
+	}
+
+	set_state(t, state);
+	bar.complete();
+}
+
 /// Detect all EDGE_IN_POLYGON. Will also detect some COLINEAR_EDGES.
 /// Overlapping edges should be EDGE_IN_POLYGON and not COLINEAR_EDGES.
 ///*****************************************************************************
@@ -388,9 +441,12 @@ void Board::detect_colinear_edges(Plane const plane) {
 		"["s + to_string(plane) + "] Detecting COLINEAR_EDGES conflicts ");
 
 	for(size_t i = 0; i < s.edges[plane].size(); ++i) {
-		if(s.edges[plane][i]->axis == Segment::Axis::DIAGONAL)
+		if(s.edges[plane][i]->axis == Segment::Axis::DIAGONAL) {
 //		|| !edges[i]->to_mesh)
+			k += (s.edges[plane].size() - i - 1);
+			bar.tick(found, k);
 			continue;
+		}
 
 		for(size_t j = i + 1; j < s.edges[plane].size(); ++j, ++k) {
 			if(s.edges[plane][j]->axis != s.edges[plane][i]->axis)
@@ -415,11 +471,14 @@ void Board::detect_colinear_edges(Plane const plane) {
 
 //******************************************************************************
 void Board::detect_individual_edges(Plane const plane) {
-	auto [bar, found, i] = Progress::Bar::build(
-		get_current_state().edges[plane].size(),
-		"["s + to_string(plane) + "] Adding fixed meshline policies ");
+	auto const& state = get_current_state();
 
-	for(Edge* edge : get_current_state().edges[plane]) {
+	auto [bar, found, i] = Progress::Bar::build(
+		state.edges[plane].size()
+		+ state.angles[plane].size(),
+		"["s + to_string(plane) + "] Detecting individual Edges ");
+
+	for(Edge* edge : state.edges[plane]) {
 		optional<Coord> const coord = domain::coord(edge->p0(), edge->axis);
 		optional<Axis> const axis = transpose(plane, edge->axis);
 		Normal const normal = edge->get_current_state().to_reverse
@@ -443,6 +502,97 @@ void Board::detect_individual_edges(Plane const plane) {
 		}
 		bar.tick(found, ++i);
 	}
+
+	for(shared_ptr<Angle> const& angle : state.angles[plane]) {
+		if(angle->get_current_state().conflicts.empty()
+		|| ranges::none_of(angle->get_current_state().conflicts, [](auto const& conflict) { return conflict ? conflict->kind == Conflict::Kind::COLINEAR_EDGES : false; })) {
+			++found;
+			for(ViewAxis axis : AllViewAxis) {
+				auto [t, state_a] = angle->make_next_state();
+				state_a.meshline_policy = line_policy_manager->add_meshline_policy(
+					{ angle.get() },
+					Axes[plane][axis],
+					MeshlinePolicy::Policy::HALFS,
+					MeshlinePolicy::Normal::NONE,
+					coord(angle->p, axis),
+					state_a.to_mesh[axis],
+					t);
+				angle->set_state(t, state_a);
+			}
+		}
+		bar.tick(found, ++i);
+	}
+	bar.complete();
+}
+
+//******************************************************************************
+void Board::detect_diagonal_zones(Plane plane) {
+	auto const& state = get_current_state();
+
+	auto angles = create_view(state.angles[plane]);
+
+	auto [bar, found, k] = Progress::Bar::build(
+		(angles.size() - (angles.size() > 1 ? 1 : 0)) * 2, // Intervals between Angles.
+		"["s + to_string(plane) + "] Detecting diagonal zones ");
+
+	auto diagonal_edges = state.edges[plane]
+		| views::filter([](Edge const* edge) { return edge->get_current_state().to_mesh && edge->axis == Segment::Axis::DIAGONAL; });
+
+	struct Range {
+		Bounding1D bounding;
+		Coord mid;
+		array<Angle*, 2> angles;
+		set<Edge*> edges;
+		Range(ViewAxis axis, array<Angle*, 2> angles) // angles must be sorted by axis coord
+		: bounding({ coord(angles[0]->p, axis), coord(angles[1]->p, axis) })
+		, mid(domain::mid(coord(angles[0]->p, axis), coord(angles[1]->p, axis)))
+		, angles(angles)
+		{}
+	};
+
+	for(ViewAxis view_axis : AllViewAxis) {
+		ranges::sort(angles, [view_axis](Angle const* a, Angle const* b) {
+			return coord(a->p, view_axis) < coord(b->p, view_axis);
+		});
+
+		std::vector<Range> angles_ranges;
+		for(size_t i = 1; i < angles.size(); ++i, ++k) {
+			auto& range = angles_ranges.emplace_back(Range(view_axis, { angles[i-1], angles[i] }));
+
+			for(Edge* edge : diagonal_edges) {
+				if(does_overlap(cast(view_axis, bounding(*edge)), range.mid)) {
+					range.edges.emplace(edge);
+				}
+			}
+			bar.tick(found, k);
+		}
+
+		auto subranges = find_consecutive_matches(angles_ranges, [](Range const& range) { return !range.edges.empty(); });
+		found += subranges.size();
+		bar.tick(found, k);
+		for(auto& subrange : subranges) {
+			auto angles = subrange
+				| views::transform([](auto const& range) { return range.angles; })
+				| views::join
+				| ranges::to<vector<Angle*>>();
+			ranges::sort(angles);
+			ranges::unique(angles);
+
+			auto edges = subrange
+				| views::transform([](auto const& range) { return range.edges; })
+				| views::join
+				| ranges::to<vector<Edge*>>();
+			ranges::sort(edges);
+			ranges::unique(edges);
+
+			conflict_manager->add_diagonal_or_circular_zone(
+				Axes[plane][view_axis],
+				angles,
+				edges,
+				global_params.get()
+			);
+		}
+	}
 	bar.complete();
 }
 
@@ -450,7 +600,7 @@ void Board::detect_individual_edges(Plane const plane) {
 void Board::add_fixed_meshline_policies(Axis axis) {
 	auto [bar, i, _] = Progress::Bar::build(
 		fixed_meshline_policy_creators[axis].size(),
-		"["s + to_string(axis) + "] Adding fixed meshline policies ");
+		"["s + to_string(axis) + "] Adding fixed Meshline Policies ");
 
 	auto* t = next_timepoint();
 	for(auto const& create_meshline_policy : fixed_meshline_policy_creators[axis]) {
@@ -464,6 +614,30 @@ void Board::add_fixed_meshline_policies(Axis axis) {
 void Board::adjust_edges_to_materials() {
 	for(auto const& plane : AllPlane)
 		adjust_edges_to_materials(plane);
+}
+
+//******************************************************************************
+void Board::detect_diagonal_angles() {
+	for(auto const& plane : AllPlane)
+		detect_diagonal_angles(plane);
+}
+
+//******************************************************************************
+void Board::detect_diagonal_zones() {
+	for(auto const& plane : AllPlane)
+		detect_diagonal_zones(plane);
+}
+
+//******************************************************************************
+void Board::solve_diagonal_zones_angles() {
+	for(auto const& axis : AllAxis)
+		conflict_manager->auto_solve_all_diagonal_angles(axis);
+}
+
+//******************************************************************************
+void Board::solve_diagonal_zones_intervals() {
+	for(auto const& axis : AllAxis)
+		conflict_manager->auto_solve_all_diagonal_zones(axis);
 }
 
 //******************************************************************************
@@ -517,6 +691,12 @@ void Board::detect_intervals() {
 }
 
 //******************************************************************************
+void Board::detect_intervals_per_diagonal_zones() {
+	for(auto const& axis : AllAxis)
+		line_policy_manager->detect_intervals_per_diagonal_zones(axis);
+}
+
+//******************************************************************************
 void Board::mesh() {
 	for(auto const& axis : AllAxis)
 		line_policy_manager->mesh(axis);
@@ -543,6 +723,11 @@ vector<shared_ptr<Interval>> const& Board::get_intervals(Axis axis) const {
 }
 
 //******************************************************************************
+vector<shared_ptr<Angle>> const& Board::get_angles(Plane plane) const {
+	return get_current_state().angles[plane];
+}
+
+//******************************************************************************
 vector<shared_ptr<Polygon>> const& Board::get_polygons(Plane plane) const {
 	return get_current_state().polygons[plane];
 }
@@ -560,6 +745,11 @@ vector<shared_ptr<ConflictColinearEdges>> const& Board::get_conflicts_colinear_e
 //******************************************************************************
 vector<shared_ptr<ConflictTooCloseMeshlinePolicies>> const& Board::get_conflicts_too_close_meshline_policies(Axis const axis) const {
 	return conflict_manager->get_too_close_meshline_policies(axis);
+}
+
+//******************************************************************************
+vector<shared_ptr<ConflictDiagonalOrCircularZone>> const& Board::get_conflicts_diagonal_or_circular_zones(Axis const axis) const {
+	return conflict_manager->get_diagonal_or_circular_zones(axis);
 }
 
 //******************************************************************************

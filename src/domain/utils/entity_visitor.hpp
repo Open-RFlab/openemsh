@@ -9,9 +9,11 @@
 namespace domain {
 
 class Board;
+class Angle;
 class Edge;
 class Polygon;
 class ConflictColinearEdges;
+class ConflictDiagonalOrCircularZone;
 class ConflictEdgeInPolygon;
 class ConflictTooCloseMeshlinePolicies;
 class MeshlinePolicy;
@@ -22,9 +24,11 @@ class Meshline;
 class EntityVisitor {
 public:
 	virtual void visit([[maybe_unused]] Board& board) {};
+	virtual void visit([[maybe_unused]] Angle& angle) {};
 	virtual void visit([[maybe_unused]] Edge& edge) {};
 	virtual void visit([[maybe_unused]] Polygon& polygon) {};
 	virtual void visit([[maybe_unused]] ConflictColinearEdges& conflict) {};
+	virtual void visit([[maybe_unused]] ConflictDiagonalOrCircularZone& conflict) {};
 	virtual void visit([[maybe_unused]] ConflictEdgeInPolygon& conflict) {};
 	virtual void visit([[maybe_unused]] ConflictTooCloseMeshlinePolicies& conflict) {};
 	virtual void visit([[maybe_unused]] MeshlinePolicy& policy) {};

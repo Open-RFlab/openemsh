@@ -49,3 +49,27 @@ bool contains_that(std::vector<T> const& vector, P&& predicate) noexcept {
 	return std::ranges::find_if(vector, std::forward<decltype(predicate)>(predicate))
 	    != std::end(vector);
 }
+
+// TODO T = PointerLike or reference
+//******************************************************************************
+template<typename T, typename P>
+std::vector<std::vector<T>>
+find_consecutive_matches(std::vector<T> const& original, P const& predicate) {
+	std::vector<std::vector<T>> result;
+
+	bool does_prev_matched = false;
+	for(auto const& it : original) {
+		if(predicate(it)) {
+			if(does_prev_matched) {
+				result.back().emplace_back(it);
+			} else {
+				result.push_back({ it });
+			}
+			does_prev_matched = true;
+		} else {
+			does_prev_matched = false;
+		}
+	}
+
+	return result;
+}

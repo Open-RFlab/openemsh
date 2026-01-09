@@ -59,6 +59,7 @@ public:
 
 	void detect_and_solve_too_close_meshline_policies(Axis const axis);
 	void detect_intervals(Axis const axis);
+	void detect_intervals_per_diagonal_zones(Axis const axis);
 	void mesh(Axis const axis);
 
 	void detect_and_solve_too_close_meshline_policies() { for(auto const& axis : AllAxis) detect_and_solve_too_close_meshline_policies(axis); };

@@ -100,4 +100,7 @@ std::optional<Range> merge(Edge const& a, Edge const& b) = delete;
 bool operator==(Range const& a, Edge const& b) noexcept;
 bool operator==(Edge const& a, Range const& b) noexcept;
 
+//******************************************************************************
+Coord angle(Point const& vec_a, Point const& vec_b) noexcept;
+
 } // namespace domain

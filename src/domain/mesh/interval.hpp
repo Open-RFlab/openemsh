@@ -12,6 +12,7 @@
 #include <tuple>
 #include <vector>
 
+#include "domain/conflicts/i_conflict_origin.hpp"
 #include "domain/geometrics/coord.hpp"
 #include "domain/geometrics/space.hpp"
 #include "domain/utils/entity_visitor.hpp"
@@ -82,7 +83,8 @@ private:
 };
 
 //******************************************************************************
-struct IntervalState final {
+struct IntervalState final
+: public IConflictOriginState {
 	double dmax;      ///< Maximum distance between two adjacent meshlines.
 	Interval::Side before;
 	Interval::Side after;

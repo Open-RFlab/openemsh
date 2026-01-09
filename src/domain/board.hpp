@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "conflicts/conflict.hpp"
+#include "geometrics/angle.hpp"
 #include "geometrics/edge.hpp"
 #include "geometrics/point.hpp"
 #include "geometrics/polygon.hpp"
@@ -37,6 +38,7 @@ namespace domain {
 struct BoardState final {
 	PlaneSpace<std::vector<std::shared_ptr<Polygon>>> polygons;
 	PlaneSpace<std::vector<Edge*>> edges;
+	PlaneSpace<std::vector<std::shared_ptr<Angle>>> angles;
 
 	explicit BoardState(PlaneSpace<std::vector<std::shared_ptr<Polygon>>>&& polygons);
 };
@@ -84,9 +86,15 @@ public:
 	void detect_edges_in_polygons(Plane const plane);
 	void detect_colinear_edges(Plane plane);
 	void detect_individual_edges(Plane const plane);
+	void detect_diagonal_angles(Plane plane);
+	void detect_diagonal_zones(Plane plane);
 	void add_fixed_meshline_policies(Axis axis);
 
 	void adjust_edges_to_materials();
+	void detect_diagonal_angles();
+	void detect_diagonal_zones();
+	void solve_diagonal_zones_angles();
+	void solve_diagonal_zones_intervals();
 	void detect_edges_in_polygons();
 	void detect_colinear_edges();
 	void detect_individual_edges();
@@ -98,6 +106,7 @@ public:
 	void auto_solve_all_colinear_edges();
 	void detect_and_solve_too_close_meshline_policies();
 	void detect_intervals();
+	void detect_intervals_per_diagonal_zones();
 	void mesh();
 
 	std::vector<std::shared_ptr<Meshline>> get_meshline_policies_meshlines(Axis axis) const;
@@ -105,9 +114,11 @@ public:
 	std::vector<std::shared_ptr<MeshlinePolicy>> const& get_meshline_policies(Axis axis) const;
 	std::vector<std::shared_ptr<Interval>> const& get_intervals(Axis axis) const;
 	std::vector<std::shared_ptr<Polygon>> const& get_polygons(Plane plane) const;
+	std::vector<std::shared_ptr<Angle>> const& get_angles(Plane plane) const;
 	std::vector<std::shared_ptr<ConflictEdgeInPolygon>> const& get_conflicts_edge_in_polygons(Plane const plane) const;
 	std::vector<std::shared_ptr<ConflictColinearEdges>> const& get_conflicts_colinear_edges(Axis const axis) const;
 	std::vector<std::shared_ptr<ConflictTooCloseMeshlinePolicies>> const& get_conflicts_too_close_meshline_policies(Axis const axis) const;
+	std::vector<std::shared_ptr<ConflictDiagonalOrCircularZone>> const& get_conflicts_diagonal_or_circular_zones(Axis const axis) const;
 	std::size_t get_mesh_cell_number() const;
 
 private:

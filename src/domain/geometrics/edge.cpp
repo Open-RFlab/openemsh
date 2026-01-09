@@ -5,7 +5,8 @@
 ///*****************************************************************************
 
 #include <algorithm>
-//#include <array>
+#include <cmath>
+#include <numbers>
 
 #include "point.hpp"
 #include "polygon.hpp"
@@ -63,6 +64,25 @@ bool operator==(Range const& a, Edge const& b) noexcept {
 bool operator==(Edge const& a, Range const& b) noexcept {
 	return ((a.p0() == b.p0() && a.p1() == b.p1())
 	    ||  (a.p0() == b.p1() && a.p1() == b.p0()));
+}
+
+// Returns the acute side of the angle.
+//******************************************************************************
+Coord angle(Point const& vec_a, Point const& vec_b) noexcept {
+	// Cross and dot products.
+	auto cross = double (vec_a.x * vec_b.y - vec_a.y * vec_b.x);
+	auto dot   = double (vec_a.x * vec_b.x + vec_a.y * vec_b.y);
+
+	// In radians between [-pi, +pi]
+	double angle_rad = atan2(fabs(cross), dot);
+
+	// Smaller angle in degree between [0, 180]
+	double angle_deg = fabs(angle_rad) * 180.0 / numbers::pi;
+
+	if (angle_deg > 180.0)
+		angle_deg = 360.0 - angle_deg;
+
+	return angle_deg;
 }
 
 } // namespace domain

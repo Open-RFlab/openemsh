@@ -162,6 +162,33 @@ void MeshlinePolicyManager::detect_intervals(Axis const axis) {
 }
 
 //******************************************************************************
+void MeshlinePolicyManager::detect_intervals_per_diagonal_zones(Axis const axis) {
+	auto [t, state] = make_next_state();
+
+	auto [bar, found, i] = Progress::Bar::build(
+		conflict_manager->get_diagonal_or_circular_zones(axis).size() * state.intervals[axis].size(),
+		"["s + to_string(axis) + "] Detecting Intervals per diagonal zones");
+
+	for(auto& conflict : conflict_manager->get_diagonal_or_circular_zones(axis)) {
+		Bounding1D const bounding = conflict->bounding();
+		vector<Interval*> intervals;
+		for(auto& interval : state.intervals[axis]) {
+			++i;
+			if(does_overlap(bounding, interval->m)) {
+				++found;
+				intervals.emplace_back(interval.get());
+				auto state_i = interval->get_current_state();
+				state_i.conflicts.emplace_back(conflict.get());
+				interval->set_state(t, state_i);
+			}
+		}
+		conflict->append(intervals, t);
+		bar.tick(found, i);
+	}
+	bar.complete();
+}
+
+//******************************************************************************
 void MeshlinePolicyManager::mesh(Axis const axis) {
 	auto [t, state] = make_next_state();
 

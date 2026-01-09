@@ -4,6 +4,9 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <algorithm>
+
+#include "geometrics/angle.hpp"
 #include "geometrics/edge.hpp"
 #include "geometrics/polygon.hpp"
 #include "mesh/meshline_policy.hpp"
@@ -199,6 +202,67 @@ ConflictTooCloseMeshlinePolicies* ConflictManager::add_too_close_meshline_polici
 	return conflict.get();
 }
 
+// TODO merge if two DOCZ in the same axis overlap, coming from two different planes
+//******************************************************************************
+void ConflictManager::add_diagonal_or_circular_zone(Axis axis, vector<Angle*> const& angles, vector<Edge*> const& edges, GlobalParams* global_params) {
+	auto [t, state] = make_next_state();
+
+	if(angles.empty())
+		return;
+
+	Plane plane = angles.front()->plane;
+	if(!ranges::all_of(angles, [&plane](Angle const* angle) {
+		return angle->plane == plane;
+	}))
+		return;
+
+	optional<ViewAxis> view_axis = transpose(plane, axis);
+	if(!view_axis.has_value())
+		return;
+
+	auto sorted_angles = angles;
+	ranges::sort(sorted_angles, [&view_axis](Angle const* a, Angle const* b) {
+		return coord(a->p, view_axis.value()).value() < coord(b->p, view_axis.value()).value();
+	});
+
+	// TODO find overlapping & merge
+	// TODO uneasy merge if the current overlaps with two (or more) other zones
+	// is popping the old ones out safe/fine?
+
+	auto const& conflict = state.all_diagonal_or_circular_zone[axis].emplace_back(
+		make_shared<ConflictDiagonalOrCircularZone>(axis, sorted_angles, global_params, t));
+
+	set_state(t, state);
+}
+
+//******************************************************************************
+void ConflictManager::auto_solve_all_diagonal_angles(Axis const axis) {
+	auto [bar, i, _] = Progress::Bar::build(
+		get_current_state().all_diagonal_or_circular_zone[axis].size(),
+		"["s + to_string(axis) + "] Solving ANGLE part of DIAGONAL_ZONE conflicts ");
+
+	for(auto const& conflict : get_current_state().all_diagonal_or_circular_zone[axis]) {
+		conflict->solve_angles();
+		bar.tick(i++);
+	}
+
+	bar.complete();
+}
+
+//******************************************************************************
+void ConflictManager::auto_solve_all_diagonal_zones(Axis const axis) {
+	auto [bar, i, _] = Progress::Bar::build(
+		get_current_state().all_diagonal_or_circular_zone[axis].size(),
+		"["s + to_string(axis) + "] Solving INTERVAL part of DIAGONAL_ZONE conflicts ");
+
+	for(auto const& conflict : get_current_state().all_diagonal_or_circular_zone[axis]) {
+		conflict->solve_intervals(*line_policy_manager);
+		bar.tick(i++);
+	}
+
+	bar.complete();
+}
+
 //******************************************************************************
 void ConflictManager::auto_solve_all_edge_in_polygon(Plane const plane) {
 	auto [bar, i, _] = Progress::Bar::build(
@@ -238,6 +302,11 @@ vector<shared_ptr<ConflictEdgeInPolygon>> const& ConflictManager::get_edge_in_po
 //******************************************************************************
 vector<shared_ptr<ConflictTooCloseMeshlinePolicies>> const& ConflictManager::get_too_close_meshline_policies(Axis const axis) const {
 	return get_current_state().all_too_close_meshline_policies[axis];
+}
+
+//******************************************************************************
+vector<shared_ptr<ConflictDiagonalOrCircularZone>> const& ConflictManager::get_diagonal_or_circular_zones(Axis const axis) const {
+	return get_current_state().all_diagonal_or_circular_zone[axis];
 }
 
 } // namespace domain
