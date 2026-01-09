@@ -23,6 +23,12 @@ using namespace std;
 optional<Step> next(Step step) {
 	switch(step) {
 	case Step::ADJUST_EDGE_TO_MATERIAL:
+		return Step::DETECT_DIAG_ANGLES;
+	case Step::DETECT_DIAG_ANGLES:
+		return Step::DETECT_DIAG_ZONES;
+	case Step::DETECT_DIAG_ZONES:
+		return Step::SOLVE_DIAG_ZONES_ANGLES;
+	case Step::SOLVE_DIAG_ZONES_ANGLES:
 		return Step::DETECT_CONFLICT_EIP;
 	case Step::DETECT_CONFLICT_EIP:
 		return Step::DETECT_CONFLICT_CE;
@@ -39,6 +45,10 @@ optional<Step> next(Step step) {
 	case Step::DETECT_AND_SOLVE_TCMLP:
 		return Step::DETECT_INTERVALS;
 	case Step::DETECT_INTERVALS:
+		return Step::DETECT_INTERVALS_PER_DIAG_ZONES;
+	case Step::DETECT_INTERVALS_PER_DIAG_ZONES:
+		return Step::SOLVE_DIAG_ZONES_INTERVALS;
+	case Step::SOLVE_DIAG_ZONES_INTERVALS:
 		return Step::MESH;
 	case Step::MESH:
 		return nullopt;
@@ -53,16 +63,21 @@ set<Step> that_and_after(Step step) {
 
 	using enum Step;
 	switch(step) {
-	case ADJUST_EDGE_TO_MATERIAL: out.emplace(ADJUST_EDGE_TO_MATERIAL); [[fallthrough]];
-	case DETECT_CONFLICT_EIP:     out.emplace(DETECT_CONFLICT_EIP);     [[fallthrough]];
-	case DETECT_CONFLICT_CE:      out.emplace(DETECT_CONFLICT_CE);      [[fallthrough]];
-	case ADD_FIXED_MLP:           out.emplace(ADD_FIXED_MLP);           [[fallthrough]];
-	case SOLVE_ALL_EIP:           out.emplace(SOLVE_ALL_EIP);           [[fallthrough]];
-	case SOLVE_ALL_CE:            out.emplace(SOLVE_ALL_CE);            [[fallthrough]];
-	case DETECT_INDIVIDUAL_EDGES: out.emplace(DETECT_INDIVIDUAL_EDGES); [[fallthrough]];
-	case DETECT_AND_SOLVE_TCMLP:  out.emplace(DETECT_AND_SOLVE_TCMLP);  [[fallthrough]];
-	case DETECT_INTERVALS:        out.emplace(DETECT_INTERVALS);        [[fallthrough]];
-	case MESH:                    out.emplace(MESH);                    break;
+	case ADJUST_EDGE_TO_MATERIAL:         out.emplace(ADJUST_EDGE_TO_MATERIAL);         [[fallthrough]];
+	case DETECT_DIAG_ANGLES:              out.emplace(DETECT_DIAG_ANGLES);              [[fallthrough]];
+	case DETECT_DIAG_ZONES:               out.emplace(DETECT_DIAG_ZONES);               [[fallthrough]];
+	case SOLVE_DIAG_ZONES_ANGLES:         out.emplace(SOLVE_DIAG_ZONES_ANGLES);         [[fallthrough]];
+	case DETECT_CONFLICT_EIP:             out.emplace(DETECT_CONFLICT_EIP);             [[fallthrough]];
+	case DETECT_CONFLICT_CE:              out.emplace(DETECT_CONFLICT_CE);              [[fallthrough]];
+	case ADD_FIXED_MLP:                   out.emplace(ADD_FIXED_MLP);                   [[fallthrough]];
+	case SOLVE_ALL_EIP:                   out.emplace(SOLVE_ALL_EIP);                   [[fallthrough]];
+	case SOLVE_ALL_CE:                    out.emplace(SOLVE_ALL_CE);                    [[fallthrough]];
+	case DETECT_INDIVIDUAL_EDGES:         out.emplace(DETECT_INDIVIDUAL_EDGES);         [[fallthrough]];
+	case DETECT_AND_SOLVE_TCMLP:          out.emplace(DETECT_AND_SOLVE_TCMLP);          [[fallthrough]];
+	case DETECT_INTERVALS:                out.emplace(DETECT_INTERVALS);                [[fallthrough]];
+	case DETECT_INTERVALS_PER_DIAG_ZONES: out.emplace(DETECT_INTERVALS_PER_DIAG_ZONES); [[fallthrough]];
+	case SOLVE_DIAG_ZONES_INTERVALS:      out.emplace(SOLVE_DIAG_ZONES_INTERVALS);      [[fallthrough]];
+	case MESH:                            out.emplace(MESH);                            break;
 	default: ::unreachable();
 	}
 
@@ -151,16 +166,21 @@ void OpenEMSH::run(std::set<Step> const& steps) const {
 	};
 
 	using enum Step;
-	handle(ADJUST_EDGE_TO_MATERIAL, [&] { board->adjust_edges_to_materials(); });
-	handle(DETECT_CONFLICT_EIP,     [&] { board->detect_edges_in_polygons(); });
-	handle(DETECT_CONFLICT_CE,      [&] { board->detect_colinear_edges(); });
-	handle(ADD_FIXED_MLP,           [&] { board->add_fixed_meshline_policies(); });
-	handle(SOLVE_ALL_EIP,           [&] { board->auto_solve_all_edge_in_polygon(); });
-	handle(SOLVE_ALL_CE,            [&] { board->auto_solve_all_colinear_edges(); });
-	handle(DETECT_INDIVIDUAL_EDGES, [&] { board->detect_individual_edges(); });
-	handle(DETECT_AND_SOLVE_TCMLP,  [&] { board->detect_and_solve_too_close_meshline_policies(); });
-	handle(DETECT_INTERVALS,        [&] { board->detect_intervals(); });
-	handle(MESH,                    [&] { board->mesh(); });
+	handle(ADJUST_EDGE_TO_MATERIAL,         [&] { board->adjust_edges_to_materials(); });
+	handle(DETECT_DIAG_ANGLES,              [&] { board->detect_diagonal_angles(); });
+	handle(DETECT_DIAG_ZONES,               [&] { board->detect_diagonal_zones(); });
+	handle(SOLVE_DIAG_ZONES_ANGLES,         [&] { board->solve_diagonal_zones_angles(); });
+	handle(DETECT_CONFLICT_EIP,             [&] { board->detect_edges_in_polygons(); });
+	handle(DETECT_CONFLICT_CE,              [&] { board->detect_colinear_edges(); });
+	handle(ADD_FIXED_MLP,                   [&] { board->add_fixed_meshline_policies(); });
+	handle(SOLVE_ALL_EIP,                   [&] { board->auto_solve_all_edge_in_polygon(); });
+	handle(SOLVE_ALL_CE,                    [&] { board->auto_solve_all_colinear_edges(); });
+	handle(DETECT_INDIVIDUAL_EDGES,         [&] { board->detect_individual_edges(); });
+	handle(DETECT_AND_SOLVE_TCMLP,          [&] { board->detect_and_solve_too_close_meshline_policies(); });
+	handle(DETECT_INTERVALS,                [&] { board->detect_intervals(); });
+	handle(DETECT_INTERVALS_PER_DIAG_ZONES, [&] { board->detect_intervals_per_diagonal_zones(); });
+	handle(SOLVE_DIAG_ZONES_INTERVALS,      [&] { board->solve_diagonal_zones_intervals(); });
+	handle(MESH,                            [&] { board->mesh(); });
 
 	Caretaker::singleton().remember_current_timepoint();
 }
@@ -169,6 +189,9 @@ void OpenEMSH::run(std::set<Step> const& steps) const {
 void OpenEMSH::run_all_steps() const {
 	run({
 		Step::ADJUST_EDGE_TO_MATERIAL,
+		Step::DETECT_DIAG_ANGLES,
+		Step::DETECT_DIAG_ZONES,
+		Step::SOLVE_DIAG_ZONES_ANGLES,
 		Step::DETECT_CONFLICT_EIP,
 		Step::DETECT_CONFLICT_CE,
 		Step::ADD_FIXED_MLP,
@@ -177,6 +200,8 @@ void OpenEMSH::run_all_steps() const {
 		Step::DETECT_INDIVIDUAL_EDGES,
 		Step::DETECT_AND_SOLVE_TCMLP,
 		Step::DETECT_INTERVALS,
+		Step::DETECT_INTERVALS_PER_DIAG_ZONES,
+		Step::SOLVE_DIAG_ZONES_INTERVALS,
 		Step::MESH
 	});
 }

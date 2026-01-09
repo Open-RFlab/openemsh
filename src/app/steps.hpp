@@ -15,6 +15,9 @@ namespace app {
 //******************************************************************************
 enum class Step {
 	ADJUST_EDGE_TO_MATERIAL,
+	DETECT_DIAG_ANGLES,
+	DETECT_DIAG_ZONES,
+	SOLVE_DIAG_ZONES_ANGLES,
 	DETECT_CONFLICT_EIP,
 	DETECT_CONFLICT_CE,
 	ADD_FIXED_MLP,
@@ -23,6 +26,8 @@ enum class Step {
 	DETECT_INDIVIDUAL_EDGES,
 	DETECT_AND_SOLVE_TCMLP,
 	DETECT_INTERVALS,
+	DETECT_INTERVALS_PER_DIAG_ZONES,
+	SOLVE_DIAG_ZONES_INTERVALS,
 	MESH
 };
 
@@ -33,15 +38,20 @@ inline std::size_t index(std::optional<Step> step) {
 
 	switch(step.value()) {
 	case Step::ADJUST_EDGE_TO_MATERIAL: return 1;
-	case Step::DETECT_CONFLICT_EIP: return 2;
-	case Step::DETECT_CONFLICT_CE: return 3;
-	case Step::ADD_FIXED_MLP: return 4;
-	case Step::SOLVE_ALL_EIP: return 5;
-	case Step::SOLVE_ALL_CE: return 6;
-	case Step::DETECT_INDIVIDUAL_EDGES: return 7;
-	case Step::DETECT_AND_SOLVE_TCMLP: return 8;
-	case Step::DETECT_INTERVALS: return 9;
-	case Step::MESH: return 10;
+	case Step::DETECT_DIAG_ANGLES: return 2;
+	case Step::DETECT_DIAG_ZONES: return 3;
+	case Step::SOLVE_DIAG_ZONES_ANGLES: return 4;
+	case Step::DETECT_CONFLICT_EIP: return 5;
+	case Step::DETECT_CONFLICT_CE: return 6;
+	case Step::ADD_FIXED_MLP: return 7;
+	case Step::SOLVE_ALL_EIP: return 8;
+	case Step::SOLVE_ALL_CE: return 9;
+	case Step::DETECT_INDIVIDUAL_EDGES: return 10;
+	case Step::DETECT_AND_SOLVE_TCMLP: return 11;
+	case Step::DETECT_INTERVALS: return 12;
+	case Step::DETECT_INTERVALS_PER_DIAG_ZONES: return 13;
+	case Step::SOLVE_DIAG_ZONES_INTERVALS: return 14;
+	case Step::MESH: return 15;
 	default: ::unreachable();
 	}
 }

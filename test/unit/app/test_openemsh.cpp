@@ -17,8 +17,31 @@ using namespace app;
 //******************************************************************************
 SCENARIO("optional<Step> next(Step step)", "[app][openemsh]") {
 	WHEN("Running for ADJUST_EDGE_TO_MATERIAL") {
-		THEN("Should return DETECT_CONFLICT_EIP") {
+		THEN("Should return DETECT_DIAG_ANGLES") {
 			std::optional<Step> a = next(Step::ADJUST_EDGE_TO_MATERIAL);
+			REQUIRE(a.has_value());
+			REQUIRE(a.value() == Step::DETECT_DIAG_ANGLES);
+		}
+	}
+	WHEN("Running for DETECT_DIAG_ANGLES") {
+		THEN("Should return DETECT_DIAG_ZONES") {
+			std::optional<Step> a = next(Step::DETECT_DIAG_ANGLES);
+			REQUIRE(a.has_value());
+			REQUIRE(a.value() == Step::DETECT_DIAG_ZONES);
+		}
+	}
+
+	WHEN("Running for DETECT_DIAG_ZONES") {
+		THEN("Should return SOLVE_DIAG_ZONES_ANGLES") {
+			std::optional<Step> a = next(Step::DETECT_DIAG_ZONES);
+			REQUIRE(a.has_value());
+			REQUIRE(a.value() == Step::SOLVE_DIAG_ZONES_ANGLES);
+		}
+	}
+
+	WHEN("Running for SOLVE_DIAG_ZONES_ANGLES") {
+		THEN("Should return DETECT_CONFLICT_EIP") {
+			std::optional<Step> a = next(Step::SOLVE_DIAG_ZONES_ANGLES);
 			REQUIRE(a.has_value());
 			REQUIRE(a.value() == Step::DETECT_CONFLICT_EIP);
 		}
@@ -76,6 +99,20 @@ SCENARIO("optional<Step> next(Step step)", "[app][openemsh]") {
 		THEN("Should return MESH") {
 			std::optional<Step> a = next(Step::DETECT_INTERVALS);
 			REQUIRE(a.has_value());
+			REQUIRE(a.value() == Step::DETECT_INTERVALS_PER_DIAG_ZONES);
+		}
+	}
+	WHEN("Running for DETECT_INTERVALS_PER_DIAG_ZONES") {
+		THEN("Should return SOLVE_DIAG_ZONES_INTERVALS") {
+			std::optional<Step> a = next(Step::DETECT_INTERVALS_PER_DIAG_ZONES);
+			REQUIRE(a.has_value());
+			REQUIRE(a.value() == Step::SOLVE_DIAG_ZONES_INTERVALS);
+		}
+	}
+	WHEN("Running for SOLVE_DIAG_ZONES_INTERVALS") {
+		THEN("Should return MESH") {
+			std::optional<Step> a = next(Step::SOLVE_DIAG_ZONES_INTERVALS);
+			REQUIRE(a.has_value());
 			REQUIRE(a.value() == Step::MESH);
 		}
 	}
@@ -93,6 +130,9 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 		THEN("Should return all Steps except those coming before ADJUST_EDGE_TO_MATERIAL") {
 			REQUIRE(that_and_after(Step::ADJUST_EDGE_TO_MATERIAL) == std::set<Step> {
 				Step::ADJUST_EDGE_TO_MATERIAL,
+				Step::DETECT_DIAG_ANGLES,
+				Step::DETECT_DIAG_ZONES,
+				Step::SOLVE_DIAG_ZONES_ANGLES,
 				Step::DETECT_CONFLICT_EIP,
 				Step::DETECT_CONFLICT_CE,
 				Step::ADD_FIXED_MLP,
@@ -101,6 +141,65 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
+				Step::SOLVE_DIAG_ZONES_INTERVALS,
+				Step::MESH
+			});
+		}
+	}
+	WHEN("Running for DETECT_DIAG_ANGLES") {
+		THEN("Should return all Steps except those coming before DETECT_DIAG_ANGLES") {
+			REQUIRE(that_and_after(Step::DETECT_DIAG_ANGLES) == std::set<Step> {
+				Step::DETECT_DIAG_ANGLES,
+				Step::DETECT_DIAG_ZONES,
+				Step::SOLVE_DIAG_ZONES_ANGLES,
+				Step::DETECT_CONFLICT_EIP,
+				Step::DETECT_CONFLICT_CE,
+				Step::ADD_FIXED_MLP,
+				Step::SOLVE_ALL_EIP,
+				Step::SOLVE_ALL_CE,
+				Step::DETECT_INDIVIDUAL_EDGES,
+				Step::DETECT_AND_SOLVE_TCMLP,
+				Step::DETECT_INTERVALS,
+				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
+				Step::SOLVE_DIAG_ZONES_INTERVALS,
+				Step::MESH
+			});
+		}
+	}
+	WHEN("Running for DETECT_DIAG_ZONES") {
+		THEN("Should return all Steps except those coming before DETECT_DIAG_ZONES") {
+			REQUIRE(that_and_after(Step::DETECT_DIAG_ZONES) == std::set<Step> {
+				Step::DETECT_DIAG_ZONES,
+				Step::SOLVE_DIAG_ZONES_ANGLES,
+				Step::DETECT_CONFLICT_EIP,
+				Step::DETECT_CONFLICT_CE,
+				Step::ADD_FIXED_MLP,
+				Step::SOLVE_ALL_EIP,
+				Step::SOLVE_ALL_CE,
+				Step::DETECT_INDIVIDUAL_EDGES,
+				Step::DETECT_AND_SOLVE_TCMLP,
+				Step::DETECT_INTERVALS,
+				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
+				Step::SOLVE_DIAG_ZONES_INTERVALS,
+				Step::MESH
+			});
+		}
+	}
+	WHEN("Running for SOLVE_DIAG_ZONES_ANGLES") {
+		THEN("Should return all Steps except those coming before SOLVE_DIAG_ZONES_ANGLES") {
+			REQUIRE(that_and_after(Step::SOLVE_DIAG_ZONES_ANGLES) == std::set<Step> {
+				Step::SOLVE_DIAG_ZONES_ANGLES,
+				Step::DETECT_CONFLICT_EIP,
+				Step::DETECT_CONFLICT_CE,
+				Step::ADD_FIXED_MLP,
+				Step::SOLVE_ALL_EIP,
+				Step::SOLVE_ALL_CE,
+				Step::DETECT_INDIVIDUAL_EDGES,
+				Step::DETECT_AND_SOLVE_TCMLP,
+				Step::DETECT_INTERVALS,
+				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
+				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
 			});
 		}
@@ -116,6 +215,8 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
+				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
 			});
 		}
@@ -130,6 +231,8 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
+				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
 			});
 		}
@@ -143,6 +246,8 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
+				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
 			});
 		}
@@ -155,6 +260,8 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
+				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
 			});
 		}
@@ -166,6 +273,8 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
+				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
 			});
 		}
@@ -176,6 +285,8 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
+				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
 			});
 		}
@@ -185,6 +296,8 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 			REQUIRE(that_and_after(Step::DETECT_AND_SOLVE_TCMLP) == std::set<Step> {
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
+				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
 			});
 		}
@@ -193,6 +306,25 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 		THEN("Should return all Steps except those coming before DETECT_INTERVALS") {
 			REQUIRE(that_and_after(Step::DETECT_INTERVALS) == std::set<Step> {
 				Step::DETECT_INTERVALS,
+				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
+				Step::SOLVE_DIAG_ZONES_INTERVALS,
+				Step::MESH
+			});
+		}
+	}
+	WHEN("Running for DETECT_INTERVALS_PER_DIAG_ZONES") {
+		THEN("Should return all Steps except those coming before DETECT_INTERVALS_PER_DIAG_ZONES") {
+			REQUIRE(that_and_after(Step::DETECT_INTERVALS_PER_DIAG_ZONES) == std::set<Step> {
+				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
+				Step::SOLVE_DIAG_ZONES_INTERVALS,
+				Step::MESH
+			});
+		}
+	}
+	WHEN("Running for SOLVE_DIAG_ZONES_INTERVALS") {
+		THEN("Should return all Steps except those coming before SOLVE_DIAG_ZONES_INTERVALS") {
+			REQUIRE(that_and_after(Step::SOLVE_DIAG_ZONES_INTERVALS) == std::set<Step> {
+				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
 			});
 		}
