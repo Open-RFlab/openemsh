@@ -12,9 +12,11 @@
 #include "ui/qt/utils/nodegraph/rect.hpp"
 #include "ui/qt/utils/nodegraph/wire.hpp"
 #include "utils/class_utils.hpp"
+#include "processing_angle.hpp"
 #include "processing_axis.hpp"
 #include "processing_conflict_colinear_edges.hpp"
 #include "processing_conflict_edge_in_polygon.hpp"
+#include "processing_conflict_diagonal_or_circular_zone.hpp"
 #include "processing_conflict_too_close_meshline_policies.hpp"
 #include "processing_edge.hpp"
 #include "processing_interval.hpp"
@@ -161,6 +163,7 @@ class ProcessingStyleSelector {
 	nodegraph::Text::Params text_enabled;
 	nodegraph::Text::Params text_enabled_for_sure;
 	nodegraph::Text::Params text_disabled;
+	ProcessingAngle::Params const angle;
 	ProcessingEdge::Params const edge;
 	ProcessingPolygon::Params const polygon;
 	ProcessingPlane::Params const plane;
@@ -170,6 +173,7 @@ class ProcessingStyleSelector {
 	ProcessingMeshline::Params const meshline;
 	ProcessingConflictColinearEdges::Params const conflict_ce;
 	ProcessingConflictEdgeInPolygon::Params const conflict_eip;
+	ProcessingConflictDiagonalOrCircularZone::Params const conflict_docz;
 	ProcessingConflictTooCloseMeshlinePolicies::Params const conflict_tcmlp;
 
 	MAKER_DECL(wire, ProcessingStyle const& style);
@@ -184,6 +188,7 @@ class ProcessingStyleSelector {
 	MAKER_DECL(text_enabled_for_sure, ProcessingStyle const& style);
 	MAKER_DECL(text_disabled, ProcessingStyle const& style);
 
+	MAKER_DECL(angle);
 	MAKER_DECL(edge);
 	MAKER_DECL(polygon);
 	MAKER_DECL(plane);
@@ -193,6 +198,7 @@ class ProcessingStyleSelector {
 	MAKER_DECL(meshline);
 	MAKER_DECL(conflict_ce);
 	MAKER_DECL(conflict_eip);
+	MAKER_DECL(conflict_docz);
 	MAKER_DECL(conflict_tcmlp);
 
 public:
@@ -208,6 +214,7 @@ public:
 	GETTER(text_enabled)
 	GETTER(text_enabled_for_sure)
 	GETTER(text_disabled)
+	GETTER(angle)
 	GETTER(edge)
 	GETTER(polygon)
 	GETTER(plane)
@@ -217,6 +224,7 @@ public:
 	GETTER(meshline)
 	GETTER(conflict_ce)
 	GETTER(conflict_eip)
+	GETTER(conflict_docz)
 	GETTER(conflict_tcmlp)
 
 	ProcessingStyleSelector();

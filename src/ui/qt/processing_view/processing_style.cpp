@@ -21,6 +21,7 @@ ProcessingStyleSelector::ProcessingStyleSelector()
 , text_enabled(make_text_enabled(style))
 , text_enabled_for_sure(make_text_enabled_for_sure(style))
 , text_disabled(make_text_disabled(style))
+, angle(make_angle())
 , edge(make_edge())
 , polygon(make_polygon())
 , plane(make_plane())
@@ -30,6 +31,7 @@ ProcessingStyleSelector::ProcessingStyleSelector()
 , meshline(make_meshline())
 , conflict_ce(make_conflict_ce())
 , conflict_eip(make_conflict_eip())
+, conflict_docz(make_conflict_docz())
 , conflict_tcmlp(make_conflict_tcmlp())
 {}
 
@@ -47,6 +49,7 @@ ProcessingStyleSelector::ProcessingStyleSelector(ProcessingStyle style)
 , text_enabled(make_text_enabled(style))
 , text_enabled_for_sure(make_text_enabled_for_sure(style))
 , text_disabled(make_text_disabled(style))
+, angle(make_angle())
 , edge(make_edge())
 , polygon(make_polygon())
 , plane(make_plane())
@@ -56,6 +59,7 @@ ProcessingStyleSelector::ProcessingStyleSelector(ProcessingStyle style)
 , meshline(make_meshline())
 , conflict_ce(make_conflict_ce())
 , conflict_eip(make_conflict_eip())
+, conflict_docz(make_conflict_docz())
 , conflict_tcmlp(make_conflict_tcmlp())
 {}
 
@@ -284,6 +288,18 @@ MAKER_DEF(ProcessingStyleSelector, text_disabled, ProcessingStyle const& style) 
 }
 
 //******************************************************************************
+MAKER_DEF(ProcessingStyleSelector, angle) {
+	return {
+		.node = get_node(),
+		.port = get_port_normal(),
+		.title = get_title(),
+		.main = get_text_normal(),
+		.enabled = get_text_enabled(),
+		.disabled = get_text_disabled()
+	};
+}
+
+//******************************************************************************
 MAKER_DEF(ProcessingStyleSelector, edge) {
 	return {
 		.node = get_node(),
@@ -378,6 +394,16 @@ MAKER_DEF(ProcessingStyleSelector, conflict_eip) {
 		.main = get_text_normal(),
 		.enabled = get_text_enabled(),
 		.disabled = get_text_disabled()
+	};
+}
+
+//******************************************************************************
+MAKER_DEF(ProcessingStyleSelector, conflict_docz) {
+	return {
+		.node = get_node(),
+		.title = get_title(),
+		.port = get_port_normal(),
+		.main = get_text_normal()
 	};
 }
 

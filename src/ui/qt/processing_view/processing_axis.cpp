@@ -29,6 +29,7 @@ ProcessingAxis::ProcessingAxis(domain::Axis axis, QGraphicsItem* parent)
 		// Can be optimized by splitting count() -> compute()/get()
 		case UserTypes::PROCESSING_MESHLINE_POLICY: return 1 + static_cast<ProcessingMeshlinePolicy const*>(item)->count_mlp_tcmlp_deepness();
 		case UserTypes::PROCESSING_CONFLICT_TCMLP: return 2 + static_cast<ProcessingConflictTooCloseMeshlinePolicies const*>(item)->count_tcmlp_mlp_deepness();
+		case UserTypes::PROCESSING_CONFLICT_DOCZ: return std::numeric_limits<std::size_t>::max() - 2;
 		case UserTypes::PROCESSING_INTERVAL: return std::numeric_limits<std::size_t>::max() - 1;
 		case UserTypes::PROCESSING_MESHLINE: return std::numeric_limits<std::size_t>::max();
 		default: return 0;

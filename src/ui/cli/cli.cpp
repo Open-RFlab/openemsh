@@ -165,6 +165,21 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 		"Smoothness factor ]1;2]."
 	)->group("Mesher options")->check(BoundExclusiveInclusive(1.0, 2.0));
 
+	app.add_option_function<decltype(domain::Params::diagonal_dmax)>("--diag-dmax",
+		make_overrider<&domain::Params::diagonal_dmax>(domain_overrides),
+		"Maximum distance between two adjacent lines in diagonal zones."
+	)->group("Mesher options");
+
+	app.add_option_function<decltype(domain::Params::diagonal_lmin)>("--diag-lmin",
+		make_overrider<&domain::Params::diagonal_lmin>(domain_overrides),
+		"Minimum line number per Interval half, at extremities of diagonal zones."
+	)->group("Mesher options");
+
+	app.add_option_function<decltype(domain::Params::consecutive_diagonal_minimal_angle)>("--diag-minimal-angle",
+		make_overrider<&domain::Params::consecutive_diagonal_minimal_angle>(domain_overrides),
+		"Angle threshold, above which angles between diagonal edges will generate MeshlinePolicies."
+	)->group("Mesher options");
+
 	app.add_flag("--no-x", [&params](size_t) { params.with_axis_x = false; }, "Don't include X axis meshlines in output.")->group("Output options");
 	app.add_flag("--no-y", [&params](size_t) { params.with_axis_y = false; }, "Don't include Y axis meshlines in output.")->group("Output options");
 	app.add_flag("--no-z", [&params](size_t) { params.with_axis_z = false; }, "Don't include Z axis meshlines in output.")->group("Output options");

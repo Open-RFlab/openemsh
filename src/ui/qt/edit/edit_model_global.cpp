@@ -34,6 +34,12 @@ EditModelGlobal::EditModelGlobal(domain::GlobalParams* global, QObject* parent)
 		"Minimum line number per Interval half.");
 	make_row(3, "dmax", QString::number(params.dmax),
 		"Maximum distance between two adjacent lines.");
+	make_row(4, "Minimal angle", QString::number(params.consecutive_diagonal_minimal_angle),
+		"Angle threshold, above which angles between diagonal edges will generate MeshlinePolicies.");
+	make_row(5, "Diagonal dmax", QString::number(params.diagonal_dmax),
+		"Maximum distance between two adjacent lines in diagonal zones.");
+	make_row(6, "Diagonal lmin", QString::number(params.diagonal_lmin),
+		"Minimum line number per Interval half, at extremities of diagonal zones.");
 }
 
 //******************************************************************************
@@ -44,11 +50,14 @@ void EditModelGlobal::commit() {
 		try_to_double(item(0, V)->text(), params.proximity_limit),
 		try_to_double(item(1, V)->text(), params.smoothness),
 		try_to_ulong(item(2, V)->text(), params.lmin),
-		try_to_double(item(3, V)->text(), params.dmax)
+		try_to_double(item(3, V)->text(), params.dmax),
+		try_to_double(item(4, V)->text(), params.consecutive_diagonal_minimal_angle),
+		try_to_double(item(5, V)->text(), params.diagonal_dmax),
+		try_to_ulong(item(6, V)->text(), params.diagonal_lmin)
 	};
 
 	if(std::ranges::all_of(does_succeed, is_true)) {
-		emit edit_from(app::Step::DETECT_CONFLICT_EIP, [&]() {
+		emit edit_from(app::Step::DETECT_DIAG_ZONES, [&]() {
 			global->set_next_state(params);
 		});
 	}

@@ -9,7 +9,9 @@
 #include <QColor>
 
 #include "utils/class_utils.hpp"
+#include "structure_angle.hpp"
 #include "structure_conflict_colinear_edges.hpp"
+#include "structure_conflict_diagonal_or_circular_zone.hpp"
 #include "structure_conflict_too_close_meshline_policies.hpp"
 #include "structure_edge.hpp"
 #include "structure_interval.hpp"
@@ -33,6 +35,22 @@ struct StructureStyle {
 	QColor edge_selected = Qt::red;
 	QColor edge_regular_hovered = edge_regular;
 	QColor edge_selected_hovered = edge_selected;
+
+
+	QColor angle_circle_regular = Qt::transparent;
+	QColor angle_circle_selected = Qt::red;
+	QColor angle_circle_regular_hovered = angle_circle_regular;
+	QColor angle_circle_selected_hovered = angle_circle_selected;
+
+	QColor angle_cross_line_enabled_regular = Qt::transparent;
+	QColor angle_cross_line_enabled_selected = Qt::green;
+	QColor angle_cross_line_enabled_regular_hovered = angle_cross_line_enabled_regular;
+	QColor angle_cross_line_enabled_selected_hovered = angle_cross_line_enabled_selected;
+
+	QColor angle_cross_line_disabled_regular = Qt::transparent;
+	QColor angle_cross_line_disabled_selected = Qt::red;
+	QColor angle_cross_line_disabled_regular_hovered = angle_cross_line_disabled_regular;
+	QColor angle_cross_line_disabled_selected_hovered = angle_cross_line_disabled_selected;
 
 
 	QColor polygon_shape_contour_regular = Qt::black;
@@ -115,6 +133,12 @@ struct StructureStyle {
 	QColor conflict_ce_selected_hovered = conflict_ce_selected;
 
 
+	QColor conflict_docz_regular = Qt::transparent;
+	QColor conflict_docz_selected = QColor(255, 0, 0, 100);
+	QColor conflict_docz_regular_hovered = conflict_ce_regular;
+	QColor conflict_docz_selected_hovered = conflict_ce_selected;
+
+
 	QColor conflict_tcmlp_solution_line_regular = Qt::transparent;
 	QColor conflict_tcmlp_solution_line_selected = Qt::green;
 	QColor conflict_tcmlp_solution_line_regular_hovered = conflict_tcmlp_solution_line_regular;
@@ -129,6 +153,10 @@ struct StructureStyle {
 class StructureStyleSelector {
 	StructureStyle style;
 
+	StructureAngle::Params angle_hv_enabled;
+	StructureAngle::Params angle_h_enabled;
+	StructureAngle::Params angle_v_enabled;
+	StructureAngle::Params angle_hv_disabled;
 	StructureEdge::Params edge;
 	StructurePolygon::Params polygon_shape;
 	StructurePolygon::Params polygon_port;
@@ -139,8 +167,13 @@ class StructureStyleSelector {
 	StructureMeshlinePolicy::Params meshline_policy_disabled;
 	StructureInterval::Params interval;
 	StructureConflictColinearEdges::Params conflict_ce;
+	StructureConflictDiagonalOrCircularZone::Params conflict_docz;
 	StructureConflictTooCloseMeshlinePolicies::Params conflict_tcmlp;
 
+	MAKER_DECL(angle_hv_enabled, StructureStyle const& style);
+	MAKER_DECL(angle_h_enabled, StructureStyle const& style);
+	MAKER_DECL(angle_v_enabled, StructureStyle const& style);
+	MAKER_DECL(angle_hv_disabled, StructureStyle const& style);
 	MAKER_DECL(edge, StructureStyle const& style);
 	MAKER_DECL(polygon_shape, StructureStyle const& style);
 	MAKER_DECL(polygon_port, StructureStyle const& style);
@@ -151,10 +184,15 @@ class StructureStyleSelector {
 	MAKER_DECL(meshline_policy_disabled, StructureStyle const& style);
 	MAKER_DECL(interval, StructureStyle const& style);
 	MAKER_DECL(conflict_ce, StructureStyle const& style);
+	MAKER_DECL(conflict_docz, StructureStyle const& style);
 	MAKER_DECL(conflict_tcmlp, StructureStyle const& style);
 
 public:
 	GETTER(style)
+	GETTER(angle_hv_enabled)
+	GETTER(angle_h_enabled)
+	GETTER(angle_v_enabled)
+	GETTER(angle_hv_disabled)
 	GETTER(edge)
 	GETTER(polygon_shape)
 	GETTER(polygon_port)
@@ -165,6 +203,7 @@ public:
 	GETTER(meshline_policy_disabled)
 	GETTER(interval)
 	GETTER(conflict_ce)
+	GETTER(conflict_docz)
 	GETTER(conflict_tcmlp)
 
 	StructureStyleSelector();

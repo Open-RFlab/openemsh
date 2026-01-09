@@ -23,13 +23,28 @@
 
 class Entity;
 
+namespace domain {
+class Polygon;
+class Edge;
+class Angle;
+class ConflictColinearEdges;
+class ConflictDiagonalOrCircularZone;
+class ConflictEdgeInPolygon;
+class ConflictTooCloseMeshlinePolicies;
+class MeshlinePolicy;
+class Interval;
+class Meshline;
+} // namespace domain
+
 namespace ui::qt {
 
 class ProcessingAxis;
 class ProcessingPlane;
 class ProcessingPolygon;
 class ProcessingEdge;
+class ProcessingAngle;
 class ProcessingConflictColinearEdges;
+class ProcessingConflictDiagonalOrCircularZone;
 class ProcessingConflictEdgeInPolygon;
 class ProcessingConflictTooCloseMeshlinePolicies;
 class ProcessingMeshlinePolicy;
@@ -60,7 +75,9 @@ public:
 	ProcessingAxis* add(domain::Axis axis);
 	ProcessingPolygon* add(domain::Polygon* polygon, ProcessingPlane* to_plane);
 	ProcessingEdge* add(domain::Edge* edge, ProcessingPolygon* to_polygon);
+	ProcessingAngle* add(domain::Angle* angle, ProcessingPlane* to_plane);
 	ProcessingConflictColinearEdges* add(domain::ConflictColinearEdges* conflict, ProcessingAxis* to_axis);
+	ProcessingConflictDiagonalOrCircularZone* add(domain::ConflictDiagonalOrCircularZone* conflict, ProcessingAxis* to_axis);
 	ProcessingConflictEdgeInPolygon* add(domain::ConflictEdgeInPolygon* conflict, ProcessingPlane* to_plane);
 	ProcessingConflictTooCloseMeshlinePolicies* add(domain::ConflictTooCloseMeshlinePolicies* conflict, ProcessingAxis* to_axis);
 	ProcessingMeshlinePolicy* add(domain::MeshlinePolicy* policy, ProcessingAxis* to_axis);
@@ -91,10 +108,12 @@ public:
 	domain::AxisSpace<ProcessingAxis*> axes;
 	QList<ProcessingPolygon*> polygons;
 	QList<ProcessingEdge*> edges;
+	QList<ProcessingAngle*> angles;
 	QList<ProcessingMeshline*> meshlines;
 	QList<ProcessingMeshlinePolicy*> meshline_policies;
 	QList<ProcessingInterval*> intervals;
 	QList<ProcessingConflictColinearEdges*> conflict_colinear_edges;
+	QList<ProcessingConflictDiagonalOrCircularZone*> conflict_diagonal_or_circular_zones;
 	QList<ProcessingConflictEdgeInPolygon*> conflict_edge_in_polygons;
 	QList<ProcessingConflictTooCloseMeshlinePolicies*> conflict_too_close_meshline_policies;
 

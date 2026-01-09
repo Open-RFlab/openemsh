@@ -17,7 +17,9 @@
 class Entity;
 
 namespace domain {
+class Angle;
 class ConflictColinearEdges;
+class ConflictDiagonalOrCircularZone;
 class ConflictTooCloseMeshlinePolicies;
 class Edge;
 class Interval;
@@ -28,7 +30,9 @@ class Polygon;
 
 namespace ui::qt {
 
+class StructureAngle;
 class StructureConflictColinearEdges;
+class StructureConflictDiagonalOrCircularZone;
 class StructureConflictTooCloseMeshlinePolicies;
 class StructureEdge;
 class StructureInterval;
@@ -59,9 +63,11 @@ public:
 	explicit StructureScene(StructureStyleSelector& style_selector, QObject* parent = nullptr);
 	~StructureScene() override;
 
+	StructureAngle* add(domain::Angle const* angle);
 	StructureEdge* add(domain::Edge const* edge);
 	StructurePolygon* add(domain::Polygon const* polygon);
 	StructureConflictColinearEdges* add(domain::ConflictColinearEdges const* conflict, domain::ViewAxis view_axis, QRectF const& scene_rect);
+	StructureConflictDiagonalOrCircularZone* add(domain::ConflictDiagonalOrCircularZone const* conflict, domain::ViewAxis view_axis, QRectF const& scene_rect);
 	StructureConflictTooCloseMeshlinePolicies* add(domain::ConflictTooCloseMeshlinePolicies const* conflict, domain::ViewAxis view_axis, QRectF const& scene_rect);
 	StructureInterval* add(domain::Interval const* interval, domain::ViewAxis view_axis, QRectF const& scene_rect);
 	StructureMeshline* add(domain::Meshline const* meshline, domain::ViewAxis view_axis, QRectF const& scene_rect);
@@ -80,7 +86,9 @@ public:
 	// TODO structure item layer + z value
 	StructureGroup* edges;
 	StructureGroup* polygons;
+	StructureGroup* angles;
 	domain::ViewAxisSpace<StructureGroup*> conflict_colinear_edges;
+	domain::ViewAxisSpace<StructureGroup*> conflict_diagonal_or_circular_zones;
 	domain::ViewAxisSpace<StructureGroup*> conflict_too_close_meshline_policies;
 	domain::ViewAxisSpace<StructureGroup*> intervals;
 	domain::ViewAxisSpace<StructureGroup*> meshlines;

@@ -8,8 +8,10 @@
 #include <QMenu>
 
 #include "domain/conflicts/conflict_colinear_edges.hpp"
+#include "domain/conflicts/conflict_diagonal_or_circular_zone.hpp"
 #include "domain/conflicts/conflict_edge_in_polygon.hpp"
 #include "domain/conflicts/conflict_too_close_meshline_policies.hpp"
+#include "domain/geometrics/angle.hpp"
 #include "domain/geometrics/edge.hpp"
 #include "domain/geometrics/polygon.hpp"
 #include "domain/geometrics/space.hpp"
@@ -24,8 +26,10 @@
 #include "utils/unreachable.hpp"
 #include "processing_axis.hpp"
 #include "processing_conflict_colinear_edges.hpp"
+#include "processing_conflict_diagonal_or_circular_zone.hpp"
 #include "processing_conflict_edge_in_polygon.hpp"
 #include "processing_conflict_too_close_meshline_policies.hpp"
+#include "processing_angle.hpp"
 #include "processing_edge.hpp"
 #include "processing_interval.hpp"
 #include "processing_meshline.hpp"
@@ -205,11 +209,33 @@ ProcessingEdge* ProcessingScene::add(domain::Edge* edge, ProcessingPolygon* to_p
 }
 
 //******************************************************************************
+ProcessingAngle* ProcessingScene::add(domain::Angle* angle, ProcessingPlane* to_plane) {
+	auto* processing_angle = add_node<ProcessingAngle>(angle, to_plane);
+	angles.append(processing_angle);
+	processing_angle->locate_processing_angle_params = [this]() -> auto& {
+		return style_selector.get_angle();
+	};
+	processing_angle->updateGeometry();
+	return processing_angle;
+}
+
+//******************************************************************************
 ProcessingConflictColinearEdges* ProcessingScene::add(domain::ConflictColinearEdges* conflict, ProcessingAxis* to_axis) {
 	auto* processing_conflict = add_node<ProcessingConflictColinearEdges>(conflict, to_axis);
 	conflict_colinear_edges.append(processing_conflict);
 	processing_conflict->locate_processing_conflict_ce_params = [this]() -> auto& {
 		return style_selector.get_conflict_ce();
+	};
+	processing_conflict->updateGeometry();
+	return processing_conflict;
+}
+
+//******************************************************************************
+ProcessingConflictDiagonalOrCircularZone* ProcessingScene::add(domain::ConflictDiagonalOrCircularZone* conflict, ProcessingAxis* to_axis) {
+	auto* processing_conflict = add_node<ProcessingConflictDiagonalOrCircularZone>(conflict, to_axis);
+	conflict_diagonal_or_circular_zones.append(processing_conflict);
+	processing_conflict->locate_processing_conflict_docz_params = [this]() -> auto& {
+		return style_selector.get_conflict_docz();
 	};
 	processing_conflict->updateGeometry();
 	return processing_conflict;
@@ -457,11 +483,12 @@ void ProcessingScene::edit_selected_nodes(QPoint const& pos) {
 //******************************************************************************
 void ProcessingScene::edit(QList<nodegraph::Node*> nodes, QPoint const& pos) {
 	static QList<int> const type_index = {
+		UserTypes::PROCESSING_ANGLE,
 		UserTypes::PROCESSING_EDGE,
 		UserTypes::PROCESSING_INTERVAL,
 		UserTypes::PROCESSING_MESHLINE_POLICY,
 		UserTypes::PROCESSING_CONFLICT_CE,
-		UserTypes::PROCESSING_CONFLICT_EIP,
+		UserTypes::PROCESSING_CONFLICT_DOCZ,
 		UserTypes::PROCESSING_CONFLICT_TCMLP
 	};
 

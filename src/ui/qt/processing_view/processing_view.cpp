@@ -159,6 +159,9 @@ void ProcessingView::populate(ProcessingScene* scene) {
 		for(auto const& conflict : board->get_conflicts_edge_in_polygons(plane))
 			scene->add(conflict.get(), processing_plane);
 
+		for(auto const& angle : board->get_angles(plane))
+			scene->add(angle.get(), processing_plane);
+
 		processing_plane->fit();
 	}
 
@@ -174,6 +177,9 @@ void ProcessingView::populate(ProcessingScene* scene) {
 		for(auto const& policy : board->get_meshline_policies(axis))
 			scene->add(policy.get(), processing_axis);
 
+		for(auto const& conflict : board->get_conflicts_diagonal_or_circular_zones(axis))
+			scene->add(conflict.get(), processing_axis);
+
 		for(auto const& interval : board->get_intervals(axis))
 			scene->add(interval.get(), processing_axis);
 
@@ -186,6 +192,9 @@ void ProcessingView::populate(ProcessingScene* scene) {
 	for(auto* edge : scene->edges)
 		scene->wire_to_destination_first_output_port(edge);
 
+	for(auto* angle : scene->angles)
+		scene->wire_to_destination_first_output_port(angle);
+
 	for(auto* conflict : scene->conflict_colinear_edges)
 		scene->wire_to_destination_first_output_port(conflict);
 
@@ -193,6 +202,9 @@ void ProcessingView::populate(ProcessingScene* scene) {
 		scene->wire_to_destination_first_output_port(conflict);
 
 	for(auto* conflict : scene->conflict_edge_in_polygons)
+		scene->wire_to_destination_first_output_port(conflict);
+
+	for(auto* conflict : scene->conflict_diagonal_or_circular_zones)
 		scene->wire_to_destination_first_output_port(conflict);
 
 	for(auto* policy : scene->meshline_policies)

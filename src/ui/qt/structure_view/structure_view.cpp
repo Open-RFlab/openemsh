@@ -232,6 +232,9 @@ void StructureView::populate(domain::PlaneSpace<StructureScene*> scenes) {
 				scenes[plane]->add(edge.get());
 		}
 
+		for(auto const& angle : board->get_angles(plane))
+			scenes[plane]->add(angle.get());
+
 		QRectF const scene_rect(scenes[plane]->sceneRect());
 
 		for(domain::Axis const axis : domain::Axes[plane]) {
@@ -246,6 +249,9 @@ void StructureView::populate(domain::PlaneSpace<StructureScene*> scenes) {
 					scenes[plane]->add(interval.get(), view_axis.value(), scene_rect);
 
 				for(auto const& conflict : board->get_conflicts_colinear_edges(axis))
+					scenes[plane]->add(conflict.get(), view_axis.value(), scene_rect);
+
+				for(auto const& conflict : board->get_conflicts_diagonal_or_circular_zones(axis))
 					scenes[plane]->add(conflict.get(), view_axis.value(), scene_rect);
 
 				for(auto const& conflict : board->get_conflicts_too_close_meshline_policies(axis))

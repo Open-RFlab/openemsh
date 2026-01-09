@@ -13,6 +13,7 @@
 #include <QtGlobal>
 
 #include "structure_view/structure_conflict_colinear_edges.hpp"
+#include "structure_view/structure_conflict_diagonal_or_circular_zone.hpp"
 #include "structure_view/structure_conflict_too_close_meshline_policies.hpp"
 #include "structure_view/structure_interval.hpp"
 #include "structure_view/structure_meshline.hpp"
@@ -105,14 +106,17 @@ QPixmap apply(QTransform const& transform, QPixmap const& pixmap) {
 #endif
 
 //******************************************************************************
+PIXMAP_MAKER_DEF(angle,             make_pixmap(draw_icon_from_text("∠")))
 PIXMAP_MAKER_DEF(edge,              make_pixmap(draw_icon_from_text("/")))
 PIXMAP_MAKER_DEF(polygon,           make_pixmap(draw_icon_from_text("▱")))
 PIXMAP_MAKER_DEF(conflict_ce_v,     make_pixmap(draw_icon_from_text("┆")))
+PIXMAP_MAKER_DEF(conflict_docz_v,   make_pixmap(draw_icon_from_text("◍")))
 PIXMAP_MAKER_DEF(conflict_tcmlp_v,  make_pixmap(draw_icon_from_text("‖")))
 PIXMAP_MAKER_DEF(interval_v,        make_pixmap(draw_icon_from_text("▥")))
 PIXMAP_MAKER_DEF(meshline_v,        make_pixmap(draw_icon_from_text("|")))
 PIXMAP_MAKER_DEF(meshline_policy_v, make_pixmap(draw_icon_from_text("⟊")))
 PIXMAP_MAKER_DEF(conflict_ce_h,     apply(rotate_90_cw, conflict_ce_v()))
+PIXMAP_MAKER_DEF(conflict_docz_h,   apply(rotate_90_cw, conflict_docz_v()))
 PIXMAP_MAKER_DEF(conflict_tcmlp_h,  apply(rotate_90_cw, conflict_tcmlp_v()))
 PIXMAP_MAKER_DEF(interval_h,        apply(rotate_90_cw, interval_v()))
 PIXMAP_MAKER_DEF(meshline_h,        apply(rotate_90_cw, meshline_v()))
@@ -123,6 +127,8 @@ QPixmap const& Icons::select(QGraphicsItem const* item) {
 	using namespace UserTypes;
 
 	switch(item->type()) {
+	case PROCESSING_ANGLE: [[fallthrough]];
+	case STRUCTURE_ANGLE: return angle();
 	case PROCESSING_EDGE: [[fallthrough]];
 	case STRUCTURE_EDGE: return edge();
 	case PROCESSING_POLYGON: [[fallthrough]];
@@ -153,6 +159,13 @@ QPixmap const& Icons::select(QGraphicsItem const* item) {
 		switch(static_cast<StructureConflictColinearEdges const*>(item)->axis) {
 		case domain::ViewAxis::H: return conflict_ce_h();
 		case domain::ViewAxis::V: return conflict_ce_v();
+		default: unreachable();
+		}
+	case PROCESSING_CONFLICT_DOCZ: return conflict_docz_v();
+	case STRUCTURE_CONFLICT_DOCZ:
+		switch(static_cast<StructureConflictDiagonalOrCircularZone const*>(item)->axis) {
+		case domain::ViewAxis::H: return conflict_docz_h();
+		case domain::ViewAxis::V: return conflict_docz_v();
 		default: unreachable();
 		}
 	case PROCESSING_CONFLICT_TCMLP: return conflict_tcmlp_v();

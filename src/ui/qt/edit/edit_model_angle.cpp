@@ -8,36 +8,36 @@
 #include <array>
 
 #include "app/steps.hpp"
-#include "domain/geometrics/edge.hpp"
+#include "domain/geometrics/angle.hpp"
 
-#include "edit_model_edge.hpp"
+#include "edit_model_angle.hpp"
 
 namespace ui::qt {
 
 //******************************************************************************
-EditModelEdge::EditModelEdge(domain::Edge* edge, QObject* parent)
+EditModelAngle::EditModelAngle(domain::Angle* angle, QObject* parent)
 : EditModel(parent)
-, edge(edge)
+, angle(angle)
 {
-	auto const& state = edge->get_current_state();
+	auto const& state = angle->get_current_state();
 	setRowCount(2);
 
-	make_row(0, "To mesh", state.to_mesh, "Take into account in the meshing process.");
-	make_row(1, "To reverse", state.to_reverse, "Swap in-side and out-side.");
+	make_row(0, "To mesh[H]", state.to_mesh[domain::H], "Take into account in the meshing process of the horizontal axis.");
+	make_row(1, "To mesh[V]", state.to_mesh[domain::V], "Take into account in the meshing process of the vertical axis.");
 }
 
 //******************************************************************************
-void EditModelEdge::commit() {
-	auto state = edge->get_current_state();
+void EditModelAngle::commit() {
+	auto state = angle->get_current_state();
 
 	std::array does_succeed = {
-		try_to_bool(item(0, V)->checkState(), state.to_mesh),
-		try_to_bool(item(1, V)->checkState(), state.to_reverse)
+		try_to_bool(item(0, V)->checkState(), state.to_mesh[domain::H]),
+		try_to_bool(item(1, V)->checkState(), state.to_mesh[domain::V])
 	};
 
 	if(std::ranges::all_of(does_succeed, is_true)) {
 		emit edit_from(app::Step::DETECT_CONFLICT_EIP, [&]() {
-			edge->set_next_state(state);
+			angle->set_next_state(state);
 		});
 	}
 }

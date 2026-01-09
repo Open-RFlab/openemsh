@@ -8,6 +8,7 @@
 #include <QGraphicsWidget>
 #include <QGraphicsLinearLayout>
 
+#include "domain/geometrics/angle.hpp"
 #include "domain/geometrics/edge.hpp"
 #include "domain/conflicts/conflict_colinear_edges.hpp"
 #include "domain/conflicts/conflict_too_close_meshline_policies.hpp"
@@ -59,6 +60,7 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 		// Downcast from IMeshLineOrigin is mandatory to upcast to Entity.
 		if(auto const* entity = down_up_cast<Entity const,
 			domain::Edge const,
+			domain::Angle const,
 			domain::ConflictColinearEdges const,
 			domain::ConflictTooCloseMeshlinePolicies const>(origin)
 		; entity)

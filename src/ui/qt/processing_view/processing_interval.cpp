@@ -8,6 +8,7 @@
 #include <QGraphicsWidget>
 #include <QGraphicsLinearLayout>
 
+#include "domain/conflicts/conflict_diagonal_or_circular_zone.hpp"
 #include "domain/mesh/interval.hpp"
 #include "domain/mesh/meshline_policy.hpp"
 #include "ui/qt/data_keys.hpp"
@@ -52,6 +53,26 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 	v_box1->addItem(before_port);
 	v_box1->addStretch();
 
+	if(interval) {
+		nodegraph::Port* docz_port = nullptr;
+		auto const& state = interval->get_current_state();
+		for(domain::Conflict* conflict : state.conflicts) {
+			if(auto* conflict_docz = dynamic_cast<domain::ConflictDiagonalOrCircularZone*>(conflict); conflict_docz) {
+				if(!docz_port) {
+					docz_port = add_input_port(" ");
+					docz_port->setFlag(QGraphicsItem::ItemIsSelectable);
+					docz_port->setAcceptedMouseButtons(Qt::NoButton);
+					docz_port->locate_port_params = [this]() -> auto& {
+						return locate_processing_interval_params().port;
+					};
+					v_box1->addItem(docz_port);
+					v_box1->addStretch();
+				}
+				to_wire.emplace_back(DataKeys::set_to_wire(conflict_docz, docz_port));
+			}
+		}
+	}
+
 	nodegraph::Port* after_port = add_input_port(" ");
 	after_port->setFlag(QGraphicsItem::ItemIsSelectable);
 	after_port->setAcceptedMouseButtons(Qt::NoButton);
@@ -69,8 +90,8 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 	};
 
 	QString dmax("dmax: ");
-	QString before_lmin ("Before.lmin: ");
-	QString before_smoothness ("Before.Smoothness: ");
+	QString before_lmin("Before.lmin: ");
+	QString before_smoothness("Before.Smoothness: ");
 	QString after_lmin("After.lmin: ");
 	QString after_smoothness("After.Smoothness: ");
 	if(interval) {

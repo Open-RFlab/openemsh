@@ -14,9 +14,11 @@
 #include <algorithm>
 
 #include "domain/conflicts/conflict_colinear_edges.hpp"
+#include "domain/conflicts/conflict_diagonal_or_circular_zone.hpp"
 #include "domain/conflicts/conflict_too_close_meshline_policies.hpp"
 #include "domain/geometrics/polygon.hpp"
 #include "domain/geometrics/edge.hpp"
+#include "domain/geometrics/angle.hpp"
 #include "domain/mesh/interval.hpp"
 #include "domain/mesh/meshline.hpp"
 #include "domain/mesh/meshline_policy.hpp"
@@ -24,7 +26,9 @@
 #include "ui/qt/data_keys.hpp"
 #include "ui/qt/icons.hpp"
 #include "ui/qt/user_types.hpp"
+#include "structure_angle.hpp"
 #include "structure_conflict_colinear_edges.hpp"
+#include "structure_conflict_diagonal_or_circular_zone.hpp"
 #include "structure_conflict_too_close_meshline_policies.hpp"
 #include "structure_edge.hpp"
 #include "structure_interval.hpp"
@@ -59,7 +63,9 @@ StructureScene::StructureScene(StructureStyleSelector& style_selector, QObject* 
 , style_selector(style_selector)
 , edges(new StructureGroup())
 , polygons(new StructureGroup())
+, angles(new StructureGroup())
 , conflict_colinear_edges{{ new StructureGroup(), new StructureGroup() }}
+, conflict_diagonal_or_circular_zones{{ new StructureGroup(), new StructureGroup() }}
 , conflict_too_close_meshline_policies{{ new StructureGroup(), new StructureGroup() }}
 , intervals{{ new StructureGroup(), new StructureGroup() }}
 , meshlines{{ new StructureGroup(), new StructureGroup() }}
@@ -69,8 +75,10 @@ StructureScene::StructureScene(StructureStyleSelector& style_selector, QObject* 
 	// Adding order matters.
 	addItem(edges);
 	addItem(polygons);
+	addItem(angles);
 	for(auto const& list : {
 		meshlines,
+		conflict_diagonal_or_circular_zones,
 		intervals,
 		meshline_policies,
 		conflict_colinear_edges,
@@ -80,8 +88,11 @@ StructureScene::StructureScene(StructureStyleSelector& style_selector, QObject* 
 			addItem(group);
 
 	polygons->stackBefore(edges);
+	polygons->stackBefore(angles);
+	angles->stackBefore(edges);
 	for(auto const& list : {
 		meshlines,
+		conflict_diagonal_or_circular_zones,
 		intervals,
 		meshline_policies,
 		conflict_colinear_edges,
@@ -100,6 +111,33 @@ StructureScene::~StructureScene() {
 	disconnect(
 		this, &QGraphicsScene::selectionChanged,
 		this, &StructureScene::on_selectionChanged);
+}
+
+//******************************************************************************
+StructureAngle* StructureScene::add(domain::Angle const* angle) {
+	auto* item = new StructureAngle(angle, angles);
+	index[angle] = item;
+	auto const& state_a = angle->get_current_state();
+	if(state_a.to_mesh[domain::H] && state_a.to_mesh[domain::V]) {
+		item->locate_structure_angle_params = [this]() -> auto& {
+			return style_selector.get_angle_hv_enabled();
+		};
+	} else if(state_a.to_mesh[domain::H] && !(state_a.to_mesh[domain::V])) {
+		item->locate_structure_angle_params = [this]() -> auto& {
+			return style_selector.get_angle_h_enabled();
+		};
+	} else if(!(state_a.to_mesh[domain::H]) && state_a.to_mesh[domain::V]) {
+		item->locate_structure_angle_params = [this]() -> auto& {
+			return style_selector.get_angle_v_enabled();
+		};
+	} else if(!(state_a.to_mesh[domain::H]) && !(state_a.to_mesh[domain::V])) {
+		item->locate_structure_angle_params = [this]() -> auto& {
+			return style_selector.get_angle_hv_disabled();
+		};
+	} else {
+		unreachable();
+	}
+	return item;
 }
 
 //******************************************************************************
@@ -158,6 +196,17 @@ StructureConflictColinearEdges* StructureScene::add(domain::ConflictColinearEdge
 	index[conflict] = item;
 	item->locate_structure_conflict_ce_params = [this]() ->auto& {
 		return style_selector.get_conflict_ce();
+	};
+	return item;
+}
+
+//******************************************************************************
+StructureConflictDiagonalOrCircularZone* StructureScene::add(domain::ConflictDiagonalOrCircularZone const* conflict, domain::ViewAxis view_axis, QRectF const& scene_rect) {
+	auto const meshline_axis = reverse(view_axis); // Let stick to meshline axis definition.
+	auto* item = new StructureConflictDiagonalOrCircularZone(meshline_axis, conflict, scene_rect, conflict_diagonal_or_circular_zones[meshline_axis]);
+	index[conflict] = item;
+	item->locate_structure_conflict_docz_params = [this]() ->auto& {
+		return style_selector.get_conflict_docz();
 	};
 	return item;
 }
@@ -224,6 +273,7 @@ void StructureScene::clear_edges() {
 	addItem(edges);
 
 	polygons->stackBefore(edges);
+	angles->stackBefore(edges);
 	for(auto const* group : meshlines)
 		edges->stackBefore(group);
 }
@@ -240,6 +290,7 @@ void StructureScene::clear_polygons() {
 	addItem(polygons);
 
 	polygons->stackBefore(edges);
+	polygons->stackBefore(angles);
 }
 
 //******************************************************************************
@@ -304,6 +355,7 @@ void StructureScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 	static QList<int> const ordered_type_index = {
 		UserTypes::STRUCTURE_EDGE,
 		UserTypes::STRUCTURE_POLYGON,
+		UserTypes::STRUCTURE_ANGLE,
 		UserTypes::STRUCTURE_MESHLINE
 	};
 

@@ -23,6 +23,7 @@ ProcessingPlane::ProcessingPlane(domain::Plane plane, QGraphicsItem* parent)
 		switch(item->type()) {
 		case UserTypes::PROCESSING_CONFLICT_EIP: return 0;
 		case UserTypes::PROCESSING_POLYGON: return 1;
+		case UserTypes::PROCESSING_ANGLE: return 2;
 		default: return 0;
 		}
 	};

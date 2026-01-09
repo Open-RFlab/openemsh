@@ -10,22 +10,10 @@ namespace ui::qt {
 
 //******************************************************************************
 StructureStyleSelector::StructureStyleSelector()
-: edge(make_edge(style))
-, polygon_shape(make_polygon_shape(style))
-, polygon_port(make_polygon_port(style))
-, polygon_ground(make_polygon_ground(style))
-, polygon_substrate(make_polygon_substrate(style))
-, meshline(make_meshline(style))
-, meshline_policy_enabled(make_meshline_policy_enabled(style))
-, meshline_policy_disabled(make_meshline_policy_disabled(style))
-, interval(make_interval(style))
-, conflict_ce(make_conflict_ce(style))
-, conflict_tcmlp(make_conflict_tcmlp(style))
-{}
-
-//******************************************************************************
-StructureStyleSelector::StructureStyleSelector(StructureStyle style)
-: style(std::move(style))
+: angle_hv_enabled(make_angle_hv_enabled(style))
+, angle_h_enabled(make_angle_h_enabled(style))
+, angle_v_enabled(make_angle_v_enabled(style))
+, angle_hv_disabled(make_angle_hv_disabled(style))
 , edge(make_edge(style))
 , polygon_shape(make_polygon_shape(style))
 , polygon_port(make_polygon_port(style))
@@ -36,12 +24,38 @@ StructureStyleSelector::StructureStyleSelector(StructureStyle style)
 , meshline_policy_disabled(make_meshline_policy_disabled(style))
 , interval(make_interval(style))
 , conflict_ce(make_conflict_ce(style))
+, conflict_docz(make_conflict_docz(style))
+, conflict_tcmlp(make_conflict_tcmlp(style))
+{}
+
+//******************************************************************************
+StructureStyleSelector::StructureStyleSelector(StructureStyle style)
+: style(std::move(style))
+, angle_hv_enabled(make_angle_hv_enabled(style))
+, angle_h_enabled(make_angle_h_enabled(style))
+, angle_v_enabled(make_angle_v_enabled(style))
+, angle_hv_disabled(make_angle_hv_disabled(style))
+, edge(make_edge(style))
+, polygon_shape(make_polygon_shape(style))
+, polygon_port(make_polygon_port(style))
+, polygon_ground(make_polygon_ground(style))
+, polygon_substrate(make_polygon_substrate(style))
+, meshline(make_meshline(style))
+, meshline_policy_enabled(make_meshline_policy_enabled(style))
+, meshline_policy_disabled(make_meshline_policy_disabled(style))
+, interval(make_interval(style))
+, conflict_ce(make_conflict_ce(style))
+, conflict_docz(make_conflict_docz(style))
 , conflict_tcmlp(make_conflict_tcmlp(style))
 {}
 
 //******************************************************************************
 StructureStyleSelector& StructureStyleSelector::operator=(StructureStyle const& style) {
 	this->style = style;
+	angle_hv_enabled = make_angle_hv_enabled(style);
+	angle_h_enabled = make_angle_h_enabled(style);
+	angle_v_enabled = make_angle_v_enabled(style);
+	angle_hv_disabled = make_angle_hv_disabled(style);
 	edge = make_edge(style);
 	polygon_shape = make_polygon_shape(style);
 	polygon_port = make_polygon_port(style);
@@ -52,6 +66,7 @@ StructureStyleSelector& StructureStyleSelector::operator=(StructureStyle const& 
 	meshline_policy_disabled = make_meshline_policy_disabled(style);
 	interval = make_interval(style);
 	conflict_ce = make_conflict_ce(style);
+	conflict_docz = make_conflict_docz(style);
 	conflict_tcmlp = make_conflict_tcmlp(style);
 	return *this;
 }
@@ -59,6 +74,10 @@ StructureStyleSelector& StructureStyleSelector::operator=(StructureStyle const& 
 //******************************************************************************
 StructureStyleSelector& StructureStyleSelector::operator=(StructureStyle&& style) {
 	this->style = std::move(style);
+	angle_hv_enabled = make_angle_hv_enabled(style);
+	angle_h_enabled = make_angle_h_enabled(style);
+	angle_v_enabled = make_angle_v_enabled(style);
+	angle_hv_disabled = make_angle_hv_disabled(style);
 	edge = make_edge(style);
 	polygon_shape = make_polygon_shape(style);
 	polygon_port = make_polygon_port(style);
@@ -69,8 +88,81 @@ StructureStyleSelector& StructureStyleSelector::operator=(StructureStyle&& style
 	meshline_policy_disabled = make_meshline_policy_disabled(style);
 	interval = make_interval(style);
 	conflict_ce = make_conflict_ce(style);
+	conflict_docz = make_conflict_docz(style);
 	conflict_tcmlp = make_conflict_tcmlp(style);
 	return *this;
+}
+
+//******************************************************************************
+MAKER_DEF(StructureStyleSelector, angle_hv_enabled, StructureStyle const& style) {
+	return {
+		.circle_regular = QPen(style.angle_circle_regular, 0.1, Qt::SolidLine),
+		.circle_selected = QPen(style.angle_circle_selected, 0.1, Qt::SolidLine),
+		.circle_regular_hovered = QPen(style.angle_circle_regular_hovered, 0.1, Qt::SolidLine),
+		.circle_selected_hovered = QPen(style.angle_circle_selected_hovered, 0.1, Qt::SolidLine),
+		.h_line_regular = QPen(style.angle_cross_line_enabled_regular, 0.1, Qt::SolidLine),
+		.h_line_selected = QPen(style.angle_cross_line_enabled_selected, 0.1, Qt::SolidLine),
+		.h_line_regular_hovered = QPen(style.angle_cross_line_enabled_regular_hovered, 0.1, Qt::SolidLine),
+		.h_line_selected_hovered = QPen(style.angle_cross_line_enabled_selected_hovered, 0.1, Qt::SolidLine),
+		.v_line_regular = QPen(style.angle_cross_line_enabled_regular, 0.1, Qt::SolidLine),
+		.v_line_selected = QPen(style.angle_cross_line_enabled_selected, 0.1, Qt::SolidLine),
+		.v_line_regular_hovered = QPen(style.angle_cross_line_enabled_regular_hovered, 0.1, Qt::SolidLine),
+		.v_line_selected_hovered = QPen(style.angle_cross_line_enabled_selected_hovered, 0.1, Qt::SolidLine)
+	};
+}
+
+//******************************************************************************
+MAKER_DEF(StructureStyleSelector, angle_h_enabled, StructureStyle const& style) {
+	return {
+		.circle_regular = QPen(style.angle_circle_regular, 0.1, Qt::SolidLine),
+		.circle_selected = QPen(style.angle_circle_selected, 0.1, Qt::SolidLine),
+		.circle_regular_hovered = QPen(style.angle_circle_regular_hovered, 0.1, Qt::SolidLine),
+		.circle_selected_hovered = QPen(style.angle_circle_selected_hovered, 0.1, Qt::SolidLine),
+		.h_line_regular = QPen(style.angle_cross_line_enabled_regular, 0.1, Qt::SolidLine),
+		.h_line_selected = QPen(style.angle_cross_line_enabled_selected, 0.1, Qt::SolidLine),
+		.h_line_regular_hovered = QPen(style.angle_cross_line_enabled_regular_hovered, 0.1, Qt::SolidLine),
+		.h_line_selected_hovered = QPen(style.angle_cross_line_enabled_selected_hovered, 0.1, Qt::SolidLine),
+		.v_line_regular = QPen(style.angle_cross_line_disabled_regular, 0.1, Qt::SolidLine),
+		.v_line_selected = QPen(style.angle_cross_line_disabled_selected, 0.1, Qt::SolidLine),
+		.v_line_regular_hovered = QPen(style.angle_cross_line_disabled_regular_hovered, 0.1, Qt::SolidLine),
+		.v_line_selected_hovered = QPen(style.angle_cross_line_disabled_selected_hovered, 0.1, Qt::SolidLine)
+	};
+}
+
+//******************************************************************************
+MAKER_DEF(StructureStyleSelector, angle_v_enabled, StructureStyle const& style) {
+	return {
+		.circle_regular = QPen(style.angle_circle_regular, 0.1, Qt::SolidLine),
+		.circle_selected = QPen(style.angle_circle_selected, 0.1, Qt::SolidLine),
+		.circle_regular_hovered = QPen(style.angle_circle_regular_hovered, 0.1, Qt::SolidLine),
+		.circle_selected_hovered = QPen(style.angle_circle_selected_hovered, 0.1, Qt::SolidLine),
+		.h_line_regular = QPen(style.angle_cross_line_disabled_regular, 0.1, Qt::SolidLine),
+		.h_line_selected = QPen(style.angle_cross_line_disabled_selected, 0.1, Qt::SolidLine),
+		.h_line_regular_hovered = QPen(style.angle_cross_line_disabled_regular_hovered, 0.1, Qt::SolidLine),
+		.h_line_selected_hovered = QPen(style.angle_cross_line_disabled_selected_hovered, 0.1, Qt::SolidLine),
+		.v_line_regular = QPen(style.angle_cross_line_enabled_regular, 0.1, Qt::SolidLine),
+		.v_line_selected = QPen(style.angle_cross_line_enabled_selected, 0.1, Qt::SolidLine),
+		.v_line_regular_hovered = QPen(style.angle_cross_line_enabled_regular_hovered, 0.1, Qt::SolidLine),
+		.v_line_selected_hovered = QPen(style.angle_cross_line_enabled_selected_hovered, 0.1, Qt::SolidLine)
+	};
+}
+
+//******************************************************************************
+MAKER_DEF(StructureStyleSelector, angle_hv_disabled, StructureStyle const& style) {
+	return {
+		.circle_regular = QPen(style.angle_circle_regular, 0.1, Qt::SolidLine),
+		.circle_selected = QPen(style.angle_circle_selected, 0.1, Qt::SolidLine),
+		.circle_regular_hovered = QPen(style.angle_circle_regular_hovered, 0.1, Qt::SolidLine),
+		.circle_selected_hovered = QPen(style.angle_circle_selected_hovered, 0.1, Qt::SolidLine),
+		.h_line_regular = QPen(style.angle_cross_line_disabled_regular, 0.1, Qt::SolidLine),
+		.h_line_selected = QPen(style.angle_cross_line_disabled_selected, 0.1, Qt::SolidLine),
+		.h_line_regular_hovered = QPen(style.angle_cross_line_disabled_regular_hovered, 0.1, Qt::SolidLine),
+		.h_line_selected_hovered = QPen(style.angle_cross_line_disabled_selected_hovered, 0.1, Qt::SolidLine),
+		.v_line_regular = QPen(style.angle_cross_line_disabled_regular, 0.1, Qt::SolidLine),
+		.v_line_selected = QPen(style.angle_cross_line_disabled_selected, 0.1, Qt::SolidLine),
+		.v_line_regular_hovered = QPen(style.angle_cross_line_disabled_regular_hovered, 0.1, Qt::SolidLine),
+		.v_line_selected_hovered = QPen(style.angle_cross_line_disabled_selected_hovered, 0.1, Qt::SolidLine)
+	};
 }
 
 //******************************************************************************
@@ -194,6 +286,16 @@ MAKER_DEF(StructureStyleSelector, conflict_ce, StructureStyle const& style) {
 		.selected = QPen(style.conflict_ce_selected, 0.1, Qt::DashLine),
 		.regular_hovered = QPen(style.conflict_ce_regular_hovered, 0.1, Qt::DashLine),
 		.selected_hovered = QPen(style.conflict_ce_selected_hovered, 0.1, Qt::DashLine)
+	};
+}
+
+//******************************************************************************
+MAKER_DEF(StructureStyleSelector, conflict_docz, StructureStyle const& style) {
+	return {
+		.regular = QBrush(style.conflict_docz_regular),
+		.selected = QBrush(style.conflict_docz_selected),
+		.regular_hovered = QBrush(style.conflict_docz_regular_hovered),
+		.selected_hovered = QBrush(style.conflict_docz_selected_hovered)
 	};
 }
 

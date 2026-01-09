@@ -4,11 +4,15 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include "edit_model_angle.hpp"
+#include "edit_model_conflict_diagonal_or_circular_zone.hpp"
 #include "edit_model_conflict_too_close_meshline_policies.hpp"
 #include "edit_model_edge.hpp"
 #include "edit_model_interval.hpp"
 #include "edit_model_meshline_policy.hpp"
 #include "ui/qt/user_types.hpp"
+#include "ui/qt/processing_view/processing_angle.hpp"
+#include "ui/qt/processing_view/processing_conflict_diagonal_or_circular_zone.hpp"
 #include "ui/qt/processing_view/processing_conflict_too_close_meshline_policies.hpp"
 #include "ui/qt/processing_view/processing_edge.hpp"
 #include "ui/qt/processing_view/processing_interval.hpp"
@@ -58,12 +62,16 @@ bool EditModel::try_to_bool(Qt::CheckState const in, bool& out) {
 //******************************************************************************
 EditModel* EditModel::make(nodegraph::Node* node, QObject* parent) {
 	switch(node->type()) {
+	case UserTypes::PROCESSING_ANGLE:
+		return new EditModelAngle(unconst(static_cast<ProcessingAngle*>(node)->angle), parent);
 	case UserTypes::PROCESSING_EDGE:
 		return new EditModelEdge(unconst(static_cast<ProcessingEdge*>(node)->edge), parent);
 	case UserTypes::PROCESSING_INTERVAL:
 		return new EditModelInterval(unconst(static_cast<ProcessingInterval*>(node)->interval), parent);
 	case UserTypes::PROCESSING_MESHLINE_POLICY:
 		return new EditModelMeshlinePolicy(unconst(static_cast<ProcessingMeshlinePolicy*>(node)->meshline_policy), parent);
+	case UserTypes::PROCESSING_CONFLICT_DOCZ:
+		return new EditModelConflictDiagonalOrCircularZone(unconst(static_cast<ProcessingConflictDiagonalOrCircularZone*>(node)->conflict), parent);
 	case UserTypes::PROCESSING_CONFLICT_TCMLP:
 		return new EditModelConflictTooCloseMeshlinePolicies(unconst(static_cast<ProcessingConflictTooCloseMeshlinePolicies*>(node)->conflict), parent);
 	default:

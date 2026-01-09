@@ -18,6 +18,7 @@ struct Icons {
 
 	static QPixmap const& select(QGraphicsItem const* item);
 
+	static QPixmap const& angle();
 	static QPixmap const& edge();
 	static QPixmap const& polygon();
 	static QPixmap const& interval_h();
@@ -26,6 +27,8 @@ struct Icons {
 	static QPixmap const& meshline_policy_v();
 	static QPixmap const& conflict_ce_h();
 	static QPixmap const& conflict_ce_v();
+	static QPixmap const& conflict_docz_h();
+	static QPixmap const& conflict_docz_v();
 	static QPixmap const& conflict_tcmlp_h();
 	static QPixmap const& conflict_tcmlp_v();
 	static QPixmap const& meshline_h();
