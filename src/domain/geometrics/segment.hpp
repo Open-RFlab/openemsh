@@ -60,4 +60,13 @@ std::optional<Range> overlap(Segment const& a, Segment const& b); // TODO -> Bou
 //******************************************************************************
 std::optional<Axis> transpose(Plane const plane, Segment::Axis const axis) noexcept;
 
+//******************************************************************************
+std::optional<ViewAxis> cast(Segment::Axis const axis) noexcept;
+
+//******************************************************************************
+Segment::Axis cast(ViewAxis const axis) noexcept;
+
+//******************************************************************************
+std::optional<Coord> coord(Point const& point, Segment::Axis const axis) noexcept;
+
 } // namespace domain

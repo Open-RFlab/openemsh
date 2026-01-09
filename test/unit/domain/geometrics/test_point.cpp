@@ -10,12 +10,13 @@
 
 #include "domain/geometrics/point.hpp"
 
-/// @test Point operator-(Point const& a, Point const& b)
-/// @test Point operator+(Point const& a, Point const& b)
-/// @test Point operator==(Point const& a, Point const& b)
-/// @test template<typename T> Point operator*(T const& n, Point const& p)
-/// @test template<typename T> Point operator*(Point const& p, T const& n)
-/// @test Point mid(Point const& a, Point const& b)
+/// @test Point operator-(Point const& a, Point const& b) noexcept
+/// @test Point operator+(Point const& a, Point const& b) noexcept
+/// @test Point operator==(Point const& a, Point const& b) noexcept
+/// @test template<typename T> Point operator*(T const& n, Point const& p) noexcept
+/// @test template<typename T> Point operator*(Point const& p, T const& n) noexcept
+/// @test Point mid(Point const& a, Point const& b) noexcept
+/// @test Coord coord(Point const& point, ViewAxis const axis) noexcept
 ///*****************************************************************************
 
 using namespace domain;
@@ -139,6 +140,23 @@ SCENARIO("Point mid(Point const& a, Point const& b)", "[point]") {
 			THEN("Should calcul the midpoint") {
 				REQUIRE(c.x == 2);
 				REQUIRE(c.y == 2);
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("Coord coord(Point const& point, ViewAxis const axis) noexcept", "[point]") {
+	GIVEN("A Point and a ViewAxis enum") {
+		Point p(1, 3);
+		WHEN("ViewAxis::H") {
+			THEN("Should return X coord (horizontal axis)") {
+				REQUIRE(coord(p, ViewAxis::H) == p.x);
+			}
+		}
+		WHEN("ViewAxis::V") {
+			THEN("Should return Y coord (vertical axis)") {
+				REQUIRE(coord(p, ViewAxis::V) == p.y);
 			}
 		}
 	}

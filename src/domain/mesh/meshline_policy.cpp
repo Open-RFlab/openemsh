@@ -47,15 +47,6 @@ optional<Meshline> MeshlinePolicy::mesh() {
 }
 
 //******************************************************************************
-optional<Coord> coord(Point const& point, Segment::Axis const axis) noexcept {
-	switch(axis) {
-	case Segment::Axis::H: return point.y;
-	case Segment::Axis::V: return point.x;
-	default: return nullopt;
-	}
-}
-
-//******************************************************************************
 MeshlinePolicy::Normal cast(Normal const normal) noexcept {
 	switch(normal) {
 	case Normal::XMIN:

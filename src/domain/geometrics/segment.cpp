@@ -237,4 +237,34 @@ optional<Axis> transpose(Plane const plane, Segment::Axis const axis) noexcept {
 	}
 }
 
+//******************************************************************************
+optional<ViewAxis> cast(Segment::Axis const axis) noexcept {
+	switch(axis) {
+	case Segment::Axis::H: return H;
+	case Segment::Axis::V: return V;
+	default: return nullopt;
+	}
+}
+
+//******************************************************************************
+Segment::Axis cast(ViewAxis const axis) noexcept {
+	switch(axis) {
+	case H: return Segment::Axis::H;
+	case V: return Segment::Axis::V;
+	default: ::unreachable();
+	}
+}
+
+/// Here, @param axis describe the orientation of the @param segment itself.
+/// H : - : y coord
+/// V : | : x coord
+///*****************************************************************************
+optional<Coord> coord(Point const& point, Segment::Axis const axis) noexcept {
+	if(auto view_axis = cast(axis)
+	; view_axis.has_value())
+		return coord(point, reverse(view_axis.value()));
+	else
+		return nullopt;
+}
+
 } // namespace domain

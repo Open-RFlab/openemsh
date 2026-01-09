@@ -14,7 +14,6 @@
 #include "domain/conflicts/i_conflict_origin.hpp"
 #include "domain/conflicts/i_conflict_solution.hpp"
 #include "domain/geometrics/coord.hpp"
-#include "domain/geometrics/segment.hpp"
 #include "domain/geometrics/normal.hpp"
 #include "domain/geometrics/space.hpp"
 #include "domain/utils/entity_visitor.hpp"
@@ -90,9 +89,6 @@ struct MeshlinePolicyState final
 	std::vector<IMeshLineOrigin*> origins;
 	std::vector<Meshline*> meshlines;
 };
-
-//******************************************************************************
-std::optional<Coord> coord(Point const& point, Segment::Axis const axis) noexcept;
 
 //******************************************************************************
 MeshlinePolicy::Normal cast(Normal const normal) noexcept;

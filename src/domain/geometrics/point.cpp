@@ -4,6 +4,8 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include "utils/unreachable.hpp"
+
 #include "point.hpp"
 
 namespace domain {
@@ -40,6 +42,18 @@ bool operator!=(Point const& a, Point const& b) {
 //******************************************************************************
 Point mid(Point const& a, Point const& b) noexcept {
 	return Point(mid(a.x, b.x), mid(a.y, b.y));
+}
+
+/// Here, @param axis describe the axis of the selected coord of the @param point.
+/// H : H axis : x coord
+/// V : V axis : y coord
+///*****************************************************************************
+Coord coord(Point const& point, ViewAxis const axis) noexcept {
+	switch(axis) {
+	case H: return point.x;
+	case V: return point.y;
+	default: unreachable();
+	}
 }
 
 } // namespace domain

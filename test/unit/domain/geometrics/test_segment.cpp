@@ -14,6 +14,9 @@
 /// @test Segment::Axis axis(Point const& vector) noexcept
 /// @test Segment::Axis axis(Point const& p0, Point const& p1) noexcept
 /// @test std::optional<Axis> transpose(Plane const plane, Segment::Axis const axis) noexcept
+/// @test std::optional<ViewAxis> cast(Segment::Axis const axis) noexcept
+/// @test Segment::Axis cast(ViewAxis const axis) noexcept
+/// @test std::optional<Coord> coord(Point const& point, Segment::Axis const axis) noexcept
 ///*****************************************************************************
 
 using namespace domain;
@@ -171,6 +174,87 @@ SCENARIO("std::optional<Axis> transpose(Plane const plane, Segment::Axis const a
 				REQUIRE_FALSE(a.has_value());
 				REQUIRE_FALSE(b.has_value());
 				REQUIRE_FALSE(c.has_value());
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("std::optional<ViewAxis> cast(Segment::Axis const axis) noexcept", "[segment]") {
+	GIVEN("A Segment::Axis enum class") {
+		WHEN("Segment::Axis::H") {
+			THEN("Should return ViewAxis::H") {
+				std::optional<ViewAxis> a(cast(Segment::Axis::H));
+				REQUIRE(a.has_value());
+				REQUIRE(a.value() == ViewAxis::H);
+			}
+		}
+		WHEN("Segment::Axis::V") {
+			THEN("Should return ViewAxis::V") {
+				std::optional<ViewAxis> a(cast(Segment::Axis::V));
+				REQUIRE(a.has_value());
+				REQUIRE(a.value() == ViewAxis::V);
+			}
+		}
+		WHEN("Segment::Axis::DIAGONAL") {
+			THEN("Should not return anything") {
+				std::optional<ViewAxis> a(cast(Segment::Axis::DIAGONAL));
+				REQUIRE_FALSE(a.has_value());
+			}
+		}
+		WHEN("Segment::Axis::H") {
+			THEN("Should return ViewAxis::H") {
+				std::optional<ViewAxis> a(cast(Segment::Axis::POINT));
+				REQUIRE_FALSE(a.has_value());
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("Segment::Axis cast(ViewAxis const axis) noexcept", "[segment]") {
+	GIVEN("A ViewAxis enum") {
+		WHEN("ViewAxis::H") {
+			THEN("Should return Segment::Axis::H") {
+				REQUIRE(cast(ViewAxis::H) == Segment::Axis::H);
+			}
+		}
+		WHEN("ViewAxis::V") {
+			THEN("Should return Segment::Axis::V") {
+				REQUIRE(cast(ViewAxis::V) == Segment::Axis::V);
+			}
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("std::optional<Coord> coord(Point const& point, Segment::Axis const axis) noexcept", "[segment]") {
+	GIVEN("A Point and a Segment::Axis enum class") {
+		Point p(1, 3);
+		WHEN("Segment::Axis::H") {
+			THEN("Should return Y coord") {
+				std::optional<Coord> a(coord(p, Segment::Axis::H));
+				REQUIRE(a.has_value());
+				REQUIRE(a.value() == p.y);
+			}
+		}
+		WHEN("Segment::Axis::V") {
+			THEN("Should return X coord") {
+				std::optional<Coord> a(coord(p, Segment::Axis::V));
+				REQUIRE(a.has_value());
+				REQUIRE(a.value() == p.x);
+			}
+		}
+		WHEN("Segment::Axis::DIAGONAL") {
+			THEN("Should not return anything") {
+				std::optional<Coord> a(coord(p, Segment::Axis::DIAGONAL));
+				REQUIRE_FALSE(a.has_value());
+			}
+		}
+		WHEN("Segment::Axis::POINT") {
+			THEN("Should not return anything") {
+				std::optional<Coord> a(coord(p, Segment::Axis::POINT));
+				REQUIRE_FALSE(a.has_value());
 			}
 		}
 	}

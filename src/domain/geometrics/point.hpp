@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "space.hpp"
+
 #include "coord.hpp"
 
 // TODO use std::complex instead of Point?
@@ -47,5 +49,8 @@ Point operator*(Point const& p, T const& n) noexcept {
 
 //******************************************************************************
 Point mid(Point const& a, Point const& b) noexcept;
+
+//******************************************************************************
+Coord coord(Point const& point, ViewAxis const axis) noexcept;
 
 } // namespace domain
