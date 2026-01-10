@@ -48,7 +48,7 @@ public:
 	// TODO Refactor to Avoid that
 	void auto_solve(MeshlinePolicyManager& line_policy_manager) override;
 	void solve_angles();
-	void solve_intervals(MeshlinePolicyManager& line_policy_manager);
+	void solve_intervals();
 };
 
 } // namespace domain

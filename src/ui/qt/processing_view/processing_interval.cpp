@@ -57,7 +57,7 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 		nodegraph::Port* docz_port = nullptr;
 		auto const& state = interval->get_current_state();
 		for(domain::Conflict* conflict : state.conflicts) {
-			if(auto* conflict_docz = dynamic_cast<domain::ConflictDiagonalOrCircularZone*>(conflict); conflict_docz) {
+			if(auto const* conflict_docz = dynamic_cast<domain::ConflictDiagonalOrCircularZone*>(conflict); conflict_docz) {
 				if(!docz_port) {
 					docz_port = add_input_port(" ");
 					docz_port->setFlag(QGraphicsItem::ItemIsSelectable);

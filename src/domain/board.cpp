@@ -5,6 +5,7 @@
 ///*****************************************************************************
 
 #include <algorithm>
+#include <set>
 #include <utility>
 
 #include "geometrics/bounding.hpp"
@@ -570,25 +571,17 @@ void Board::detect_diagonal_zones(Plane plane) {
 		auto subranges = find_consecutive_matches(angles_ranges, [](Range const& range) { return !range.edges.empty(); });
 		found += subranges.size();
 		bar.tick(found, k);
-		for(auto& subrange : subranges) {
-			auto angles = subrange
+		for(auto const& subrange : subranges) {
+			auto subrange_angles = subrange
 				| views::transform([](auto const& range) { return range.angles; })
 				| views::join
 				| ranges::to<vector<Angle*>>();
-			ranges::sort(angles);
-			ranges::unique(angles);
-
-			auto edges = subrange
-				| views::transform([](auto const& range) { return range.edges; })
-				| views::join
-				| ranges::to<vector<Edge*>>();
-			ranges::sort(edges);
-			ranges::unique(edges);
+			auto [b, e] = ranges::unique(subrange_angles);
+			subrange_angles.erase(b, e);
 
 			conflict_manager->add_diagonal_or_circular_zone(
 				Axes[plane][view_axis],
-				angles,
-				edges,
+				subrange_angles,
 				global_params.get()
 			);
 		}

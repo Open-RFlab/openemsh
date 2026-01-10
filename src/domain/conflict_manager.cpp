@@ -204,7 +204,7 @@ ConflictTooCloseMeshlinePolicies* ConflictManager::add_too_close_meshline_polici
 
 // TODO merge if two DOCZ in the same axis overlap, coming from two different planes
 //******************************************************************************
-void ConflictManager::add_diagonal_or_circular_zone(Axis axis, vector<Angle*> const& angles, vector<Edge*> const& edges, GlobalParams* global_params) {
+void ConflictManager::add_diagonal_or_circular_zone(Axis axis, vector<Angle*> const& angles, GlobalParams* global_params) {
 	auto [t, state] = make_next_state();
 
 	if(angles.empty())
@@ -256,7 +256,7 @@ void ConflictManager::auto_solve_all_diagonal_zones(Axis const axis) {
 		"["s + to_string(axis) + "] Solving INTERVAL part of DIAGONAL_ZONE conflicts ");
 
 	for(auto const& conflict : get_current_state().all_diagonal_or_circular_zone[axis]) {
-		conflict->solve_intervals(*line_policy_manager);
+		conflict->solve_intervals();
 		bar.tick(i++);
 	}
 

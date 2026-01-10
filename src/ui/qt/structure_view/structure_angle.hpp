@@ -43,7 +43,7 @@ public:
 
 	std::function<Params const& ()> locate_structure_angle_params;
 
-	StructureAngle(domain::Angle const* angle, QGraphicsItem* parent = nullptr);
+	explicit StructureAngle(domain::Angle const* angle, QGraphicsItem* parent = nullptr);
 
 	int type() const override;
 	void paint(QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget* widget = nullptr) override;

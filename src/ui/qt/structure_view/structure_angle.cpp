@@ -16,7 +16,7 @@
 
 namespace ui::qt {
 
-static qreal diameter = 5;
+static qreal constexpr diameter = 5;
 
 //******************************************************************************
 static QRectF convert(domain::Angle const* angle) {

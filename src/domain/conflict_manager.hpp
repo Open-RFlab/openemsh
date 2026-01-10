@@ -58,7 +58,7 @@ public:
 	void add_edge_in_polygon(Edge* a, Polygon* polygon, Range const range, std::optional<Edge const*> b = std::nullopt);
 	ConflictTooCloseMeshlinePolicies* add_too_close_meshline_policies(MeshlinePolicy* a, MeshlinePolicy* b) noexcept;
 
-	void add_diagonal_or_circular_zone(Axis axis, std::vector<Angle*> const& angles, std::vector<Edge*> const& edges, GlobalParams* global_params);
+	void add_diagonal_or_circular_zone(Axis axis, std::vector<Angle*> const& angles, GlobalParams* global_params);
 
 //	void add_user_will(Edge* a); // TODO
 

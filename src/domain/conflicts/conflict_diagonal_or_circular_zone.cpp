@@ -81,7 +81,7 @@ void ConflictDiagonalOrCircularZone::solve_angles() {
 }
 
 //******************************************************************************
-void ConflictDiagonalOrCircularZone::solve_intervals(MeshlinePolicyManager& line_policy_manager) {
+void ConflictDiagonalOrCircularZone::solve_intervals() {
 	auto [t, state] = make_next_state();
 
 	// TODO lmin for extremities

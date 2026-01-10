@@ -172,7 +172,7 @@ void MeshlinePolicyManager::detect_intervals_per_diagonal_zones(Axis const axis)
 	for(auto& conflict : conflict_manager->get_diagonal_or_circular_zones(axis)) {
 		Bounding1D const bounding = conflict->bounding();
 		vector<Interval*> intervals;
-		for(auto& interval : state.intervals[axis]) {
+		for(auto const& interval : state.intervals[axis]) {
 			++i;
 			if(does_overlap(bounding, interval->m)) {
 				++found;
