@@ -11,6 +11,7 @@
 /// @test bool does_overlap(Bounding1D const& a, Coord const& b) noexcept
 /// @test bool does_overlap(Bounding1D const& a, Bounding1D const& b) noexcept
 /// @test bool does_overlap(Bounding2D const& a, Bounding2D const& b) noexcept
+/// @test bool does_overlap_strict(Bounding2D const& a, Bounding2D const& b) noexcept
 /// @test Bounding1D cast(ViewAxis axis, Bounding2D const& a) noexcept
 ///*****************************************************************************
 
@@ -100,6 +101,23 @@ SCENARIO("bool does_overlap(Bounding1D const& a, Bounding1D const& b) noexcept",
 
 //******************************************************************************
 SCENARIO("bool does_overlap(Bounding2D const& a, Bounding2D const& b) noexcept", "[bounding]") {
+	GIVEN("Two bounding boxes that are strictly the same") {
+		Bounding2D a;
+		a[XMIN] = 1;
+		a[XMAX] = 4;
+		a[YMIN] = 2;
+		a[YMAX] = 4;
+		Bounding2D b;
+		b[XMIN] = 1;
+		b[XMAX] = 4;
+		b[YMIN] = 2;
+		b[YMAX] = 4;
+		THEN("Should be detected as overlapping") {
+			REQUIRE(does_overlap(a, b));
+			REQUIRE(does_overlap(b, a));
+		}
+	}
+
 	GIVEN("Two bounding boxes that do not overlap") {
 		Bounding2D a;
 		a[XMIN] = 1;
@@ -165,6 +183,94 @@ SCENARIO("bool does_overlap(Bounding2D const& a, Bounding2D const& b) noexcept",
 		THEN("Should be detected as overlapping") {
 			REQUIRE(does_overlap(a, b));
 			REQUIRE(does_overlap(b, a));
+		}
+	}
+}
+
+//******************************************************************************
+SCENARIO("bool does_overlap_strict(Bounding2D const& a, Bounding2D const& b) noexcept", "[bounding]") {
+	GIVEN("Two bounding boxes that are strictly the same") {
+		Bounding2D a;
+		a[XMIN] = 1;
+		a[XMAX] = 4;
+		a[YMIN] = 2;
+		a[YMAX] = 4;
+		Bounding2D b;
+		b[XMIN] = 1;
+		b[XMAX] = 4;
+		b[YMIN] = 2;
+		b[YMAX] = 4;
+		THEN("Should be detected as overlapping") {
+			REQUIRE(does_overlap_strict(a, b));
+			REQUIRE(does_overlap_strict(b, a));
+		}
+	}
+
+	GIVEN("Two bounding boxes that do not overlap") {
+		Bounding2D a;
+		a[XMIN] = 1;
+		a[XMAX] = 4;
+		a[YMIN] = 2;
+		a[YMAX] = 4;
+		Bounding2D b;
+		b[XMIN] = 5;
+		b[XMAX] = 6;
+		b[YMIN] = 1;
+		b[YMAX] = 3;
+		THEN("Should not be detected as overlapping") {
+			REQUIRE_FALSE(does_overlap_strict(a, b));
+			REQUIRE_FALSE(does_overlap_strict(b, a));
+		}
+	}
+
+	GIVEN("Two bounding boxes that overlap") {
+		Bounding2D a;
+		a[XMIN] = 1;
+		a[XMAX] = 4;
+		a[YMIN] = 2;
+		a[YMAX] = 4;
+		Bounding2D b;
+		b[XMIN] = 2;
+		b[XMAX] = 5;
+		b[YMIN] = 1;
+		b[YMAX] = 3;
+		THEN("Should be detected as overlapping") {
+			REQUIRE(does_overlap_strict(a, b));
+			REQUIRE(does_overlap_strict(b, a));
+		}
+	}
+
+	GIVEN("A bounding box that is totally inside an other") {
+		Bounding2D a;
+		a[XMIN] = 1;
+		a[XMAX] = 4;
+		a[YMIN] = 2;
+		a[YMAX] = 4;
+		Bounding2D b;
+		b[XMIN] = 2;
+		b[XMAX] = 3;
+		b[YMIN] = 2.5;
+		b[YMAX] = 3.5;
+		THEN("Should be detected as overlapping") {
+			REQUIRE(does_overlap_strict(a, b));
+			REQUIRE(does_overlap_strict(b, a));
+		}
+	}
+
+	GIVEN("Two bounding boxes that just touch each other by a corner") {
+		Bounding2D a;
+		a[XMIN] = 1;
+		a[XMAX] = 4;
+		a[YMIN] = 2;
+		a[YMAX] = 4;
+		Bounding2D b;
+		b[XMIN] = 4;
+		b[XMAX] = 5;
+		b[YMIN] = 4;
+		b[YMAX] = 5;
+		THEN("Should not be detected as overlapping") {
+			REQUIRE_FALSE(does_overlap_strict(a, b));
+			REQUIRE_FALSE(does_overlap_strict(b, a));
 		}
 	}
 }

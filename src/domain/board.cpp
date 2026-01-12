@@ -246,8 +246,8 @@ void Board::detect_diagonal_angles(Plane plane) {
 	auto [t, state] = make_next_state();
 
 	auto [bar, found, k] = Progress::Bar::build(
-		state.edges[plane].size() // As many Edges as Polygon::Point
-		+ ((state.edges[plane].size() * state.edges[plane].size()) - state.edges[plane].size()) / 2, // AB/BA deduplicated, AA dismissed.
+		/*state.edges[plane].size() // As many Edges as Polygon::Point
+		+*/ ((state.edges[plane].size() * state.edges[plane].size()) - state.edges[plane].size()) / 2, // AB/BA deduplicated, AA dismissed.
 		"["s + to_string(plane) + "] Detecting diagonal Angles ");
 
 // TODO calculate Normals (easy in first case, uneasy in second case)
@@ -266,27 +266,35 @@ void Board::detect_diagonal_angles(Plane plane) {
 		bar.tick(found, k);
 	}
 
+	// TODO also inside polygon, except itself, previous and next
+
 	// Crosses between any diagonal edge and any other edge.
-	for(size_t i = 0; i < state.edges[plane].size(); ++i) {
-		auto* edge_a = state.edges[plane][i];
-		if(edge_a->axis != Segment::Axis::DIAGONAL) {
-			k += (state.edges[plane].size() - i - 1);
-			bar.tick(found, k);
-			continue;
-		}
+	for(size_t i = 0; i < state.polygons[plane].size(); ++i) {
+		for(size_t l = 0; l < state.polygons[plane][i]->edges.size(); ++l) {
+			auto& edge_a = state.polygons[plane][i]->edges[l];
 
-		for(size_t j = i + 1; j < state.edges[plane].size(); ++j, ++k) {
-			auto* edge_b = state.edges[plane][j];
+			for(size_t j = i + 1; j < state.polygons[plane].size(); ++j) {
+				for(size_t m = 0; m < state.polygons[plane][j]->edges.size(); ++m, ++k) {
+					auto& edge_b = state.polygons[plane][j]->edges[m];
 
-			relation::SegmentSegment rel = edge_a->relation_to(*edge_b);
-			if(rel == relation::SegmentSegment::CROSSING) {
-				if(optional<Point> p = intersection(*edge_a, *edge_b)) {
-					++found;
-					state.angles[plane].emplace_back(make_shared<Angle>(p.value(), edge_a, edge_b, t));
+					if(edge_a->axis != Segment::Axis::DIAGONAL
+					&& edge_b->axis != Segment::Axis::DIAGONAL)
+						continue;
+
+					if(!does_overlap_strict(bounding(*edge_a), bounding(*edge_b)))
+						continue;
+
+					relation::SegmentSegment rel = edge_a->relation_to(*edge_b);
+					if(rel == relation::SegmentSegment::CROSSING) {
+						if(optional<Point> p = intersection(*edge_a, *edge_b)) {
+							++found;
+							state.angles[plane].emplace_back(make_shared<Angle>(p.value(), edge_a.get(), edge_b.get(), t));
+						}
+					}
 				}
 			}
+			bar.tick(found, k);
 		}
-		bar.tick(found, k);
 	}
 
 	set_state(t, state);

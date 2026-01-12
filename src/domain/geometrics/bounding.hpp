@@ -28,6 +28,9 @@ bool does_overlap(Bounding1D const& a, Bounding1D const& b) noexcept;
 bool does_overlap(Bounding2D const& a, Bounding2D const& b) noexcept;
 
 //******************************************************************************
+bool does_overlap_strict(Bounding2D const& a, Bounding2D const& b) noexcept;
+
+//******************************************************************************
 Bounding1D cast(ViewAxis axis, Bounding2D const& a) noexcept;
 
 } // namespace domain

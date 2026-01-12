@@ -59,6 +59,40 @@ SCENARIO("relation::SegmentSegment Segment::relation_to(Segment const* segment) 
 			}
 		}
 
+		WHEN("A vertical edge and an horizontal edge are touching by just an extremity") {
+			Point a0(1, 1), a1(3, 1);
+			Point b0(1, 1), b1(1, 3);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
+			Edge c(XY, &a1, &a0, &t), d(XY, &b1, &b0, &t);
+			THEN("Should be detected as CROSSING") {
+				REQUIRE(a.axis == Segment::Axis::H);
+				REQUIRE(b.axis == Segment::Axis::V);
+				REQUIRE(a.relation_to(b) == relation::SegmentSegment::CROSSING);
+				REQUIRE(b.relation_to(a) == relation::SegmentSegment::CROSSING);
+				REQUIRE(c.axis == Segment::Axis::H);
+				REQUIRE(d.axis == Segment::Axis::V);
+				REQUIRE(c.relation_to(d) == relation::SegmentSegment::CROSSING);
+				REQUIRE(d.relation_to(c) == relation::SegmentSegment::CROSSING);
+			}
+		}
+
+		WHEN("Two diagonal edges are touching by just an extremity") {
+			Point a0(1, 1), a1(2, 3);
+			Point b0(2, 3), b1(3, 1);
+			Edge a(XY, &a0, &a1, &t), b(XY, &b0, &b1, &t);
+			Edge c(XY, &a1, &a0, &t), d(XY, &b1, &b0, &t);
+			THEN("Should be detected as CROSSING") {
+				REQUIRE(a.axis == Segment::Axis::DIAGONAL);
+				REQUIRE(b.axis == Segment::Axis::DIAGONAL);
+				REQUIRE(a.relation_to(b) == relation::SegmentSegment::CROSSING);
+				REQUIRE(b.relation_to(a) == relation::SegmentSegment::CROSSING);
+				REQUIRE(c.axis == Segment::Axis::DIAGONAL);
+				REQUIRE(d.axis == Segment::Axis::DIAGONAL);
+				REQUIRE(c.relation_to(d) == relation::SegmentSegment::CROSSING);
+				REQUIRE(d.relation_to(c) == relation::SegmentSegment::CROSSING);
+			}
+		}
+
 		WHEN("Two vertical edges are colinear") {
 			Point a0(1, 1), a1(1, 2);
 			Point b0(1, 3), b1(1, 4);
