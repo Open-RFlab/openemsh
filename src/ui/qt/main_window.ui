@@ -657,6 +657,7 @@
    <addaction name="separator"/>
    <addaction name="a_undo"/>
    <addaction name="a_redo"/>
+   <addaction name="a_appcsxcad"/>
   </widget>
 
   <widget class="QStatusBar" name="statusBar">
@@ -790,6 +791,17 @@
    </property>
    <property name="icon">
     <iconset theme="QIcon::ThemeIcon::EditRedo"/>
+   </property>
+  </action>
+  <action name="a_appcsxcad">
+   <property name="text">
+    <string>AppCSXCAD</string>
+   </property>
+   <property name="toolTip">
+    <string>Preview mesh in AppCSXCAD</string>
+   </property>
+   <property name="icon">
+    <iconset>:/qcsxcad.png</iconset>
    </property>
   </action>
   <action name="a_does_use_csx_properties_color">
