@@ -34,6 +34,7 @@ private:
 	void set_style(Style const& style);
 
 	void update_title();
+	void update_board_dependant_buttons_visibility(bool are_enabled);
 	void update_navigation_buttons_visibility();
 	void update_show_buttons_pressing();
 	void update_cell_number(bool reset = false);
