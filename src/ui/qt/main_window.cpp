@@ -9,6 +9,8 @@
 #include <QGuiApplication>
 #include <QMarginsF>
 #include <QMessageBox>
+#include <QProcess>
+#include <QTemporaryFile>
 #include <QToolButton>
 
 #include <format>
@@ -415,6 +417,71 @@ void MainWindow::on_a_file_save_as_triggered() {
 }
 
 //******************************************************************************
+void MainWindow::on_a_appcsxcad_triggered() {
+	auto* file = new QTemporaryFile(this);
+	std::filesystem::path file_name(csx_file.toStdString());
+//	file->setAutoRemove(true);
+	file->setFileTemplate(QString("%1/%2.oemsh.XXXXXX%3")
+		.arg(QDir::tempPath())
+		.arg(QString::fromStdString(file_name.stem().generic_string()))
+		.arg(QString::fromStdString(file_name.extension().generic_string())));
+	if(!file->open()) {
+		log({
+			.level = Logger::Level::ERROR,
+			.user_actions = { Logger::UserAction::OK },
+			.message = std::format(
+				"Failed to create temporary file {}",
+				file->fileName().toStdString())
+			});
+		return;
+	}
+	file->close();
+
+	auto output_backup = oemsh.get_params().output;
+	auto output_format_backup = oemsh.get_params().output_format;
+	oemsh.set_output(file->fileName().toStdString());
+	oemsh.set_output_format(app::OpenEMSH::Params::OutputFormat::CSX);
+	auto res = oemsh.write();
+	oemsh.set_output(output_backup);
+	oemsh.set_output_format(output_format_backup);
+	if(res.has_value()) {
+		log({
+			.destination = Logger::id("Cli"),
+			.level = Logger::Level::INFO,
+			.message = std::format(
+				"Saved temporary file \"{}\"",
+				file->fileName().toStdString())
+			});
+	} else {
+		log({
+			.level = Logger::Level::ERROR,
+			.user_actions = { Logger::UserAction::OK },
+			.message = std::format(
+				"Failed to save temporary file \"{}\" : {}",
+				file->fileName().toStdString(),
+				res.error())
+			});
+		return;
+	}
+
+	auto* p = new QProcess(this);
+	p->setProgram("AppCSXCAD");
+	p->setArguments({ "--disableEdit", file->fileName() });
+	connect(p, &QProcess::errorOccurred, [this](QProcess::ProcessError error) {
+		if(error == QProcess::FailedToStart)
+		log({
+			.level = Logger::Level::ERROR,
+			.user_actions = { Logger::UserAction::OK },
+			.message = "Failed to run AppCSXCAD"
+			});
+	});
+	connect(this, &QObject::destroyed, [p](QObject* obj) {
+		disconnect(p, &QProcess::errorOccurred, nullptr, nullptr);
+	});
+	p->start();
+}
+
+//******************************************************************************
 void MainWindow::on_a_edit_triggered() {
 	auto* widget = static_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->a_edit));
 	widget->setDown(true);
@@ -570,6 +637,8 @@ void MainWindow::keyPressEvent(QKeyEvent* event) {
 		on_a_edit_triggered();
 	} else if(event->key() == Qt::Key_F) {
 		on_a_fit_triggered();
+	} else if(event->key() == Qt::Key_A) {
+		on_a_appcsxcad_triggered();
 	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_O) {
 		on_a_file_open_triggered();
 	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_S) {
