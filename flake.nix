@@ -238,6 +238,25 @@
           nativeBuildInputs = old.nativeBuildInputs ++ [
             prev.libsForQt5.wrapQtAppsHook
           ];
+          prePatch = ''
+            # Allow to open .csx files
+            substituteInPlace QCSXCAD.cpp --replace-fail 'XML-File (*.xml)' 'XML-File (*.xml *.csx)'
+
+            # Open OEMSH
+            cp ${self}/icon/openemsh.ico images/openemsh.ico
+            sed -i resources.qrc \
+              -e '/^    <file>images\/QCSXCAD_Icon.png<\/file>/a\    <file>images\/openemsh.ico<\/file>'
+            sed -i QCSGridEditor.h \
+              -e '/^	void DetectEdges();/a\	void RunOpenEMSH();' \
+              -e '/^	void signalDetectEdges(int);/a\	void signalRunOpenEMSH();'
+            sed -i QCSGridEditor.cpp \
+              -e '/^	TB->addAction(tr("detect \\nedges"),this,SLOT(DetectEdges()));/a\	TB->addAction(QPixmap(":\/images\/openemsh.ico"),tr("Run OpenEMSH"),this,SLOT(RunOpenEMSH()));' \
+              -e '/^void QCSGridEditor::BuildHomogenDisc()/i\void QCSGridEditor::RunOpenEMSH() { emit signalRunOpenEMSH(); }'
+            sed -i QCSXCAD.h \
+              -e '/^	virtual void clear();/i\ virtual void RunOpenEMSH() {}'
+            sed -i QCSXCAD.cpp \
+              -e '/^	QObject::connect(GridEditor,SIGNAL(signalDetectEdges(int)),this,SLOT(DetectEdges(int)));/a\	QObject::connect(GridEditor,SIGNAL(signalRunOpenEMSH()),this,SLOT(RunOpenEMSH()));'
+          '';
         })).override {
           mkDerivation = prev.fastStdenv.mkDerivation;
           inherit (final) csxcad;
@@ -247,11 +266,48 @@
           nativeBuildInputs = old.nativeBuildInputs ++ [
             prev.libsForQt5.wrapQtAppsHook
           ];
-          prePatch = ''
+          prePatch = let
+            run_oemsh = ''
+              void AppCSXCAD::RunOpenEMSH()
+              {
+              	if(bModified) {
+              		if(QMessageBox::question(this, tr("OpenEMSH mesher"), tr("Save current Geometry before meshing? (only geometry matters, mesh will be overwritten)"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes) {
+              			Save();
+              			bModified=false;
+              		}
+              	}
+
+              	setEnabled(false);
+              	repaint();
+              	QGuiApplication::setOverrideCursor(QCursor(Qt::ForbiddenCursor));
+              	int ret = QProcess::execute("openemsh", { "-Gvf", "--input", m_filename });
+              	QGuiApplication::restoreOverrideCursor();
+              	setEnabled(true);
+
+              	if(ret == -1) {
+              		QMessageBox::warning(this, tr("OpenEMSH mesher"), tr("Error OpenEMSH crashed!"));
+              	} else if(ret == -2) {
+              		QMessageBox::warning(this, tr("OpenEMSH mesher"), tr("Error OpenEMSH could not start!"));
+              	} else {
+              		ReadFile(m_filename);
+              	}
+              }
+            '';
+          in ''
             # Set icon
             # TODO add Windows RC file
             sed -i AppCSXCAD.cpp \
               -e '/^	QString title = tr("AppCSXCAD");/a\	setWindowIcon(QPixmap(":/images/QCSXCAD_Icon.png"));'
+
+            # Open OEMSH
+            sed -i AppCSXCAD.h \
+              -e '/^	virtual void clear();/a\void RunOpenEMSH() override;'
+            sed -i AppCSXCAD.cpp \
+              -e '/^QMenu *InfoMenu = mb->addMenu("Info");/a\	QObject::connect(this, QCSXCAD::signalRunOpenEMSH, this, AppCSXCAD::RunOpenEMSH);' \
+              -e 's/	return QCSXCAD::ReadFile(filename);/	bool ret = QCSXCAD::ReadFile(filename);\n	bModified = false;\n	return ret;/'
+            cat >> AppCSXCAD.cpp << EOF
+            ${run_oemsh}
+            EOF
           '';
         })).override {
           mkDerivation = prev.fastStdenv.mkDerivation;
