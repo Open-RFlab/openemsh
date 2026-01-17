@@ -673,12 +673,24 @@ expected<void, string> ParserFromCsx::parse() {
 		TRY(pimpl->parse_oemsh(oemsh.node()));
 	}
 
-	if(!doc.select_node("/openEMS"))
+	bool is_under_openems;
+	if(doc.select_node("/openEMS/ContinuousStructure"))
+		is_under_openems = true;
+	else if(doc.select_node("/ContinuousStructure"))
+		is_under_openems = false;
+	else
 		return unexpected("No \"/openEMS\" path in CSX XML file");
 
-	pugi::xpath_node fdtd = doc.select_node("/openEMS/FDTD");
+	auto const root = [&](string const str) -> string {
+		if(is_under_openems)
+			return "/openEMS"s + str;
+		else
+			return str;
+	};
 
-	pugi::xpath_node csx = doc.select_node("/openEMS/ContinuousStructure");
+	pugi::xpath_node fdtd = doc.select_node(root("/FDTD").c_str());
+
+	pugi::xpath_node csx = doc.select_node(root("/ContinuousStructure").c_str());
 	TRY(pimpl->parse_grid(csx.node()));
 
 	pimpl->board.set_background_material(pimpl->parse_property(csx.node().child("BackgroundMaterial")));
@@ -686,7 +698,7 @@ expected<void, string> ParserFromCsx::parse() {
 	{
 		// Primitives' IDs grow disregarding properties.
 		size_t id = 0;
-		pugi::xpath_node_set primitives = doc.select_nodes("/openEMS/ContinuousStructure/Properties/*/Primitives");
+		pugi::xpath_node_set primitives = doc.select_nodes(root("/ContinuousStructure/Properties/*/Primitives").c_str());
 		for(auto const& primitive : primitives)
 			for(auto const& node : primitive.node().children()) {
 				pimpl->primitives_ids.emplace(node, id++);
@@ -698,7 +710,7 @@ expected<void, string> ParserFromCsx::parse() {
 		pimpl->primitives_ids.size(),
 		"Parsing primitives ");
 
-	pugi::xpath_node properties = doc.select_node("/openEMS/ContinuousStructure/Properties");
+	pugi::xpath_node properties = doc.select_node(root("/ContinuousStructure/Properties").c_str());
 	for(auto const& node : properties.node().children()) {
 		auto material = pimpl->parse_property(node);
 
