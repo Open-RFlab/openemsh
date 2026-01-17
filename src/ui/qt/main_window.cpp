@@ -52,6 +52,8 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 
 	// TODO Init StructureView & ProcessingView stuff from buttons default values
 
+	update_board_dependant_buttons_visibility(false);
+
 	ui->statusBar->addPermanentWidget(ui->l_cell_number);
 
 	Progress::singleton().register_impl_builder(
@@ -93,6 +95,7 @@ bool MainWindow::parse_and_display() {
 	if(auto res = oemsh.parse()
 	; !res.has_value()) {
 		QGuiApplication::restoreOverrideCursor();
+		update_board_dependant_buttons_visibility(false);
 		log({
 			.level = Logger::Level::ERROR,
 			.user_actions = { Logger::UserAction::OK },
@@ -104,6 +107,7 @@ bool MainWindow::parse_and_display() {
 		return false;
 	}
 
+	update_board_dependant_buttons_visibility(true);
 	update_title();
 	ui->structure_view->init(&oemsh.get_board());
 	ui->processing_view->init(&oemsh.get_board());
@@ -606,6 +610,37 @@ void MainWindow::handle_edition_from(app::Step from, std::function<void ()> cons
 }
 
 //******************************************************************************
+void MainWindow::update_board_dependant_buttons_visibility(bool are_enabled) {
+	ui->a_file_save->setEnabled(are_enabled);
+	ui->a_file_save_as->setEnabled(are_enabled);
+	ui->a_edit->setEnabled(are_enabled);
+	ui->a_mesh_prev->setEnabled(are_enabled);
+	ui->a_mesh_next->setEnabled(are_enabled);
+	ui->a_undo->setEnabled(are_enabled);
+	ui->a_redo->setEnabled(are_enabled);
+	ui->a_appcsxcad->setEnabled(are_enabled);
+	ui->tb_show_all_mesh->setEnabled(are_enabled);
+	ui->tb_show_horizontal_mesh->setEnabled(are_enabled);
+	ui->tb_show_vertical_mesh->setEnabled(are_enabled);
+	ui->tb_show_no_mesh->setEnabled(are_enabled);
+	ui->tb_show_selected->setEnabled(are_enabled);
+	ui->tb_show_displayed->setEnabled(are_enabled);
+	ui->tb_show_everything->setEnabled(are_enabled);
+	ui->tb_curved_wires->setEnabled(are_enabled);
+	ui->tb_direct_wires->setEnabled(are_enabled);
+	ui->tb_structure_rotate_cw->setEnabled(are_enabled);
+	ui->tb_structure_rotate_ccw->setEnabled(are_enabled);
+	ui->tb_structure_zoom_in->setEnabled(are_enabled);
+	ui->tb_structure_zoom_out->setEnabled(are_enabled);
+	ui->tb_processing_zoom_in->setEnabled(are_enabled);
+	ui->tb_processing_zoom_out->setEnabled(are_enabled);
+	ui->tb_plane_xy->setEnabled(are_enabled);
+	ui->tb_plane_yz->setEnabled(are_enabled);
+	ui->tb_plane_zx->setEnabled(are_enabled);
+	ui->tb_anchor->setEnabled(are_enabled);
+}
+
+//******************************************************************************
 void MainWindow::update_navigation_buttons_visibility() {
 	ui->a_undo->setEnabled(Caretaker::singleton().can_undo());
 	ui->a_redo->setEnabled(Caretaker::singleton().can_redo());
@@ -634,29 +669,29 @@ void MainWindow::update_show_buttons_pressing() {
 //******************************************************************************
 void MainWindow::keyPressEvent(QKeyEvent* event) {
 	if(event->key() == Qt::Key_E || event->key() == Qt::Key_Space) {
-		on_a_edit_triggered();
+		ui->a_edit->trigger();
 	} else if(event->key() == Qt::Key_F) {
-		on_a_fit_triggered();
+		ui->a_fit->trigger();
 	} else if(event->key() == Qt::Key_A) {
-		on_a_appcsxcad_triggered();
+		ui->a_appcsxcad->trigger();
 	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_O) {
-		on_a_file_open_triggered();
+		ui->a_file_open->trigger();
 	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_S) {
 		if(event->modifiers() & Qt::ShiftModifier) {
-			on_a_file_save_as_triggered();
+			ui->a_file_save_as->trigger();
 		} else {
-			on_a_file_save_triggered();
+			ui->a_file_save->trigger();
 		}
 	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_Z) {
 		if(event->modifiers() & Qt::ShiftModifier) {
-			on_a_redo_triggered();
+			ui->a_redo->trigger();
 		} else {
-			on_a_undo_triggered();
+			ui->a_undo->trigger();
 		}
 	} else if(event->key() == Qt::Key_Greater) {
-		on_a_mesh_next_triggered();
+		ui->a_mesh_next->trigger();
 	} else if(event->key() == Qt::Key_Less) {
-		on_a_mesh_prev_triggered();
+		ui->a_mesh_prev->trigger();
 	} else if(event->key() == Qt::Key_1) {
 		ui->tb_show_selected->click();
 	} else if(event->key() == Qt::Key_2) {
