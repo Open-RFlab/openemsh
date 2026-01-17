@@ -247,6 +247,12 @@
           nativeBuildInputs = old.nativeBuildInputs ++ [
             prev.libsForQt5.wrapQtAppsHook
           ];
+          prePatch = ''
+            # Set icon
+            # TODO add Windows RC file
+            sed -i AppCSXCAD.cpp \
+              -e '/^	QString title = tr("AppCSXCAD");/a\	setWindowIcon(QPixmap(":/images/QCSXCAD_Icon.png"));'
+          '';
         })).override {
           mkDerivation = prev.fastStdenv.mkDerivation;
           inherit (final) csxcad qcsxcad;
