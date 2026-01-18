@@ -38,6 +38,21 @@ using DisplayMode = ProcessingScene::DisplayMode;
 using MeshVisibility = StructureScene::MeshVisibility;
 
 //******************************************************************************
+static QString get_shortcuts(QAction* p) { return QKeySequence::listToString(p->shortcuts()); }
+static QString get_shortcuts(QToolButton* p) { return p->shortcut().toString(); }
+
+//******************************************************************************
+static void add_shortcut_to_tooltip(auto* p, QString const& shortcut = QString()) {
+	QString s = shortcut.isNull()
+	          ? get_shortcuts(p)
+	          : shortcut;
+	if(!s.isEmpty())
+		p->setToolTip(QString("%1 (%2)")
+			.arg(p->toolTip())
+			.arg(s));
+}
+
+//******************************************************************************
 MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 : QMainWindow(parent)
 , ui(std::make_unique<Ui::MainWindow>())
@@ -55,6 +70,30 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 	update_board_dependant_buttons_visibility(false);
 
 	ui->statusBar->addPermanentWidget(ui->l_cell_number);
+
+	ui->a_edit->setShortcuts(ui->a_edit->shortcuts() += QKeySequence(Qt::Key_Space));
+	add_shortcut_to_tooltip(ui->a_edit);
+	add_shortcut_to_tooltip(ui->a_fit);
+	add_shortcut_to_tooltip(ui->a_appcsxcad);
+	add_shortcut_to_tooltip(ui->a_file_open);
+	add_shortcut_to_tooltip(ui->a_file_save_as);
+	add_shortcut_to_tooltip(ui->a_file_save);
+	add_shortcut_to_tooltip(ui->a_redo);
+	add_shortcut_to_tooltip(ui->a_undo);
+	add_shortcut_to_tooltip(ui->a_mesh_next);
+	add_shortcut_to_tooltip(ui->a_mesh_prev);
+	add_shortcut_to_tooltip(ui->tb_show_selected);
+	add_shortcut_to_tooltip(ui->tb_show_displayed);
+	add_shortcut_to_tooltip(ui->tb_show_everything);
+	add_shortcut_to_tooltip(ui->tb_curved_wires);
+	add_shortcut_to_tooltip(ui->tb_direct_wires);
+	add_shortcut_to_tooltip(ui->tb_show_all_mesh);
+	add_shortcut_to_tooltip(ui->tb_show_vertical_mesh);
+	add_shortcut_to_tooltip(ui->tb_show_horizontal_mesh);
+	add_shortcut_to_tooltip(ui->tb_show_no_mesh);
+	add_shortcut_to_tooltip(ui->tb_plane_zx, QKeySequence::listToString({ QKeySequence(Qt::Key_PageUp), QKeySequence(Qt::Key_PageDown) }));
+	add_shortcut_to_tooltip(ui->tb_plane_yz, QKeySequence::listToString({ QKeySequence(Qt::Key_PageUp), QKeySequence(Qt::Key_PageDown) }));
+	add_shortcut_to_tooltip(ui->tb_plane_xy, QKeySequence::listToString({ QKeySequence(Qt::Key_PageUp), QKeySequence(Qt::Key_PageDown) }));
 
 	Progress::singleton().register_impl_builder(
 		[this](std::size_t max, std::string const& message) {
@@ -319,7 +358,7 @@ static QString const format_filter_csx("OpenEMS CSX file (*.csx *.xml)");
 
 //******************************************************************************
 void MainWindow::on_a_file_open_triggered() {
-	QFileDialog dialog(this, ui->a_file_open->toolTip());
+	QFileDialog dialog(this, ui->a_file_open->text());
 	dialog.setAcceptMode(QFileDialog::AcceptOpen);
 	dialog.setFileMode(QFileDialog::ExistingFile);
 	dialog.setNameFilter(format_filter_csx);
@@ -403,7 +442,7 @@ void MainWindow::on_a_file_save_triggered() {
 
 //******************************************************************************
 void MainWindow::on_a_file_save_as_triggered() {
-	QFileDialog dialog(this, ui->a_file_save_as->toolTip());
+	QFileDialog dialog(this, ui->a_file_save_as->text());
 	dialog.setAcceptMode(QFileDialog::AcceptSave);
 	dialog.setFileMode(QFileDialog::AnyFile);
 	dialog.setNameFilter(format_filter_csx);
@@ -668,49 +707,7 @@ void MainWindow::update_show_buttons_pressing() {
 
 //******************************************************************************
 void MainWindow::keyPressEvent(QKeyEvent* event) {
-	if(event->key() == Qt::Key_E || event->key() == Qt::Key_Space) {
-		ui->a_edit->trigger();
-	} else if(event->key() == Qt::Key_F) {
-		ui->a_fit->trigger();
-	} else if(event->key() == Qt::Key_A) {
-		ui->a_appcsxcad->trigger();
-	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_O) {
-		ui->a_file_open->trigger();
-	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_S) {
-		if(event->modifiers() & Qt::ShiftModifier) {
-			ui->a_file_save_as->trigger();
-		} else {
-			ui->a_file_save->trigger();
-		}
-	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_Z) {
-		if(event->modifiers() & Qt::ShiftModifier) {
-			ui->a_redo->trigger();
-		} else {
-			ui->a_undo->trigger();
-		}
-	} else if(event->key() == Qt::Key_Greater) {
-		ui->a_mesh_next->trigger();
-	} else if(event->key() == Qt::Key_Less) {
-		ui->a_mesh_prev->trigger();
-	} else if(event->key() == Qt::Key_1) {
-		ui->tb_show_selected->click();
-	} else if(event->key() == Qt::Key_2) {
-		ui->tb_show_displayed->click();
-	} else if(event->key() == Qt::Key_3) {
-		ui->tb_show_everything->click();
-	} else if(event->key() == Qt::Key_C) {
-		ui->tb_curved_wires->click();
-	} else if(event->key() == Qt::Key_D) {
-		ui->tb_direct_wires->click();
-	} else if(event->key() == Qt::Key_X) {
-		ui->tb_show_all_mesh->click();
-	} else if(event->key() == Qt::Key_V) {
-		ui->tb_show_vertical_mesh->click();
-	} else if(event->key() == Qt::Key_H) {
-		ui->tb_show_horizontal_mesh->click();
-	} else if(event->key() == Qt::Key_Period) {
-		ui->tb_show_no_mesh->click();
-	} else if(event->key() == Qt::Key_PageUp) {
+	if(event->key() == Qt::Key_PageUp) {
 		if(auto const* b = ui->bg_plane->checkedButton()
 		; b == ui->tb_plane_xy) {
 			ui->tb_plane_zx->click();
