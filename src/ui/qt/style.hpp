@@ -16,6 +16,8 @@
 
 namespace ui::qt {
 
+inline QColor constexpr openems_blue(48, 64, 144);
+
 //******************************************************************************
 struct Style {
 	QString name;
