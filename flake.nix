@@ -238,12 +238,19 @@
           nativeBuildInputs = old.nativeBuildInputs ++ [
             prev.libsForQt5.wrapQtAppsHook
           ];
-          prePatch = ''
+          prePatch = let
+            icon = lib.nix-filter {
+              root = ./.;
+              include = [
+                "icon"
+              ];
+            };
+          in ''
             # Allow to open .csx files
             substituteInPlace QCSXCAD.cpp --replace-fail 'XML-File (*.xml)' 'XML-File (*.xml *.csx)'
 
             # Open OEMSH
-            cp ${self}/icon/openemsh.ico images/openemsh.ico
+            cp ${icon}/icon/openemsh.ico images/openemsh.ico
             sed -i resources.qrc \
               -e '/^    <file>images\/QCSXCAD_Icon.png<\/file>/a\    <file>images\/openemsh.ico<\/file>'
             sed -i QCSGridEditor.h \
