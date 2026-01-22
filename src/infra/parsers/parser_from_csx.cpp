@@ -4,6 +4,7 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <exception>
 #include <map>
 #include <optional>
 #include <ranges>
@@ -92,15 +93,29 @@ void ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& node) {
 //******************************************************************************
 expected<void, string> ParserFromCsx::Pimpl::parse_grid(pugi::xml_node const& node) {
 	std::size_t coord_system = node.attribute("CoordSystem").as_uint();
+	std::size_t delta_unit = node.attribute("DeltaUnit").as_uint(1);
 
 	if(coord_system == 0) {
 		// First step : into bool has_grid_already
 		pugi::xml_node grid = node.child("RectilinearGrid");
-		string_view x_lines = grid.child_value("XLines");
-		string_view y_lines = grid.child_value("YLines");
-		string_view z_lines = grid.child_value("ZLines");
-		domain_params.has_grid_already = !x_lines.empty() || !y_lines.empty() || !z_lines.empty();
+		AxisSpace<string_view> lines = {
+			grid.child_value("XLines"),
+			grid.child_value("YLines"),
+			grid.child_value("ZLines")
+		};
+		domain_params.has_grid_already = ranges::any_of(lines, [](auto const& str){ return !str.empty(); });
 		// TODO Second step : into fixed MLP
+		if(params.keep_old_mesh) {
+			for(Axis axis : AllAxis) {
+				for(auto const part : views::split(lines[axis], ',')) {
+					try {
+						board.add_fixed_meshline_policy(axis, delta_unit * stod(string(string_view(part))));
+					} catch(exception const& e) {
+						return unexpected("Invalid meshline value"s + e.what());
+					}
+				}
+			}
+		}
 		// TODO Third step : into vizualisable set of meshlines for comparison
 //	} else if(coord_system == 1) {
 	} else {

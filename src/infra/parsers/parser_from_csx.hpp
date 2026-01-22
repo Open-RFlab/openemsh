@@ -29,6 +29,7 @@ public:
 		bool with_zx = true;
 		bool with_xy = true;
 		bool read_oemsh_params = true;
+		bool keep_old_mesh = false;
 	};
 
 	~ParserFromCsx();

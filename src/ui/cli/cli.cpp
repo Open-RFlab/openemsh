@@ -145,6 +145,7 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app.add_flag("--no-zx", [&params](size_t) { params.with_zx = false; }, "Don't process ZX plane.")->group("Input options");
 	app.add_flag("--no-xy", [&params](size_t) { params.with_xy = false; }, "Don't process XY plane.")->group("Input options");
 	app.add_option("--read-oemsh-params", params.read_oemsh_params, "Read OpenEMSH parameters from file, if any.")->group("Input options")->default_str(to_string(params.read_oemsh_params));
+	app.add_option("--integrate-old-mesh", params.keep_old_mesh, "Keep current meshlines and integrate those in the final mesh.")->group("Input options")->default_str(to_string(params.keep_old_mesh));
 
 	app.add_option_function<decltype(domain::Params::proximity_limit)>("--proximity-limit",
 		make_overrider<&domain::Params::proximity_limit>(domain_overrides),
