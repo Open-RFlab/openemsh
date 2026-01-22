@@ -23,6 +23,7 @@ Logger::UserAction from_qt(int button) noexcept {
 	case QMessageBox::Cancel: return Logger::UserAction::CANCEL;
 	case QMessageBox::Ok: return Logger::UserAction::OK;
 	case QMessageBox::Save: return Logger::UserAction::SAVE;
+	case QMessageBox::Close: return Logger::UserAction::CLOSE;
 	case QMessageBox::Abort: return Logger::UserAction::ABORT;
 	}
 }
@@ -34,6 +35,7 @@ QMessageBox::StandardButton to_qt(Logger::UserAction action) noexcept {
 	case Logger::UserAction::CANCEL: return QMessageBox::Cancel;
 	case Logger::UserAction::OK: return QMessageBox::Ok;
 	case Logger::UserAction::SAVE: return QMessageBox::Save;
+	case Logger::UserAction::CLOSE: return QMessageBox::Close;
 	case Logger::UserAction::ABORT: return QMessageBox::Abort;
 	default: ::unreachable();
 	}
