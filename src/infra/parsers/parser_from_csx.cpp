@@ -63,7 +63,7 @@ public:
 
 	Pimpl(ParserFromCsx::Params const& params);
 
-	void parse_oemsh(pugi::xml_node const& node);
+	expected<void, string> parse_oemsh(pugi::xml_node const& node);
 	expected<void, string> parse_grid(pugi::xml_node const& node);
 
 	shared_ptr<Material> parse_property(pugi::xml_node const& node);
@@ -82,12 +82,30 @@ ParserFromCsx::Pimpl::Pimpl(ParserFromCsx::Params const& params)
 {}
 
 //******************************************************************************
-void ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& node) {
+expected<void, string> ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& node) {
 	pugi::xml_node global_params = node.child("GlobalParams");
 	if(auto a = global_params.attribute("ProximityLimit"); a) domain_params.proximity_limit = a.as_double();
 	if(auto a = global_params.attribute("Smoothness"); a) domain_params.smoothness = a.as_double();
 	if(auto a = global_params.attribute("dmax"); a) domain_params.dmax = a.as_double();
 	if(auto a = global_params.attribute("lmin"); a) domain_params.lmin = a.as_uint();
+
+	pugi::xml_node fixed_meshlines = node.child("FixedMeshlines");
+	size_t delta_unit = fixed_meshlines.attribute("DeltaUnit").as_uint(1);
+	AxisSpace<string_view> lines = {
+		fixed_meshlines.child_value("XLines"),
+		fixed_meshlines.child_value("YLines"),
+		fixed_meshlines.child_value("ZLines")
+	};
+	for(Axis axis : AllAxis) {
+		for(auto const part : views::split(lines[axis], ',')) {
+			try {
+				board.add_fixed_meshline_policy(axis, delta_unit * stod(string(string_view(part))));
+			} catch(exception const& e) {
+				return unexpected("Invalid meshline value"s + e.what());
+			}
+		}
+	}
+	return {};
 }
 
 //******************************************************************************
@@ -364,6 +382,9 @@ expected<shared_ptr<Board>, string> ParserFromCsx::run(std::filesystem::path con
 	ParserFromCsx parser(input, std::move(params));
 	TRY(parser.parse());
 	override_domain_params(parser.domain_params);
+	for(auto& [axis, coord] : parser.domain_params.input_fixed_meshlines)
+		parser.pimpl->board.add_fixed_meshline_policy(axis, coord);
+	parser.domain_params.input_fixed_meshlines.clear();
 	return parser.output();
 }
 
@@ -394,7 +415,7 @@ expected<void, string> ParserFromCsx::parse() {
 
 	if(parser_params.read_oemsh_params) {
 		pugi::xpath_node oemsh = doc.select_node("/OpenEMSH");
-		pimpl->parse_oemsh(oemsh.node());
+		TRY(pimpl->parse_oemsh(oemsh.node()));
 	}
 
 	if(!doc.select_node("/openEMS"))

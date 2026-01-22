@@ -7,7 +7,10 @@
 #pragma once
 
 #include <cstddef>
+#include <utility>
+#include <vector>
 
+#include "geometrics/space.hpp"
 #include "utils/state_management.hpp"
 
 namespace domain {
@@ -23,6 +26,8 @@ struct Params {
 	std::size_t diagonal_lmin = 2;
 	double diagonal_dmax = 0.2;
 	double consecutive_diagonal_minimal_angle = 20; // Limite between acute / obtuse angles.
+
+	std::vector<std::pair<Axis, double>> input_fixed_meshlines;
 };
 
 //******************************************************************************

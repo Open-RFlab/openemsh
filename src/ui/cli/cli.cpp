@@ -107,6 +107,17 @@ auto make_overrider(auto& overrides_collector) {
 }
 
 //******************************************************************************
+template<auto Container>
+auto make_appender_vector(auto& overrides_collector) {
+	return [&overrides_collector](auto const& value) { // This is CLI::add_option_function callback.
+		overrides_collector.emplace_back(
+			[value](auto& to_override) { // This is to be executed to actually apply override.
+				(to_override.*Container).emplace_back(value.first, value.second);
+			});
+	};
+}
+
+//******************************************************************************
 app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app::OpenEMSH::Params params;
 	vector<function<void (domain::Params&)>> domain_overrides;
@@ -133,19 +144,39 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app.add_option("-o,--output", params.output, "Output CSX file. If different from input, will copy and extend it. (Defaults to input, if provided)")->type_name(format("{}:FILE", CLI::detail::type_name<decltype(params.output)>()));
 	app.add_flag("-f,--force", params.force, "Allow overwriting a file.")->trigger_on_parse();
 
-	static std::map<std::string, app::OpenEMSH::Params::OutputFormat, std::less<>> const map {
+	static std::map<std::string, app::OpenEMSH::Params::OutputFormat, std::less<>> const output_formats {
 		{ "csx", app::OpenEMSH::Params::OutputFormat::CSX },
 		{ "plantuml", app::OpenEMSH::Params::OutputFormat::PLANTUML },
 		{ "prettyprint", app::OpenEMSH::Params::OutputFormat::PRETTYPRINT }
 	};
 	// https://github.com/CLIUtils/CLI11/issues/554#issuecomment-932782337
-	app.add_option("--output-format", params.output_format, "Output format.")->transform(CLI::CheckedTransformer(map, CLI::ignore_case).description(CLI::detail::generate_map(CLI::detail::smart_deref(map), true)))->default_str(reverse_kv(map).at(params.output_format));
+	app.add_option("--output-format", params.output_format, "Output format.")->transform(CLI::CheckedTransformer(output_formats, CLI::ignore_case).description(CLI::detail::generate_map(CLI::detail::smart_deref(output_formats), true)))->default_str(reverse_kv(output_formats).at(params.output_format));
 
 	app.add_flag("--no-yz", [&params](size_t) { params.with_yz = false; }, "Don't process YZ plane.")->group("Input options");
 	app.add_flag("--no-zx", [&params](size_t) { params.with_zx = false; }, "Don't process ZX plane.")->group("Input options");
 	app.add_flag("--no-xy", [&params](size_t) { params.with_xy = false; }, "Don't process XY plane.")->group("Input options");
 	app.add_option("--read-oemsh-params", params.read_oemsh_params, "Read OpenEMSH parameters from file, if any.")->group("Input options")->default_str(to_string(params.read_oemsh_params));
 	app.add_option("--integrate-old-mesh", params.keep_old_mesh, "Keep current meshlines and integrate those in the final mesh.")->group("Input options")->default_str(to_string(params.keep_old_mesh));
+
+	static std::map<std::string, domain::Axis, std::less<>> const axes {
+		{ "x", domain::Axis::X },
+		{ "y", domain::Axis::Y },
+		{ "z", domain::Axis::Z }
+	};
+	app.add_option_function<std::pair<
+		decltype(domain::Params::input_fixed_meshlines)::value_type::first_type,
+		decltype(domain::Params::input_fixed_meshlines)::value_type::second_type>
+	>("--add-fixed-meshline",
+		make_appender_vector<&domain::Params::input_fixed_meshlines>(domain_overrides),
+		"Add MeshlinePolicy at fixed position."
+	)->group("Mesher options")
+	->delimiter(',')
+	->transform(CLI::CheckedTransformer(axes, CLI::ignore_case).application_index(0).description(""))
+	->type_name("["s
+		+ CLI::detail::type_name<decltype(domain::Params::input_fixed_meshlines)::value_type::first_type>() + ":"
+		+ CLI::detail::generate_map(CLI::detail::smart_deref(axes), true) + ","
+		+ CLI::detail::type_name<decltype(domain::Params::input_fixed_meshlines)::value_type::second_type>()
+		+ "]");
 
 	app.add_option_function<decltype(domain::Params::proximity_limit)>("--proximity-limit",
 		make_overrider<&domain::Params::proximity_limit>(domain_overrides),
