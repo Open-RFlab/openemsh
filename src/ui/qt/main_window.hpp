@@ -29,6 +29,7 @@ private:
 	app::OpenEMSH& oemsh;
 
 	bool dock_layout_order;
+	bool is_unsaved;
 	QString csx_file;
 
 	void set_style(Style const& style);
@@ -95,6 +96,7 @@ public:
 
 protected:
 	void keyPressEvent(QKeyEvent* event) override;
+	void closeEvent(QCloseEvent* event) override;
 };
 
 } // namespace ui::qt

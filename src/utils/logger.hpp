@@ -29,6 +29,7 @@ public:
 		CANCEL,
 		OK,
 		SAVE,
+		CLOSE,
 		ABORT
 	};
 

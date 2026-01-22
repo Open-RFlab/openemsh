@@ -58,6 +58,7 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 , ui(std::make_unique<Ui::MainWindow>())
 , oemsh(oemsh)
 , dock_layout_order(false)
+, is_unsaved(false)
 , csx_file(oemsh.get_params().input.empty()
 	? QString()
 	: QString::fromStdString(oemsh.get_params().input.generic_string()))
@@ -395,14 +396,15 @@ void MainWindow::save_csx_file() {
 
 	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 	if(auto res = oemsh.write()
-	; res.has_value())
+	; res.has_value()) {
+		is_unsaved = false;
 		log({
 			.level = Logger::Level::INFO,
 			.message = std::format(
 				"Saved file \"{}\"",
 				csx_file.toStdString())
 			});
-	else
+	} else {
 		log({
 			.level = Logger::Level::ERROR,
 			.user_actions = { Logger::UserAction::OK },
@@ -411,7 +413,7 @@ void MainWindow::save_csx_file() {
 				csx_file.toStdString(),
 				res.error())
 			});
-
+	}
 
 	QGuiApplication::restoreOverrideCursor();
 }
@@ -589,6 +591,7 @@ void MainWindow::go_to_or_make_current_state() {
 		go_to_current_state();
 	else
 		make_current_state_view();
+	is_unsaved = true;
 }
 
 //******************************************************************************
@@ -633,12 +636,14 @@ void MainWindow::make_current_state_view() {
 void MainWindow::run(app::Step from) {
 	oemsh.run_from_step(from);
 	make_current_state_view();
+	is_unsaved = true;
 }
 
 //******************************************************************************
 void MainWindow::run() {
 	oemsh.run_all_steps();
 	make_current_state_view();
+	is_unsaved = true;
 }
 
 //******************************************************************************
@@ -732,6 +737,25 @@ void MainWindow::keyPressEvent(QKeyEvent* event) {
 	} else {
 		QWidget::keyPressEvent(event);
 	}
+}
+
+//******************************************************************************
+void MainWindow::closeEvent(QCloseEvent* event) {
+	if(is_unsaved) {
+		auto res = log({
+			.level = Logger::Level::QUESTION,
+			.user_actions = { Logger::UserAction::CANCEL, Logger::UserAction::SAVE, Logger::UserAction::CLOSE },
+			.message = std::format(
+				"You are about closing a unsaved document, do you want to save it before?")
+			});
+		if(res == Logger::UserAction::CANCEL) {
+			event->ignore();
+			return;
+		} else if(res == Logger::UserAction::SAVE) {
+			on_a_file_save_triggered();
+		}
+	}
+	event->accept();
 }
 
 } // namespace ui::qt

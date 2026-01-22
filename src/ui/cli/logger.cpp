@@ -52,6 +52,7 @@ string to_string(Logger::UserAction action) noexcept {
 	case Logger::UserAction::CANCEL: return "n";
 	case Logger::UserAction::OK: return "y";
 	case Logger::UserAction::SAVE: return "s";
+	case Logger::UserAction::CLOSE: return "c";
 	case Logger::UserAction::ABORT: return "a";
 	default: ::unreachable();
 	}
@@ -71,6 +72,7 @@ Logger::UserAction from_string(string const& str) noexcept {
 	if(str == "n") return Logger::UserAction::CANCEL;
 	else if(str == "y") return Logger::UserAction::OK;
 	else if(str == "s") return Logger::UserAction::SAVE;
+	else if(str == "c") return Logger::UserAction::CLOSE;
 	else if(str == "a") return Logger::UserAction::ABORT;
 	else return Logger::UserAction::NOTHING;
 }
