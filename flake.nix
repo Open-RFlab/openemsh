@@ -129,11 +129,19 @@
         packages = [
           nixGL.packages.${system}.nixGLDefault
           pkgs.openems
+          pkgs.openemsh
           pkgs.appcsxcad
           (pkgs.octaveFull.withPackages (p: [
-            pkgs.octave-openems
             pkgs.octave-csxcad
+            pkgs.octave-openems
             pkgs.octave-openems-hll
+          ]))
+          (pkgs.python3.withPackages (p: [
+            p.numpy
+            p.matplotlib
+            pkgs.python-csxcad
+            pkgs.python-openems
+            pkgs.python-openemsh
           ]))
         ];
       };
@@ -353,6 +361,31 @@
           stdenv = prev.fastStdenv;
           inherit (final) csxcad qcsxcad;
           withQcsxcad = false;
+        };
+
+        python-csxcad = (prev.python3Packages.python-csxcad.overrideAttrs (new: old: {
+          CSXCAD_INSTALL_PATH_IGNORE = true;
+        })).override {
+          inherit (final) csxcad openems;
+        };
+
+        python-openems = (prev.python3Packages.python-openems.overrideAttrs (new: old: {
+          OPENEMS_INSTALL_PATH_IGNORE = true;
+          nativeBuildInputs = old.nativeBuildInputs ++ [
+            prev.boost.dev
+          ];
+          setupPyBuildFlags = old.setupPyBuildFlags ++ [
+            "-I${prev.boost.dev}/include"
+            "-L${prev.boost}/lib"
+            "-R${prev.boost}/lib"
+          ];
+        })).override {
+          inherit (final) csxcad openems python-csxcad;
+        };
+
+        python-openemsh = prev.python3Packages.callPackage ./api/python/default.nix {
+          inherit lib;
+          inherit (final) appcsxcad openemsh;
         };
 
         octave-csxcad = prev.octavePackages.buildOctavePackage rec {

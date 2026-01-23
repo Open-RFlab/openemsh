@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+dynamic = ["version"]
+name = "openemsh"
+description = "API for OpenEMSH, openEMS mesher"
+dependencies = []
+license = "GPL-3.0-or-later"
+readme = "../../README.md"
+keywords = ["openems", "fdtd", "mesh"]
+authors = [
+  {name = "Thomas Lepoix", email = "thomas.lepoix@protonmail.ch"}
+]
+maintainers = [
+  {name = "Thomas Lepoix", email = "thomas.lepoix@protonmail.ch"}
+]
+
+[project.urls]
+homepage = "https://github.com/Open-RFlab/openemsh"
+source = "https://github.com/Open-RFlab/openemsh"
+changelog = "https://github.com/Open-RFlab/openemsh/blob/main/CHANGELOG"
+releasenotes = "https://github.com/Open-RFlab/openemsh/releases"
+#documentation = "https://github.com/Open-RFlab/openemsh"
+issues = "https://github.com/Open-RFlab/openemsh/issues"
+funding = "https://liberapay.com/thomaslepoix"
+
+[project.scripts]
+spam-cli = "spam:main_cli"
+
+[project.gui-scripts]
+spam-gui = "spam:main_gui"
+
+[tool.hatch.version]
+path = "../../CHANGELOG"
+# TODO + in version are not fine
+pattern = "^[^ ]+ \\((?P<version>.*)\\)$"
