@@ -2,6 +2,7 @@
 , buildPythonPackage
 , hatchling
 , openemsh
+, openems
 , appcsxcad
 }:
 
@@ -28,6 +29,7 @@ buildPythonPackage {
 
   dependencies = [
     openemsh
+    openems
     appcsxcad
   ];
 
