@@ -1,16 +1,19 @@
 import os
 import shutil
 import subprocess
+from openEMS import openEMS
 
-def run_openemsh(csx_file: str, args: list[str] = ["-Gv"]):
+def run_openemsh(fdtd: openEMS, csx_file: str, args: list[str] = ["-Gv"]):
 	"""
 	Invokes OpenEMSH mesher
 
 	:param csx_file: CSX XML file path.
 	"""
+	fdtd.Write2XML(csx_file)
 	subprocess.run(["openemsh", "-i", csx_file] + args, capture_output=False, text=True, check=True, stderr=subprocess.STDOUT)
+	fdtd.ReadFromXML(csx_file)
 
-def run_appcsxcad(csx_file: str, edit: bool = False, render_disc_material: bool = False):
+def run_appcsxcad(fdtd: openEMS, csx_file: str, edit: bool = False, render_disc_material: bool = False):
 	"""
 	Invokes AppCSXCAD
 
@@ -18,6 +21,7 @@ def run_appcsxcad(csx_file: str, edit: bool = False, render_disc_material: bool 
 	:param edit: Edit mode, `--disableEdit`.
 	:param render_disc_material: Render discrete material, `--RenderDiscMaterial`.
 	"""
+	fdtd.Write2XML(csx_file)
 	command = ["AppCSXCAD"]
 	if render_disc_material:
 		command += ["--RenderDiscMaterial"]
@@ -29,6 +33,8 @@ def run_appcsxcad(csx_file: str, edit: bool = False, render_disc_material: bool 
 		capture_output=False,
 		text=True,
 		check=False)
+	if edit:
+		fdtd.ReadFromXML(csx_file)
 
 def ensure_sim_path(sim_path: str, cleanup: bool = False):
 	"""
