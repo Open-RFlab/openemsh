@@ -36,52 +36,49 @@ void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManager& line_po
 	if(a->axis != b->axis)
 		return;
 
-	auto [policy, normal] = [&]() -> tuple<optional<MeshlinePolicy::Policy>, optional<MeshlinePolicy::Normal>> {
+	auto [policy, normal, coord] = [&]() -> tuple<optional<MeshlinePolicy::Policy>, optional<MeshlinePolicy::Normal>, optional<Coord>> {
 		auto const& state_a = a->get_current_state();
 		auto const& state_b = b->get_current_state();
 
-		if(state_a.policy == MeshlinePolicy::Policy::THIRDS && state_b.policy == MeshlinePolicy::Policy::THIRDS) {
+		if(state_a.policy == MeshlinePolicy::Policy::ONELINE && state_b.policy == MeshlinePolicy::Policy::ONELINE) {
+			return { MeshlinePolicy::Policy::ONELINE, MeshlinePolicy::Normal::NONE, mid(a->coord, b->coord) };
+		} else if(state_a.policy == MeshlinePolicy::Policy::ONELINE && state_b.policy != MeshlinePolicy::Policy::ONELINE) {
+			return { MeshlinePolicy::Policy::ONELINE, MeshlinePolicy::Normal::NONE, a->coord };
+		} else if(state_a.policy != MeshlinePolicy::Policy::ONELINE && state_b.policy == MeshlinePolicy::Policy::ONELINE) {
+			return { MeshlinePolicy::Policy::ONELINE, MeshlinePolicy::Normal::NONE, b->coord };
+		} else if(state_a.policy == MeshlinePolicy::Policy::THIRDS && state_b.policy == MeshlinePolicy::Policy::THIRDS) {
 			if(state_a.normal != state_b.normal) {
-				return { MeshlinePolicy::Policy::HALFS, MeshlinePolicy::Normal::NONE };
+				return { MeshlinePolicy::Policy::HALFS, MeshlinePolicy::Normal::NONE, mid(a->coord, b->coord) };
 			} else if(state_a.normal == MeshlinePolicy::Normal::MIN
 			       && state_b.normal == MeshlinePolicy::Normal::MIN) {
-				return { MeshlinePolicy::Policy::THIRDS, MeshlinePolicy::Normal::MIN };
+				return { MeshlinePolicy::Policy::THIRDS, MeshlinePolicy::Normal::MIN, mid(a->coord, b->coord) };
 			} else if(state_a.normal == MeshlinePolicy::Normal::MAX
 			       && state_b.normal == MeshlinePolicy::Normal::MAX) {
-				return { MeshlinePolicy::Policy::THIRDS, MeshlinePolicy::Normal::MAX };
+				return { MeshlinePolicy::Policy::THIRDS, MeshlinePolicy::Normal::MAX, mid(a->coord, b->coord) };
 			}
 		} else if((state_a.policy == MeshlinePolicy::Policy::HALFS && state_b.policy == MeshlinePolicy::Policy::HALFS)
 		       || (state_a.policy == MeshlinePolicy::Policy::HALFS && state_b.policy == MeshlinePolicy::Policy::THIRDS)
 		       || (state_a.policy == MeshlinePolicy::Policy::THIRDS && state_b.policy == MeshlinePolicy::Policy::HALFS)) {
-			return { MeshlinePolicy::Policy::HALFS, MeshlinePolicy::Normal::NONE };
-		} //else if(ONE and *) { // TODO }
-		// TODO should not have been created ?
-		// TODO only one, remove other?
-		// TODO one and one : merge
+			return { MeshlinePolicy::Policy::HALFS, MeshlinePolicy::Normal::NONE, mid(a->coord, b->coord) };
+		}
 
-		return { nullopt, nullopt };
+		return { nullopt, nullopt, nullopt };
 	} ();
 
-	if(policy && normal) {
+	if(policy && normal && coord) {
 		auto [t, state] = make_next_state();
 		state.meshline_policy = line_policy_manager.add_meshline_policy(
 			{ this },
 			axis,
 			policy.value(),
 			normal.value(),
-			mid(a->coord, b->coord),
+			coord.value(),
 			true,
 			t);
 		state.solution = state.meshline_policy;
 		state.is_solved = true;
 		set_state(t, state);
 	}
-
-	// TODO detect axis
-	// TODO detect 2 vs 3 rule (vs 1 rule?)
-	// TODO detect normal
-	// TODO create MLP
-
 }
 
 // TODO Interval class : just mesh() from adjacent / neibourgh

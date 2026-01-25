@@ -298,29 +298,6 @@ Coord proximity_limit)", "[meshline_policy_manager]") {
 				REQUIRE_FALSE(ret.has_value());
 			}
 		}
-
-		WHEN("Containing two meshline policies less distant than proximity limit but one is ONELINE policy") {
-			MeshlinePolicy a(
-				Y,
-				MeshlinePolicy::Policy::ONELINE,
-				MeshlinePolicy::Normal::NONE,
-				&params,
-				10,
-				t);
-			MeshlinePolicy b(
-				Y,
-				MeshlinePolicy::Policy::HALFS,
-				MeshlinePolicy::Normal::NONE,
-				&params,
-				10.5,
-				t);
-			vec.emplace_back(&a);
-			vec.emplace_back(&b);
-			THEN("Should return nullopt") {
-				auto ret = detect_closest_meshline_policies(vec, params.get_current_state().proximity_limit);
-				REQUIRE_FALSE(ret.has_value());
-			}
-		}
 	}
 }
 

@@ -669,9 +669,7 @@ void Board::detect_individual_edges() {
 
 //******************************************************************************
 void Board::add_fixed_meshline_policies() {
-#warning TODO
-//	for(auto const& axis : AllAxis)
-	for(auto const& axis : { X, Y })
+	for(auto const& axis : AllAxis)
 		add_fixed_meshline_policies(axis);
 }
 

@@ -309,16 +309,62 @@ SCENARIO("void ConflictTooCloseMeshlinePolicies::auto_solve(MeshlinePolicyManage
 			11,
 			t);
 		ConflictTooCloseMeshlinePolicies x(X, &a, &c, t);
-		ConflictTooCloseMeshlinePolicies y(X, &b, &c, t);
-		THEN("Should add nothing to the meshline policy manager") {
+		ConflictTooCloseMeshlinePolicies y(X, &c, &b, t);
+		THEN("Should add a ONELINE meshline policy at the coord of the ONELINE in the meshline policy manager") {
 			x.auto_solve(mpm);
 			y.auto_solve(mpm);
-			REQUIRE(mpm.get_current_state().line_policies[X].size() == 0);
 			REQUIRE(mpm.get_current_state().line_policies[Y].size() == 0);
-			REQUIRE_FALSE(x.get_current_state().is_solved);
-			REQUIRE_FALSE(y.get_current_state().is_solved);
-			REQUIRE(x.get_current_state().solution == nullptr);
-			REQUIRE(y.get_current_state().solution == nullptr);
+			REQUIRE(mpm.get_current_state().line_policies[X].size() == 2);
+			REQUIRE(mpm.get_current_state().line_policies[X][0].get() == x.get_current_state().solution);
+			REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().origins.size() == 1);
+			REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().origins[0] == &x);
+			REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().policy == MeshlinePolicy::Policy::ONELINE);
+			REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().normal == MeshlinePolicy::Normal::NONE);
+			REQUIRE(mpm.get_current_state().line_policies[X][0]->coord == 11);
+			REQUIRE(mpm.get_current_state().line_policies[X][0]->get_current_state().is_enabled);
+			REQUIRE(mpm.get_current_state().line_policies[X][1].get() == y.get_current_state().solution);
+			REQUIRE(mpm.get_current_state().line_policies[X][1]->get_current_state().origins.size() == 1);
+			REQUIRE(mpm.get_current_state().line_policies[X][1]->get_current_state().origins[0] == &y);
+			REQUIRE(mpm.get_current_state().line_policies[X][1]->get_current_state().policy == MeshlinePolicy::Policy::ONELINE);
+			REQUIRE(mpm.get_current_state().line_policies[X][1]->get_current_state().normal == MeshlinePolicy::Normal::NONE);
+			REQUIRE(mpm.get_current_state().line_policies[X][1]->coord == 11);
+			REQUIRE(mpm.get_current_state().line_policies[X][1]->get_current_state().is_enabled);
+			REQUIRE(x.get_current_state().is_solved);
+			REQUIRE(y.get_current_state().is_solved);
+			REQUIRE(x.get_current_state().solution == mpm.get_current_state().line_policies[X][0].get());
+			REQUIRE(y.get_current_state().solution == mpm.get_current_state().line_policies[X][1].get());
+		}
+	}
+
+	GIVEN("A conflict between ONELINE and ONELINE meshline policies") {
+		MeshlinePolicy a(
+			Y,
+			MeshlinePolicy::Policy::ONELINE,
+			MeshlinePolicy::Normal::NONE,
+			&params,
+			10,
+			t);
+		MeshlinePolicy b(
+			Y,
+			MeshlinePolicy::Policy::ONELINE,
+			MeshlinePolicy::Normal::NONE,
+			&params,
+			11,
+			t);
+		ConflictTooCloseMeshlinePolicies x(Y, &a, &b, t);
+		THEN("Should add a ONELINE meshline policy in the meshline policy manager") {
+			x.auto_solve(mpm);
+			REQUIRE(mpm.get_current_state().line_policies[X].size() == 0);
+			REQUIRE(mpm.get_current_state().line_policies[Y].size() == 1);
+			REQUIRE(mpm.get_current_state().line_policies[Y][0].get() == x.get_current_state().solution);
+			REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().origins.size() == 1);
+			REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().origins[0] == &x);
+			REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().policy == MeshlinePolicy::Policy::ONELINE);
+			REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().normal == MeshlinePolicy::Normal::NONE);
+			REQUIRE(mpm.get_current_state().line_policies[Y][0]->coord == 10.5);
+			REQUIRE(mpm.get_current_state().line_policies[Y][0]->get_current_state().is_enabled);
+			REQUIRE(x.get_current_state().is_solved);
+			REQUIRE(x.get_current_state().solution == mpm.get_current_state().line_policies[Y][0].get());
 		}
 	}
 }
