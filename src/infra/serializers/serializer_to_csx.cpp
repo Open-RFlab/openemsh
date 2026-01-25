@@ -82,8 +82,13 @@ void SerializerToCsx::visit(Board& board) {
 		return;
 	}
 
-	pugi::xml_node oems = find_or_append_child(doc, "openEMS");
-	pugi::xml_node csx = find_or_append_child(oems, "ContinuousStructure");
+	pugi::xml_node csx;
+	if(doc.select_node("/ContinuousStructure")) {
+		csx = find_or_append_child(doc, "ContinuousStructure");
+	} else {
+		pugi::xml_node oems = find_or_append_child(doc, "openEMS");
+		csx = find_or_append_child(oems, "ContinuousStructure");
+	}
 	pugi::xml_node grid = find_or_append_child(csx, "RectilinearGrid");
 	grid.remove_children();
 

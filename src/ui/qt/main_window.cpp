@@ -9,6 +9,8 @@
 #include <QGuiApplication>
 #include <QMarginsF>
 #include <QMessageBox>
+#include <QProcess>
+#include <QTemporaryFile>
 #include <QToolButton>
 
 #include <format>
@@ -22,6 +24,7 @@
 #include "utils/state_management.hpp"
 #include "utils/unreachable.hpp"
 #include "about_dialog.hpp"
+#include "logger.hpp"
 #include "progress.hpp"
 #include "settings.hpp"
 
@@ -33,6 +36,21 @@ namespace ui::qt {
 //******************************************************************************
 using DisplayMode = ProcessingScene::DisplayMode;
 using MeshVisibility = StructureScene::MeshVisibility;
+
+//******************************************************************************
+static QString get_shortcuts(QAction* p) { return QKeySequence::listToString(p->shortcuts()); }
+static QString get_shortcuts(QToolButton* p) { return p->shortcut().toString(); }
+
+//******************************************************************************
+static void add_shortcut_to_tooltip(auto* p, QString const& shortcut = QString()) {
+	QString s = shortcut.isNull()
+	          ? get_shortcuts(p)
+	          : shortcut;
+	if(!s.isEmpty())
+		p->setToolTip(QString("%1 (%2)")
+			.arg(p->toolTip())
+			.arg(s));
+}
 
 //******************************************************************************
 MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
@@ -49,7 +67,33 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 
 	// TODO Init StructureView & ProcessingView stuff from buttons default values
 
+	update_board_dependant_buttons_visibility(false);
+
 	ui->statusBar->addPermanentWidget(ui->l_cell_number);
+
+	ui->a_edit->setShortcuts(ui->a_edit->shortcuts() += QKeySequence(Qt::Key_Space));
+	add_shortcut_to_tooltip(ui->a_edit);
+	add_shortcut_to_tooltip(ui->a_fit);
+	add_shortcut_to_tooltip(ui->a_appcsxcad);
+	add_shortcut_to_tooltip(ui->a_file_open);
+	add_shortcut_to_tooltip(ui->a_file_save_as);
+	add_shortcut_to_tooltip(ui->a_file_save);
+	add_shortcut_to_tooltip(ui->a_redo);
+	add_shortcut_to_tooltip(ui->a_undo);
+	add_shortcut_to_tooltip(ui->a_mesh_next);
+	add_shortcut_to_tooltip(ui->a_mesh_prev);
+	add_shortcut_to_tooltip(ui->tb_show_selected);
+	add_shortcut_to_tooltip(ui->tb_show_displayed);
+	add_shortcut_to_tooltip(ui->tb_show_everything);
+	add_shortcut_to_tooltip(ui->tb_curved_wires);
+	add_shortcut_to_tooltip(ui->tb_direct_wires);
+	add_shortcut_to_tooltip(ui->tb_show_all_mesh);
+	add_shortcut_to_tooltip(ui->tb_show_vertical_mesh);
+	add_shortcut_to_tooltip(ui->tb_show_horizontal_mesh);
+	add_shortcut_to_tooltip(ui->tb_show_no_mesh);
+	add_shortcut_to_tooltip(ui->tb_plane_zx, QKeySequence::listToString({ QKeySequence(Qt::Key_PageUp), QKeySequence(Qt::Key_PageDown) }));
+	add_shortcut_to_tooltip(ui->tb_plane_yz, QKeySequence::listToString({ QKeySequence(Qt::Key_PageUp), QKeySequence(Qt::Key_PageDown) }));
+	add_shortcut_to_tooltip(ui->tb_plane_xy, QKeySequence::listToString({ QKeySequence(Qt::Key_PageUp), QKeySequence(Qt::Key_PageDown) }));
 
 	Progress::singleton().register_impl_builder(
 		[this](std::size_t max, std::string const& message) {
@@ -59,6 +103,8 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 					app::index_max(),
 					message)));
 		});
+
+	Logger::singleton().register_sink(Logger::id("Qt"), std::make_unique<LoggerSink>(ui->statusBar, this), true);
 
 	for(auto const& style : Style::available_styles) {
 		auto* const action = new QAction(style.name, ui->ag_styles);
@@ -88,10 +134,19 @@ bool MainWindow::parse_and_display() {
 	if(auto res = oemsh.parse()
 	; !res.has_value()) {
 		QGuiApplication::restoreOverrideCursor();
-		ui->statusBar->showMessage("Error parsing file \"" + csx_file + "\"" + " : " + QString::fromStdString(res.error()));
+		update_board_dependant_buttons_visibility(false);
+		log({
+			.level = Logger::Level::ERROR,
+			.user_actions = { Logger::UserAction::OK },
+			.message = std::format(
+				"Failed to parse file \"{}\" : {}",
+				csx_file.toStdString(),
+				res.error())
+			});
 		return false;
 	}
 
+	update_board_dependant_buttons_visibility(true);
 	update_title();
 	ui->structure_view->init(&oemsh.get_board());
 	ui->processing_view->init(&oemsh.get_board());
@@ -303,7 +358,7 @@ static QString const format_filter_csx("OpenEMS CSX file (*.csx *.xml)");
 
 //******************************************************************************
 void MainWindow::on_a_file_open_triggered() {
-	QFileDialog dialog(this, ui->a_file_open->toolTip());
+	QFileDialog dialog(this, ui->a_file_open->text());
 	dialog.setAcceptMode(QFileDialog::AcceptOpen);
 	dialog.setFileMode(QFileDialog::ExistingFile);
 	dialog.setNameFilter(format_filter_csx);
@@ -325,13 +380,15 @@ void MainWindow::save_csx_file() {
 	oemsh.set_output_format(app::OpenEMSH::Params::OutputFormat::CSX);
 
 	if(oemsh.is_about_overwriting()) {
-		auto res = QMessageBox::warning(this,
-			"",
-			QString::fromStdString(std::format(
-				"You are about overwriting the file \"{}\", do you want to continue?",
-				oemsh.get_params().output.generic_string())),
-			QMessageBox::Cancel | QMessageBox::Save);
-		if(res != QMessageBox::Save) {
+		auto res = log({
+			.level = Logger::Level::WARNING,
+			.user_actions = { Logger::UserAction::CANCEL, Logger::UserAction::SAVE },
+			.message = std::format(
+				"You are about overwriting the file \"{}\", "
+				"do you want to continue?",
+				oemsh.get_params().output.generic_string())
+			});
+		if(res != Logger::UserAction::SAVE) {
 			return;
 		}
 	}
@@ -339,9 +396,23 @@ void MainWindow::save_csx_file() {
 	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 	if(auto res = oemsh.write()
 	; res.has_value())
-		ui->statusBar->showMessage("Saved file \"" + csx_file + "\"");
+		log({
+			.level = Logger::Level::INFO,
+			.message = std::format(
+				"Saved file \"{}\"",
+				csx_file.toStdString())
+			});
 	else
-		ui->statusBar->showMessage("Failed to save file \"" + csx_file + "\"" + " : " + QString::fromStdString(res.error()));
+		log({
+			.level = Logger::Level::ERROR,
+			.user_actions = { Logger::UserAction::OK },
+			.message = std::format(
+				"Failed to save file \"{}\" : {}",
+				csx_file.toStdString(),
+				res.error())
+			});
+
+
 	QGuiApplication::restoreOverrideCursor();
 }
 
@@ -350,14 +421,15 @@ void MainWindow::on_a_file_save_triggered() {
 	if(oemsh.get_params().output.empty()) {
 		oemsh.set_output(csx_file.toStdString());
 	} else if(csx_file != QString::fromStdString(oemsh.get_params().output.generic_string())) {
-		auto res = QMessageBox::question(this,
-			"",
-			QString::fromStdString(std::format(
+		auto res = log({
+			.level = Logger::Level::QUESTION,
+			.user_actions = { Logger::UserAction::CANCEL, Logger::UserAction::SAVE },
+			.message = std::format(
 				"You are about saving to the file \"{}\" which is different from the input file \"{}\", do you want to continue?",
 				oemsh.get_params().output.generic_string(),
-				oemsh.get_params().input.generic_string())),
-			QMessageBox::Cancel | QMessageBox::Save);
-		if(res == QMessageBox::Save) {
+				oemsh.get_params().input.generic_string())
+			});
+		if(res == Logger::UserAction::SAVE) {
 			csx_file = QString::fromStdString(oemsh.get_params().output.generic_string());
 		} else {
 			return;
@@ -370,7 +442,7 @@ void MainWindow::on_a_file_save_triggered() {
 
 //******************************************************************************
 void MainWindow::on_a_file_save_as_triggered() {
-	QFileDialog dialog(this, ui->a_file_save_as->toolTip());
+	QFileDialog dialog(this, ui->a_file_save_as->text());
 	dialog.setAcceptMode(QFileDialog::AcceptSave);
 	dialog.setFileMode(QFileDialog::AnyFile);
 	dialog.setNameFilter(format_filter_csx);
@@ -385,6 +457,71 @@ void MainWindow::on_a_file_save_as_triggered() {
 		oemsh.set_output(csx_file.toStdString());
 		save_csx_file();
 	}
+}
+
+//******************************************************************************
+void MainWindow::on_a_appcsxcad_triggered() {
+	auto* file = new QTemporaryFile(this);
+	std::filesystem::path file_name(csx_file.toStdString());
+//	file->setAutoRemove(true);
+	file->setFileTemplate(QString("%1/%2.oemsh.XXXXXX%3")
+		.arg(QDir::tempPath())
+		.arg(QString::fromStdString(file_name.stem().generic_string()))
+		.arg(QString::fromStdString(file_name.extension().generic_string())));
+	if(!file->open()) {
+		log({
+			.level = Logger::Level::ERROR,
+			.user_actions = { Logger::UserAction::OK },
+			.message = std::format(
+				"Failed to create temporary file {}",
+				file->fileName().toStdString())
+			});
+		return;
+	}
+	file->close();
+
+	auto output_backup = oemsh.get_params().output;
+	auto output_format_backup = oemsh.get_params().output_format;
+	oemsh.set_output(file->fileName().toStdString());
+	oemsh.set_output_format(app::OpenEMSH::Params::OutputFormat::CSX);
+	auto res = oemsh.write();
+	oemsh.set_output(output_backup);
+	oemsh.set_output_format(output_format_backup);
+	if(res.has_value()) {
+		log({
+			.destination = Logger::id("Cli"),
+			.level = Logger::Level::INFO,
+			.message = std::format(
+				"Saved temporary file \"{}\"",
+				file->fileName().toStdString())
+			});
+	} else {
+		log({
+			.level = Logger::Level::ERROR,
+			.user_actions = { Logger::UserAction::OK },
+			.message = std::format(
+				"Failed to save temporary file \"{}\" : {}",
+				file->fileName().toStdString(),
+				res.error())
+			});
+		return;
+	}
+
+	auto* p = new QProcess(this);
+	p->setProgram("AppCSXCAD");
+	p->setArguments({ "--disableEdit", file->fileName() });
+	connect(p, &QProcess::errorOccurred, [this](QProcess::ProcessError error) {
+		if(error == QProcess::FailedToStart)
+		log({
+			.level = Logger::Level::ERROR,
+			.user_actions = { Logger::UserAction::OK },
+			.message = "Failed to run AppCSXCAD"
+			});
+	});
+	connect(this, &QObject::destroyed, [p](QObject* obj) {
+		disconnect(p, &QProcess::errorOccurred, nullptr, nullptr);
+	});
+	p->start();
 }
 
 //******************************************************************************
@@ -512,6 +649,37 @@ void MainWindow::handle_edition_from(app::Step from, std::function<void ()> cons
 }
 
 //******************************************************************************
+void MainWindow::update_board_dependant_buttons_visibility(bool are_enabled) {
+	ui->a_file_save->setEnabled(are_enabled);
+	ui->a_file_save_as->setEnabled(are_enabled);
+	ui->a_edit->setEnabled(are_enabled);
+	ui->a_mesh_prev->setEnabled(are_enabled);
+	ui->a_mesh_next->setEnabled(are_enabled);
+	ui->a_undo->setEnabled(are_enabled);
+	ui->a_redo->setEnabled(are_enabled);
+	ui->a_appcsxcad->setEnabled(are_enabled);
+	ui->tb_show_all_mesh->setEnabled(are_enabled);
+	ui->tb_show_horizontal_mesh->setEnabled(are_enabled);
+	ui->tb_show_vertical_mesh->setEnabled(are_enabled);
+	ui->tb_show_no_mesh->setEnabled(are_enabled);
+	ui->tb_show_selected->setEnabled(are_enabled);
+	ui->tb_show_displayed->setEnabled(are_enabled);
+	ui->tb_show_everything->setEnabled(are_enabled);
+	ui->tb_curved_wires->setEnabled(are_enabled);
+	ui->tb_direct_wires->setEnabled(are_enabled);
+	ui->tb_structure_rotate_cw->setEnabled(are_enabled);
+	ui->tb_structure_rotate_ccw->setEnabled(are_enabled);
+	ui->tb_structure_zoom_in->setEnabled(are_enabled);
+	ui->tb_structure_zoom_out->setEnabled(are_enabled);
+	ui->tb_processing_zoom_in->setEnabled(are_enabled);
+	ui->tb_processing_zoom_out->setEnabled(are_enabled);
+	ui->tb_plane_xy->setEnabled(are_enabled);
+	ui->tb_plane_yz->setEnabled(are_enabled);
+	ui->tb_plane_zx->setEnabled(are_enabled);
+	ui->tb_anchor->setEnabled(are_enabled);
+}
+
+//******************************************************************************
 void MainWindow::update_navigation_buttons_visibility() {
 	ui->a_undo->setEnabled(Caretaker::singleton().can_undo());
 	ui->a_redo->setEnabled(Caretaker::singleton().can_redo());
@@ -539,47 +707,7 @@ void MainWindow::update_show_buttons_pressing() {
 
 //******************************************************************************
 void MainWindow::keyPressEvent(QKeyEvent* event) {
-	if(event->key() == Qt::Key_E || event->key() == Qt::Key_Space) {
-		on_a_edit_triggered();
-	} else if(event->key() == Qt::Key_F) {
-		on_a_fit_triggered();
-	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_O) {
-		on_a_file_open_triggered();
-	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_S) {
-		if(event->modifiers() & Qt::ShiftModifier) {
-			on_a_file_save_as_triggered();
-		} else {
-			on_a_file_save_triggered();
-		}
-	} else if(event->modifiers() & Qt::ControlModifier && event->key() == Qt::Key_Z) {
-		if(event->modifiers() & Qt::ShiftModifier) {
-			on_a_redo_triggered();
-		} else {
-			on_a_undo_triggered();
-		}
-	} else if(event->key() == Qt::Key_Greater) {
-		on_a_mesh_next_triggered();
-	} else if(event->key() == Qt::Key_Less) {
-		on_a_mesh_prev_triggered();
-	} else if(event->key() == Qt::Key_1) {
-		ui->tb_show_selected->click();
-	} else if(event->key() == Qt::Key_2) {
-		ui->tb_show_displayed->click();
-	} else if(event->key() == Qt::Key_3) {
-		ui->tb_show_everything->click();
-	} else if(event->key() == Qt::Key_C) {
-		ui->tb_curved_wires->click();
-	} else if(event->key() == Qt::Key_D) {
-		ui->tb_direct_wires->click();
-	} else if(event->key() == Qt::Key_X) {
-		ui->tb_show_all_mesh->click();
-	} else if(event->key() == Qt::Key_V) {
-		ui->tb_show_vertical_mesh->click();
-	} else if(event->key() == Qt::Key_H) {
-		ui->tb_show_horizontal_mesh->click();
-	} else if(event->key() == Qt::Key_Period) {
-		ui->tb_show_no_mesh->click();
-	} else if(event->key() == Qt::Key_PageUp) {
+	if(event->key() == Qt::Key_PageUp) {
 		if(auto const* b = ui->bg_plane->checkedButton()
 		; b == ui->tb_plane_xy) {
 			ui->tb_plane_zx->click();

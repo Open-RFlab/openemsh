@@ -4,8 +4,11 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <exception>
 #include <map>
 #include <optional>
+#include <ranges>
+#include <set>
 #include <string_view>
 
 #include <pugixml.hpp>
@@ -19,6 +22,7 @@
 
 #include "parser_from_csx.hpp"
 #include "utils/expected_utils.hpp"
+#include "utils/logger.hpp"
 #include "utils/progress.hpp"
 #include "utils/unreachable.hpp"
 #include "utils/vector_utils.hpp"
@@ -54,8 +58,12 @@ public:
 	Board::Builder board;
 	domain::Params domain_params;
 
+	set<string> warning_unsupported_primitives_types;
+	set<string> warning_unsupported_primitives_names;
+
 	Pimpl(ParserFromCsx::Params const& params);
 
+	expected<void, string> parse_oemsh(pugi::xml_node const& node);
 	expected<void, string> parse_grid(pugi::xml_node const& node);
 
 	shared_ptr<Material> parse_property(pugi::xml_node const& node);
@@ -63,6 +71,7 @@ public:
 	bool parse_primitive(pugi::xml_node const& node, shared_ptr<Material> const& material);
 	void parse_primitive_box(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 	void parse_primitive_linpoly(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
+	void parse_primitive_polygon(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 
 private:
 };
@@ -73,17 +82,58 @@ ParserFromCsx::Pimpl::Pimpl(ParserFromCsx::Params const& params)
 {}
 
 //******************************************************************************
+expected<void, string> ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& node) {
+	pugi::xml_node global_params = node.child("GlobalParams");
+	if(auto a = global_params.attribute("ProximityLimit"); a) domain_params.proximity_limit = a.as_double();
+	if(auto a = global_params.attribute("Smoothness"); a) domain_params.smoothness = a.as_double();
+	if(auto a = global_params.attribute("dmax"); a) domain_params.dmax = a.as_double();
+	if(auto a = global_params.attribute("lmin"); a) domain_params.lmin = a.as_uint();
+
+	pugi::xml_node fixed_meshlines = node.child("FixedMeshlines");
+	size_t delta_unit = fixed_meshlines.attribute("DeltaUnit").as_uint(1);
+	AxisSpace<string_view> lines = {
+		fixed_meshlines.child_value("XLines"),
+		fixed_meshlines.child_value("YLines"),
+		fixed_meshlines.child_value("ZLines")
+	};
+	for(Axis axis : AllAxis) {
+		for(auto const part : views::split(lines[axis], ',')) {
+			try {
+				board.add_fixed_meshline_policy(axis, delta_unit * stod(string(string_view(part))));
+			} catch(exception const& e) {
+				return unexpected("Invalid meshline value"s + e.what());
+			}
+		}
+	}
+	return {};
+}
+
+//******************************************************************************
 expected<void, string> ParserFromCsx::Pimpl::parse_grid(pugi::xml_node const& node) {
 	std::size_t coord_system = node.attribute("CoordSystem").as_uint();
+	std::size_t delta_unit = node.attribute("DeltaUnit").as_uint(1);
 
 	if(coord_system == 0) {
 		// First step : into bool has_grid_already
 		pugi::xml_node grid = node.child("RectilinearGrid");
-		string_view x_lines = grid.child_value("XLines");
-		string_view y_lines = grid.child_value("YLines");
-		string_view z_lines = grid.child_value("ZLines");
-		domain_params.has_grid_already = !x_lines.empty() || !y_lines.empty() || !z_lines.empty();
+		AxisSpace<string_view> lines = {
+			grid.child_value("XLines"),
+			grid.child_value("YLines"),
+			grid.child_value("ZLines")
+		};
+		domain_params.has_grid_already = ranges::any_of(lines, [](auto const& str){ return !str.empty(); });
 		// TODO Second step : into fixed MLP
+		if(params.keep_old_mesh) {
+			for(Axis axis : AllAxis) {
+				for(auto const part : views::split(lines[axis], ',')) {
+					try {
+						board.add_fixed_meshline_policy(axis, delta_unit * stod(string(string_view(part))));
+					} catch(exception const& e) {
+						return unexpected("Invalid meshline value"s + e.what());
+					}
+				}
+			}
+		}
 		// TODO Third step : into vizualisable set of meshlines for comparison
 //	} else if(coord_system == 1) {
 	} else {
@@ -108,35 +158,45 @@ shared_ptr<Material> ParserFromCsx::Pimpl::parse_property(pugi::xml_node const& 
 			return nullopt;
 	};
 
-	auto fill = parse_color(node.child("FillColor"));
-	auto edge = parse_color(node.child("EdgeColor"));
+	auto const parse_material_property = [](pugi::xml_node const& node) -> array<double, 4> {
+		return {
+			node.attribute("Epsilon").as_double(Material::default_epsilon),
+			node.attribute("Mue").as_double(Material::default_mue),
+			node.attribute("Kappa").as_double(Material::default_kappa),
+			node.attribute("Sigma").as_double(Material::default_sigma)
+		};
+	};
 
-	if(node.name() == "Material"s) {
-		// https://github.com/thliebig/openEMS-Project/discussions/347
-		// Currently do not take care of Isotropy=false
-		// as_double() selects the first term and ditch the part after
-		bool isotropy = node.attribute("Isotropy").as_bool();
-		pugi::xml_node property = node.child("Property");
-		double epsilon = property.attribute("Epsilon").as_double(Material::default_epsilon);
-		double mue = property.attribute("Mue").as_double(Material::default_mue);
-		double kappa = property.attribute("Kappa").as_double(Material::default_kappa);
-		double sigma = property.attribute("Sigma").as_double(Material::default_sigma);
-		return make_shared<Material>(Material::deduce_type(epsilon, mue, kappa), name, fill, edge);
-	} else if(node.name() == "Metal"s) {
-		return make_shared<Material>(Material::Type::CONDUCTOR, name, fill, edge);
-	} else if(node.name() == "ConductingSheet"s) {
-		double conductivity = node.attribute("Conductivity").as_double();
-		double thickness = node.attribute("Thickness").as_double();
-		return make_shared<Material>(Material::Type::CONDUCTOR, name, fill, edge);
-	} else if(node.name() == "LumpedElement"s) {
-	} else if(node.name() == "Excitation"s) {
-	} else if(node.name() == "ProbeBox"s) {
-	} else if(node.name() == "DumpBox"s) {
-	} else if(node.name() == "DebyeMaterial"s) {
-	} else if(node.name() == "LorentzMaterial"s) {
-	} else if(node.name() == "ResBox"s) {
-	} else if(node.name() == "Unknown"s) {
-	} else if(node.name() == "DiscMaterial"s) {
+	if(node.name() == "BackgroundMaterial"s) {
+		auto [epsilon, mue, kappa, sigma] = parse_material_property(node);
+		return make_shared<Material>(Material::deduce_type(epsilon, mue, kappa), "BackgroundMaterial");
+	} else {
+		auto fill = parse_color(node.child("FillColor"));
+		auto edge = parse_color(node.child("EdgeColor"));
+
+		if(node.name() == "Material"s) {
+			// https://github.com/thliebig/openEMS-Project/discussions/347
+			// Currently do not take care of Isotropy=false
+			// as_double() selects the first term and ditch the part after
+			bool isotropy = node.attribute("Isotropy").as_bool();
+			auto [epsilon, mue, kappa, sigma] = parse_material_property(node.child("Property"));
+			return make_shared<Material>(Material::deduce_type(epsilon, mue, kappa), name, fill, edge);
+		} else if(node.name() == "Metal"s) {
+			return make_shared<Material>(Material::Type::CONDUCTOR, name, fill, edge);
+		} else if(node.name() == "ConductingSheet"s) {
+			double conductivity = node.attribute("Conductivity").as_double();
+			double thickness = node.attribute("Thickness").as_double();
+			return make_shared<Material>(Material::Type::CONDUCTOR, name, fill, edge);
+		} else if(node.name() == "LumpedElement"s) {
+		} else if(node.name() == "Excitation"s) {
+		} else if(node.name() == "ProbeBox"s) {
+		} else if(node.name() == "DumpBox"s) {
+		} else if(node.name() == "DebyeMaterial"s) {
+		} else if(node.name() == "LorentzMaterial"s) {
+		} else if(node.name() == "ResBox"s) {
+		} else if(node.name() == "Unknown"s) {
+		} else if(node.name() == "DiscMaterial"s) {
+		}
 	}
 
 	return shared_ptr<Material>();
@@ -148,6 +208,11 @@ bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_pt
 	string property_name(node.parent().parent().attribute("Name").as_string());
 	string name(property_name + "::" + to_string(primitives_ids.at(node)));
 
+	auto const warn_unsupported = [this](string const& primitive_type, string const& primitive_name) {
+		warning_unsupported_primitives_types.emplace(primitive_type);
+		warning_unsupported_primitives_names.emplace(primitive_name);
+	};
+
 	using pugi::char_t;
 	if(node.name() == "Box"s) {
 		parse_primitive_box(node, material, name);
@@ -155,15 +220,21 @@ bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_pt
 	} else if(node.name() == "LinPoly"s) {
 		parse_primitive_linpoly(node, material, name);
 		return true;
-	} else if(node.name() == "Polyhedron"s) {
 	} else if(node.name() == "Polygon"s) {
-	} else if(node.name() == "RotPoly"s) {
-	} else if(node.name() == "Sphere"s) {
-	} else if(node.name() == "Cylinder"s) {
-	} else if(node.name() == "Wire"s) {
-	} else if(node.name() == "CylindricalShell"s) {
-	} else if(node.name() == "User-Defined"s) {
-	} else if(node.name() == "Curve"s) {
+		parse_primitive_polygon(node, material, name);
+		return true;
+	} else if(node.name() == "Polyhedron"s
+	       || node.name() == "PolyhedronReader"s
+	       || node.name() == "RotPoly"s
+	       || node.name() == "Sphere"s
+	       || node.name() == "Cylinder"s
+	       || node.name() == "CylindricalShell"
+	       || node.name() == "Point"s
+	       || node.name() == "Curve"s
+	       || node.name() == "Wire"s
+	       || node.name() == "MultiBox"s
+	       || node.name() == "User-Defined"s) {
+		warn_unsupported(node.name(), name);
 	}
 	return false;
 }
@@ -273,6 +344,28 @@ void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, s
 }
 
 //******************************************************************************
+void ParserFromCsx::Pimpl::parse_primitive_polygon(pugi::xml_node const& node, shared_ptr<Material> const& material, string name) {
+	size_t priority = node.attribute("Priority").as_uint();
+	double elevation = node.attribute("Elevation").as_double(); // offset in normdir
+	size_t normdir = node.attribute("NormDir").as_uint(); // (0->x, 1->y, 2->z)
+	optional<Plane> plane = to_plane(normdir);
+	optional<Axis> normal = to_axis(normdir);
+	if(!plane || !normal)
+		return;
+
+	vector<unique_ptr<Point const>> points;
+	for(auto const& vertex : node.children("Vertex"))
+		points.push_back(make_unique<Point const>(
+			vertex.attribute("X1").as_double(),
+			vertex.attribute("X2").as_double()));
+
+	Bounding2D bounding(detect_bounding(points));
+
+	board.add_polygon(plane.value(), material, name, priority, { elevation, elevation }, std::move(points));
+	board.add_fixed_meshline_policy(normal.value(), elevation);
+}
+
+//******************************************************************************
 expected<shared_ptr<Board>, string> ParserFromCsx::run(std::filesystem::path const& input) {
 	return ParserFromCsx::run(input, {});
 }
@@ -289,6 +382,9 @@ expected<shared_ptr<Board>, string> ParserFromCsx::run(std::filesystem::path con
 	ParserFromCsx parser(input, std::move(params));
 	TRY(parser.parse());
 	override_domain_params(parser.domain_params);
+	for(auto& [axis, coord] : parser.domain_params.input_fixed_meshlines)
+		parser.pimpl->board.add_fixed_meshline_policy(axis, coord);
+	parser.domain_params.input_fixed_meshlines.clear();
 	return parser.output();
 }
 
@@ -317,15 +413,37 @@ expected<void, string> ParserFromCsx::parse() {
 		return unexpected(res.description());
 	}
 
-	pugi::xpath_node fdtd = doc.select_node("/openEMS/FDTD");
+	if(parser_params.read_oemsh_params) {
+		pugi::xpath_node oemsh = doc.select_node("/OpenEMSH");
+		TRY(pimpl->parse_oemsh(oemsh.node()));
+	}
 
-	pugi::xpath_node csx = doc.select_node("/openEMS/ContinuousStructure");
+	bool is_under_openems;
+	if(doc.select_node("/openEMS/ContinuousStructure"))
+		is_under_openems = true;
+	else if(doc.select_node("/ContinuousStructure"))
+		is_under_openems = false;
+	else
+		return unexpected("No \"/openEMS\" path in CSX XML file");
+
+	auto const root = [&](string const str) -> string {
+		if(is_under_openems)
+			return "/openEMS"s + str;
+		else
+			return str;
+	};
+
+	pugi::xpath_node fdtd = doc.select_node(root("/FDTD").c_str());
+
+	pugi::xpath_node csx = doc.select_node(root("/ContinuousStructure").c_str());
 	TRY(pimpl->parse_grid(csx.node()));
+
+	pimpl->board.set_background_material(pimpl->parse_property(csx.node().child("BackgroundMaterial")));
 
 	{
 		// Primitives' IDs grow disregarding properties.
 		size_t id = 0;
-		pugi::xpath_node_set primitives = doc.select_nodes("/openEMS/ContinuousStructure/Properties/*/Primitives");
+		pugi::xpath_node_set primitives = doc.select_nodes(root("/ContinuousStructure/Properties/*/Primitives").c_str());
 		for(auto const& primitive : primitives)
 			for(auto const& node : primitive.node().children()) {
 				pimpl->primitives_ids.emplace(node, id++);
@@ -337,7 +455,7 @@ expected<void, string> ParserFromCsx::parse() {
 		pimpl->primitives_ids.size(),
 		"Parsing primitives ");
 
-	pugi::xpath_node properties = doc.select_node("/openEMS/ContinuousStructure/Properties");
+	pugi::xpath_node properties = doc.select_node(root("/ContinuousStructure/Properties").c_str());
 	for(auto const& node : properties.node().children()) {
 		auto material = pimpl->parse_property(node);
 
@@ -351,6 +469,17 @@ expected<void, string> ParserFromCsx::parse() {
 	}
 	bar.complete();
 	domain_params = std::move(pimpl->domain_params);
+
+	if(!pimpl->warning_unsupported_primitives_names.empty()
+	&& !pimpl->warning_unsupported_primitives_types.empty())
+		log({
+			.level = Logger::Level::WARNING,
+			.user_actions = { Logger::UserAction::OK },
+			.message = "Unsupported CSXCAD Primitives:",
+			.informative = pimpl->warning_unsupported_primitives_types | views::join_with(", "s) | ranges::to<string>(),
+			.details = pimpl->warning_unsupported_primitives_names | views::join_with(", "s) | ranges::to<string>()
+			});
+
 	return {};
 }
 

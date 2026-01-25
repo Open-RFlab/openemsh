@@ -6,26 +6,21 @@
 
 #pragma once
 
-#include <QString>
+#include "utils/logger.hpp"
 
-#include <optional>
-#include <vector>
-
-#include "processing_view/processing_style.hpp"
-#include "structure_view/structure_style.hpp"
+class QStatusBar;
+class QWidget;
 
 namespace ui::qt {
 
-inline QColor constexpr openems_blue(48, 64, 144);
-
 //******************************************************************************
-struct Style {
-	QString name;
-	ProcessingStyle processing;
-	StructureStyle structure;
-
-	static std::vector<Style> const available_styles;
-	static std::optional<Style> find_style(QString const& name);
+class LoggerSink final : public Logger::ISink {
+private:
+	QStatusBar* status_bar;
+	QWidget* parent;
+public:
+	LoggerSink(QStatusBar* status_bar, QWidget* parent);
+	Logger::UserAction log(Logger::LogEvent const& log) const override;
 };
 
 } // namespace ui::qt

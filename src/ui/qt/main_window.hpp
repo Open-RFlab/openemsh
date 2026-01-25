@@ -34,6 +34,7 @@ private:
 	void set_style(Style const& style);
 
 	void update_title();
+	void update_board_dependant_buttons_visibility(bool are_enabled);
 	void update_navigation_buttons_visibility();
 	void update_show_buttons_pressing();
 	void update_cell_number(bool reset = false);
@@ -79,6 +80,7 @@ private slots:
 	void on_a_mesh_next_triggered();
 	void on_a_undo_triggered();
 	void on_a_redo_triggered();
+	void on_a_appcsxcad_triggered();
 	void on_a_does_use_csx_properties_color_triggered();
 
 	void edit_global_params();
