@@ -20,7 +20,7 @@ struct Params {
 	bool has_grid_already = false; // TODO would better fit in infra layer?
 	double proximity_limit = 1; // TODO must be linked to initial d
 	double smoothness = 2;
-	std::size_t lmin = 10;
+	std::size_t lmin = 2;
 	double dmax = 2.5;
 
 	std::size_t diagonal_lmin = 2;
