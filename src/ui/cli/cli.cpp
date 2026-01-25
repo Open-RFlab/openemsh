@@ -107,17 +107,6 @@ auto make_overrider(auto& overrides_collector) {
 }
 
 //******************************************************************************
-template<auto Container>
-auto make_appender_vector(auto& overrides_collector) {
-	return [&overrides_collector](auto const& value) { // This is CLI::add_option_function callback.
-		overrides_collector.emplace_back(
-			[value](auto& to_override) { // This is to be executed to actually apply override.
-				(to_override.*Container).emplace_back(value.first, value.second);
-			});
-	};
-}
-
-//******************************************************************************
 app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app::OpenEMSH::Params params;
 	vector<function<void (domain::Params&)>> domain_overrides;
@@ -163,13 +152,11 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 		{ "y", domain::Axis::Y },
 		{ "z", domain::Axis::Z }
 	};
-	app.add_option_function<std::pair<
-		decltype(domain::Params::input_fixed_meshlines)::value_type::first_type,
-		decltype(domain::Params::input_fixed_meshlines)::value_type::second_type>
-	>("--add-fixed-meshline",
-		make_appender_vector<&domain::Params::input_fixed_meshlines>(domain_overrides),
+	app.add_option_function<decltype(domain::Params::input_fixed_meshlines)>("--add-fixed-meshline",
+		make_overrider<&domain::Params::input_fixed_meshlines>(domain_overrides),
 		"Add MeshlinePolicy at fixed position."
 	)->group("Mesher options")
+	->take_all()
 	->delimiter(',')
 	->transform(CLI::CheckedTransformer(axes, CLI::ignore_case).application_index(0).description(""))
 	->type_name("["s
