@@ -11,6 +11,14 @@
       <Metal Name="Shape">
         <Primitives>
           <Box Priority="1">
+            <P1 X="-25" Y="-25" Z="1"/>
+            <P2 X="-30" Y="-30" Z="-1"/>
+            <Transformation>
+              <Rotate_Z Argument="0.7854"/>
+              <Translate Argument="-25, 10, 0"/>
+            </Transformation>
+          </Box>
+          <Box Priority="1">
             <P1 X="0" Y="0" Z="1"/>
             <P2 X="-20" Y="-20" Z="-1"/>
           </Box>

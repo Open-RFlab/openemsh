@@ -5,6 +5,7 @@
 ///*****************************************************************************
 
 #include <exception>
+#include <format>
 #include <map>
 #include <optional>
 #include <ranges>
@@ -216,6 +217,11 @@ bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_pt
 
 	string property_name(node.parent().parent().attribute("Name").as_string());
 	string name(property_name + "::" + to_string(primitives_ids.at(node)));
+
+	if(node.child("Transformation")) {
+		warn_unsupported(format("Transformed {}", node.name()), name);
+		return false;
+	}
 
 	using pugi::char_t;
 	if(node.name() == "Box"s) {
