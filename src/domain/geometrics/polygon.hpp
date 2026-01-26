@@ -90,4 +90,7 @@ std::vector<std::shared_ptr<Edge>> detect_edges(std::vector<std::unique_ptr<Poin
 //******************************************************************************
 bool does_overlap(Polygon::RangeZ const& a, Polygon::RangeZ const& b) noexcept;
 
+//******************************************************************************
+std::vector<std::unique_ptr<Point const>> circle_to_points(Point const& center, double radius, std::size_t n_slices_per_quarter = 9);
+
 } // namespace domain

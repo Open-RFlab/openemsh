@@ -72,6 +72,7 @@ public:
 	void parse_primitive_box(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 	void parse_primitive_linpoly(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 	void parse_primitive_polygon(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
+	void parse_primitive_shpere(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 
 private:
 };
@@ -223,10 +224,12 @@ bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_pt
 	} else if(node.name() == "Polygon"s) {
 		parse_primitive_polygon(node, material, name);
 		return true;
+	} else if(node.name() == "Sphere"s) {
+		parse_primitive_shpere(node, material, name);
+		return true;
 	} else if(node.name() == "Polyhedron"s
 	       || node.name() == "PolyhedronReader"s
 	       || node.name() == "RotPoly"s
-	       || node.name() == "Sphere"s
 	       || node.name() == "Cylinder"s
 	       || node.name() == "CylindricalShell"
 	       || node.name() == "Point"s
@@ -363,6 +366,25 @@ void ParserFromCsx::Pimpl::parse_primitive_polygon(pugi::xml_node const& node, s
 
 	board.add_polygon(plane.value(), material, name, priority, { elevation, elevation }, std::move(points));
 	board.add_fixed_meshline_policy(normal.value(), elevation);
+}
+
+//******************************************************************************
+void ParserFromCsx::Pimpl::parse_primitive_shpere(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name) {
+	size_t priority = node.attribute("Priority").as_uint();
+	double radius = node.attribute("Radius").as_double();
+	pugi::xml_node node_center = node.child("Center");
+	Point3D center(
+		node_center.attribute("X").as_double(),
+		node_center.attribute("Y").as_double(),
+		node_center.attribute("Z").as_double());
+
+	// TODO Z placement here is the bounding box
+	if(params.with_yz)
+		board.add_polygon(YZ, material, name, priority, { center.x - radius, center.x + radius }, circle_to_points({ center.y, center.z }, radius));
+	if(params.with_zx)
+		board.add_polygon(ZX, material, name, priority, { center.y - radius, center.y + radius }, circle_to_points({ center.z, center.x }, radius));
+	if(params.with_xy)
+		board.add_polygon(XY, material, name, priority, { center.z - radius, center.z + radius }, circle_to_points({ center.x, center.y }, radius));
 }
 
 //******************************************************************************
