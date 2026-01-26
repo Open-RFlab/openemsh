@@ -22,6 +22,14 @@
           <Sphere Priority="1" Radius="5">
             <Center X="50" Y="50" Z="10"/>
           </Sphere>
+          <Cylinder Priority="1" Radius="6">
+            <P1 X="65" Y="65" Z="-10"/>
+            <P2 X="65" Y="65" Z="-20"/>
+          </Cylinder>
+          <Cylinder Priority="1" Radius="6">
+            <P1 X="80" Y="70" Z="30"/>
+            <P2 X="80" Y="80" Z="40"/>
+          </Cylinder>
         </Primitives>
       </Metal>
     </Properties>

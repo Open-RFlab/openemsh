@@ -73,14 +73,22 @@ public:
 	void parse_primitive_linpoly(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 	void parse_primitive_polygon(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 	void parse_primitive_shpere(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
+	void parse_primitive_cylinder(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 
 private:
+	void warn_unsupported(string const& primitive_type, string const& primitive_name);
 };
 
 //******************************************************************************
 ParserFromCsx::Pimpl::Pimpl(ParserFromCsx::Params const& params)
 : params(params)
 {}
+
+//******************************************************************************
+void ParserFromCsx::Pimpl::warn_unsupported(string const& primitive_type, string const& primitive_name) {
+	warning_unsupported_primitives_types.emplace(primitive_type);
+	warning_unsupported_primitives_names.emplace(primitive_name);
+}
 
 //******************************************************************************
 expected<void, string> ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& node) {
@@ -209,11 +217,6 @@ bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_pt
 	string property_name(node.parent().parent().attribute("Name").as_string());
 	string name(property_name + "::" + to_string(primitives_ids.at(node)));
 
-	auto const warn_unsupported = [this](string const& primitive_type, string const& primitive_name) {
-		warning_unsupported_primitives_types.emplace(primitive_type);
-		warning_unsupported_primitives_names.emplace(primitive_name);
-	};
-
 	using pugi::char_t;
 	if(node.name() == "Box"s) {
 		parse_primitive_box(node, material, name);
@@ -227,11 +230,14 @@ bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_pt
 	} else if(node.name() == "Sphere"s) {
 		parse_primitive_shpere(node, material, name);
 		return true;
+	} else if(node.name() == "Cylinder"s) {
+		parse_primitive_cylinder(node, material, name);
+		return true;
 	} else if(node.name() == "Polyhedron"s
 	       || node.name() == "PolyhedronReader"s
 	       || node.name() == "RotPoly"s
-	       || node.name() == "Cylinder"s
-	       || node.name() == "CylindricalShell"
+	       || node.name() == "SphericalShell"s
+	       || node.name() == "CylindricalShell"s
 	       || node.name() == "Point"s
 	       || node.name() == "Curve"s
 	       || node.name() == "Wire"s
@@ -385,6 +391,72 @@ void ParserFromCsx::Pimpl::parse_primitive_shpere(pugi::xml_node const& node, sh
 		board.add_polygon(ZX, material, name, priority, { center.y - radius, center.y + radius }, circle_to_points({ center.z, center.x }, radius));
 	if(params.with_xy)
 		board.add_polygon(XY, material, name, priority, { center.z - radius, center.z + radius }, circle_to_points({ center.x, center.y }, radius));
+}
+
+//******************************************************************************
+void ParserFromCsx::Pimpl::parse_primitive_cylinder(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name) {
+	size_t priority = node.attribute("Priority").as_uint();
+	double radius = node.attribute("Radius").as_double();
+	pugi::xml_node node_p1 = node.child("P1");
+	pugi::xml_node node_p2 = node.child("P2");
+	Point3D p1(
+		node_p1.attribute("X").as_double(),
+		node_p1.attribute("Y").as_double(),
+		node_p1.attribute("Z").as_double());
+	Point3D p2(
+		node_p2.attribute("X").as_double(),
+		node_p2.attribute("Y").as_double(),
+		node_p2.attribute("Z").as_double());
+
+	// If orthogonal circle + polygons.
+	if(p1.y == p2.y && p1.z == p2.z) {
+		if(params.with_yz)
+			board.add_polygon(YZ, material, name, priority, { p1.x, p2.x }, circle_to_points({ p1.y, p1.z }, radius));
+		if(params.with_zx)
+			// TODO Z placement here is the bounding box
+			board.add_polygon_from_box(ZX, material, name, priority,
+				{ p1.y, p2.y },
+				{ p1.z - radius/2, p1.x },
+				{ p2.z + radius/2, p2.x });
+		if(params.with_xy)
+			// TODO Z placement here is the bounding box
+			board.add_polygon_from_box(XY, material, name, priority,
+				{ p1.z, p2.z },
+				{ p1.x, p1.y - radius/2 },
+				{ p2.x, p2.y + radius/2 });
+	} else if(p1.z == p2.z && p1.x == p2.x) {
+		if(params.with_zx)
+			board.add_polygon(ZX, material, name, priority, { p1.y, p2.y }, circle_to_points({ p1.z, p1.x }, radius));
+		if(params.with_xy)
+			// TODO Z placement here is the bounding box
+			board.add_polygon_from_box(XY, material, name, priority,
+				{ p1.z, p2.z },
+				{ p1.x - radius/2, p1.y },
+				{ p2.x + radius/2, p2.y });
+		if(params.with_yz)
+			// TODO Z placement here is the bounding box
+			board.add_polygon_from_box(YZ, material, name, priority,
+				{ p1.x, p2.x },
+				{ p1.y, p1.z - radius/2 },
+				{ p2.y, p2.z + radius/2 });
+	} else if(p1.x == p2.x && p1.y == p2.y) {
+		if(params.with_xy)
+			board.add_polygon(XY, material, name, priority, { p1.z, p2.z }, circle_to_points({ p1.x, p1.y }, radius));
+		if(params.with_yz)
+			// TODO Z placement here is the bounding box
+			board.add_polygon_from_box(YZ, material, name, priority,
+				{ p1.x, p2.x },
+				{ p1.y - radius/2, p1.z },
+				{ p2.y + radius/2, p2.z });
+		if(params.with_zx)
+			// TODO Z placement here is the bounding box
+			board.add_polygon_from_box(ZX, material, name, priority,
+				{ p1.y, p2.y },
+				{ p1.z, p1.x - radius/2 },
+				{ p2.z, p2.x + radius/2 });
+	} else {
+		warn_unsupported(format("{} (with diagonal axis)", node.name()), name);
+	}
 }
 
 //******************************************************************************
