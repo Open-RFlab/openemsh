@@ -22,6 +22,7 @@
             <P1 X="0" Y="0" Z="1"/>
             <P2 X="-20" Y="-20" Z="-1"/>
           </Box>
+          <Point Priority="1" X="1" Y="1" Z="1"/>
           <LinPoly Priority="1" Elevation="1" Length="3" NormDir="2">
             <Vertex X1="10" X2="10" />
             <Vertex X1="10" X2="20" />

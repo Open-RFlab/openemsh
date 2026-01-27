@@ -75,6 +75,7 @@ public:
 	void parse_primitive_polygon(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 	void parse_primitive_shpere(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 	void parse_primitive_cylinder(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
+	void parse_primitive_point(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 
 private:
 	void warn_unsupported(string const& primitive_type, string const& primitive_name);
@@ -239,12 +240,14 @@ bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_pt
 	} else if(node.name() == "Cylinder"s) {
 		parse_primitive_cylinder(node, material, name);
 		return true;
+	} else if(node.name() == "Point"s) {
+		parse_primitive_point(node, material, name);
+		return true;
 	} else if(node.name() == "Polyhedron"s
 	       || node.name() == "PolyhedronReader"s
 	       || node.name() == "RotPoly"s
 	       || node.name() == "SphericalShell"s
 	       || node.name() == "CylindricalShell"s
-	       || node.name() == "Point"s
 	       || node.name() == "Curve"s
 	       || node.name() == "Wire"s
 	       || node.name() == "MultiBox"s
@@ -462,6 +465,32 @@ void ParserFromCsx::Pimpl::parse_primitive_cylinder(pugi::xml_node const& node, 
 				{ p2.z, p2.x + radius/2 });
 	} else {
 		warn_unsupported(format("{} (with diagonal axis)", node.name()), name);
+	}
+}
+
+//******************************************************************************
+void ParserFromCsx::Pimpl::parse_primitive_point(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name) {
+//	size_t priority = node.attribute("Priority").as_uint();
+	Point3D p(
+		node.attribute("X").as_double(),
+		node.attribute("Y").as_double(),
+		node.attribute("Z").as_double());
+
+	// TODO board.add_point()
+	if(params.with_yz) {
+//		board.add_point(YZ, material, name, /*priority,*/ { p.y, p.z });
+		board.add_fixed_meshline_policy(Y, p.y);
+		board.add_fixed_meshline_policy(Z, p.z);
+	}
+	if(params.with_zx) {
+//		board.add_point(ZX, material, name, /*priority,*/ { p.z, p.x });
+		board.add_fixed_meshline_policy(Z, p.z);
+		board.add_fixed_meshline_policy(X, p.x);
+	}
+	if(params.with_xy) {
+//		board.add_point(XY, material, name, /*priority,*/ { p.x, p.y });
+		board.add_fixed_meshline_policy(X, p.x);
+		board.add_fixed_meshline_policy(Y, p.y);
 	}
 }
 
