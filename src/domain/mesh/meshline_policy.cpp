@@ -38,7 +38,8 @@ MeshlinePolicy::MeshlinePolicy(
 
 //******************************************************************************
 optional<Meshline> MeshlinePolicy::mesh() {
-	if(get_current_state().policy == Policy::ONELINE)
+	auto const& state = get_current_state();
+	if(state.is_enabled && state.policy == Policy::ONELINE)
 		return Meshline(coord, this);
 	else
 		return nullopt;
