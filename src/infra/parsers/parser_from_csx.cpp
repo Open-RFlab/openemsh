@@ -76,6 +76,7 @@ public:
 	void parse_primitive_shpere(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 	void parse_primitive_cylinder(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 	void parse_primitive_point(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
+	void parse_primitive_curve(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 
 private:
 	void warn_unsupported(string const& primitive_type, string const& primitive_name);
@@ -243,12 +244,14 @@ bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_pt
 	} else if(node.name() == "Point"s) {
 		parse_primitive_point(node, material, name);
 		return true;
+	} else if(node.name() == "Curve"s) {
+		parse_primitive_curve(node, material, name);
+		return true;
 	} else if(node.name() == "Polyhedron"s
 	       || node.name() == "PolyhedronReader"s
 	       || node.name() == "RotPoly"s
 	       || node.name() == "SphericalShell"s
 	       || node.name() == "CylindricalShell"s
-	       || node.name() == "Curve"s
 	       || node.name() == "Wire"s
 	       || node.name() == "MultiBox"s
 	       || node.name() == "User-Defined"s) {
@@ -491,6 +494,75 @@ void ParserFromCsx::Pimpl::parse_primitive_point(pugi::xml_node const& node, sha
 //		board.add_point(XY, material, name, /*priority,*/ { p.x, p.y });
 		board.add_fixed_meshline_policy(X, p.x);
 		board.add_fixed_meshline_policy(Y, p.y);
+	}
+}
+
+//******************************************************************************
+void ParserFromCsx::Pimpl::parse_primitive_curve(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name) {
+	size_t priority = node.attribute("Priority").as_uint();
+
+	vector<Point3D> vertices;
+	for(auto const& vertex : node.children("Vertex")) {
+		vertices.emplace_back(
+			vertex.attribute("X").as_double(),
+			vertex.attribute("Y").as_double(),
+			vertex.attribute("Z").as_double());
+	}
+
+	// TODO support onepoint polygon and open polygons (not to double points, edges & angles)
+	if(params.with_yz) {
+		// TODO Z placement here is the bounding box
+		Polygon::RangeZ z_placement {
+			ranges::min(vertices, [&](Point3D const& a, Point3D const& b) { return a.x < b.x; }).x,
+			ranges::max(vertices, [&](Point3D const& a, Point3D const& b) { return a.x > b.x; }).x
+		};
+		vector<unique_ptr<Point const>> points;
+		for(auto const& vertex : vertices)
+			points.push_back(make_unique<Point const>(
+				vertex.y,
+				vertex.z));
+		for(auto const& vertex : vertices | views::drop(1) | views::reverse | views::drop(1))
+			points.push_back(make_unique<Point const>(
+				vertex.y,
+				vertex.z));
+		points.shrink_to_fit();
+		board.add_polygon(YZ, material, name, priority, z_placement, std::move(points));
+	}
+	if(params.with_zx) {
+		// TODO Z placement here is the bounding box
+		Polygon::RangeZ z_placement {
+			ranges::min(vertices, [&](Point3D const& a, Point3D const& b) { return a.y < b.y; }).y,
+			ranges::max(vertices, [&](Point3D const& a, Point3D const& b) { return a.y > b.y; }).y
+		};
+		vector<unique_ptr<Point const>> points;
+		for(auto const& vertex : vertices)
+			points.push_back(make_unique<Point const>(
+				vertex.z,
+				vertex.x));
+		for(auto const& vertex : vertices | views::drop(1) | views::reverse | views::drop(1))
+			points.push_back(make_unique<Point const>(
+				vertex.z,
+				vertex.x));
+		points.shrink_to_fit();
+		board.add_polygon(ZX, material, name, priority, z_placement, std::move(points));
+	}
+	if(params.with_xy) {
+		// TODO Z placement here is the bounding box
+		Polygon::RangeZ z_placement {
+			ranges::min(vertices, [&](Point3D const& a, Point3D const& b) { return a.z < b.z; }).z,
+			ranges::max(vertices, [&](Point3D const& a, Point3D const& b) { return a.z > b.z; }).z
+		};
+		vector<unique_ptr<Point const>> points;
+		for(auto const& vertex : vertices)
+			points.push_back(make_unique<Point const>(
+				vertex.x,
+				vertex.y));
+		for(auto const& vertex : vertices | views::drop(1) | views::reverse | views::drop(1))
+			points.push_back(make_unique<Point const>(
+				vertex.x,
+				vertex.y));
+		points.shrink_to_fit();
+		board.add_polygon(XY, material, name, priority, z_placement, std::move(points));
 	}
 }
 

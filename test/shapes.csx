@@ -24,9 +24,9 @@
           </Box>
           <Point Priority="1" X="1" Y="1" Z="1"/>
           <LinPoly Priority="1" Elevation="1" Length="3" NormDir="2">
-            <Vertex X1="10" X2="10" />
-            <Vertex X1="10" X2="20" />
-            <Vertex X1="30" X2="20" />
+            <Vertex X1="10" X2="10"/>
+            <Vertex X1="10" X2="20"/>
+            <Vertex X1="30" X2="20"/>
           </LinPoly>
           <Sphere Priority="1" Radius="5">
             <Center X="50" Y="50" Z="10"/>
@@ -39,6 +39,12 @@
             <P1 X="80" Y="70" Z="30"/>
             <P2 X="80" Y="80" Z="40"/>
           </Cylinder>
+          <Curve Priority="1">
+            <Vertex X="90" Y="90" Z="50"/>
+            <Vertex X="95" Y="95" Z="50"/>
+            <Vertex X="100" Y="90" Z="50"/>
+            <Vertex X="105" Y="95" Z="55"/>
+          </Curve>
         </Primitives>
       </Metal>
     </Properties>
