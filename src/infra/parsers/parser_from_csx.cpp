@@ -6,6 +6,7 @@
 
 #include <exception>
 #include <format>
+#include <limits>
 #include <map>
 #include <optional>
 #include <ranges>
@@ -498,7 +499,7 @@ void ParserFromCsx::Pimpl::parse_primitive_cylinder(pugi::xml_node const& node, 
 
 //******************************************************************************
 void ParserFromCsx::Pimpl::parse_primitive_point(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name) {
-//	size_t priority = node.attribute("Priority").as_uint();
+//	size_t priority = numeric_limits<size_t>::max();
 	Point3D p(
 		node.attribute("X").as_double(),
 		node.attribute("Y").as_double(),
@@ -524,8 +525,7 @@ void ParserFromCsx::Pimpl::parse_primitive_point(pugi::xml_node const& node, sha
 
 //******************************************************************************
 void ParserFromCsx::Pimpl::parse_primitive_curve(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name) {
-	size_t priority = node.attribute("Priority").as_uint();
-
+	size_t priority = numeric_limits<size_t>::max();
 	vector<Point3D> vertices;
 	for(auto const& vertex : node.children("Vertex")) {
 		vertices.emplace_back(
