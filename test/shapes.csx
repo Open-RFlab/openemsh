@@ -10,6 +10,14 @@
     <Properties>
       <Metal Name="Shape">
         <Primitives>
+          <MultiBox Priority="1">
+            <StartP X="-60" Y="-60" Z="-2"/>
+            <EndP X="-55" Y="-55" Z="-7"/>
+            <StartP X="-50" Y="-50" Z="-2"/>
+            <EndP X="-45" Y="-45" Z="-7"/>
+            <StartP X="-40" Y="-40" Z="-2"/>
+            <EndP X="-35" Y="-35" Z="-7"/>
+          </MultiBox>
           <Box Priority="1">
             <P1 X="-25" Y="-25" Z="1"/>
             <P2 X="-30" Y="-30" Z="-1"/>

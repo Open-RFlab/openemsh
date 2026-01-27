@@ -71,6 +71,7 @@ public:
 
 	bool parse_primitive(pugi::xml_node const& node, shared_ptr<Material> const& material);
 	void parse_primitive_box(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
+	void parse_primitive_multibox(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 	void parse_primitive_linpoly(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 	void parse_primitive_polygon(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 	void parse_primitive_shpere(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
@@ -229,6 +230,9 @@ bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_pt
 	if(node.name() == "Box"s) {
 		parse_primitive_box(node, material, name);
 		return true;
+	} else if(node.name() == "MultiBox"s) {
+		parse_primitive_multibox(node, material, name);
+		return true;
 	} else if(node.name() == "LinPoly"s) {
 		parse_primitive_linpoly(node, material, name);
 		return true;
@@ -253,7 +257,6 @@ bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_pt
 	       || node.name() == "SphericalShell"s
 	       || node.name() == "CylindricalShell"s
 	       || node.name() == "Wire"s
-	       || node.name() == "MultiBox"s
 	       || node.name() == "User-Defined"s) {
 		warn_unsupported(node.name(), name);
 	}
@@ -280,6 +283,27 @@ void ParserFromCsx::Pimpl::parse_primitive_box(pugi::xml_node const& node, share
 	if(params.with_xy)
 		board.add_polygon_from_box(XY, material, name, priority, { p1.z, p2.z }, { p1.x, p1.y }, { p2.x, p2.y });
 	// TODO if property == ConductingSheet : add_fixed_meshline_policy()
+}
+
+//******************************************************************************
+void ParserFromCsx::Pimpl::parse_primitive_multibox(pugi::xml_node const& node, shared_ptr<Material> const& material, string name) {
+	size_t priority = node.attribute("Priority").as_uint();
+	for(auto const& [s, e] : views::zip(node.children("StartP"), node.children("EndP"))) {
+		Point3D p1(
+			s.attribute("X").as_double(),
+			s.attribute("Y").as_double(),
+			s.attribute("Z").as_double());
+		Point3D p2(
+			e.attribute("X").as_double(),
+			e.attribute("Y").as_double(),
+			e.attribute("Z").as_double());
+		if(params.with_yz)
+			board.add_polygon_from_box(YZ, material, name, priority, { p1.x, p2.x }, { p1.y, p1.z }, { p2.y, p2.z });
+		if(params.with_zx)
+			board.add_polygon_from_box(ZX, material, name, priority, { p1.y, p2.y }, { p1.z, p1.x }, { p2.z, p2.x });
+		if(params.with_xy)
+			board.add_polygon_from_box(XY, material, name, priority, { p1.z, p2.z }, { p1.x, p1.y }, { p2.x, p2.y });
+	}
 }
 
 //******************************************************************************
