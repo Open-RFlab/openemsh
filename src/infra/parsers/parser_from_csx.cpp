@@ -187,7 +187,11 @@ shared_ptr<Material> ParserFromCsx::Pimpl::parse_property(pugi::xml_node const& 
 		auto fill = parse_color(node.child("FillColor"));
 		auto edge = parse_color(node.child("EdgeColor"));
 
-		if(node.name() == "Material"s) {
+		if(node.name() == "Material"s
+		|| node.name() == "DispersiveMaterial"s
+		|| node.name() == "DebyeMaterial"s
+		|| node.name() == "LorentzMaterial"s
+		|| node.name() == "DiscMaterial"s) {
 			// https://github.com/thliebig/openEMS-Project/discussions/347
 			// Currently do not take care of Isotropy=false
 			// as_double() selects the first term and ditch the part after
@@ -204,11 +208,8 @@ shared_ptr<Material> ParserFromCsx::Pimpl::parse_property(pugi::xml_node const& 
 		} else if(node.name() == "Excitation"s) {
 		} else if(node.name() == "ProbeBox"s) {
 		} else if(node.name() == "DumpBox"s) {
-		} else if(node.name() == "DebyeMaterial"s) {
-		} else if(node.name() == "LorentzMaterial"s) {
 		} else if(node.name() == "ResBox"s) {
 		} else if(node.name() == "Unknown"s) {
-		} else if(node.name() == "DiscMaterial"s) {
 		}
 	}
 
