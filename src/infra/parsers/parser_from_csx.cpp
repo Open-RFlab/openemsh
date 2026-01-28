@@ -319,7 +319,7 @@ void ParserFromCsx::Pimpl::parse_primitive_box(pugi::xml_node const& node, share
 //******************************************************************************
 void ParserFromCsx::Pimpl::parse_primitive_multibox(pugi::xml_node const& node, shared_ptr<Material> const& material, string name) {
 	size_t priority = parse_priority(node, material);
-	for(auto const& [s, e] : views::zip(node.children("StartP"), node.children("EndP"))) {
+	for(auto const& [s, e] : views::zip(node.children("StartP"), node.children("EndP")) | views::as_const) {
 		Point3D p1(
 			s.attribute("X").as_double(),
 			s.attribute("Y").as_double(),
@@ -637,7 +637,7 @@ expected<shared_ptr<Board>, string> ParserFromCsx::run(std::filesystem::path con
 	ParserFromCsx parser(input, std::move(params));
 	TRY(parser.parse());
 	override_domain_params(parser.domain_params);
-	for(auto& [axis, coord] : parser.domain_params.input_fixed_meshlines)
+	for(auto const& [axis, coord] : parser.domain_params.input_fixed_meshlines)
 		parser.pimpl->board.add_fixed_meshline_policy(axis, coord);
 	parser.domain_params.input_fixed_meshlines.clear();
 	return parser.output();

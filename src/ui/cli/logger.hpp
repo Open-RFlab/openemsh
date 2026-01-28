@@ -13,7 +13,7 @@ namespace ui::cli {
 //******************************************************************************
 class LoggerSink final : public Logger::ISink {
 public:
-	LoggerSink(bool verbose);
+	explicit LoggerSink(bool verbose);
 	Logger::UserAction log(Logger::LogEvent const& log) const override;
 
 private:
