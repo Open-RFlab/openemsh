@@ -64,6 +64,13 @@ expected<double, string> str_to_double(string_view const& str) {
 }
 
 //******************************************************************************
+size_t parse_priority(pugi::xml_node const& node, shared_ptr<Material> const& material) {
+	return (material && material->type == Material::Type::PORT)
+	     ? numeric_limits<size_t>::max()
+	     : node.attribute("Priority").as_uint();
+}
+
+//******************************************************************************
 class ParserFromCsx::Pimpl {
 public:
 	ParserFromCsx::Params const& params;
@@ -217,8 +224,11 @@ shared_ptr<Material> ParserFromCsx::Pimpl::parse_property(pugi::xml_node const& 
 			double thickness = node.attribute("Thickness").as_double();
 			return make_shared<Material>(Material::Type::CONDUCTOR, name, fill, edge);
 		} else if(node.name() == "LumpedElement"s) {
+			return make_shared<Material>(Material::Type::PORT, name, fill, edge);
 		} else if(node.name() == "Excitation"s) {
+			return make_shared<Material>(Material::Type::PORT, name, fill, edge);
 		} else if(node.name() == "ProbeBox"s) {
+			return make_shared<Material>(Material::Type::PORT, name, fill, edge);
 		} else if(node.name() == "DumpBox"s) {
 		} else if(node.name() == "ResBox"s) {
 		} else if(node.name() == "Unknown"s) {
@@ -278,7 +288,7 @@ bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_pt
 
 //******************************************************************************
 void ParserFromCsx::Pimpl::parse_primitive_box(pugi::xml_node const& node, shared_ptr<Material> const& material, string name) {
-	size_t priority = node.attribute("Priority").as_uint();
+	size_t priority = parse_priority(node, material);
 	pugi::xml_node node_p1 = node.child("P1");
 	pugi::xml_node node_p2 = node.child("P2");
 	Point3D p1(
@@ -300,7 +310,7 @@ void ParserFromCsx::Pimpl::parse_primitive_box(pugi::xml_node const& node, share
 
 //******************************************************************************
 void ParserFromCsx::Pimpl::parse_primitive_multibox(pugi::xml_node const& node, shared_ptr<Material> const& material, string name) {
-	size_t priority = node.attribute("Priority").as_uint();
+	size_t priority = parse_priority(node, material);
 	for(auto const& [s, e] : views::zip(node.children("StartP"), node.children("EndP"))) {
 		Point3D p1(
 			s.attribute("X").as_double(),
@@ -321,7 +331,7 @@ void ParserFromCsx::Pimpl::parse_primitive_multibox(pugi::xml_node const& node, 
 
 //******************************************************************************
 void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, shared_ptr<Material> const& material, string name) {
-	size_t priority = node.attribute("Priority").as_uint();
+	size_t priority = parse_priority(node, material);
 	double elevation = node.attribute("Elevation").as_double(); // offset in normdir
 	double length = node.attribute("Length").as_double(); // height in normdir
 	size_t normdir = node.attribute("NormDir").as_uint(); // (0->x, 1->y, 2->z)
@@ -403,7 +413,7 @@ void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, s
 
 //******************************************************************************
 void ParserFromCsx::Pimpl::parse_primitive_polygon(pugi::xml_node const& node, shared_ptr<Material> const& material, string name) {
-	size_t priority = node.attribute("Priority").as_uint();
+	size_t priority = parse_priority(node, material);
 	double elevation = node.attribute("Elevation").as_double(); // offset in normdir
 	size_t normdir = node.attribute("NormDir").as_uint(); // (0->x, 1->y, 2->z)
 	optional<Plane> plane = to_plane(normdir);
@@ -425,7 +435,7 @@ void ParserFromCsx::Pimpl::parse_primitive_polygon(pugi::xml_node const& node, s
 
 //******************************************************************************
 void ParserFromCsx::Pimpl::parse_primitive_shpere(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name) {
-	size_t priority = node.attribute("Priority").as_uint();
+	size_t priority = parse_priority(node, material);
 	double radius = node.attribute("Radius").as_double();
 	pugi::xml_node node_center = node.child("Center");
 	Point3D center(
@@ -444,7 +454,7 @@ void ParserFromCsx::Pimpl::parse_primitive_shpere(pugi::xml_node const& node, sh
 
 //******************************************************************************
 void ParserFromCsx::Pimpl::parse_primitive_cylinder(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name) {
-	size_t priority = node.attribute("Priority").as_uint();
+	size_t priority = parse_priority(node, material);
 	double radius = node.attribute("Radius").as_double();
 	pugi::xml_node node_p1 = node.child("P1");
 	pugi::xml_node node_p2 = node.child("P2");

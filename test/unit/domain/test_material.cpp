@@ -16,9 +16,35 @@ using namespace domain;
 
 //******************************************************************************
 SCENARIO("std::strong_ordering Material::operator<=>(Material const& other) const noexcept", "[domain][material]") {
+	Material port(Material::Type::PORT, "");
 	Material conductor(Material::Type::CONDUCTOR, "");
 	Material dielectric(Material::Type::DIELECTRIC, "");
 	Material air(Material::Type::AIR, "");
+	WHEN("Comparing PORT to PORT") {
+		THEN("Should return equivalent") {
+			REQUIRE(port <=> port == std::strong_ordering::equivalent);
+		}
+	}
+	WHEN("Comparing PORT to CONDUCTOR") {
+		THEN("Should return greater") {
+			REQUIRE(port <=> conductor == std::strong_ordering::greater);
+		}
+	}
+	WHEN("Comparing PORT to DIELECTRIC") {
+		THEN("Should return greater") {
+			REQUIRE(port <=> dielectric == std::strong_ordering::greater);
+		}
+	}
+	WHEN("Comparing PORT to AIR") {
+		THEN("Should return greater") {
+			REQUIRE(port <=> air == std::strong_ordering::greater);
+		}
+	}
+	WHEN("Comparing CONDUCTOR to PORT") {
+		THEN("Should return equivalent") {
+			REQUIRE(conductor <=> port == std::strong_ordering::less);
+		}
+	}
 	WHEN("Comparing CONDUCTOR to CONDUCTOR") {
 		THEN("Should return equivalent") {
 			REQUIRE(conductor <=> conductor == std::strong_ordering::equivalent);
@@ -39,6 +65,11 @@ SCENARIO("std::strong_ordering Material::operator<=>(Material const& other) cons
 			REQUIRE(dielectric <=> conductor == std::strong_ordering::less);
 		}
 	}
+	WHEN("Comparing DIELECTRIC to PORT") {
+		THEN("Should return less") {
+			REQUIRE(dielectric <=> port == std::strong_ordering::less);
+		}
+	}
 	WHEN("Comparing DIELECTRIC to DIELECTRIC") {
 		THEN("Should return equivalent") {
 			REQUIRE(dielectric <=> dielectric == std::strong_ordering::equivalent);
@@ -47,6 +78,11 @@ SCENARIO("std::strong_ordering Material::operator<=>(Material const& other) cons
 	WHEN("Comparing DIELECTRIC to AIR") {
 		THEN("Should return greater") {
 			REQUIRE(dielectric <=> air == std::strong_ordering::greater);
+		}
+	}
+	WHEN("Comparing AIR to PORT") {
+		THEN("Should return less") {
+			REQUIRE(air <=> port == std::strong_ordering::less);
 		}
 	}
 	WHEN("Comparing AIR to CONDUCTOR") {

@@ -38,8 +38,17 @@ Material::Material(Type type, string const& name, optional<Color> const& fill_co
 //******************************************************************************
 strong_ordering Material::operator<=>(Material const& other) const noexcept {
 	switch(type) {
+	case Type::PORT:
+		switch(other.type) {
+		case Type::PORT: return strong_ordering::equivalent;
+		case Type::CONDUCTOR: return strong_ordering::greater;
+		case Type::DIELECTRIC: return strong_ordering::greater;
+		case Type::AIR: return strong_ordering::greater;
+		default: ::unreachable();
+		}
 	case Type::CONDUCTOR:
 		switch(other.type) {
+		case Type::PORT: return strong_ordering::less;
 		case Type::CONDUCTOR: return strong_ordering::equivalent;
 		case Type::DIELECTRIC: return strong_ordering::greater;
 		case Type::AIR: return strong_ordering::greater;
@@ -47,6 +56,7 @@ strong_ordering Material::operator<=>(Material const& other) const noexcept {
 		}
 	case Type::DIELECTRIC:
 		switch(other.type) {
+		case Type::PORT: return strong_ordering::less;
 		case Type::CONDUCTOR: return strong_ordering::less;
 		case Type::DIELECTRIC: return strong_ordering::equivalent;
 		case Type::AIR: return strong_ordering::greater;
@@ -54,6 +64,7 @@ strong_ordering Material::operator<=>(Material const& other) const noexcept {
 		}
 	case Type::AIR:
 		switch(other.type) {
+		case Type::PORT: return strong_ordering::less;
 		case Type::CONDUCTOR: return strong_ordering::less;
 		case Type::DIELECTRIC: return strong_ordering::less;
 		case Type::AIR: return strong_ordering::equivalent;

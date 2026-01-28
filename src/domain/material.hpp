@@ -18,6 +18,7 @@ public:
 
 	enum class Type {
 //		DUMP,
+		PORT,
 //		PEC,
 		CONDUCTOR,
 		DIELECTRIC,
