@@ -33,6 +33,7 @@ void ConflictColinearEdges::append(Edge* edge, Timepoint* t) {
 void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manager) {
 	size_t normal_min = 0;
 	size_t normal_max = 0;
+	bool must_be_oneline = false;
 
 	auto const& s = get_current_state();
 
@@ -49,15 +50,21 @@ void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manage
 		case Normal::YMIN:
 		case Normal::ZMIN:
 			++normal_min;
-			break;
+			continue;
 		case Normal::XMAX:
 		case Normal::YMAX:
 		case Normal::ZMAX:
 			++normal_max;
+			continue;
+		case Normal::NONE:
+			must_be_oneline = true;
 			break;
 		default:
-			break;
+			::unreachable();
 		}
+
+		if(must_be_oneline)
+			break;
 	}
 
 	optional<Coord> const coord = domain::coord(s.edges.front()->p0(), s.edges.front()->axis);
@@ -78,7 +85,11 @@ void ConflictColinearEdges::auto_solve(MeshlinePolicyManager& line_policy_manage
 	};
 
 	if(coord) {
-		if(normal_min && normal_max) {
+		if(must_be_oneline) {
+			add_policy(
+				MeshlinePolicy::Policy::ONELINE,
+				MeshlinePolicy::Normal::NONE);
+		} else if(normal_min && normal_max) {
 			add_policy(
 				MeshlinePolicy::Policy::HALFS,
 				MeshlinePolicy::Normal::NONE);

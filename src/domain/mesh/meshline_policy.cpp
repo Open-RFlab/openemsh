@@ -23,14 +23,12 @@ MeshlinePolicy::MeshlinePolicy(
 		Coord const coord,
 		Timepoint* t,
 		vector<IMeshLineOrigin*> const& origins,
-		bool const is_enabled,
-		double const res_factor)
+		bool const is_enabled)
 : Originator(t, {
 	.policy = policy,
 	.normal = normal,
 	.is_enabled = is_enabled,
-	.res_factor = res_factor,
-	.d = global_params->get_current_state().dmax / res_factor,
+	.d = global_params->get_current_state().dmax / 2, // TODO this seems to help while center of intervals is buggy
 	.origins = origins
 })
 , axis(axis)
@@ -40,7 +38,8 @@ MeshlinePolicy::MeshlinePolicy(
 
 //******************************************************************************
 optional<Meshline> MeshlinePolicy::mesh() {
-	if(get_current_state().policy == Policy::ONELINE)
+	auto const& state = get_current_state();
+	if(state.is_enabled && state.policy == Policy::ONELINE)
 		return Meshline(coord, this);
 	else
 		return nullopt;

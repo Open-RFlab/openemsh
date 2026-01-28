@@ -77,8 +77,7 @@ optional<array<MeshlinePolicy*, 2>> detect_closest_meshline_policies(
 
 	erase_if(dimension,
 		[](MeshlinePolicy const* a) {
-			return (!a->get_current_state().is_enabled)
-			    || a->get_current_state().policy == MeshlinePolicy::Policy::ONELINE;
+			return (!a->get_current_state().is_enabled);
 		});
 
 	ranges::sort(dimension,
@@ -90,7 +89,7 @@ optional<array<MeshlinePolicy*, 2>> detect_closest_meshline_policies(
 	array<MeshlinePolicy*, 2> closest;
 
 	for(size_t i = 1; i < dimension.size(); ++i) {
-		Coord space(abs((double) (dimension[i]->coord - dimension[i-1]->coord)));
+		Coord space(distance(dimension[i-1]->coord, dimension[i]->coord));
 		if(space < smallest_space) {
 			smallest_space = space;
 			closest = { dimension[i-1], dimension[i] };

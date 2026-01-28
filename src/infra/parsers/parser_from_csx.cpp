@@ -4,9 +4,15 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <charconv>
+#include <format>
+#include <limits>
 #include <map>
 #include <optional>
+#include <ranges>
+#include <set>
 #include <string_view>
+#include <system_error>
 
 #include <pugixml.hpp>
 
@@ -19,6 +25,7 @@
 
 #include "parser_from_csx.hpp"
 #include "utils/expected_utils.hpp"
+#include "utils/logger.hpp"
 #include "utils/progress.hpp"
 #include "utils/unreachable.hpp"
 #include "utils/vector_utils.hpp"
@@ -47,6 +54,23 @@ constexpr optional<Plane> to_plane(size_t const normdir) {
 }
 
 //******************************************************************************
+expected<double, string> str_to_double(string_view const& str) {
+	double res;
+	auto [_, e] = std::from_chars(str.data(), str.data() + str.size(), res);
+	if(e == std::errc {})
+		return res;
+	else
+		return unexpected(make_error_code(e).message());
+}
+
+//******************************************************************************
+size_t parse_priority(pugi::xml_node const& node, shared_ptr<Material> const& material) {
+	return (material && material->type == Material::Type::PORT)
+	     ? numeric_limits<size_t>::max()
+	     : node.attribute("Priority").as_uint();
+}
+
+//******************************************************************************
 class ParserFromCsx::Pimpl {
 public:
 	ParserFromCsx::Params const& params;
@@ -54,17 +78,31 @@ public:
 	Board::Builder board;
 	domain::Params domain_params;
 
+	set<string> warning_unsupported_properties_types;
+	set<string> warning_unsupported_properties_names;
+	set<string> warning_unsupported_primitives_types;
+	set<string> warning_unsupported_primitives_names;
+
 	Pimpl(ParserFromCsx::Params const& params);
 
+	expected<void, string> parse_oemsh(pugi::xml_node const& node);
 	expected<void, string> parse_grid(pugi::xml_node const& node);
 
 	shared_ptr<Material> parse_property(pugi::xml_node const& node);
 
 	bool parse_primitive(pugi::xml_node const& node, shared_ptr<Material> const& material);
 	void parse_primitive_box(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
+	void parse_primitive_multibox(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 	void parse_primitive_linpoly(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
+	void parse_primitive_polygon(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
+	void parse_primitive_shpere(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
+	void parse_primitive_cylinder(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
+	void parse_primitive_point(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
+	void parse_primitive_curve(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 
 private:
+	void warn_unsupported_property(string const& property_type, string const& property_name);
+	void warn_unsupported_primitive(string const& primitive_type, string const& primitive_name);
 };
 
 //******************************************************************************
@@ -73,17 +111,70 @@ ParserFromCsx::Pimpl::Pimpl(ParserFromCsx::Params const& params)
 {}
 
 //******************************************************************************
+void ParserFromCsx::Pimpl::warn_unsupported_property(string const& primitive_type, string const& primitive_name) {
+	warning_unsupported_properties_types.emplace(primitive_type);
+	warning_unsupported_properties_names.emplace(primitive_name);
+}
+
+//******************************************************************************
+void ParserFromCsx::Pimpl::warn_unsupported_primitive(string const& primitive_type, string const& primitive_name) {
+	warning_unsupported_primitives_types.emplace(primitive_type);
+	warning_unsupported_primitives_names.emplace(primitive_name);
+}
+
+//******************************************************************************
+expected<void, string> ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& node) {
+	pugi::xml_node global_params = node.child("GlobalParams");
+	if(auto a = global_params.attribute("ProximityLimit"); a) domain_params.proximity_limit = a.as_double();
+	if(auto a = global_params.attribute("Smoothness"); a) domain_params.smoothness = a.as_double();
+	if(auto a = global_params.attribute("dmax"); a) domain_params.dmax = a.as_double();
+	if(auto a = global_params.attribute("lmin"); a) domain_params.lmin = a.as_uint();
+
+	pugi::xml_node fixed_meshlines = node.child("FixedMeshlines");
+	size_t delta_unit = fixed_meshlines.attribute("DeltaUnit").as_uint(1);
+	AxisSpace<string_view> lines = {
+		fixed_meshlines.child_value("XLines"),
+		fixed_meshlines.child_value("YLines"),
+		fixed_meshlines.child_value("ZLines")
+	};
+	for(Axis axis : AllAxis) {
+		for(auto const part : views::split(lines[axis], ',')) {
+			string_view str(part);
+			if(auto line = str_to_double(str); line.has_value())
+				board.add_fixed_meshline_policy(axis, delta_unit * line.value());
+			else
+				return unexpected(format("Invalid meshline value \"{}\": {}", str, line.error()));
+		}
+	}
+	return {};
+}
+
+//******************************************************************************
 expected<void, string> ParserFromCsx::Pimpl::parse_grid(pugi::xml_node const& node) {
 	std::size_t coord_system = node.attribute("CoordSystem").as_uint();
+	std::size_t delta_unit = node.attribute("DeltaUnit").as_uint(1);
 
 	if(coord_system == 0) {
 		// First step : into bool has_grid_already
 		pugi::xml_node grid = node.child("RectilinearGrid");
-		string_view x_lines = grid.child_value("XLines");
-		string_view y_lines = grid.child_value("YLines");
-		string_view z_lines = grid.child_value("ZLines");
-		domain_params.has_grid_already = !x_lines.empty() || !y_lines.empty() || !z_lines.empty();
-		// TODO Second step : into fixed MLP
+		AxisSpace<string_view> lines = {
+			grid.child_value("XLines"),
+			grid.child_value("YLines"),
+			grid.child_value("ZLines")
+		};
+		domain_params.has_grid_already = ranges::any_of(lines, [](auto const& str){ return !str.empty(); });
+		// Second step : into fixed MLP
+		if(params.keep_old_mesh) {
+			for(Axis axis : AllAxis) {
+				for(auto const part : views::split(lines[axis], ',')) {
+					string_view str(part);
+					if(auto line = str_to_double(str); line.has_value())
+						board.add_fixed_meshline_policy(axis, delta_unit * line.value());
+					else
+						return unexpected(format("Invalid meshline value \"{}\": {}", str, line.error()));
+				}
+			}
+		}
 		// TODO Third step : into vizualisable set of meshlines for comparison
 //	} else if(coord_system == 1) {
 	} else {
@@ -108,35 +199,48 @@ shared_ptr<Material> ParserFromCsx::Pimpl::parse_property(pugi::xml_node const& 
 			return nullopt;
 	};
 
-	auto fill = parse_color(node.child("FillColor"));
-	auto edge = parse_color(node.child("EdgeColor"));
+	auto const parse_material_property = [](pugi::xml_node const& node) -> array<double, 4> {
+		return {
+			node.attribute("Epsilon").as_double(Material::default_epsilon),
+			node.attribute("Mue").as_double(Material::default_mue),
+			node.attribute("Kappa").as_double(Material::default_kappa),
+			node.attribute("Sigma").as_double(Material::default_sigma)
+		};
+	};
 
-	if(node.name() == "Material"s) {
-		// https://github.com/thliebig/openEMS-Project/discussions/347
-		// Currently do not take care of Isotropy=false
-		// as_double() selects the first term and ditch the part after
-		bool isotropy = node.attribute("Isotropy").as_bool();
-		pugi::xml_node property = node.child("Property");
-		double epsilon = property.attribute("Epsilon").as_double(Material::default_epsilon);
-		double mue = property.attribute("Mue").as_double(Material::default_mue);
-		double kappa = property.attribute("Kappa").as_double(Material::default_kappa);
-		double sigma = property.attribute("Sigma").as_double(Material::default_sigma);
-		return make_shared<Material>(Material::deduce_type(epsilon, mue, kappa), name, fill, edge);
-	} else if(node.name() == "Metal"s) {
-		return make_shared<Material>(Material::Type::CONDUCTOR, name, fill, edge);
-	} else if(node.name() == "ConductingSheet"s) {
-		double conductivity = node.attribute("Conductivity").as_double();
-		double thickness = node.attribute("Thickness").as_double();
-		return make_shared<Material>(Material::Type::CONDUCTOR, name, fill, edge);
-	} else if(node.name() == "LumpedElement"s) {
-	} else if(node.name() == "Excitation"s) {
-	} else if(node.name() == "ProbeBox"s) {
-	} else if(node.name() == "DumpBox"s) {
-	} else if(node.name() == "DebyeMaterial"s) {
-	} else if(node.name() == "LorentzMaterial"s) {
-	} else if(node.name() == "ResBox"s) {
-	} else if(node.name() == "Unknown"s) {
-	} else if(node.name() == "DiscMaterial"s) {
+	if(node.name() == "BackgroundMaterial"s) {
+		auto [epsilon, mue, kappa, sigma] = parse_material_property(node);
+		return make_shared<Material>(Material::deduce_type(epsilon, mue, kappa), "BackgroundMaterial");
+	} else {
+		auto fill = parse_color(node.child("FillColor"));
+		auto edge = parse_color(node.child("EdgeColor"));
+
+		if(node.name() == "Material"s
+		|| node.name() == "DispersiveMaterial"s
+		|| node.name() == "DebyeMaterial"s
+		|| node.name() == "LorentzMaterial"s) {
+			// https://github.com/thliebig/openEMS-Project/discussions/347
+			// Currently do not take care of Isotropy=false
+			// as_double() selects the first term and ditch the part after
+			bool isotropy = node.attribute("Isotropy").as_bool();
+			auto [epsilon, mue, kappa, sigma] = parse_material_property(node.child("Property"));
+			return make_shared<Material>(Material::deduce_type(epsilon, mue, kappa), name, fill, edge);
+		} else if(node.name() == "Metal"s) {
+			return make_shared<Material>(Material::Type::CONDUCTOR, name, fill, edge);
+		} else if(node.name() == "ConductingSheet"s) {
+			double conductivity = node.attribute("Conductivity").as_double();
+			double thickness = node.attribute("Thickness").as_double();
+			return make_shared<Material>(Material::Type::CONDUCTOR, name, fill, edge);
+		} else if(node.name() == "LumpedElement"s
+		       || node.name() == "Excitation"s
+		       || node.name() == "ProbeBox"s) {
+			return make_shared<Material>(Material::Type::PORT, name, fill, edge);
+		} else if(node.name() == "DumpBox"s
+		       || node.name() == "ResBox"s
+		       || node.name() == "DiscMaterial"s
+		       || node.name() == "Unknown"s) {
+			warn_unsupported_property(node.name(), name);
+		}
 	}
 
 	return shared_ptr<Material>();
@@ -148,29 +252,51 @@ bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_pt
 	string property_name(node.parent().parent().attribute("Name").as_string());
 	string name(property_name + "::" + to_string(primitives_ids.at(node)));
 
+	if(!node.child("Transformation").first_child().empty()) {
+		warn_unsupported_primitive(format("Transformed {}", node.name()), name);
+		return false;
+	}
+
 	using pugi::char_t;
 	if(node.name() == "Box"s) {
 		parse_primitive_box(node, material, name);
 		return true;
+	} else if(node.name() == "MultiBox"s) {
+		parse_primitive_multibox(node, material, name);
+		return true;
 	} else if(node.name() == "LinPoly"s) {
 		parse_primitive_linpoly(node, material, name);
 		return true;
-	} else if(node.name() == "Polyhedron"s) {
 	} else if(node.name() == "Polygon"s) {
-	} else if(node.name() == "RotPoly"s) {
+		parse_primitive_polygon(node, material, name);
+		return true;
 	} else if(node.name() == "Sphere"s) {
+		parse_primitive_shpere(node, material, name);
+		return true;
 	} else if(node.name() == "Cylinder"s) {
-	} else if(node.name() == "Wire"s) {
-	} else if(node.name() == "CylindricalShell"s) {
-	} else if(node.name() == "User-Defined"s) {
+		parse_primitive_cylinder(node, material, name);
+		return true;
+	} else if(node.name() == "Point"s) {
+		parse_primitive_point(node, material, name);
+		return true;
 	} else if(node.name() == "Curve"s) {
+		parse_primitive_curve(node, material, name);
+		return true;
+	} else if(node.name() == "Polyhedron"s
+	       || node.name() == "PolyhedronReader"s
+	       || node.name() == "RotPoly"s
+	       || node.name() == "SphericalShell"s
+	       || node.name() == "CylindricalShell"s
+	       || node.name() == "Wire"s
+	       || node.name() == "User-Defined"s) {
+		warn_unsupported_primitive(node.name(), name);
 	}
 	return false;
 }
 
 //******************************************************************************
 void ParserFromCsx::Pimpl::parse_primitive_box(pugi::xml_node const& node, shared_ptr<Material> const& material, string name) {
-	size_t priority = node.attribute("Priority").as_uint();
+	size_t priority = parse_priority(node, material);
 	pugi::xml_node node_p1 = node.child("P1");
 	pugi::xml_node node_p2 = node.child("P2");
 	Point3D p1(
@@ -191,8 +317,29 @@ void ParserFromCsx::Pimpl::parse_primitive_box(pugi::xml_node const& node, share
 }
 
 //******************************************************************************
+void ParserFromCsx::Pimpl::parse_primitive_multibox(pugi::xml_node const& node, shared_ptr<Material> const& material, string name) {
+	size_t priority = parse_priority(node, material);
+	for(auto const& [s, e] : views::zip(node.children("StartP"), node.children("EndP")) | views::as_const) {
+		Point3D p1(
+			s.attribute("X").as_double(),
+			s.attribute("Y").as_double(),
+			s.attribute("Z").as_double());
+		Point3D p2(
+			e.attribute("X").as_double(),
+			e.attribute("Y").as_double(),
+			e.attribute("Z").as_double());
+		if(params.with_yz)
+			board.add_polygon_from_box(YZ, material, name, priority, { p1.x, p2.x }, { p1.y, p1.z }, { p2.y, p2.z });
+		if(params.with_zx)
+			board.add_polygon_from_box(ZX, material, name, priority, { p1.y, p2.y }, { p1.z, p1.x }, { p2.z, p2.x });
+		if(params.with_xy)
+			board.add_polygon_from_box(XY, material, name, priority, { p1.z, p2.z }, { p1.x, p1.y }, { p2.x, p2.y });
+	}
+}
+
+//******************************************************************************
 void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, shared_ptr<Material> const& material, string name) {
-	size_t priority = node.attribute("Priority").as_uint();
+	size_t priority = parse_priority(node, material);
 	double elevation = node.attribute("Elevation").as_double(); // offset in normdir
 	double length = node.attribute("Length").as_double(); // height in normdir
 	size_t normdir = node.attribute("NormDir").as_uint(); // (0->x, 1->y, 2->z)
@@ -273,6 +420,207 @@ void ParserFromCsx::Pimpl::parse_primitive_linpoly(pugi::xml_node const& node, s
 }
 
 //******************************************************************************
+void ParserFromCsx::Pimpl::parse_primitive_polygon(pugi::xml_node const& node, shared_ptr<Material> const& material, string name) {
+	size_t priority = parse_priority(node, material);
+	double elevation = node.attribute("Elevation").as_double(); // offset in normdir
+	size_t normdir = node.attribute("NormDir").as_uint(); // (0->x, 1->y, 2->z)
+	optional<Plane> plane = to_plane(normdir);
+	optional<Axis> normal = to_axis(normdir);
+	if(!plane || !normal)
+		return;
+
+	vector<unique_ptr<Point const>> points;
+	for(auto const& vertex : node.children("Vertex"))
+		points.push_back(make_unique<Point const>(
+			vertex.attribute("X1").as_double(),
+			vertex.attribute("X2").as_double()));
+
+	Bounding2D bounding(detect_bounding(points));
+
+	board.add_polygon(plane.value(), material, name, priority, { elevation, elevation }, std::move(points));
+	board.add_fixed_meshline_policy(normal.value(), elevation);
+}
+
+//******************************************************************************
+void ParserFromCsx::Pimpl::parse_primitive_shpere(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name) {
+	size_t priority = parse_priority(node, material);
+	double radius = node.attribute("Radius").as_double();
+	pugi::xml_node node_center = node.child("Center");
+	Point3D center(
+		node_center.attribute("X").as_double(),
+		node_center.attribute("Y").as_double(),
+		node_center.attribute("Z").as_double());
+
+	// TODO Z placement here is the bounding box
+	if(params.with_yz)
+		board.add_polygon(YZ, material, name, priority, { center.x - radius, center.x + radius }, circle_to_points({ center.y, center.z }, radius));
+	if(params.with_zx)
+		board.add_polygon(ZX, material, name, priority, { center.y - radius, center.y + radius }, circle_to_points({ center.z, center.x }, radius));
+	if(params.with_xy)
+		board.add_polygon(XY, material, name, priority, { center.z - radius, center.z + radius }, circle_to_points({ center.x, center.y }, radius));
+}
+
+//******************************************************************************
+void ParserFromCsx::Pimpl::parse_primitive_cylinder(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name) {
+	size_t priority = parse_priority(node, material);
+	double radius = node.attribute("Radius").as_double();
+	pugi::xml_node node_p1 = node.child("P1");
+	pugi::xml_node node_p2 = node.child("P2");
+	Point3D p1(
+		node_p1.attribute("X").as_double(),
+		node_p1.attribute("Y").as_double(),
+		node_p1.attribute("Z").as_double());
+	Point3D p2(
+		node_p2.attribute("X").as_double(),
+		node_p2.attribute("Y").as_double(),
+		node_p2.attribute("Z").as_double());
+
+	// If orthogonal circle + polygons.
+	if(p1.y == p2.y && p1.z == p2.z) {
+		if(params.with_yz)
+			board.add_polygon(YZ, material, name, priority, { p1.x, p2.x }, circle_to_points({ p1.y, p1.z }, radius));
+		if(params.with_zx)
+			// TODO Z placement here is the bounding box
+			board.add_polygon_from_box(ZX, material, name, priority,
+				{ p1.y, p2.y },
+				{ p1.z - radius/2, p1.x },
+				{ p2.z + radius/2, p2.x });
+		if(params.with_xy)
+			// TODO Z placement here is the bounding box
+			board.add_polygon_from_box(XY, material, name, priority,
+				{ p1.z, p2.z },
+				{ p1.x, p1.y - radius/2 },
+				{ p2.x, p2.y + radius/2 });
+	} else if(p1.z == p2.z && p1.x == p2.x) {
+		if(params.with_zx)
+			board.add_polygon(ZX, material, name, priority, { p1.y, p2.y }, circle_to_points({ p1.z, p1.x }, radius));
+		if(params.with_xy)
+			// TODO Z placement here is the bounding box
+			board.add_polygon_from_box(XY, material, name, priority,
+				{ p1.z, p2.z },
+				{ p1.x - radius/2, p1.y },
+				{ p2.x + radius/2, p2.y });
+		if(params.with_yz)
+			// TODO Z placement here is the bounding box
+			board.add_polygon_from_box(YZ, material, name, priority,
+				{ p1.x, p2.x },
+				{ p1.y, p1.z - radius/2 },
+				{ p2.y, p2.z + radius/2 });
+	} else if(p1.x == p2.x && p1.y == p2.y) {
+		if(params.with_xy)
+			board.add_polygon(XY, material, name, priority, { p1.z, p2.z }, circle_to_points({ p1.x, p1.y }, radius));
+		if(params.with_yz)
+			// TODO Z placement here is the bounding box
+			board.add_polygon_from_box(YZ, material, name, priority,
+				{ p1.x, p2.x },
+				{ p1.y - radius/2, p1.z },
+				{ p2.y + radius/2, p2.z });
+		if(params.with_zx)
+			// TODO Z placement here is the bounding box
+			board.add_polygon_from_box(ZX, material, name, priority,
+				{ p1.y, p2.y },
+				{ p1.z, p1.x - radius/2 },
+				{ p2.z, p2.x + radius/2 });
+	} else {
+		warn_unsupported_primitive(format("{} (with diagonal axis)", node.name()), name);
+	}
+}
+
+//******************************************************************************
+void ParserFromCsx::Pimpl::parse_primitive_point(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name) {
+//	size_t priority = numeric_limits<size_t>::max();
+	Point3D p(
+		node.attribute("X").as_double(),
+		node.attribute("Y").as_double(),
+		node.attribute("Z").as_double());
+
+	// TODO board.add_point()
+	if(params.with_yz) {
+//		board.add_point(YZ, material, name, /*priority,*/ { p.y, p.z });
+		board.add_fixed_meshline_policy(Y, p.y);
+		board.add_fixed_meshline_policy(Z, p.z);
+	}
+	if(params.with_zx) {
+//		board.add_point(ZX, material, name, /*priority,*/ { p.z, p.x });
+		board.add_fixed_meshline_policy(Z, p.z);
+		board.add_fixed_meshline_policy(X, p.x);
+	}
+	if(params.with_xy) {
+//		board.add_point(XY, material, name, /*priority,*/ { p.x, p.y });
+		board.add_fixed_meshline_policy(X, p.x);
+		board.add_fixed_meshline_policy(Y, p.y);
+	}
+}
+
+//******************************************************************************
+void ParserFromCsx::Pimpl::parse_primitive_curve(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name) {
+	size_t priority = numeric_limits<size_t>::max();
+	vector<Point3D> vertices;
+	for(auto const& vertex : node.children("Vertex")) {
+		vertices.emplace_back(
+			vertex.attribute("X").as_double(),
+			vertex.attribute("Y").as_double(),
+			vertex.attribute("Z").as_double());
+	}
+
+	// TODO support onepoint polygon and open polygons (not to double points, edges & angles)
+	if(params.with_yz) {
+		// TODO Z placement here is the bounding box
+		Polygon::RangeZ z_placement {
+			ranges::min(vertices, [&](Point3D const& a, Point3D const& b) { return a.x < b.x; }).x,
+			ranges::max(vertices, [&](Point3D const& a, Point3D const& b) { return a.x > b.x; }).x
+		};
+		vector<unique_ptr<Point const>> points;
+		for(auto const& vertex : vertices)
+			points.push_back(make_unique<Point const>(
+				vertex.y,
+				vertex.z));
+		for(auto const& vertex : vertices | views::drop(1) | views::reverse | views::drop(1))
+			points.push_back(make_unique<Point const>(
+				vertex.y,
+				vertex.z));
+		points.shrink_to_fit();
+		board.add_polygon(YZ, material, name, priority, z_placement, std::move(points));
+	}
+	if(params.with_zx) {
+		// TODO Z placement here is the bounding box
+		Polygon::RangeZ z_placement {
+			ranges::min(vertices, [&](Point3D const& a, Point3D const& b) { return a.y < b.y; }).y,
+			ranges::max(vertices, [&](Point3D const& a, Point3D const& b) { return a.y > b.y; }).y
+		};
+		vector<unique_ptr<Point const>> points;
+		for(auto const& vertex : vertices)
+			points.push_back(make_unique<Point const>(
+				vertex.z,
+				vertex.x));
+		for(auto const& vertex : vertices | views::drop(1) | views::reverse | views::drop(1))
+			points.push_back(make_unique<Point const>(
+				vertex.z,
+				vertex.x));
+		points.shrink_to_fit();
+		board.add_polygon(ZX, material, name, priority, z_placement, std::move(points));
+	}
+	if(params.with_xy) {
+		// TODO Z placement here is the bounding box
+		Polygon::RangeZ z_placement {
+			ranges::min(vertices, [&](Point3D const& a, Point3D const& b) { return a.z < b.z; }).z,
+			ranges::max(vertices, [&](Point3D const& a, Point3D const& b) { return a.z > b.z; }).z
+		};
+		vector<unique_ptr<Point const>> points;
+		for(auto const& vertex : vertices)
+			points.push_back(make_unique<Point const>(
+				vertex.x,
+				vertex.y));
+		for(auto const& vertex : vertices | views::drop(1) | views::reverse | views::drop(1))
+			points.push_back(make_unique<Point const>(
+				vertex.x,
+				vertex.y));
+		points.shrink_to_fit();
+		board.add_polygon(XY, material, name, priority, z_placement, std::move(points));
+	}
+}
+
+//******************************************************************************
 expected<shared_ptr<Board>, string> ParserFromCsx::run(std::filesystem::path const& input) {
 	return ParserFromCsx::run(input, {});
 }
@@ -289,6 +637,9 @@ expected<shared_ptr<Board>, string> ParserFromCsx::run(std::filesystem::path con
 	ParserFromCsx parser(input, std::move(params));
 	TRY(parser.parse());
 	override_domain_params(parser.domain_params);
+	for(auto const& [axis, coord] : parser.domain_params.input_fixed_meshlines)
+		parser.pimpl->board.add_fixed_meshline_policy(axis, coord);
+	parser.domain_params.input_fixed_meshlines.clear();
 	return parser.output();
 }
 
@@ -317,10 +668,20 @@ expected<void, string> ParserFromCsx::parse() {
 		return unexpected(res.description());
 	}
 
+	if(parser_params.read_oemsh_params) {
+		pugi::xpath_node oemsh = doc.select_node("/OpenEMSH");
+		TRY(pimpl->parse_oemsh(oemsh.node()));
+	}
+
+	if(!doc.select_node("/openEMS"))
+		return unexpected("No \"/openEMS\" path in CSX XML file");
+
 	pugi::xpath_node fdtd = doc.select_node("/openEMS/FDTD");
 
 	pugi::xpath_node csx = doc.select_node("/openEMS/ContinuousStructure");
 	TRY(pimpl->parse_grid(csx.node()));
+
+	pimpl->board.set_background_material(pimpl->parse_property(csx.node().child("BackgroundMaterial")));
 
 	{
 		// Primitives' IDs grow disregarding properties.
@@ -351,6 +712,26 @@ expected<void, string> ParserFromCsx::parse() {
 	}
 	bar.complete();
 	domain_params = std::move(pimpl->domain_params);
+
+	if(!pimpl->warning_unsupported_properties_names.empty()
+	&& !pimpl->warning_unsupported_properties_types.empty())
+		log({
+			.level = Logger::Level::WARNING,
+			.user_actions = { Logger::UserAction::OK },
+			.message = "Unsupported CSXCAD Properties:",
+			.informative = pimpl->warning_unsupported_properties_types | views::join_with(", "s) | ranges::to<string>(),
+			.details = pimpl->warning_unsupported_properties_names | views::join_with(", "s) | ranges::to<string>()
+			});
+	if(!pimpl->warning_unsupported_primitives_names.empty()
+	&& !pimpl->warning_unsupported_primitives_types.empty())
+		log({
+			.level = Logger::Level::WARNING,
+			.user_actions = { Logger::UserAction::OK },
+			.message = "Unsupported CSXCAD Primitives:",
+			.informative = pimpl->warning_unsupported_primitives_types | views::join_with(", "s) | ranges::to<string>(),
+			.details = pimpl->warning_unsupported_primitives_names | views::join_with(", "s) | ranges::to<string>()
+			});
+
 	return {};
 }
 

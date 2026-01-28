@@ -101,6 +101,7 @@ string to_string(Plane const plane) noexcept {
 //******************************************************************************
 string to_string(domain::Material::Type type) noexcept {
 	switch(type) {
+	case Material::Type::PORT: return "PORT";
 	case Material::Type::CONDUCTOR: return "CONDUCTOR";
 	case Material::Type::DIELECTRIC: return "DIELECTRIC";
 	case Material::Type::AIR: return "AIR";

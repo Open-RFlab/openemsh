@@ -39,7 +39,6 @@ EditModelMeshlinePolicy::EditModelMeshlinePolicy(domain::MeshlinePolicy* meshlin
 		"Direction associated with Policy.");
 	make_row(2, "Enabled", state.is_enabled,
 		"Take into account in the meshing process.");
-//	make_row(3, "res_factor", QString::number(state.res_factor), "");
 	make_row(3, "d", QString::number(state.d),
 		"Desired distance between policy lines (HALFS|THIRDS) or "
 		"between policy line and adjacent lines (ONELINE).<br/>"
@@ -77,7 +76,6 @@ void EditModelMeshlinePolicy::commit() {
 	std::array does_succeed = {
 		are_policy_and_normal_compatible(),
 		try_to_bool(item(2, V)->checkState(), state.is_enabled),
-//		try_to_double(item(3, V)->text(), state.res_factor),
 		try_to_double(item(3, V)->text(), state.d)
 	};
 

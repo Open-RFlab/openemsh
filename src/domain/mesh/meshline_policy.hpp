@@ -71,8 +71,7 @@ public:
 		Coord const coord,
 		Timepoint* t,
 		std::vector<IMeshLineOrigin*> const& origins = {},
-		bool const is_enabled = true,
-		double const res_factor = 2);
+		bool const is_enabled = true);
 
 	std::optional<Meshline> mesh();
 };
@@ -84,7 +83,6 @@ struct MeshlinePolicyState final
 	MeshlinePolicy::Policy policy;
 	MeshlinePolicy::Normal normal;
 	bool is_enabled;
-	double res_factor; // TODO useful? d directly? come from params
 	double d; ///< Distance betwen two lines (HALFS and THIRDS only).
 	std::vector<IMeshLineOrigin*> origins;
 	std::vector<Meshline*> meshlines;

@@ -22,6 +22,7 @@
 #include "utils/state_management.hpp"
 #include "utils/unreachable.hpp"
 #include "about_dialog.hpp"
+#include "logger.hpp"
 #include "progress.hpp"
 #include "settings.hpp"
 
@@ -60,6 +61,8 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 					message)));
 		});
 
+	Logger::singleton().register_sink(Logger::id("Qt"), std::make_unique<LoggerSink>(ui->statusBar, this), true);
+
 	for(auto const& style : Style::available_styles) {
 		auto* const action = new QAction(style.name, ui->ag_styles);
 		action->setCheckable(true);
@@ -88,7 +91,14 @@ bool MainWindow::parse_and_display() {
 	if(auto res = oemsh.parse()
 	; !res.has_value()) {
 		QGuiApplication::restoreOverrideCursor();
-		ui->statusBar->showMessage("Error parsing file \"" + csx_file + "\"" + " : " + QString::fromStdString(res.error()));
+		log({
+			.level = Logger::Level::ERROR,
+			.user_actions = { Logger::UserAction::OK },
+			.message = std::format(
+				"Failed to parse file \"{}\" : {}",
+				csx_file.toStdString(),
+				res.error())
+			});
 		return false;
 	}
 
@@ -325,13 +335,15 @@ void MainWindow::save_csx_file() {
 	oemsh.set_output_format(app::OpenEMSH::Params::OutputFormat::CSX);
 
 	if(oemsh.is_about_overwriting()) {
-		auto res = QMessageBox::warning(this,
-			"",
-			QString::fromStdString(std::format(
-				"You are about overwriting the file \"{}\", do you want to continue?",
-				oemsh.get_params().output.generic_string())),
-			QMessageBox::Cancel | QMessageBox::Save);
-		if(res != QMessageBox::Save) {
+		auto res = log({
+			.level = Logger::Level::WARNING,
+			.user_actions = { Logger::UserAction::CANCEL, Logger::UserAction::SAVE },
+			.message = std::format(
+				"You are about overwriting the file \"{}\", "
+				"do you want to continue?",
+				oemsh.get_params().output.generic_string())
+			});
+		if(res != Logger::UserAction::SAVE) {
 			return;
 		}
 	}
@@ -339,9 +351,23 @@ void MainWindow::save_csx_file() {
 	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 	if(auto res = oemsh.write()
 	; res.has_value())
-		ui->statusBar->showMessage("Saved file \"" + csx_file + "\"");
+		log({
+			.level = Logger::Level::INFO,
+			.message = std::format(
+				"Saved file \"{}\"",
+				csx_file.toStdString())
+			});
 	else
-		ui->statusBar->showMessage("Failed to save file \"" + csx_file + "\"" + " : " + QString::fromStdString(res.error()));
+		log({
+			.level = Logger::Level::ERROR,
+			.user_actions = { Logger::UserAction::OK },
+			.message = std::format(
+				"Failed to save file \"{}\" : {}",
+				csx_file.toStdString(),
+				res.error())
+			});
+
+
 	QGuiApplication::restoreOverrideCursor();
 }
 
@@ -350,14 +376,15 @@ void MainWindow::on_a_file_save_triggered() {
 	if(oemsh.get_params().output.empty()) {
 		oemsh.set_output(csx_file.toStdString());
 	} else if(csx_file != QString::fromStdString(oemsh.get_params().output.generic_string())) {
-		auto res = QMessageBox::question(this,
-			"",
-			QString::fromStdString(std::format(
+		auto res = log({
+			.level = Logger::Level::QUESTION,
+			.user_actions = { Logger::UserAction::CANCEL, Logger::UserAction::SAVE },
+			.message = std::format(
 				"You are about saving to the file \"{}\" which is different from the input file \"{}\", do you want to continue?",
 				oemsh.get_params().output.generic_string(),
-				oemsh.get_params().input.generic_string())),
-			QMessageBox::Cancel | QMessageBox::Save);
-		if(res == QMessageBox::Save) {
+				oemsh.get_params().input.generic_string())
+			});
+		if(res == Logger::UserAction::SAVE) {
 			csx_file = QString::fromStdString(oemsh.get_params().output.generic_string());
 		} else {
 			return;

@@ -4,6 +4,9 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include <cmath>
+#include <numbers>
+
 #include "utils/unreachable.hpp"
 #include "edge.hpp"
 #include "point.hpp"
@@ -50,8 +53,8 @@ vector<shared_ptr<Edge>> detect_edges(vector<unique_ptr<Point const>> const& poi
 		edges.push_back(make_shared<Edge>(plane, prev, point.get(), t));
 		prev = point.get();
 	}
-	edges.shrink_to_fit();
 
+	edges.shrink_to_fit();
 	return edges;
 }
 
@@ -204,10 +207,26 @@ relation::PolygonPoint Polygon::relation_to(Point const& point) const noexcept {
 /// Check if two Z ranges overlap or just touch each other.
 ///*****************************************************************************
 bool does_overlap(Polygon::RangeZ const& a, Polygon::RangeZ const& b) noexcept {
-	return (b.min >= a.min && b.min <= a.max)
-	    || (b.max >= a.min && b.max <= a.max)
-	    || (a.min >= b.min && a.min <= b.max)
-	    || (a.max >= b.min && a.max <= b.max);
+	return min(a.max, b.max) >= max(a.min, b.min);
+}
+
+/// Points on axes guaranteed. CCW oriented.
+///*****************************************************************************
+vector<unique_ptr<Point const>> circle_to_points(Point const& center, double radius, size_t n_slices_per_quarter) {
+	if(!n_slices_per_quarter)
+		n_slices_per_quarter = 1;
+
+	double const angle = (numbers::pi/2) / n_slices_per_quarter;
+	size_t const n = n_slices_per_quarter * 4;
+
+	vector<unique_ptr<Point const>> points;
+	for(size_t i = 0; i < n; ++i) {
+		double a = angle * i;
+		points.emplace_back(make_unique<Point const>(center.x + radius * cos(a), center.y + radius * sin(a)));
+	}
+
+	points.shrink_to_fit();
+	return points;
 }
 
 } // namespace domain

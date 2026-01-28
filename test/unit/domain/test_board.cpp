@@ -250,10 +250,12 @@ SCENARIO("std::unique_ptr<Board> Board::Builder::build()", "[board]") {
 			{ 66.2713, -43.9276 },
 			{ 66.2713, -43.9514 },
 			{ 70.3673, -43.9514 }});
+		b.set_background_material(material);
 		REQUIRE(b.polygons[XY].size() == 3);
 		WHEN("Calling build()") {
 			std::shared_ptr<Board> a = b.build();
 			THEN("Should output a Board containing the polygons") {
+				REQUIRE(a->material == material);
 				REQUIRE(a->get_current_state().polygons[XY].size() == 3);
 				REQUIRE(a->get_current_state().polygons[XY][0]->name == "MS1");
 				REQUIRE(*(a->get_current_state().polygons[XY][0]->points[0]) == Point(16.1, -26.5));
@@ -309,21 +311,41 @@ SCENARIO("std::pair<std::shared_ptr<Material>, std::remove_const_t<decltype(Poly
 		auto pc2 = std::make_shared<Polygon>(XY, c2, "", 2, z, from_init_list<Point>({{ 1, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }}), t);
 		auto pd2 = std::make_shared<Polygon>(XY, d2, "", 2, z, from_init_list<Point>({{ 1, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }}), t);
 		auto pa2 = std::make_shared<Polygon>(XY, a2, "", 2, z, from_init_list<Point>({{ 1, 1 }, { 6, 1 }, { 6, 6 }, { 1, 6 }}), t);
-		WHEN("Looking for ambient Material inside the overlap of all Polygons relative to one of AIR Material with the lower priority") {
-			{
-				PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
-				tmp[XY].push_back(px);
-				tmp[XY].push_back(pc0);
-				tmp[XY].push_back(pd0);
-				tmp[XY].push_back(pa0);
-				tmp[XY].push_back(pc1);
-				tmp[XY].push_back(pd1);
-				tmp[XY].push_back(pa1);
-				tmp[XY].push_back(pc2);
-				tmp[XY].push_back(pd2);
-				tmp[XY].push_back(pa2);
-				b = std::make_unique<Board>(std::move(tmp), Params(), t);
+		{
+			PlaneSpace<std::vector<std::shared_ptr<Polygon>>> tmp;
+			tmp[XY].push_back(px);
+			tmp[XY].push_back(pc0);
+			tmp[XY].push_back(pd0);
+			tmp[XY].push_back(pa0);
+			tmp[XY].push_back(pc1);
+			tmp[XY].push_back(pd1);
+			tmp[XY].push_back(pa1);
+			tmp[XY].push_back(pc2);
+			tmp[XY].push_back(pd2);
+			tmp[XY].push_back(pa2);
+			b = std::make_unique<Board>(std::move(tmp), Params(), t);
+		}
+		WHEN("Looking for ambient Material outside of any Polygon, relative to a Polygon") {
+			AND_WHEN("The board has a background Material") {
+				auto background = std::make_shared<Material>(Material::Type::DIELECTRIC, "");
+				b->material = background;
+				auto [material, priority] = b->find_ambient_material(XY, Range({ 10, 10 }, { 11, 11 }), px);
+				THEN("Should return the board background Material and the lowest possible priority") {
+					REQUIRE(material);
+					REQUIRE(material == background);
+					REQUIRE(material->type == Material::Type::DIELECTRIC);
+					REQUIRE(priority == std::numeric_limits<std::size_t>::min());
+				}
 			}
+			AND_WHEN("The board has no background Material") {
+				auto [material, priority] = b->find_ambient_material(XY, Range({ 10, 10 }, { 11, 11 }), px);
+				THEN("Should not return any Material and the lowest possible priority") {
+					REQUIRE_FALSE(material);
+					REQUIRE(priority == std::numeric_limits<std::size_t>::min());
+				}
+			}
+		}
+		WHEN("Looking for ambient Material inside the overlap of all Polygons relative to one of AIR Material with the lower priority") {
 			auto [material, priority] = b->find_ambient_material(XY, Range({ 3.5, 3.2 }, { 3.5, 3.8 }), px);
 			THEN("Should the CONDUCTOR Material of the Polygon with the highest priority") {
 				REQUIRE(material);
@@ -352,8 +374,20 @@ SCENARIO("std::pair<std::shared_ptr<Material>, std::remove_const_t<decltype(Poly
 				tmp[XY].push_back(z0);
 				b = std::make_unique<Board>(std::move(tmp), Params(), t);
 			}
-			THEN("Should not return any Material") {
-				REQUIRE_FALSE(b->find_ambient_material(XY, Range({ 10, 10 }, { 11, 11 })));
+			AND_WHEN("The board has a background Material") {
+				auto background = std::make_shared<Material>(Material::Type::DIELECTRIC, "");
+				b->material = background;
+				auto material = b->find_ambient_material(XY, Range({ 10, 10 }, { 11, 11 }));
+				THEN("Should return the board background Material") {
+					REQUIRE(material);
+					REQUIRE(material == background);
+					REQUIRE(material->type == Material::Type::DIELECTRIC);
+				}
+			}
+			AND_WHEN("The board has no background Material") {
+				THEN("Should not return any Material") {
+					REQUIRE_FALSE(b->find_ambient_material(XY, Range({ 10, 10 }, { 11, 11 })));
+				}
 			}
 		}
 		WHEN("Looking for absolute ambient Material inside the overlap of all Polygons") {
