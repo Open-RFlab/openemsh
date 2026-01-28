@@ -78,6 +78,8 @@ public:
 	Board::Builder board;
 	domain::Params domain_params;
 
+	set<string> warning_unsupported_properties_types;
+	set<string> warning_unsupported_properties_names;
 	set<string> warning_unsupported_primitives_types;
 	set<string> warning_unsupported_primitives_names;
 
@@ -99,7 +101,8 @@ public:
 	void parse_primitive_curve(pugi::xml_node const& node, shared_ptr<Material> const& material, std::string name);
 
 private:
-	void warn_unsupported(string const& primitive_type, string const& primitive_name);
+	void warn_unsupported_property(string const& property_type, string const& property_name);
+	void warn_unsupported_primitive(string const& primitive_type, string const& primitive_name);
 };
 
 //******************************************************************************
@@ -108,7 +111,13 @@ ParserFromCsx::Pimpl::Pimpl(ParserFromCsx::Params const& params)
 {}
 
 //******************************************************************************
-void ParserFromCsx::Pimpl::warn_unsupported(string const& primitive_type, string const& primitive_name) {
+void ParserFromCsx::Pimpl::warn_unsupported_property(string const& primitive_type, string const& primitive_name) {
+	warning_unsupported_properties_types.emplace(primitive_type);
+	warning_unsupported_properties_names.emplace(primitive_name);
+}
+
+//******************************************************************************
+void ParserFromCsx::Pimpl::warn_unsupported_primitive(string const& primitive_type, string const& primitive_name) {
 	warning_unsupported_primitives_types.emplace(primitive_type);
 	warning_unsupported_primitives_names.emplace(primitive_name);
 }
@@ -209,8 +218,7 @@ shared_ptr<Material> ParserFromCsx::Pimpl::parse_property(pugi::xml_node const& 
 		if(node.name() == "Material"s
 		|| node.name() == "DispersiveMaterial"s
 		|| node.name() == "DebyeMaterial"s
-		|| node.name() == "LorentzMaterial"s
-		|| node.name() == "DiscMaterial"s) {
+		|| node.name() == "LorentzMaterial"s) {
 			// https://github.com/thliebig/openEMS-Project/discussions/347
 			// Currently do not take care of Isotropy=false
 			// as_double() selects the first term and ditch the part after
@@ -223,15 +231,15 @@ shared_ptr<Material> ParserFromCsx::Pimpl::parse_property(pugi::xml_node const& 
 			double conductivity = node.attribute("Conductivity").as_double();
 			double thickness = node.attribute("Thickness").as_double();
 			return make_shared<Material>(Material::Type::CONDUCTOR, name, fill, edge);
-		} else if(node.name() == "LumpedElement"s) {
+		} else if(node.name() == "LumpedElement"s
+		       || node.name() == "Excitation"s
+		       || node.name() == "ProbeBox"s) {
 			return make_shared<Material>(Material::Type::PORT, name, fill, edge);
-		} else if(node.name() == "Excitation"s) {
-			return make_shared<Material>(Material::Type::PORT, name, fill, edge);
-		} else if(node.name() == "ProbeBox"s) {
-			return make_shared<Material>(Material::Type::PORT, name, fill, edge);
-		} else if(node.name() == "DumpBox"s) {
-		} else if(node.name() == "ResBox"s) {
-		} else if(node.name() == "Unknown"s) {
+		} else if(node.name() == "DumpBox"s
+		       || node.name() == "ResBox"s
+		       || node.name() == "DiscMaterial"s
+		       || node.name() == "Unknown"s) {
+			warn_unsupported_property(node.name(), name);
 		}
 	}
 
@@ -244,8 +252,8 @@ bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_pt
 	string property_name(node.parent().parent().attribute("Name").as_string());
 	string name(property_name + "::" + to_string(primitives_ids.at(node)));
 
-	if(node.child("Transformation")) {
-		warn_unsupported(format("Transformed {}", node.name()), name);
+	if(!node.child("Transformation").first_child().empty()) {
+		warn_unsupported_primitive(format("Transformed {}", node.name()), name);
 		return false;
 	}
 
@@ -281,7 +289,7 @@ bool ParserFromCsx::Pimpl::parse_primitive(pugi::xml_node const& node, shared_pt
 	       || node.name() == "CylindricalShell"s
 	       || node.name() == "Wire"s
 	       || node.name() == "User-Defined"s) {
-		warn_unsupported(node.name(), name);
+		warn_unsupported_primitive(node.name(), name);
 	}
 	return false;
 }
@@ -514,7 +522,7 @@ void ParserFromCsx::Pimpl::parse_primitive_cylinder(pugi::xml_node const& node, 
 				{ p1.z, p1.x - radius/2 },
 				{ p2.z, p2.x + radius/2 });
 	} else {
-		warn_unsupported(format("{} (with diagonal axis)", node.name()), name);
+		warn_unsupported_primitive(format("{} (with diagonal axis)", node.name()), name);
 	}
 }
 
@@ -705,6 +713,15 @@ expected<void, string> ParserFromCsx::parse() {
 	bar.complete();
 	domain_params = std::move(pimpl->domain_params);
 
+	if(!pimpl->warning_unsupported_properties_names.empty()
+	&& !pimpl->warning_unsupported_properties_types.empty())
+		log({
+			.level = Logger::Level::WARNING,
+			.user_actions = { Logger::UserAction::OK },
+			.message = "Unsupported CSXCAD Properties:",
+			.informative = pimpl->warning_unsupported_properties_types | views::join_with(", "s) | ranges::to<string>(),
+			.details = pimpl->warning_unsupported_properties_names | views::join_with(", "s) | ranges::to<string>()
+			});
 	if(!pimpl->warning_unsupported_primitives_names.empty()
 	&& !pimpl->warning_unsupported_primitives_types.empty())
 		log({
