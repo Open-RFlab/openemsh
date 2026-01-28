@@ -36,6 +36,11 @@
             <Vertex X1="10" X2="20"/>
             <Vertex X1="30" X2="20"/>
           </LinPoly>
+          <Polygon Priority="1" Elevation="1" NormDir="2">
+            <Vertex X1="35" X2="25"/>
+            <Vertex X1="40" X2="25"/>
+            <Vertex X1="40" X2="40"/>
+          </Polygon>
           <Sphere Priority="1" Radius="5">
             <Center X="50" Y="50" Z="10"/>
           </Sphere>
@@ -53,6 +58,12 @@
             <Vertex X="100" Y="90" Z="50"/>
             <Vertex X="105" Y="95" Z="55"/>
           </Curve>
+          <Wire Priority="1" WireRadius="0.2">
+            <Vertex X="115" Y="115" Z="60"/>
+            <Vertex X="120" Y="120" Z="60"/>
+            <Vertex X="125" Y="115" Z="60"/>
+            <Vertex X="130" Y="120" Z="65"/>
+          </Wire>
         </Primitives>
       </Metal>
     </Properties>
