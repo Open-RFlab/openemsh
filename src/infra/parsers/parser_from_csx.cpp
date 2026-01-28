@@ -4,7 +4,7 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#include <exception>
+#include <charconv>
 #include <format>
 #include <limits>
 #include <map>
@@ -12,6 +12,7 @@
 #include <ranges>
 #include <set>
 #include <string_view>
+#include <system_error>
 
 #include <pugixml.hpp>
 
@@ -50,6 +51,16 @@ constexpr optional<Plane> to_plane(size_t const normdir) {
 	case 2: return XY;
 	default: return nullopt;
 	}
+}
+
+//******************************************************************************
+expected<double, string> str_to_double(string_view const& str) {
+	double res;
+	auto [_, e] = std::from_chars(str.data(), str.data() + str.size(), res);
+	if(e == std::errc {})
+		return res;
+	else
+		return unexpected(make_error_code(e).message());
 }
 
 //******************************************************************************
@@ -112,11 +123,11 @@ expected<void, string> ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& n
 	};
 	for(Axis axis : AllAxis) {
 		for(auto const part : views::split(lines[axis], ',')) {
-			try {
-				board.add_fixed_meshline_policy(axis, delta_unit * stod(string(string_view(part))));
-			} catch(exception const& e) {
-				return unexpected("Invalid meshline value"s + e.what());
-			}
+			string_view str(part);
+			if(auto line = str_to_double(str); line.has_value())
+				board.add_fixed_meshline_policy(axis, delta_unit * line.value());
+			else
+				return unexpected(format("Invalid meshline value \"{}\": {}", str, line.error()));
 		}
 	}
 	return {};
@@ -136,15 +147,15 @@ expected<void, string> ParserFromCsx::Pimpl::parse_grid(pugi::xml_node const& no
 			grid.child_value("ZLines")
 		};
 		domain_params.has_grid_already = ranges::any_of(lines, [](auto const& str){ return !str.empty(); });
-		// TODO Second step : into fixed MLP
+		// Second step : into fixed MLP
 		if(params.keep_old_mesh) {
 			for(Axis axis : AllAxis) {
 				for(auto const part : views::split(lines[axis], ',')) {
-					try {
-						board.add_fixed_meshline_policy(axis, delta_unit * stod(string(string_view(part))));
-					} catch(exception const& e) {
-						return unexpected("Invalid meshline value"s + e.what());
-					}
+					string_view str(part);
+					if(auto line = str_to_double(str); line.has_value())
+						board.add_fixed_meshline_policy(axis, delta_unit * line.value());
+					else
+						return unexpected(format("Invalid meshline value \"{}\": {}", str, line.error()));
 				}
 			}
 		}
