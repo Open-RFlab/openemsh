@@ -681,7 +681,7 @@ expected<void, string> ParserFromCsx::parse() {
 	else
 		return unexpected("No \"/openEMS\" path in CSX XML file");
 
-	auto const root = [&](string const str) -> string {
+	auto const root = [&](string const str) {
 		if(is_under_openems)
 			return "/openEMS"s + str;
 		else

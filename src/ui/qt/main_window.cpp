@@ -38,8 +38,8 @@ using DisplayMode = ProcessingScene::DisplayMode;
 using MeshVisibility = StructureScene::MeshVisibility;
 
 //******************************************************************************
-static QString get_shortcuts(QAction* p) { return QKeySequence::listToString(p->shortcuts()); }
-static QString get_shortcuts(QToolButton* p) { return p->shortcut().toString(); }
+static QString get_shortcuts(QAction const* p) { return QKeySequence::listToString(p->shortcuts()); }
+static QString get_shortcuts(QToolButton const* p) { return p->shortcut().toString(); }
 
 //******************************************************************************
 static void add_shortcut_to_tooltip(auto* p, QString const& shortcut = QString()) {
@@ -510,15 +510,15 @@ void MainWindow::on_a_appcsxcad_triggered() {
 	auto* p = new QProcess(this);
 	p->setProgram("AppCSXCAD");
 	p->setArguments({ "--disableEdit", file->fileName() });
-	connect(p, &QProcess::errorOccurred, [this](QProcess::ProcessError error) {
+	connect(p, &QProcess::errorOccurred, [](QProcess::ProcessError error) {
 		if(error == QProcess::FailedToStart)
-		log({
-			.level = Logger::Level::ERROR,
-			.user_actions = { Logger::UserAction::OK },
-			.message = "Failed to run AppCSXCAD"
-			});
+			log({
+				.level = Logger::Level::ERROR,
+				.user_actions = { Logger::UserAction::OK },
+				.message = "Failed to run AppCSXCAD"
+				});
 	});
-	connect(this, &QObject::destroyed, [p](QObject* obj) {
+	connect(this, &QObject::destroyed, [p](QObject* /*obj*/) {
 		disconnect(p, &QProcess::errorOccurred, nullptr, nullptr);
 	});
 	p->start();
