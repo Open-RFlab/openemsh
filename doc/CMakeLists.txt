@@ -1,4 +1,5 @@
 add_custom_target( doc )
+add_subdirectory( "${CMAKE_CURRENT_SOURCE_DIR}/latex" )
 
 configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/openemsh.1.in"
