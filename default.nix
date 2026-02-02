@@ -61,18 +61,14 @@ stdenv.mkDerivation {
 #      };
       lete-sans-math = {
         pkgs = [
-          (runCommand "lete-sans-math" {
+          (runCommand "lete-sans-math" rec {
             src = fetchzip {
-              url = "https://mirrors.ctan.org/fonts/lete-sans-math.zip";
-#              url = "https://raw.githubusercontent.com/abccsss/LeteSansMath/refs/tags/v0.41/lete-sans-math.sty";
-  #            url = "https://raw.githubusercontent.com/PierreSenellart/apxproof/1ac14c47b8351b693ca05eec73dca1332a517ac9/apxproof.sty";
-  #            sha256 = "sha256-XSgtXsOwhMu2Wo4hVp8ZfaPWgjEEg3EBn5/BhD3xkMA=";
-#              hash = "sha256-aUKS2tCbC+eBFPMSJuzzkWgFkSqWnizekTOnoK2f5L4=";
-              hash = "sha256-pz5qKo4ALYuTjGeO9YqxB6hcrqIkT4S8U28cLMZdG5U=";
+              url = "https://github.com/abccsss/LeteSansMath/archive/refs/tags/v${passthru.version}.zip";
+              hash = "sha256-q+WwdSUeHIffpgrJ6GKzyQz+iNxUTeHr4GQZsT0r1Kw=";
             };
             passthru = {
               pname = "lete-sans-math";
-              version = "0.45";
+              version = "0.50";
               tlType = "run";
             };
           } ''
