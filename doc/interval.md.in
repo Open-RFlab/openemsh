@@ -1,0 +1,42 @@
+# Meshing algorithm
+
+## Scope
+
+The meshing process consists of two parts:
+- The geometrical analysis that, given a structure, outputs some `MeshlinePolicies` ("Here is something of interest that must be meshed according those rules", typically an `Edge` must be meshed according Thirds rule) and some `Interval` in between.
+- The `Meshline` generation, that consist of filling each `Interval` while respecting enclosing `MeshlinePolicies`' specific rules.
+
+Despite being actually just the last step of the whole process, this explanatory document is about the generation of `Meshlines` at `Interval` level.
+
+## Reference
+
+<img src="@INTERVAL_SVG@" width="100%" title="reference_schematic"/>
+
+- `x`: Position of `MeshlinePolicies`.
+- `m`: Position of the middle of the `Interval` between two `MeshlinePolicies`.
+- `h`: Half of the Interval between two `MeshlinePolicies`.
+- `f`: Smoothness factor `[1;2]`.
+- `d`: Distance between the two lines around a `MeshlinePolicy`.
+- `dinit`: Space between `x` and the first line (may not be the half of `d`).
+- `dmax`: Maximal authorized space between two lines.
+- `s`: Space to fill of lines.
+- `z`: Distance from the first line (belonging to `MeshlinePolicy`) to the last line before `m` (the middle of the `Interval`).
+- `lz`: Number of lines before the middle of the `Interval` (minus the line belonging to the `MeshlinePolicy`).
+
+<span style="color:orange">Orange</span> lines belong to `MeshlinePolicies`, <span style="color:lime">green</span> lines belong to `Interval`.
+
+## Algorithm
+
+### Rules
+
+- Axes are meshed `Interval` by `Interval`, smallest first.
+- `Intervals` are meshed **half by half**.
+- Spaces between lines, including `d` are always bounded to `dmax`.
+- Space between lines cannot exceed adjacent spaces multiplied by the smoothness factor.
+
+### Steps
+
+- Choose `dmax` among `Interval`'s `dmax` and projection from both sides' `d` of `f**(lz+1)`, so the sizes of the two cells around `m` (belonging to both sides) will respect the smoothness factor (`f`).
+- Reduce `d` until enough lines are in the half (`lz >= lmin`).
+- Reduce the smoothness factor (which augments the spaces between lines, except `d`) until `z` matches `s`, that is to say until the last line of the half overlaps with `m` (actually just passed `m`).
+- Trim out the last line, that overlaps `m` (a line at `m`, that will count for both halves, will be placed instead).

@@ -126,6 +126,13 @@ else()
 	message( STATUS "Not found D2: Some parts of doc disabled" )
 endif()
 
+find_program( PDF2SVG NAMES pdf2svg )
+if( PDF2SVG )
+	message( STATUS "Found pdf2svg: ${PDF2SVG}" )
+else()
+	message( STATUS "Not found pdf2svg: Some parts of doc disabled" )
+endif()
+
 if( CMakeUtils_FOUND )
 	set( CMAKE_UTILS * )
 	set( COVERAGE_GLOBAL_ONLY ON )

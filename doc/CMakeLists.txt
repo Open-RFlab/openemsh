@@ -1,5 +1,50 @@
 add_custom_target( doc )
-add_subdirectory( "${CMAKE_CURRENT_SOURCE_DIR}/latex" )
+
+if( CMakeUtils_Latex_FOUND AND PDF2SVG )
+	compile_latex_file( "interval"
+		OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/interval.svg"
+		SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/latex"
+		TEXINPUTS "${CMAKE_CURRENT_SOURCE_DIR}/latex"
+		REGISTER_TO "INTERVAL_FILES"
+		SHELL_ESCAPE
+		)
+endif()
+
+# TODO wrap in configure_file_build_time()
+#configure_file_build_time(
+#	"${CMAKE_CURRENT_SOURCE_DIR}/interval.md.in"
+#	"${CMAKE_CURRENT_BINARY_DIR}/interval.md"
+#	ARGS
+#		@ONLY
+#	VARS
+#		INTERVAL_SVG "./latex/interval.svg"
+#	)
+file( WRITE
+	"${CMAKE_CURRENT_BINARY_DIR}/interval.cmake"
+	"configure_file(\"${CMAKE_CURRENT_SOURCE_DIR}/interval.md.in\" \"${CMAKE_CURRENT_BINARY_DIR}/interval.md\" @ONLY)"
+	)
+add_custom_command(
+	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/interval.md"
+	DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/interval.md.in"
+	COMMAND ${CMAKE_COMMAND}
+		-D INTERVAL_SVG="./latex/interval.svg"
+		-P "${CMAKE_CURRENT_BINARY_DIR}/interval.cmake"
+	)
+
+add_custom_target( interval
+	DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/interval.md" ${INTERVAL_FILES}
+	)
+
+add_dependencies( doc interval )
+
+install(
+	FILES
+		"${CMAKE_CURRENT_BINARY_DIR}/interval.md"
+		${INTERVAL_FILES}
+	DESTINATION "${CMAKE_INSTALL_DOCDIR}"
+	CONFIGURATIONS Release
+	OPTIONAL
+	)
 
 configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/openemsh.1.in"

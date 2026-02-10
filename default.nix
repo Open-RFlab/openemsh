@@ -4,6 +4,7 @@
 , cmake-utils
 , git
 , texlive
+, pdf2svg
 , cli11
 , indicators
 , pugixml
@@ -42,6 +43,7 @@ stdenv.mkDerivation {
     cmake-utils
     git
     wrapQtAppsHook
+    pdf2svg
     (texlive.combine {
       inherit (texlive) scheme-small standalone pgfplots unicode-math;
       # https://ctan.org/tex-archive/fonts/lete-sans-math
