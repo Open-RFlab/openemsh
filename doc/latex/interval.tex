@@ -103,7 +103,7 @@
 %%%% #3 : x
 %%%% #4 : d
 %%%% #5 : d_init
-%%%% #6 : lambda
+%%%% #6 : smoothness
 %%%% #7 : direction
 %%%\newcommand{\createlines}[6] {%
 %%%	% ##1 : n
@@ -143,7 +143,7 @@
 % #3 : x
 % #4 : d
 % #5 : d_init
-% #6 : lambda
+% #6 : smoothness
 % #7 : direction (+ | -)
 \newcommand{\createlines}[7] {%
 	\tikzmath{
@@ -197,7 +197,7 @@
 ] in {\lines} {
 	\draw [line width=0.5pt] (\ox,\oy) ++(0,1)
 		+(\lastn,0) .. controls +(0,0.2) and +(0,0.2) .. +(\n,0)
-		+(\fpeval{(\lastn+\n)/2},0.2) node[above] {$d\cdot\lambda$$^\i$};
+		+(\fpeval{(\lastn+\n)/2},0.2) node[above] {$d\cdot f$$^\i$};
 
 	\pgfmathparse{\dmax < \fpeval{abs(\lastn-\n)}}
 	\ifnum \pgfmathresult>0
