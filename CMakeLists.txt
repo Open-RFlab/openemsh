@@ -39,12 +39,12 @@ message( STATUS "Build type: ${CMAKE_BUILD_TYPE}" )
 option( CPM_DISABLE "Don't use CPM to retrieve dependencies" "$ENV{CPM_DISABLE}" )
 option( OEMSH_PORTABILITY_TWEAKS "Enable some portability tweaks" OFF )
 
+list( APPEND CMAKE_MODULE_PATH
+	"${CMAKE_SOURCE_DIR}/cmake"
+	)
+
 if( NOT CPM_DISABLE )
 	message( STATUS "Downloading dependencies with CPM" )
-
-	list( APPEND CMAKE_MODULE_PATH
-		"${CMAKE_SOURCE_DIR}/cmake"
-		)
 
 	include( CPM )
 
@@ -139,6 +139,7 @@ if( CMakeUtils_FOUND )
 	include( CMakeUtils )
 endif()
 
+include( ConfigureFileBuildTime )
 include( GNUInstallDirs )
 
 set( CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
