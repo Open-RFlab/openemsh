@@ -12,6 +12,7 @@
 , wrapQtAppsHook
 , fetchzip
 , runCommand
+, withDoc ? true
 , withPortabilityTweaks ? false
 }:
 
@@ -45,7 +46,7 @@ stdenv.mkDerivation {
     wrapQtAppsHook
     pdf2svg
     (texlive.combine {
-      inherit (texlive) scheme-small standalone pgfplots unicode-math;
+      inherit (texlive) scheme-small standalone pgfplots unicode-math lato;
       # https://ctan.org/tex-archive/fonts/lete-sans-math
       # TODO use buildTeXLivePackage
 #      lete-sans-math = pkgs.texlivePackages.buildTeXLivePackage {
@@ -100,6 +101,11 @@ stdenv.mkDerivation {
   shellHook = ''
     unset NIX_HARDENING_ENABLE
     export CPM_DISABLE=ON
+  '';
+
+  postBuild = lib.optionals withDoc ''
+    export XDG_CACHE_HOME=$TMPDIR
+    make doc
   '';
 
   postInstall = lib.optionals stdenv.hostPlatform.isWindows ''

@@ -3,8 +3,7 @@ add_custom_target( doc )
 if( CMakeUtils_Latex_FOUND AND PDF2SVG )
 	compile_latex_file( "interval"
 		OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/interval.svg"
-		SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/latex"
-		TEXINPUTS "${CMAKE_CURRENT_SOURCE_DIR}/latex"
+		TEXINPUTS "${CMAKE_CURRENT_SOURCE_DIR}"
 		REGISTER_TO "INTERVAL_FILES"
 		SHELL_ESCAPE
 		)
@@ -15,7 +14,7 @@ configure_file_build_time(
 	"${CMAKE_CURRENT_BINARY_DIR}/interval.md"
 	@ONLY
 	VARS
-		INTERVAL_SVG "./latex/interval.svg"
+		INTERVAL_SVG "./interval.svg"
 	)
 
 add_custom_target( interval
