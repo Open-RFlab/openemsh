@@ -1,0 +1,135 @@
+///*****************************************************************************
+/// @date Feb 2021
+/// @copyright GPL-3.0-or-later
+/// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
+///*****************************************************************************
+
+#include <cstdlib>
+#include <format>
+#include <ranges>
+#include <source_location>
+#include <string>
+
+#include "infra/utils/to_string.hpp"
+#include "utils/logger.hpp"
+
+#include "global.hpp"
+
+using namespace std;
+
+//******************************************************************************
+template<typename T>
+string to_string(T const& t) {
+	if constexpr(is_enum_v<T>)
+		return to_string(t);
+	else
+		return format("{}", t);
+}
+
+//******************************************************************************
+template<typename T, std::size_t N>
+string to_string(array<T, N> const& a) {
+	return a | views::join_with(", ") | ranges::to<string>();
+}
+
+//******************************************************************************
+template<typename ...T>
+string to_string(variant<T...> const& v) {
+	return visit([](auto&& arg) {
+		return to_string(arg);
+	}, v);
+}
+
+//******************************************************************************
+template<typename T>
+string to_string(optional<T> const& t) {
+	if(t.has_value())
+		return to_string(t.value());
+	else
+		return "*";
+}
+
+//******************************************************************************
+template<typename Criteria, typename Value>
+string to_string(domain::Params::PerAxisPer<Criteria, Value> const& m) {
+	string res;
+	for(auto const& [k, v] : m) {
+		auto const& [axis, criteria] = k;
+		res += format("    {{ {}, {}, {} }}\n",
+			to_string(axis),
+			to_string(criteria),
+			to_string(v));
+	}
+	res.pop_back();
+	return res;
+}
+
+namespace domain {
+
+//******************************************************************************
+GlobalParams::GlobalParams(Timepoint* t)
+: Originator(t)
+{}
+
+//******************************************************************************
+GlobalParams::GlobalParams(Params params, Timepoint* t)
+: Originator(t, std::move(params))
+{}
+
+
+//******************************************************************************
+template<auto Member, typename MemberType>
+auto const& GlobalParams::get_per_axis_per_criteria(Axis axis, Material const* material) const {
+	return get_per_axis_per_criteria<Member, MemberType>(axis, material, get_current_state());
+}
+
+//******************************************************************************
+template<auto Member, typename MemberType>
+auto const& GlobalParams::get_per_axis_per_criteria(Axis axis, Material const* material, Params const& state) const {
+	using Key = MemberType::key_type;
+
+	vector<Key> to_try;
+	if(material) {
+		if(!material->name.empty()) {
+			to_try.emplace_back(axis, material->name);
+			to_try.emplace_back(Params::ALL, material->name);
+		}
+		to_try.emplace_back(axis, material->type);
+		to_try.emplace_back(Params::ALL, material->type);
+	}
+	to_try.emplace_back(axis, Params::ALL);
+	to_try.emplace_back(Params::ALL, Params::ALL);
+
+	for(auto const& k : to_try)
+		if((state.*Member).contains(k))
+			return (state.*Member).at(k);
+
+	{
+		[[unlikely]]
+		log({
+			.level = Logger::Level::ERROR,
+			.user_actions = { Logger::UserAction::OK },
+			.message = "This should never happen, please report a bug:",
+			.informative = "Did not match any value to answer the request",
+			.details = format(
+				"Requested value:\n"
+				"- axis: {}\n"
+				"- material: {}\n"
+				"Available values:\n{}\n"
+				"Location (Member is what matters):\n{}",
+				to_string(axis),
+				(material
+				? format("\n    - type: {}\n    - name: {}",
+					to_string(material->type),
+					material->name)
+				: string("nullptr")),
+				to_string(state.*Member),
+				source_location::current().function_name()
+				)
+			});
+		abort();
+//		::unreachable(); // { ALL, ALL } rule MUST be always present if not better
+	}
+}
+
+} // namespace domain

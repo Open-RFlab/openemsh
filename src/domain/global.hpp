@@ -7,7 +7,10 @@
 #pragma once
 
 #include <cstddef>
+#include <map>
+#include <optional>
 #include <utility>
+#include <variant>
 #include <vector>
 
 #include "geometrics/space.hpp"
@@ -28,13 +31,25 @@ struct Params {
 	double consecutive_diagonal_minimal_angle = 20; // Limite between acute / obtuse angles.
 
 	std::vector<std::pair<Axis, double>> input_fixed_meshlines;
+
+	template<typename Criteria, typename Value>
+	using PerAxisPer = std::map<std::tuple<std::optional<Axis>, std::optional<Criteria>>, Value>;
+	static auto constexpr ALL = std::nullopt;
+
+	using Mat = std::variant<Material::Type, std::string>;
 };
 
 //******************************************************************************
 class GlobalParams : public Originator<Params const> {
 public:
-	explicit GlobalParams(Timepoint* t) : Originator(t) {}
-	GlobalParams(Params params, Timepoint* t) : Originator(t, std::move(params)) {}
+	explicit GlobalParams(Timepoint* t);
+	GlobalParams(Params params, Timepoint* t);
+
+private:
+	template<auto Member, typename MemberType>
+	auto const& get_per_axis_per_criteria(Axis axis, Material const* material) const;
+	template<auto Member, typename MemberType>
+	auto const& get_per_axis_per_criteria(Axis axis, Material const* material, Params const& state) const;
 };
 
 inline double equality_tolerance = 1e-8;

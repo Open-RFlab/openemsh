@@ -33,6 +33,7 @@ target_sources( openemsh
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/mesh/interval.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/mesh/meshline.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/mesh/meshline_policy.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/domain/global.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/material.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/meshline_policy_manager.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/domain/conflict_manager.cpp"
