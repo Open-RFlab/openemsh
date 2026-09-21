@@ -11,7 +11,6 @@
 #include <functional>
 
 #include "app/steps.hpp"
-#include "utils/concepts.hpp"
 
 namespace ui::qt {
 
@@ -40,8 +39,8 @@ protected:
 	static bool try_to_bool(Qt::CheckState const in, bool& out);
 
 private:
-	template<Enum E>
-	static void set_content(QStandardItem* item, E e);
+	template<typename T>
+	static void set_content(QStandardItem* item, T t);
 	static void set_content(QStandardItem* item, QString const& s);
 	static void set_content(QStandardItem* item, bool b);
 	static void set_uneditable(QStandardItem* item);
@@ -51,9 +50,9 @@ signals:
 };
 
 //******************************************************************************
-template<Enum E>
-void EditModel::set_content(QStandardItem* item, E e) {
-	item->setData(QVariant::fromValue(e));
+template<typename T>
+void EditModel::set_content(QStandardItem* item, T t) {
+	item->setData(QVariant::fromValue(t));
 }
 
 //******************************************************************************
