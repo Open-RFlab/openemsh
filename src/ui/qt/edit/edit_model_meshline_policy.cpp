@@ -46,7 +46,7 @@ EditModelMeshlinePolicy::EditModelMeshlinePolicy(domain::MeshlinePolicy* meshlin
 }
 
 //******************************************************************************
-void EditModelMeshlinePolicy::commit() {
+bool EditModelMeshlinePolicy::commit() {
 	auto state = meshline_policy->get_current_state();
 
 	auto const are_policy_and_normal_compatible = [&state]() {
@@ -83,7 +83,9 @@ void EditModelMeshlinePolicy::commit() {
 		emit edit_from(app::Step::DETECT_INTERVALS, [&]() {
 			meshline_policy->set_next_state(state);
 		});
+		return true;
 	}
+	return false;
 }
 
 } // namespace ui::qt

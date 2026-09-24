@@ -25,8 +25,8 @@ public slots:
 template<typename Var>
 class EditModelPerAxisPerCriteria : public IEditModelPerAxisPerCriteria {
 public:
-	explicit EditModelPerAxisPerCriteria(QString const& criteria_name, Var::value_type const& default_value, QObject* parent = nullptr);
-	void commit() override;
+	EditModelPerAxisPerCriteria(QString const& criteria_name, Var::value_type const& default_value, QObject* parent = nullptr);
+	bool commit() override;
 	void add_new_row() override;
 
 	void set(Var const& v);

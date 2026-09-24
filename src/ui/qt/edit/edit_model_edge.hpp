@@ -18,7 +18,7 @@ namespace ui::qt {
 class EditModelEdge : public EditModel {
 public:
 	explicit EditModelEdge(domain::Edge* edge, QObject* parent = nullptr);
-	void commit() override;
+	bool commit() override;
 
 private:
 	domain::Edge* edge;

@@ -25,7 +25,7 @@ public:
 	static EditModel* make(nodegraph::Node* node, QObject* parent = nullptr);
 
 	explicit EditModel(QObject* parent = nullptr);
-	virtual void commit();
+	virtual bool commit();
 
 protected:
 	static auto constexpr V = 2; // Value column index.

@@ -94,6 +94,8 @@ EditModel::EditModel(QObject* parent)
 }
 
 //******************************************************************************
-void EditModel::commit() {}
+bool EditModel::commit() {
+	return true;
+}
 
 } // namespace ui::qt

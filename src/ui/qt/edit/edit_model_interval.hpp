@@ -18,7 +18,7 @@ namespace ui::qt {
 class EditModelInterval : public EditModel {
 public:
 	explicit EditModelInterval(domain::Interval* interval, QObject* parent = nullptr);
-	void commit() override;
+	bool commit() override;
 
 private:
 	domain::Interval* interval;

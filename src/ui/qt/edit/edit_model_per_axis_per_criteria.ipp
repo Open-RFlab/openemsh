@@ -9,10 +9,12 @@
 
 #include <algorithm>
 #include <array>
+#include <format>
 #include <tuple>
 
 #include "app/steps.hpp"
 #include "domain/global.hpp"
+#include "infra/utils/to_string.hpp"
 #include "utils/logger.hpp"
 
 Q_DECLARE_METATYPE(domain::Material::Type)
@@ -33,7 +35,7 @@ EditModelPerAxisPerCriteria<Var>::EditModelPerAxisPerCriteria(QString const& cri
 
 //******************************************************************************
 template<typename Var>
-void EditModelPerAxisPerCriteria<Var>::commit() {
+bool EditModelPerAxisPerCriteria<Var>::commit() {
 	Var v;
 
 	using MaterialType = domain::Material::Type;
@@ -66,6 +68,17 @@ void EditModelPerAxisPerCriteria<Var>::commit() {
 
 		if(does_succeed) {
 			v.emplace(std::make_tuple(k1, k2), value);
+		} else {
+			log({
+				.level = Logger::Level::WARNING,
+				.user_actions = { Logger::UserAction::OK },
+				.message = std::format("Invalid data at row {}: {{{}, {}}} = {}",
+					i+1,
+					to_string(k1),
+					to_string(k2),
+					item(i, 2)->text().toStdString())
+			});
+			return false;
 		}
 	}
 
@@ -73,12 +86,13 @@ void EditModelPerAxisPerCriteria<Var>::commit() {
 		log({
 			.level = Logger::Level::WARNING,
 			.user_actions = { Logger::UserAction::OK },
-			.message = "Default rule must be provided:",
-			.informative = "{*, *} = ?"
+			.message = "Default rule must be provided: {*, *} = ?"
 		});
+		return false;
 	}
 
 	var = v;
+	return true;
 }
 
 //******************************************************************************

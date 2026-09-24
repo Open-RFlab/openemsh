@@ -27,7 +27,7 @@ EditModelEdge::EditModelEdge(domain::Edge* edge, QObject* parent)
 }
 
 //******************************************************************************
-void EditModelEdge::commit() {
+bool EditModelEdge::commit() {
 	auto state = edge->get_current_state();
 
 	std::array does_succeed = {
@@ -39,7 +39,9 @@ void EditModelEdge::commit() {
 		emit edit_from(app::Step::DETECT_CONFLICT_EIP, [&]() {
 			edge->set_next_state(state);
 		});
+		return true;
 	}
+	return false;
 }
 
 } // namespace ui::qt

@@ -18,7 +18,7 @@ namespace ui::qt {
 class EditModelConflictDiagonalOrCircularZone : public EditModel {
 public:
 	explicit EditModelConflictDiagonalOrCircularZone(domain::ConflictDiagonalOrCircularZone* conflict, QObject* parent = nullptr);
-	void commit() override;
+	bool commit() override;
 
 private:
 	domain::ConflictDiagonalOrCircularZone* conflict;

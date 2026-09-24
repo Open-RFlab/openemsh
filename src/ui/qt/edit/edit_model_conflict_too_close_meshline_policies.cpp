@@ -26,7 +26,7 @@ EditModelConflictTooCloseMeshlinePolicies::EditModelConflictTooCloseMeshlinePoli
 }
 
 //******************************************************************************
-void EditModelConflictTooCloseMeshlinePolicies::commit() {
+bool EditModelConflictTooCloseMeshlinePolicies::commit() {
 	auto state = conflict->get_current_state();
 
 	std::array does_succeed = {
@@ -37,7 +37,9 @@ void EditModelConflictTooCloseMeshlinePolicies::commit() {
 		emit edit_from(app::Step::DETECT_AND_SOLVE_TCMLP, [&]() {
 			conflict->set_next_state(state);
 		});
+		return true;
 	}
+	return false;
 }
 
 } // namespace ui::qt

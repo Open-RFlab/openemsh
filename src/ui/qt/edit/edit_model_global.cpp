@@ -43,7 +43,7 @@ EditModelGlobal::EditModelGlobal(domain::GlobalParams* global, QObject* parent)
 }
 
 //******************************************************************************
-void EditModelGlobal::commit() {
+bool EditModelGlobal::commit() {
 	domain::Params params;
 
 	std::array does_succeed = {
@@ -60,6 +60,9 @@ void EditModelGlobal::commit() {
 		emit edit_from(app::Step::DETECT_DIAG_ZONES, [&]() {
 			global->set_next_state(params);
 		});
+		return true;
+	} else {
+		return false;
 	}
 }
 

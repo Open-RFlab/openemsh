@@ -39,7 +39,7 @@ EditModelInterval::EditModelInterval(domain::Interval* interval, QObject* parent
 }
 
 //******************************************************************************
-void EditModelInterval::commit() {
+bool EditModelInterval::commit() {
 	auto state = interval->get_current_state();
 
 	std::array does_succeed = {
@@ -54,7 +54,9 @@ void EditModelInterval::commit() {
 		emit edit_from(app::Step::MESH, [&] {
 			interval->set_next_state(state);
 		});
+		return true;
 	}
+	return false;
 }
 
 } // namespace ui::qt

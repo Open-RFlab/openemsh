@@ -18,7 +18,7 @@ namespace ui::qt {
 class EditModelConflictTooCloseMeshlinePolicies : public EditModel {
 public:
 	explicit EditModelConflictTooCloseMeshlinePolicies(domain::ConflictTooCloseMeshlinePolicies* conflict, QObject* parent = nullptr);
-	void commit() override;
+	bool commit() override;
 
 private:
 	domain::ConflictTooCloseMeshlinePolicies* conflict;

@@ -31,7 +31,7 @@ EditModelConflictDiagonalOrCircularZone::EditModelConflictDiagonalOrCircularZone
 }
 
 //******************************************************************************
-void EditModelConflictDiagonalOrCircularZone::commit() {
+bool EditModelConflictDiagonalOrCircularZone::commit() {
 	auto state = conflict->get_current_state();
 
 	std::array does_succeed = {
@@ -46,7 +46,9 @@ void EditModelConflictDiagonalOrCircularZone::commit() {
 		               : app::Step::SOLVE_DIAG_ZONES_INTERVALS), [&]() {
 			conflict->set_next_state(state);
 		});
+		return true;
 	}
+	return false;
 }
 
 } // namespace ui::qt
