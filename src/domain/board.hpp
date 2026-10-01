@@ -94,6 +94,7 @@ public:
 	void detect_diagonal_angles(Plane plane);
 	void detect_diagonal_zones(Plane plane);
 	void add_fixed_meshline_policies(Axis axis);
+	void adjust_mesh_to_materials(Axis axis);
 
 	void adjust_edges_to_materials();
 	void detect_diagonal_angles();
@@ -104,6 +105,7 @@ public:
 	void detect_colinear_edges();
 	void detect_individual_edges();
 	void add_fixed_meshline_policies();
+	void adjust_mesh_to_materials();
 
 	/// Mesh resolution dependant detection tasks
 	///*************************************************************************
@@ -127,6 +129,7 @@ public:
 	std::size_t get_mesh_cell_number() const;
 
 private:
+	std::shared_ptr<Material> find_ambient_material(Axis axis, Coord const& coord) const;
 	std::shared_ptr<Material> find_ambient_material(Plane plane, Segment const& segment) const;
 	std::pair<std::shared_ptr<Material>, std::remove_const_t<decltype(Polygon::priority)>> find_ambient_material(Plane plane, Segment const& segment, std::shared_ptr<Polygon> const& current_polygon) const;
 };

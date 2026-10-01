@@ -126,10 +126,8 @@ void ParserFromCsx::Pimpl::warn_unsupported_primitive(string const& primitive_ty
 //******************************************************************************
 expected<void, string> ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& node) {
 	pugi::xml_node global_params = node.child("GlobalParams");
-	if(auto a = global_params.attribute("ProximityLimit"); a) domain_params.proximity_limit = a.as_double();
-	if(auto a = global_params.attribute("Smoothness"); a) domain_params.smoothness = a.as_double();
-	if(auto a = global_params.attribute("dmax"); a) domain_params.dmax = a.as_double();
-	if(auto a = global_params.attribute("lmin"); a) domain_params.lmin = a.as_uint();
+	if(auto a = global_params.attribute("ProximityLimit"); a)
+		domain_params.proximity_limit = a.as_double();
 
 	static std::map<std::string, optional<domain::Axis>> const axes {
 		{ "X", domain::Axis::X },
@@ -183,6 +181,11 @@ expected<void, string> ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& n
 		}
 		return {};
 	};
+
+	pugi::xml_node per_material_params = node.child("PerMaterialParams");
+	TRY(parse_per_material(domain_params.dmax, per_material_params.child("dmax")));
+	TRY(parse_per_material(domain_params.lmin, per_material_params.child("lmin")));
+	TRY(parse_per_material(domain_params.smoothness, per_material_params.child("smoothness")));
 
 	pugi::xml_node fixed_meshlines = node.child("FixedMeshlines");
 	size_t delta_unit = fixed_meshlines.attribute("DeltaUnit").as_uint(1);

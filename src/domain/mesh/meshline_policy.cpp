@@ -4,6 +4,7 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include "domain/global.hpp"
 #include "domain/geometrics/point.hpp"
 #include "utils/unreachable.hpp"
 #include "meshline.hpp"
@@ -28,7 +29,7 @@ MeshlinePolicy::MeshlinePolicy(
 	.policy = policy,
 	.normal = normal,
 	.is_enabled = is_enabled,
-	.d = global_params->get_current_state().dmax / 2, // TODO this seems to help while center of intervals is buggy
+	.d = global_params->get_dmax(axis) / 2, // TODO this seems to help while center of intervals is buggy
 	.origins = origins
 })
 , axis(axis)

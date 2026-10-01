@@ -321,21 +321,6 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 		"Distance under which two adjacent lines trigger a conflict."
 	)->group("Mesher options");
 
-	app.add_option_function<decltype(domain::Params::dmax)>("--dmax",
-		make_overrider<&domain::Params::dmax>(domain_overrides),
-		"Maximum distance between two adjacent lines."
-	)->group("Mesher options"); // TODO is in fact mres / sres / ares
-
-	app.add_option_function<decltype(domain::Params::lmin)>("--lmin",
-		make_overrider<&domain::Params::lmin>(domain_overrides),
-		"Minimum line number per interval half."
-	)->group("Mesher options");
-
-	app.add_option_function<decltype(domain::Params::smoothness)>("--smoothness",
-		make_overrider<&domain::Params::smoothness>(domain_overrides),
-		"Smoothness factor ]1;2]."
-	)->group("Mesher options")->check(BoundExclusiveInclusive(1.0, 2.0));
-
 	app.add_option_function<decltype(domain::Params::diagonal_dmax)>("--diag-dmax",
 		make_overrider<&domain::Params::diagonal_dmax>(domain_overrides),
 		"Maximum distance between two adjacent lines in diagonal zones."
@@ -350,6 +335,16 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 		make_overrider<&domain::Params::consecutive_diagonal_minimal_angle>(domain_overrides),
 		"Angle threshold, above which angles between diagonal edges will generate MeshlinePolicies."
 	)->group("Mesher options");
+
+	// TODO is in fact mres / sres / ares
+	add_per_material_type_option<&domain::Params::dmax, decltype(domain::Params::dmax)>("dmax", "Maximum distance between two adjacent lines.", app, domain_overrides);
+	add_per_material_name_option<&domain::Params::dmax, decltype(domain::Params::dmax)>("dmax", "Maximum distance between two adjacent lines.", app, domain_overrides);
+
+	add_per_material_type_option<&domain::Params::lmin, decltype(domain::Params::lmin)>("lmin", "Minimum line number per interval half.", app, domain_overrides);
+	add_per_material_name_option<&domain::Params::lmin, decltype(domain::Params::lmin)>("lmin", "Minimum line number per interval half.", app, domain_overrides);
+
+	add_per_material_type_option<&domain::Params::smoothness, decltype(domain::Params::smoothness)>("smoothness", "Smoothness factor ]1;2].", app, domain_overrides)->check(BoundExclusiveInclusive(1.0, 2.0).application_index(2));
+	add_per_material_name_option<&domain::Params::smoothness, decltype(domain::Params::smoothness)>("smoothness", "Smoothness factor ]1;2].", app, domain_overrides)->check(BoundExclusiveInclusive(1.0, 2.0).application_index(2));
 
 	app.add_flag("--no-x", [&params](size_t) { params.with_axis_x = false; }, "Don't include X axis meshlines in output.")->group("Output options");
 	app.add_flag("--no-y", [&params](size_t) { params.with_axis_y = false; }, "Don't include Y axis meshlines in output.")->group("Output options");

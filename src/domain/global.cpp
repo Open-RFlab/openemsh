@@ -132,4 +132,34 @@ auto const& GlobalParams::get_per_axis_per_criteria(Axis axis, Material const* m
 	}
 }
 
+//******************************************************************************
+auto GlobalParams::get_dmax(Axis axis, Material const* material) const -> decltype(Params::dmax)::mapped_type const& {
+	return get_dmax(axis, material, get_current_state());
+}
+
+//******************************************************************************
+auto GlobalParams::get_lmin(Axis axis, Material const* material) const -> decltype(Params::lmin)::mapped_type const& {
+	return get_lmin(axis, material, get_current_state());
+}
+
+//******************************************************************************
+auto GlobalParams::get_smoothness(Axis axis, Material const* material) const -> decltype(Params::smoothness)::mapped_type const& {
+	return get_smoothness(axis, material, get_current_state());
+}
+
+//******************************************************************************
+auto GlobalParams::get_dmax(Axis axis, Material const* material, Params const& state) const -> decltype(Params::dmax)::mapped_type const& {
+	return get_per_axis_per_criteria<&Params::dmax, decltype(Params::dmax)>(axis, material, state);
+}
+
+//******************************************************************************
+auto GlobalParams::get_lmin(Axis axis, Material const* material, Params const& state) const -> decltype(Params::lmin)::mapped_type const& {
+	return get_per_axis_per_criteria<&Params::lmin, decltype(Params::lmin)>(axis, material, state);
+}
+
+//******************************************************************************
+auto GlobalParams::get_smoothness(Axis axis, Material const* material, Params const& state) const -> decltype(Params::smoothness)::mapped_type const& {
+	return get_per_axis_per_criteria<&Params::smoothness, decltype(Params::smoothness)>(axis, material, state);
+}
+
 } // namespace domain

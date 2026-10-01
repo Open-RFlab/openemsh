@@ -20,7 +20,7 @@ using namespace std;
 ConflictDiagonalOrCircularZone::ConflictDiagonalOrCircularZone(Axis axis, vector<Angle*> const& angles, GlobalParams* global_params, Timepoint* t)
 : Originator(t, {
 	.dmax = global_params->get_current_state().diagonal_dmax,
-	.lmin = global_params->get_current_state().lmin,
+	.lmin = global_params->get_lmin(axis),
 	.minimal_angle = global_params->get_current_state().consecutive_diagonal_minimal_angle,
 	.angles = angles })
 , Conflict(Kind::DIAGONAL_OR_CIRCULAR_ZONE)
@@ -89,8 +89,10 @@ void ConflictDiagonalOrCircularZone::solve_intervals() {
 
 	for(Interval* interval : state.intervals) {
 		auto state_i = interval->get_current_state();
-		state_i.dmax = state.dmax;
-		interval->set_state(t, state_i);
+		if(state.dmax < state_i.dmax) {
+			state_i.dmax = state.dmax;
+			interval->set_state(t, state_i);
+		}
 	}
 }
 

@@ -45,6 +45,8 @@ optional<Step> next(Step step) {
 	case Step::DETECT_AND_SOLVE_TCMLP:
 		return Step::DETECT_INTERVALS;
 	case Step::DETECT_INTERVALS:
+		return Step::ADJUST_MESH_TO_MATERIAL;
+	case Step::ADJUST_MESH_TO_MATERIAL:
 		return Step::DETECT_INTERVALS_PER_DIAG_ZONES;
 	case Step::DETECT_INTERVALS_PER_DIAG_ZONES:
 		return Step::SOLVE_DIAG_ZONES_INTERVALS;
@@ -75,6 +77,7 @@ set<Step> that_and_after(Step step) {
 	case DETECT_INDIVIDUAL_EDGES:         out.emplace(DETECT_INDIVIDUAL_EDGES);         [[fallthrough]];
 	case DETECT_AND_SOLVE_TCMLP:          out.emplace(DETECT_AND_SOLVE_TCMLP);          [[fallthrough]];
 	case DETECT_INTERVALS:                out.emplace(DETECT_INTERVALS);                [[fallthrough]];
+	case ADJUST_MESH_TO_MATERIAL:         out.emplace(ADJUST_MESH_TO_MATERIAL);         [[fallthrough]];
 	case DETECT_INTERVALS_PER_DIAG_ZONES: out.emplace(DETECT_INTERVALS_PER_DIAG_ZONES); [[fallthrough]];
 	case SOLVE_DIAG_ZONES_INTERVALS:      out.emplace(SOLVE_DIAG_ZONES_INTERVALS);      [[fallthrough]];
 	case MESH:                            out.emplace(MESH);                            break;
@@ -178,6 +181,7 @@ void OpenEMSH::run(std::set<Step> const& steps) const {
 	handle(DETECT_INDIVIDUAL_EDGES,         [&] { board->detect_individual_edges(); });
 	handle(DETECT_AND_SOLVE_TCMLP,          [&] { board->detect_and_solve_too_close_meshline_policies(); });
 	handle(DETECT_INTERVALS,                [&] { board->detect_intervals(); });
+	handle(ADJUST_MESH_TO_MATERIAL,         [&] { board->adjust_mesh_to_materials(); });
 	handle(DETECT_INTERVALS_PER_DIAG_ZONES, [&] { board->detect_intervals_per_diagonal_zones(); });
 	handle(SOLVE_DIAG_ZONES_INTERVALS,      [&] { board->solve_diagonal_zones_intervals(); });
 	handle(MESH,                            [&] { board->mesh(); });

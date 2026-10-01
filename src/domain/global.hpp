@@ -15,6 +15,7 @@
 
 #include "geometrics/space.hpp"
 #include "utils/state_management.hpp"
+#include "material.hpp"
 
 namespace domain {
 
@@ -22,9 +23,6 @@ namespace domain {
 struct Params {
 	bool has_grid_already = false; // TODO would better fit in infra layer?
 	double proximity_limit = 1; // TODO must be linked to initial d
-	double smoothness = 2;
-	std::size_t lmin = 2;
-	double dmax = 2.5;
 
 	std::size_t diagonal_lmin = 2;
 	double diagonal_dmax = 0.2;
@@ -37,6 +35,10 @@ struct Params {
 	static auto constexpr ALL = std::nullopt;
 
 	using Mat = std::variant<Material::Type, std::string>;
+
+	PerAxisPer<Mat, double> dmax = {{{ ALL, ALL }, 2.5 }};
+	PerAxisPer<Mat, size_t> lmin = {{{ ALL, ALL }, 2 }};
+	PerAxisPer<Mat, double> smoothness = {{{ ALL, ALL }, 2 }};
 };
 
 //******************************************************************************
@@ -44,6 +46,14 @@ class GlobalParams : public Originator<Params const> {
 public:
 	explicit GlobalParams(Timepoint* t);
 	GlobalParams(Params params, Timepoint* t);
+
+	auto get_dmax(Axis axis, Material const* material = nullptr) const -> decltype(Params::dmax)::mapped_type const&;
+	auto get_lmin(Axis axis, Material const* material = nullptr) const -> decltype(Params::lmin)::mapped_type const&;
+	auto get_smoothness(Axis axis, Material const* material = nullptr) const -> decltype(Params::smoothness)::mapped_type const&;
+
+	auto get_dmax(Axis axis, Material const* material, Params const& state) const -> decltype(Params::dmax)::mapped_type const&;
+	auto get_lmin(Axis axis, Material const* material, Params const& state) const -> decltype(Params::lmin)::mapped_type const&;
+	auto get_smoothness(Axis axis, Material const* material, Params const& state) const -> decltype(Params::smoothness)::mapped_type const&;
 
 private:
 	template<auto Member, typename MemberType>

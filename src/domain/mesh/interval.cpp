@@ -44,8 +44,8 @@ Coord calc_h(Coord const& a, Coord const& b) noexcept {
 //******************************************************************************
 Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, GlobalParams* global_params, Timepoint* t)
 : Originator(t, {
-	.dmax = global_params->get_current_state().dmax,
-	.before = Side(before, global_params->get_current_state().lmin, global_params->get_current_state().smoothness, calc_h(before->coord, after->coord), [before](double d) noexcept {
+	.dmax = global_params->get_dmax(axis),
+	.before = Side(before, global_params->get_lmin(axis), global_params->get_smoothness(axis), calc_h(before->coord, after->coord), [before](double d) noexcept {
 		switch(before->get_current_state().policy) {
 		case MeshlinePolicy::Policy::ONELINE: return 0.0;
 		case MeshlinePolicy::Policy::HALFS: return d / 2.0;
@@ -62,7 +62,7 @@ Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Glo
 		default: ::unreachable();
 		}
 	}),
-	.after = Side(after, global_params->get_current_state().lmin, global_params->get_current_state().smoothness, calc_h(before->coord, after->coord), [after](double d) noexcept {
+	.after = Side(after, global_params->get_lmin(axis), global_params->get_smoothness(axis), calc_h(before->coord, after->coord), [after](double d) noexcept {
 		switch(after->get_current_state().policy) {
 		case MeshlinePolicy::Policy::ONELINE: return 0.0;
 		case MeshlinePolicy::Policy::HALFS: return d / 2.0;
@@ -78,7 +78,8 @@ Interval::Interval(MeshlinePolicy* before, MeshlinePolicy* after, Axis axis, Glo
 		} ();
 		default: ::unreachable();
 		}
-	})
+	}),
+	.main_material = nullptr
 })
 , global_params(global_params)
 , axis(axis)
@@ -369,12 +370,12 @@ void Interval::auto_solve_d() {
 	update_ls(state);
 
 	auto state_b = state.before.meshline_policy->get_current_state();
+	auto state_a = state.after.meshline_policy->get_current_state();
+
 	state_b.d = get<0>(adjust_d_for_dmax_lmin(state.before/*, 10000*/));
 	state.before.meshline_policy->set_state(t, state_b);
 	update_ls(state.before);
 
-
-	auto state_a = state.after.meshline_policy->get_current_state();
 	state_a.d = get<0>(adjust_d_for_dmax_lmin(state.after/*, 10000*/));
 	state.after.meshline_policy->set_state(t, state_a);
 	update_ls(state.after);
