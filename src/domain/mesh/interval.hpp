@@ -17,6 +17,7 @@
 #include "domain/geometrics/space.hpp"
 #include "domain/utils/entity_visitor.hpp"
 #include "domain/global.hpp"
+#include "domain/material.hpp"
 #include "utils/entity.hpp"
 #include "utils/state_management.hpp"
 
@@ -39,10 +40,8 @@ class Interval
 : public Originator<IntervalState const>
 , public Visitable<Interval, EntityVisitor>
 , public Entity {
-private:
-	GlobalParams* global_params;
-
 public:
+	GlobalParams* global_params;
 	Axis const axis;
 
 	struct Side {
@@ -88,6 +87,7 @@ struct IntervalState final
 	double dmax;      ///< Maximum distance between two adjacent meshlines.
 	Interval::Side before;
 	Interval::Side after;
+	Material* main_material;
 };
 
 #ifdef UNITTEST

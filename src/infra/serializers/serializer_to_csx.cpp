@@ -172,9 +172,12 @@ void SerializerToCsx::visit(Board& board) {
 		pugi::xml_node global_params = find_or_append_child(oemsh, "GlobalParams");
 		global_params.remove_attributes();
 		global_params.append_attribute("ProximityLimit").set_value(p.proximity_limit);
-		global_params.append_attribute("Smoothness").set_value(p.smoothness);
-		global_params.append_attribute("dmax").set_value(p.dmax);
-		global_params.append_attribute("lmin").set_value(p.lmin);
+		pugi::xml_node per_material_params = find_or_append_child(oemsh, "PerMaterialParams");
+		per_material_params.remove_attributes();
+		per_material_params.remove_children();
+		handle_per_material(p.smoothness, per_material_params.append_child("smoothness"));
+		handle_per_material(p.dmax, per_material_params.append_child("dmax"));
+		handle_per_material(p.lmin, per_material_params.append_child("lmin"));
 	} else {
 		doc.remove_child("OpenEMSH");
 	}

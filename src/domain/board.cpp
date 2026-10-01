@@ -174,6 +174,43 @@ Board::Board(
 }
 
 //******************************************************************************
+shared_ptr<Material> Board::find_ambient_material(Axis axis, Coord const& coord) const {
+	// TODO is this order (view_axis) in phase with B1D cast(view_axis, B2D) ?
+	auto planes = [](Axis axis) -> array<Plane, 2> {
+		switch(axis) {
+		case X: return { ZX, XY };
+		case Y: return { YZ, XY };
+		case Z: return { YZ, ZX };
+		default: ::unreachable();
+		}
+	} (axis);
+
+	vector<pair<shared_ptr<Material>, remove_const_t<decltype(Polygon::priority)>>> materials;
+
+	for(ViewAxis view_axis : AllViewAxis) {
+		for(shared_ptr<Polygon> const& polygon : get_current_state().polygons[planes[view_axis]]) {
+			if(polygon->material
+			&& does_overlap(cast(view_axis, polygon->bounding), coord)) {
+				materials.emplace_back(shared_ptr<Material>(polygon->material), polygon->priority);
+			}
+		}
+	}
+
+	ranges::sort(materials, [](auto const& a, auto const& b) {
+		auto const& [material_a, priority_a] = a;
+		auto const& [material_b, priority_b] = b;
+		return priority_a != priority_b
+		     ? priority_a < priority_b
+		     : *material_a < *material_b;
+	});
+
+	if(!materials.empty())
+		return materials.back().first;
+	else
+		return material;
+}
+
+//******************************************************************************
 shared_ptr<Material> Board::find_ambient_material(Plane plane, Segment const& segment) const {
 	return find_ambient_material(plane, segment, nullptr).first;
 }
@@ -620,6 +657,35 @@ void Board::add_fixed_meshline_policies(Axis axis) {
 }
 
 //******************************************************************************
+void Board::adjust_mesh_to_materials(Axis axis) {
+	auto [t, state_mlpm] = line_policy_manager->make_next_state();
+
+	auto [bar, i, _] = Progress::Bar::build(
+		state_mlpm.intervals[axis].size() + 1,
+		"["s + to_string(axis) + "] Adjusting mesh to Materials ");
+
+	for(auto const& interval : state_mlpm.intervals[axis]) {
+		auto const& params = global_params->get_current_state();
+		auto state_i = interval->get_current_state();
+		auto material = find_ambient_material(axis, interval->m);
+
+		auto const& lmin = global_params->get_lmin(axis, material.get(), params);
+		auto const& smoothness = global_params->get_smoothness(axis, material.get(), params);
+		state_i.main_material = material.get();
+		state_i.dmax = min(state_i.dmax, global_params->get_dmax(axis, material.get(), params));
+		state_i.before.lmin = lmin;
+		state_i.after.lmin = lmin;
+		state_i.before.smoothness = smoothness;
+		state_i.after.smoothness = smoothness;
+
+		interval->set_state(t, state_i);
+		bar.tick(++i);
+	}
+
+	bar.complete();
+}
+
+//******************************************************************************
 void Board::adjust_edges_to_materials() {
 	for(auto const& plane : AllPlane)
 		adjust_edges_to_materials(plane);
@@ -671,6 +737,12 @@ void Board::detect_individual_edges() {
 void Board::add_fixed_meshline_policies() {
 	for(auto const& axis : AllAxis)
 		add_fixed_meshline_policies(axis);
+}
+
+//******************************************************************************
+void Board::adjust_mesh_to_materials() {
+	for(auto const& axis : AllAxis)
+		adjust_mesh_to_materials(axis);
 }
 
 //******************************************************************************

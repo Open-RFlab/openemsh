@@ -26,6 +26,7 @@ enum class Step {
 	DETECT_INDIVIDUAL_EDGES,
 	DETECT_AND_SOLVE_TCMLP,
 	DETECT_INTERVALS,
+	ADJUST_MESH_TO_MATERIAL,
 	DETECT_INTERVALS_PER_DIAG_ZONES,
 	SOLVE_DIAG_ZONES_INTERVALS,
 	MESH
@@ -49,9 +50,10 @@ inline std::size_t index(std::optional<Step> step) {
 	case Step::DETECT_INDIVIDUAL_EDGES: return 10;
 	case Step::DETECT_AND_SOLVE_TCMLP: return 11;
 	case Step::DETECT_INTERVALS: return 12;
-	case Step::DETECT_INTERVALS_PER_DIAG_ZONES: return 13;
-	case Step::SOLVE_DIAG_ZONES_INTERVALS: return 14;
-	case Step::MESH: return 15;
+	case Step::ADJUST_MESH_TO_MATERIAL: return 13;
+	case Step::DETECT_INTERVALS_PER_DIAG_ZONES: return 14;
+	case Step::SOLVE_DIAG_ZONES_INTERVALS: return 15;
+	case Step::MESH: return 16;
 	default: ::unreachable();
 	}
 }
