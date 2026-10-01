@@ -6,9 +6,13 @@
 
 #include <pugixml.hpp>
 
+#include <variant>
+
 #include "domain/mesh/meshline.hpp"
+#include "domain/global.hpp"
 #include "domain/board.hpp"
 #include "utils/unreachable.hpp"
+#include "utils/variant_utils.hpp"
 
 #include "serializer_to_csx.hpp"
 
@@ -16,13 +20,45 @@ using namespace domain;
 using namespace std;
 
 //******************************************************************************
-string to_xml_node(Axis const axis) noexcept {
+static string to_xml_node(Axis const axis) noexcept {
 	switch(axis) {
 	case X: return "XLines";
 	case Y: return "YLines";
 	case Z: return "ZLines";
 	default: ::unreachable();
 	}
+}
+
+//******************************************************************************
+static string to_string(optional<Axis> const& axis) noexcept {
+	if(axis.has_value())
+		switch(axis.value()) {
+		case X: return "X";
+		case Y: return "Y";
+		case Z: return "Z";
+		default: ::unreachable();
+		}
+	else
+		return "*";
+}
+
+//******************************************************************************
+static string to_string(Material::Type const type) noexcept {
+	switch(type) {
+	case Material::Type::PORT: return "Port";
+	case Material::Type::CONDUCTOR: return "Conductor";
+	case Material::Type::DIELECTRIC: return "Dielectric";
+	case Material::Type::AIR: return "Air";
+	default: ::unreachable();
+	}
+}
+
+//******************************************************************************
+static string to_string(optional<Material::Type> const& type) noexcept {
+	if(type.has_value())
+		return to_string(type.value());
+	else
+		return "*";
 }
 
 //******************************************************************************
@@ -115,6 +151,22 @@ void SerializerToCsx::visit(Board& board) {
 		add_meshlines_to_xml_doc(Z);
 
 	if(params.with_oemsh_params) {
+		auto const handle_per_material = [](auto const& var, pugi::xml_node&& node) {
+			for(auto const& [k, v] : var) {
+				auto const& [axis, material] = k;
+				pugi::xml_node r = node.append_child("Rule");
+				r.append_attribute("Axis").set_value(to_string(axis));
+				if(material.has_value())
+					std::visit(overloaded {
+						[&](std::string const& name) { r.append_attribute("Name").set_value(name); },
+						[&](Material::Type const& type) { r.append_attribute("Type").set_value(to_string(type)); }
+					}, material.value());
+				else
+					r.append_attribute("Type").set_value("*");
+				r.append_attribute("Value").set_value(v);
+			}
+		};
+
 		auto const& p = board.global_params->get_current_state();
 		pugi::xml_node oemsh = find_or_prepend_child(doc, "OpenEMSH");
 		pugi::xml_node global_params = find_or_append_child(oemsh, "GlobalParams");

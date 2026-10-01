@@ -13,6 +13,7 @@
 #include <set>
 #include <string_view>
 #include <system_error>
+#include <type_traits>
 
 #include <pugixml.hpp>
 
@@ -129,6 +130,59 @@ expected<void, string> ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& n
 	if(auto a = global_params.attribute("Smoothness"); a) domain_params.smoothness = a.as_double();
 	if(auto a = global_params.attribute("dmax"); a) domain_params.dmax = a.as_double();
 	if(auto a = global_params.attribute("lmin"); a) domain_params.lmin = a.as_uint();
+
+	static std::map<std::string, optional<domain::Axis>> const axes {
+		{ "X", domain::Axis::X },
+		{ "Y", domain::Axis::Y },
+		{ "Z", domain::Axis::Z },
+		{ "*", nullopt }
+	};
+	static std::map<std::string, optional<domain::Material::Type>> const material_types {
+		{ "Conductor", domain::Material::Type::CONDUCTOR },
+		{ "Dielectric", domain::Material::Type::DIELECTRIC },
+		{ "Air", domain::Material::Type::AIR },
+		{ "*", nullopt }
+	};
+
+	auto const parse_per_material = [](auto& var, pugi::xml_node const& node) -> expected<void, string> {
+		for(auto const& rule : node.children()) {
+			auto a = rule.attribute("Axis");
+			auto v = rule.attribute("Value");
+			auto n = rule.attribute("Name");
+			auto t = rule.attribute("Type");
+
+			if(v
+			&& (a && axes.contains(a.as_string()))
+			&& (n || (t && material_types.contains(t.as_string())))) {
+				var.insert_or_assign(
+					{
+						axes.at(a.as_string()),
+						[&]() -> tuple_element<1, typename remove_reference_t<decltype(var)>::key_type>::type {
+							if(n)
+								return string(n.as_string());
+							else
+								return material_types.at(t.as_string());
+						} ()
+					},
+					[&]() {
+						using V = typename remove_reference_t<decltype(var)>::mapped_type;
+						if constexpr(is_floating_point_v<V>) {
+							return v.as_double();
+						} else if constexpr(is_integral_v<V>) {
+							return v.as_uint();
+						} else {
+							static_assert(false, "Usupported case");
+						}
+					} ()
+				);
+			} else {
+				ostringstream rule_text;
+				rule.print(rule_text, "", pugi::format_raw);
+				return unexpected(format("Invalid rule \"{}\"", rule_text.str()));
+			}
+		}
+		return {};
+	};
 
 	pugi::xml_node fixed_meshlines = node.child("FixedMeshlines");
 	size_t delta_unit = fixed_meshlines.attribute("DeltaUnit").as_uint(1);
