@@ -12,6 +12,11 @@ using namespace std;
 
 namespace domain {
 
+//******************************************************************************
+double Material::calc_wavelength_in_vacuum(double f) {
+	return c_0 / f;
+}
+
 /// Simplified deduction.
 ///*****************************************************************************
 Material::Type Material::deduce_type(double epsilon, double mue, double kappa) {

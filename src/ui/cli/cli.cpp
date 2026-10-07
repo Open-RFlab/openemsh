@@ -373,6 +373,10 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
+	domain_overrides.emplace_back([](auto& to_override) {
+		domain::GlobalParams::switch_all_lengths_between_absolute_and_wavelength_relative(to_override);
+	});
+
 	params.override_from_cli = [domain_overrides](domain::Params& to_override) {
 		for(auto const& apply : domain_overrides)
 			apply(to_override);

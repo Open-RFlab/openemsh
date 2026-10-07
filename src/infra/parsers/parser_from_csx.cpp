@@ -88,6 +88,7 @@ public:
 
 	expected<void, string> parse_oemsh(pugi::xml_node const& node);
 	expected<void, string> parse_grid(pugi::xml_node const& node);
+	expected<void, string> parse_fdtd(pugi::xml_node const& node);
 
 	shared_ptr<Material> parse_property(pugi::xml_node const& node);
 
@@ -209,11 +210,11 @@ expected<void, string> ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& n
 //******************************************************************************
 expected<void, string> ParserFromCsx::Pimpl::parse_grid(pugi::xml_node const& node) {
 	std::size_t coord_system = node.attribute("CoordSystem").as_uint();
-	std::size_t delta_unit = node.attribute("DeltaUnit").as_uint(1);
 
 	if(coord_system == 0) {
 		// First step : into bool has_grid_already
 		pugi::xml_node grid = node.child("RectilinearGrid");
+		domain_params.delta_unit = grid.attribute("DeltaUnit").as_double(1);
 		AxisSpace<string_view> lines = {
 			grid.child_value("XLines"),
 			grid.child_value("YLines"),
@@ -226,7 +227,7 @@ expected<void, string> ParserFromCsx::Pimpl::parse_grid(pugi::xml_node const& no
 				for(auto const part : views::split(lines[axis], ',')) {
 					string_view str(part);
 					if(auto line = str_to_double(str); line.has_value())
-						board.add_fixed_meshline_policy(axis, delta_unit * line.value());
+						board.add_fixed_meshline_policy(axis, domain_params.delta_unit * line.value()); // TODO *unit might not be required here
 					else
 						return unexpected(format("Invalid meshline value \"{}\": {}", str, line.error()));
 				}
@@ -236,6 +237,17 @@ expected<void, string> ParserFromCsx::Pimpl::parse_grid(pugi::xml_node const& no
 //	} else if(coord_system == 1) {
 	} else {
 		return unexpected("Unsupported CoordSystem");
+	}
+	return {};
+}
+
+//******************************************************************************
+expected<void, string> ParserFromCsx::Pimpl::parse_fdtd(pugi::xml_node const& node) {
+	if(auto a = node.attribute("f_max"); a) {
+		double f_max = a.as_double();
+		domain_params.wavelength_min_vacuum = Material::calc_wavelength_in_vacuum(f_max);
+	} else {
+		return unexpected(format("No maximal frequency specified"));
 	}
 	return {};
 }
@@ -746,6 +758,7 @@ expected<void, string> ParserFromCsx::parse() {
 	};
 
 	pugi::xpath_node fdtd = doc.select_node(root("/FDTD").c_str());
+	TRY(pimpl->parse_fdtd(fdtd.node()));
 
 	pugi::xpath_node csx = doc.select_node(root("/ContinuousStructure").c_str());
 	TRY(pimpl->parse_grid(csx.node()));

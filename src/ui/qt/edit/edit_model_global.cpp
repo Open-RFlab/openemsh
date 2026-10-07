@@ -23,7 +23,8 @@ EditModelGlobal::EditModelGlobal(domain::GlobalParams* global, QObject* parent)
 : EditModel(parent)
 , global(global)
 {
-	auto const& params = global->get_current_state();
+	auto params = global->get_current_state();
+	domain::GlobalParams::switch_all_lengths_between_absolute_and_wavelength_relative(params);
 	setRowCount(7);
 
 	make_row(0, "Proximity limit", QString::number(params.proximity_limit),
@@ -58,6 +59,8 @@ bool EditModelGlobal::commit() {
 	};
 
 	if(std::ranges::all_of(does_succeed, is_true)) {
+		domain::GlobalParams::switch_all_lengths_between_absolute_and_wavelength_relative(params);
+
 		emit edit_from(app::Step::DETECT_DIAG_ZONES, [&]() {
 			global->set_next_state(params);
 		});
