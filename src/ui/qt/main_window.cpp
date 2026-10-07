@@ -70,6 +70,7 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 
 	update_board_dependant_buttons_visibility(false);
 
+	ui->statusBar->addPermanentWidget(ui->l_wavelength_min_vacuum);
 	ui->statusBar->addPermanentWidget(ui->l_cell_number);
 
 	ui->a_edit->setShortcuts(ui->a_edit->shortcuts() += QKeySequence(Qt::Key_Space));
@@ -149,6 +150,7 @@ bool MainWindow::parse_and_display() {
 
 	update_board_dependant_buttons_visibility(true);
 	update_title();
+	update_wavelength_min_vacuum();
 	ui->structure_view->init(&oemsh.get_board());
 	ui->processing_view->init(&oemsh.get_board());
 	run();
@@ -166,6 +168,14 @@ void MainWindow::update_cell_number(bool reset) {
 }
 
 //******************************************************************************
+void MainWindow::update_wavelength_min_vacuum(bool reset) {
+	static QString const base_str(ui->l_wavelength_min_vacuum->text());
+	ui->l_wavelength_min_vacuum->setText(reset
+		? base_str
+		: base_str + QString::number(oemsh.get_board().global_params->get_current_state().wavelength_min_vacuum, 'e', 2));
+}
+
+//******************************************************************************
 void MainWindow::update_title() {
 	static QString const base_title(windowTitle());
 
@@ -179,6 +189,7 @@ void MainWindow::clear() {
 	ui->processing_view->clear();
 	ui->statusBar->clearMessage();
 	update_cell_number(true);
+	update_wavelength_min_vacuum(true);
 }
 
 //******************************************************************************
@@ -746,7 +757,7 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 			.level = Logger::Level::QUESTION,
 			.user_actions = { Logger::UserAction::CANCEL, Logger::UserAction::SAVE, Logger::UserAction::CLOSE },
 			.message = std::format(
-				"You are about closing a unsaved document, do you want to save it before?")
+				"You are about closing an unsaved document, do you want to save it before?")
 			});
 		if(res == Logger::UserAction::CANCEL) {
 			event->ignore();

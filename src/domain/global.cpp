@@ -162,4 +162,22 @@ auto GlobalParams::get_smoothness(Axis axis, Material const* material, Params co
 	return get_per_axis_per_criteria<&Params::smoothness, decltype(Params::smoothness)>(axis, material, state);
 }
 
+//******************************************************************************
+double GlobalParams::switch_length_between_absolute_and_wavelength_relative(double length) const noexcept {
+	return switch_length_between_absolute_and_wavelength_relative(get_current_state(), length);
+}
+
+//******************************************************************************
+double GlobalParams::switch_length_between_absolute_and_wavelength_relative(Params const& state, double length) noexcept {
+	return state.wavelength_min_vacuum / state.delta_unit / length;
+}
+
+//******************************************************************************
+void GlobalParams::switch_all_lengths_between_absolute_and_wavelength_relative(Params& state) noexcept {
+		state.diagonal_dmax = switch_length_between_absolute_and_wavelength_relative(state, state.diagonal_dmax);
+		state.proximity_limit = switch_length_between_absolute_and_wavelength_relative(state, state.proximity_limit);
+		for(auto& [_, v] : state.dmax)
+			v = switch_length_between_absolute_and_wavelength_relative(state, v);
+}
+
 } // namespace domain

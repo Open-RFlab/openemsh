@@ -151,7 +151,7 @@ void SerializerToCsx::visit(Board& board) {
 		add_meshlines_to_xml_doc(Z);
 
 	if(params.with_oemsh_params) {
-		auto const handle_per_material = [](auto const& var, pugi::xml_node&& node) {
+		auto const handle_per_material = [this](auto const& var, pugi::xml_node&& node) {
 			for(auto const& [k, v] : var) {
 				auto const& [axis, material] = k;
 				pugi::xml_node r = node.append_child("Rule");
@@ -163,15 +163,23 @@ void SerializerToCsx::visit(Board& board) {
 					}, material.value());
 				else
 					r.append_attribute("Type").set_value("*");
-				r.append_attribute("Value").set_value(v);
+
+				if constexpr(is_floating_point_v<decltype(v)>) {
+					r.append_attribute("Value").set_value(v, params.double_precision);
+				} else if constexpr(is_integral_v<decltype(v)>) {
+					r.append_attribute("Value").set_value(v);
+				} else {
+					static_assert(false, "Usupported case");
+				}
 			}
 		};
 
-		auto const& p = board.global_params->get_current_state();
+		auto p = board.global_params->get_current_state();
+		GlobalParams::switch_all_lengths_between_absolute_and_wavelength_relative(p);
 		pugi::xml_node oemsh = find_or_prepend_child(doc, "OpenEMSH");
 		pugi::xml_node global_params = find_or_append_child(oemsh, "GlobalParams");
 		global_params.remove_attributes();
-		global_params.append_attribute("ProximityLimit").set_value(p.proximity_limit);
+		global_params.append_attribute("ProximityLimit").set_value(p.proximity_limit, params.double_precision);
 		pugi::xml_node per_material_params = find_or_append_child(oemsh, "PerMaterialParams");
 		per_material_params.remove_attributes();
 		per_material_params.remove_children();

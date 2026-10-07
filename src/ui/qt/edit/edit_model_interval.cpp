@@ -22,7 +22,7 @@ EditModelInterval::EditModelInterval(domain::Interval* interval, QObject* parent
 	auto const& state = interval->get_current_state();
 	setRowCount(5);
 
-	make_row(0, "dmax", QString::number(state.dmax),
+	make_row(0, "dmax", QString::number(interval->global_params->switch_length_between_absolute_and_wavelength_relative(state.dmax)),
 		"Maximum distance between two adjacent lines.");
 	make_row(1, "Before.lmin", QString::number(state.before.lmin),
 		"Minimum line number in the minimal interval half. "
@@ -51,6 +51,8 @@ bool EditModelInterval::commit() {
 	};
 
 	if(std::ranges::all_of(does_succeed, is_true)) {
+		state.dmax = interval->global_params->switch_length_between_absolute_and_wavelength_relative(state.dmax);
+
 		emit edit_from(app::Step::MESH, [&] {
 			interval->set_next_state(state);
 		});

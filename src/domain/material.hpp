@@ -12,6 +12,9 @@
 
 namespace domain {
 
+/// https://en.wikipedia.org/wiki/Speed_of_light
+constexpr double c_0 = 299792458;
+
 //******************************************************************************
 class Material {
 public:
@@ -29,6 +32,8 @@ public:
 	struct Color {
 		unsigned char r, g, b, a;
 	};
+
+	static double calc_wavelength_in_vacuum(double f);
 
 	std::strong_ordering operator<=>(Material const& other) const noexcept;
 

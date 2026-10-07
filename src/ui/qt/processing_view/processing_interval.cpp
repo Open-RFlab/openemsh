@@ -100,7 +100,7 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 		auto const& state = interval->get_current_state();
 		if(state.main_material)
 			type += QString::fromStdString(to_string(state.main_material->type));
-		dmax += QString::number(state.dmax);
+		dmax += QString::number(interval->global_params->switch_length_between_absolute_and_wavelength_relative(state.dmax));
 		before_lmin += QString::number(state.before.lmin);
 		before_smoothness += QString::number(state.before.smoothness);
 		after_lmin += QString::number(state.after.lmin);
