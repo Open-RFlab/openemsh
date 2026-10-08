@@ -16,7 +16,7 @@ namespace ui::qt {
 
 //******************************************************************************
 EditModelAngle::EditModelAngle(domain::Angle* angle, QObject* parent)
-: EditModel(parent)
+: EditModel(false, parent)
 , angle(angle)
 {
 	auto const& state = angle->get_current_state();

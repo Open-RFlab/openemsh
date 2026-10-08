@@ -16,7 +16,7 @@ namespace ui::qt {
 
 //******************************************************************************
 EditModelInterval::EditModelInterval(domain::Interval* interval, QObject* parent)
-: EditModel(parent)
+: EditModel(true, parent)
 , interval(interval)
 {
 	auto const& state = interval->get_current_state();

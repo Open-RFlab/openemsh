@@ -25,7 +25,7 @@ using Policy = domain::MeshlinePolicy::Policy;
 
 //******************************************************************************
 EditModelMeshlinePolicy::EditModelMeshlinePolicy(domain::MeshlinePolicy* meshline_policy, QObject* parent)
-: EditModel(parent)
+: EditModel(false, parent)
 , meshline_policy(meshline_policy)
 {
 	auto const& state = meshline_policy->get_current_state();

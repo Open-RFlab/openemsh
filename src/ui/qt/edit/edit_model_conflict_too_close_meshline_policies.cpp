@@ -16,7 +16,7 @@ namespace ui::qt {
 
 //******************************************************************************
 EditModelConflictTooCloseMeshlinePolicies::EditModelConflictTooCloseMeshlinePolicies(domain::ConflictTooCloseMeshlinePolicies* conflict, QObject* parent)
-: EditModel(parent)
+: EditModel(false, parent)
 , conflict(conflict)
 {
 	auto const& state = conflict->get_current_state();

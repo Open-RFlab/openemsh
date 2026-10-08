@@ -10,7 +10,7 @@ namespace ui::qt {
 
 //******************************************************************************
 IEditModelPerAxisPerCriteria::IEditModelPerAxisPerCriteria(QObject* parent)
-: EditModel(parent)
+: EditModel(false, parent)
 {}
 
 } // namespace ui::qt

@@ -20,7 +20,7 @@ namespace ui::qt {
 // https://stackoverflow.com/questions/3135505/qstandarditem-qcombobox
 //******************************************************************************
 EditModelGlobal::EditModelGlobal(domain::GlobalParams* global, QObject* parent)
-: EditModel(parent)
+: EditModel(false, parent)
 , global(global)
 {
 	auto params = global->get_current_state();
