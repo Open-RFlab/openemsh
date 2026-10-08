@@ -20,6 +20,7 @@ EditModelInterval::EditModelInterval(domain::Interval* interval, QObject* parent
 , interval(interval)
 {
 	auto const& state = interval->get_current_state();
+	auto const& default_smoothness = interval->global_params->get_smoothness(interval->axis, state.main_material);
 	setRowCount(5);
 
 	make_row(0, "dmax", QString::number(interval->global_params->switch_length_between_absolute_and_wavelength_relative(state.dmax)),
@@ -27,13 +28,13 @@ EditModelInterval::EditModelInterval(domain::Interval* interval, QObject* parent
 	make_row(1, "Before.lmin", QString::number(state.before.lmin),
 		"Minimum line number in the minimal interval half. "
 		"Note a line will always be placed at the interval center.");
-	make_row(2, "Before.Smoothness", QString::number(state.before.smoothness), QString("2"),
+	make_row(2, "Before.Smoothness", QString::number(state.before.smoothness), QString::number(default_smoothness),
 		"Smoothness factor <b>]1;2]</b> around the minimal side. "
 		"Meshing algorithm will decrease it, better to start high.");
 	make_row(3, "After.lmin", QString::number(state.after.lmin),
 		"Minimum line number in the maximal interval half. "
 		"Note a line will always be placed at the interval center.");
-	make_row(4, "After.Smoothness", QString::number(state.after.smoothness), QString("2"),
+	make_row(4, "After.Smoothness", QString::number(state.after.smoothness), QString::number(default_smoothness),
 		"Smoothness factor <b>]1;2]</b> around the maximal side. "
 		"Meshing algorithm will decrease it, better to start high.");
 }
