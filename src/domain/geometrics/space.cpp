@@ -21,6 +21,14 @@ static_assert(Axes[XY][H] == X);
 static_assert(Axes[XY][V] == Y);
 
 //******************************************************************************
+static_assert(Planes[X][H] == XY);
+static_assert(Planes[X][V] == ZX);
+static_assert(Planes[Y][H] == YZ);
+static_assert(Planes[Y][V] == XY);
+static_assert(Planes[Z][H] == ZX);
+static_assert(Planes[Z][V] == YZ);
+
+//******************************************************************************
 optional<ViewAxis> transpose(Plane const plane, Axis const axis) noexcept {
 	switch(plane) {
 	case YZ:
