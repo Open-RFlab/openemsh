@@ -80,14 +80,13 @@ EditModel* EditModel::make(nodegraph::Node* node, QObject* parent) {
 }
 
 //******************************************************************************
-EditModel::EditModel(QObject* parent)
+EditModel::EditModel(bool with_old_value, QObject* parent)
 : QStandardItemModel(parent)
+, V(with_old_value ? 2 : 1)
 {
-	static_assert(1 <= V && V <= 2, "The Value column index V must be either 1 or 2");
-
 	setColumnCount(V + 1);
 
-	if constexpr(V == 2)
+	if(with_old_value)
 		setHorizontalHeaderLabels({ "Property", "Old value", "New value" });
 	else
 		setHorizontalHeaderLabels({ "Property", "Value" });

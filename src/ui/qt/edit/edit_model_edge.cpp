@@ -16,7 +16,7 @@ namespace ui::qt {
 
 //******************************************************************************
 EditModelEdge::EditModelEdge(domain::Edge* edge, QObject* parent)
-: EditModel(parent)
+: EditModel(false, parent)
 , edge(edge)
 {
 	auto const& state = edge->get_current_state();
