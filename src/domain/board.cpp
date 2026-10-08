@@ -175,20 +175,10 @@ Board::Board(
 
 //******************************************************************************
 shared_ptr<Material> Board::find_ambient_material(Axis axis, Coord const& coord) const {
-	// TODO is this order (view_axis) in phase with B1D cast(view_axis, B2D) ?
-	auto planes = [](Axis axis) -> array<Plane, 2> {
-		switch(axis) {
-		case X: return { ZX, XY };
-		case Y: return { YZ, XY };
-		case Z: return { YZ, ZX };
-		default: ::unreachable();
-		}
-	} (axis);
-
 	vector<pair<shared_ptr<Material>, remove_const_t<decltype(Polygon::priority)>>> materials;
 
 	for(ViewAxis view_axis : AllViewAxis) {
-		for(shared_ptr<Polygon> const& polygon : get_current_state().polygons[planes[view_axis]]) {
+		for(shared_ptr<Polygon> const& polygon : get_current_state().polygons[Planes[axis][view_axis]]) {
 			if(polygon->material
 			&& does_overlap(cast(view_axis, polygon->bounding), coord)) {
 				materials.emplace_back(shared_ptr<Material>(polygon->material), polygon->priority);
