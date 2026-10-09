@@ -6,22 +6,10 @@
 
 #pragma once
 
-#include "edit_model.hpp"
-
-namespace domain {
-class Interval;
-} // namespace domain
-
-namespace ui::qt {
+//******************************************************************************
+template<class... Ts>
+struct overloaded : Ts... { using Ts::operator()...; };
 
 //******************************************************************************
-class EditModelInterval : public EditModel {
-public:
-	explicit EditModelInterval(domain::Interval* interval, QObject* parent = nullptr);
-	bool commit() override;
-
-private:
-	domain::Interval* interval;
-};
-
-} // namespace ui::qt
+template<class... Ts>
+overloaded(Ts...) -> overloaded<Ts...>;

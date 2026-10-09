@@ -4,6 +4,7 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
+#include "utils/variant_utils.hpp"
 #include "utils/unreachable.hpp"
 
 #include "to_string.hpp"
@@ -107,4 +108,23 @@ string to_string(domain::Material::Type type) noexcept {
 	case Material::Type::AIR: return "AIR";
 	default: ::unreachable();
 	}
+}
+
+//******************************************************************************
+string to_string(optional<Axis> const& axis) noexcept {
+	if(axis.has_value())
+		return to_string(axis.value());
+	else
+		return "*";
+}
+
+//******************************************************************************
+string to_string(optional<domain::Params::Mat> const& mat) noexcept {
+	if(mat.has_value())
+		return visit(overloaded {
+			[&](string const& name) { return name; },
+			[&](domain::Material::Type const& type) { return to_string(type); }
+		}, mat.value());
+	else
+		return "*";
 }

@@ -16,30 +16,31 @@ namespace ui::qt {
 
 //******************************************************************************
 EditModelInterval::EditModelInterval(domain::Interval* interval, QObject* parent)
-: EditModel(parent)
+: EditModel(true, parent)
 , interval(interval)
 {
 	auto const& state = interval->get_current_state();
+	auto const& default_smoothness = interval->global_params->get_smoothness(interval->axis, state.main_material);
 	setRowCount(5);
 
-	make_row(0, "dmax", QString::number(state.dmax),
+	make_row(0, "dmax", QString::number(interval->global_params->switch_length_between_absolute_and_wavelength_relative(state.dmax)),
 		"Maximum distance between two adjacent lines.");
 	make_row(1, "Before.lmin", QString::number(state.before.lmin),
 		"Minimum line number in the minimal interval half. "
 		"Note a line will always be placed at the interval center.");
-	make_row(2, "Before.Smoothness", QString::number(state.before.smoothness), QString("2"),
+	make_row(2, "Before.Smoothness", QString::number(state.before.smoothness), QString::number(default_smoothness),
 		"Smoothness factor <b>]1;2]</b> around the minimal side. "
 		"Meshing algorithm will decrease it, better to start high.");
 	make_row(3, "After.lmin", QString::number(state.after.lmin),
 		"Minimum line number in the maximal interval half. "
 		"Note a line will always be placed at the interval center.");
-	make_row(4, "After.Smoothness", QString::number(state.after.smoothness), QString("2"),
+	make_row(4, "After.Smoothness", QString::number(state.after.smoothness), QString::number(default_smoothness),
 		"Smoothness factor <b>]1;2]</b> around the maximal side. "
 		"Meshing algorithm will decrease it, better to start high.");
 }
 
 //******************************************************************************
-void EditModelInterval::commit() {
+bool EditModelInterval::commit() {
 	auto state = interval->get_current_state();
 
 	std::array does_succeed = {
@@ -51,10 +52,14 @@ void EditModelInterval::commit() {
 	};
 
 	if(std::ranges::all_of(does_succeed, is_true)) {
+		state.dmax = interval->global_params->switch_length_between_absolute_and_wavelength_relative(state.dmax);
+
 		emit edit_from(app::Step::MESH, [&] {
 			interval->set_next_state(state);
 		});
+		return true;
 	}
+	return false;
 }
 
 } // namespace ui::qt

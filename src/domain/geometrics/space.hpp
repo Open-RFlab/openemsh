@@ -28,6 +28,13 @@ inline static PlaneSpace<ViewAxisSpace<Axis const>> constexpr Axes {{
 	{ X, Y }
 }};
 
+//******************************************************************************
+inline static AxisSpace<ViewAxisSpace<Plane const>> constexpr Planes {{
+	{ XY, ZX },
+	{ YZ, XY },
+	{ ZX, YZ }
+}};
+
 /// ViewAxis describe the orientation of Axis itself.
 ///*****************************************************************************
 std::optional<ViewAxis> transpose(Plane const plane, Axis const axis) noexcept;

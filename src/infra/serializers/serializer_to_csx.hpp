@@ -25,6 +25,7 @@ public:
 		bool with_axis_y = true;
 		bool with_axis_z = true;
 		bool with_oemsh_params = false;
+		std::size_t double_precision = 5;
 	};
 
 	static std::expected<void, std::string> run(

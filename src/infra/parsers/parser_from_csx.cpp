@@ -13,6 +13,7 @@
 #include <set>
 #include <string_view>
 #include <system_error>
+#include <type_traits>
 
 #include <pugixml.hpp>
 
@@ -87,6 +88,7 @@ public:
 
 	expected<void, string> parse_oemsh(pugi::xml_node const& node);
 	expected<void, string> parse_grid(pugi::xml_node const& node);
+	expected<void, string> parse_fdtd(pugi::xml_node const& node);
 
 	shared_ptr<Material> parse_property(pugi::xml_node const& node);
 
@@ -125,10 +127,66 @@ void ParserFromCsx::Pimpl::warn_unsupported_primitive(string const& primitive_ty
 //******************************************************************************
 expected<void, string> ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& node) {
 	pugi::xml_node global_params = node.child("GlobalParams");
-	if(auto a = global_params.attribute("ProximityLimit"); a) domain_params.proximity_limit = a.as_double();
-	if(auto a = global_params.attribute("Smoothness"); a) domain_params.smoothness = a.as_double();
-	if(auto a = global_params.attribute("dmax"); a) domain_params.dmax = a.as_double();
-	if(auto a = global_params.attribute("lmin"); a) domain_params.lmin = a.as_uint();
+	if(auto a = global_params.attribute("ProximityLimit"); a)
+		domain_params.proximity_limit = a.as_double();
+
+	static std::map<std::string, optional<domain::Axis>> const axes {
+		{ "X", domain::Axis::X },
+		{ "Y", domain::Axis::Y },
+		{ "Z", domain::Axis::Z },
+		{ "*", nullopt }
+	};
+	static std::map<std::string, optional<domain::Material::Type>> const material_types {
+		{ "Conductor", domain::Material::Type::CONDUCTOR },
+		{ "Dielectric", domain::Material::Type::DIELECTRIC },
+		{ "Air", domain::Material::Type::AIR },
+		{ "*", nullopt }
+	};
+
+	auto const parse_per_material = [](auto& var, pugi::xml_node const& node) -> expected<void, string> {
+		for(auto const& rule : node.children()) {
+			auto a = rule.attribute("Axis");
+			auto v = rule.attribute("Value");
+			auto n = rule.attribute("Name");
+			auto t = rule.attribute("Type");
+
+			if(v
+			&& (a && axes.contains(a.as_string()))
+			&& (n || (t && material_types.contains(t.as_string())))) {
+				var.insert_or_assign(
+					{
+						axes.at(a.as_string()),
+						[&]() -> tuple_element<1, typename remove_reference_t<decltype(var)>::key_type>::type {
+							if(n)
+								return string(n.as_string());
+							else
+								return material_types.at(t.as_string());
+						} ()
+					},
+					[&]() {
+						using V = typename remove_reference_t<decltype(var)>::mapped_type;
+						if constexpr(is_floating_point_v<V>) {
+							return v.as_double();
+						} else if constexpr(is_integral_v<V>) {
+							return v.as_uint();
+						} else {
+							static_assert(false, "Usupported case");
+						}
+					} ()
+				);
+			} else {
+				ostringstream rule_text;
+				rule.print(rule_text, "", pugi::format_raw);
+				return unexpected(format("Invalid rule \"{}\"", rule_text.str()));
+			}
+		}
+		return {};
+	};
+
+	pugi::xml_node per_material_params = node.child("PerMaterialParams");
+	TRY(parse_per_material(domain_params.dmax, per_material_params.child("dmax")));
+	TRY(parse_per_material(domain_params.lmin, per_material_params.child("lmin")));
+	TRY(parse_per_material(domain_params.smoothness, per_material_params.child("smoothness")));
 
 	pugi::xml_node fixed_meshlines = node.child("FixedMeshlines");
 	size_t delta_unit = fixed_meshlines.attribute("DeltaUnit").as_uint(1);
@@ -152,11 +210,11 @@ expected<void, string> ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& n
 //******************************************************************************
 expected<void, string> ParserFromCsx::Pimpl::parse_grid(pugi::xml_node const& node) {
 	std::size_t coord_system = node.attribute("CoordSystem").as_uint();
-	std::size_t delta_unit = node.attribute("DeltaUnit").as_uint(1);
 
 	if(coord_system == 0) {
 		// First step : into bool has_grid_already
 		pugi::xml_node grid = node.child("RectilinearGrid");
+		domain_params.delta_unit = grid.attribute("DeltaUnit").as_double(1);
 		AxisSpace<string_view> lines = {
 			grid.child_value("XLines"),
 			grid.child_value("YLines"),
@@ -169,7 +227,7 @@ expected<void, string> ParserFromCsx::Pimpl::parse_grid(pugi::xml_node const& no
 				for(auto const part : views::split(lines[axis], ',')) {
 					string_view str(part);
 					if(auto line = str_to_double(str); line.has_value())
-						board.add_fixed_meshline_policy(axis, delta_unit * line.value());
+						board.add_fixed_meshline_policy(axis, domain_params.delta_unit * line.value()); // TODO *unit might not be required here
 					else
 						return unexpected(format("Invalid meshline value \"{}\": {}", str, line.error()));
 				}
@@ -179,6 +237,17 @@ expected<void, string> ParserFromCsx::Pimpl::parse_grid(pugi::xml_node const& no
 //	} else if(coord_system == 1) {
 	} else {
 		return unexpected("Unsupported CoordSystem");
+	}
+	return {};
+}
+
+//******************************************************************************
+expected<void, string> ParserFromCsx::Pimpl::parse_fdtd(pugi::xml_node const& node) {
+	if(auto a = node.attribute("f_max"); a) {
+		double f_max = a.as_double();
+		domain_params.wavelength_min_vacuum = Material::calc_wavelength_in_vacuum(f_max);
+	} else {
+		return unexpected(format("No maximal frequency specified"));
 	}
 	return {};
 }
@@ -689,6 +758,7 @@ expected<void, string> ParserFromCsx::parse() {
 	};
 
 	pugi::xpath_node fdtd = doc.select_node(root("/FDTD").c_str());
+	TRY(pimpl->parse_fdtd(fdtd.node()));
 
 	pugi::xpath_node csx = doc.select_node(root("/ContinuousStructure").c_str());
 	TRY(pimpl->parse_grid(csx.node()));

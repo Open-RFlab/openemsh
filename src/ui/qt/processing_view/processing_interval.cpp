@@ -11,6 +11,7 @@
 #include "domain/conflicts/conflict_diagonal_or_circular_zone.hpp"
 #include "domain/mesh/interval.hpp"
 #include "domain/mesh/meshline_policy.hpp"
+#include "infra/utils/to_string.hpp"
 #include "ui/qt/data_keys.hpp"
 #include "ui/qt/utils/nodegraph/text.hpp"
 
@@ -89,6 +90,7 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 		return locate_processing_interval_params().port;
 	};
 
+	QString type("Type: ");
 	QString dmax("dmax: ");
 	QString before_lmin("Before.lmin: ");
 	QString before_smoothness("Before.Smoothness: ");
@@ -96,7 +98,9 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 	QString after_smoothness("After.Smoothness: ");
 	if(interval) {
 		auto const& state = interval->get_current_state();
-		dmax += QString::number(state.dmax);
+		if(state.main_material)
+			type += QString::fromStdString(to_string(state.main_material->type));
+		dmax += QString::number(interval->global_params->switch_length_between_absolute_and_wavelength_relative(state.dmax));
 		before_lmin += QString::number(state.before.lmin);
 		before_smoothness += QString::number(state.before.smoothness);
 		after_lmin += QString::number(state.after.lmin);
@@ -106,6 +110,13 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 		if(state.after.meshline_policy)
 			to_wire.emplace_back(DataKeys::set_to_wire(state.after.meshline_policy, after_port));
 	}
+
+	auto* text_type = new nodegraph::Text(type, this);
+	text_type->setFlag(QGraphicsItem::ItemIsSelectable);
+	text_type->setAcceptedMouseButtons(Qt::NoButton);
+	text_type->locate_text_params = [this]() -> auto& {
+		return locate_processing_interval_params().main;
+	};
 
 	auto* text_dmax = new nodegraph::Text(dmax, this);
 	text_dmax->setFlag(QGraphicsItem::ItemIsSelectable);
@@ -142,6 +153,7 @@ ProcessingInterval::ProcessingInterval(domain::Interval const* interval, QGraphi
 		return locate_processing_interval_params().main;
 	};
 
+	v_box2->addItem(text_type);
 	v_box2->addItem(text_dmax);
 	v_box2->addItem(text_before_lmin);
 	v_box2->addItem(text_before_smoothness);

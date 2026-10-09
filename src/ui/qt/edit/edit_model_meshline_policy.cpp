@@ -25,7 +25,7 @@ using Policy = domain::MeshlinePolicy::Policy;
 
 //******************************************************************************
 EditModelMeshlinePolicy::EditModelMeshlinePolicy(domain::MeshlinePolicy* meshline_policy, QObject* parent)
-: EditModel(parent)
+: EditModel(false, parent)
 , meshline_policy(meshline_policy)
 {
 	auto const& state = meshline_policy->get_current_state();
@@ -39,14 +39,14 @@ EditModelMeshlinePolicy::EditModelMeshlinePolicy(domain::MeshlinePolicy* meshlin
 		"Direction associated with Policy.");
 	make_row(2, "Enabled", state.is_enabled,
 		"Take into account in the meshing process.");
-	make_row(3, "d", QString::number(state.d),
+	make_row(3, "d", QString::number(meshline_policy->global_params->switch_length_between_absolute_and_wavelength_relative(state.d)),
 		"Desired distance between policy lines (HALFS|THIRDS) or "
 		"between policy line and adjacent lines (ONELINE).<br/>"
 		"Can be decreased by the meshing algorithm.");
 }
 
 //******************************************************************************
-void EditModelMeshlinePolicy::commit() {
+bool EditModelMeshlinePolicy::commit() {
 	auto state = meshline_policy->get_current_state();
 
 	auto const are_policy_and_normal_compatible = [&state]() {
@@ -80,10 +80,14 @@ void EditModelMeshlinePolicy::commit() {
 	};
 
 	if(std::ranges::all_of(does_succeed, is_true)) {
+		state.d = meshline_policy->global_params->switch_length_between_absolute_and_wavelength_relative(state.d);
+
 		emit edit_from(app::Step::DETECT_INTERVALS, [&]() {
 			meshline_policy->set_next_state(state);
 		});
+		return true;
 	}
+	return false;
 }
 
 } // namespace ui::qt

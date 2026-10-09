@@ -96,8 +96,15 @@ SCENARIO("optional<Step> next(Step step)", "[app][openemsh]") {
 		}
 	}
 	WHEN("Running for DETECT_INTERVALS") {
-		THEN("Should return MESH") {
+		THEN("Should return ADJUST_MESH_TO_MATERIAL") {
 			std::optional<Step> a = next(Step::DETECT_INTERVALS);
+			REQUIRE(a.has_value());
+			REQUIRE(a.value() == Step::ADJUST_MESH_TO_MATERIAL);
+		}
+	}
+	WHEN("Running for ADJUST_MESH_TO_MATERIAL") {
+		THEN("Should return MESH") {
+			std::optional<Step> a = next(Step::ADJUST_MESH_TO_MATERIAL);
 			REQUIRE(a.has_value());
 			REQUIRE(a.value() == Step::DETECT_INTERVALS_PER_DIAG_ZONES);
 		}
@@ -141,6 +148,7 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::ADJUST_MESH_TO_MATERIAL,
 				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
 				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
@@ -161,6 +169,7 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::ADJUST_MESH_TO_MATERIAL,
 				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
 				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
@@ -180,6 +189,7 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::ADJUST_MESH_TO_MATERIAL,
 				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
 				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
@@ -198,6 +208,7 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::ADJUST_MESH_TO_MATERIAL,
 				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
 				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
@@ -215,6 +226,7 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::ADJUST_MESH_TO_MATERIAL,
 				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
 				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
@@ -231,6 +243,7 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::ADJUST_MESH_TO_MATERIAL,
 				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
 				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
@@ -246,6 +259,7 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::ADJUST_MESH_TO_MATERIAL,
 				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
 				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
@@ -260,6 +274,7 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::ADJUST_MESH_TO_MATERIAL,
 				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
 				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
@@ -273,6 +288,7 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::ADJUST_MESH_TO_MATERIAL,
 				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
 				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
@@ -285,6 +301,7 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 				Step::DETECT_INDIVIDUAL_EDGES,
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::ADJUST_MESH_TO_MATERIAL,
 				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
 				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
@@ -296,6 +313,7 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 			REQUIRE(that_and_after(Step::DETECT_AND_SOLVE_TCMLP) == std::set<Step> {
 				Step::DETECT_AND_SOLVE_TCMLP,
 				Step::DETECT_INTERVALS,
+				Step::ADJUST_MESH_TO_MATERIAL,
 				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
 				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH
@@ -306,6 +324,17 @@ SCENARIO("set<Step> that_and_after(Step step)", "[app][openemsh]") {
 		THEN("Should return all Steps except those coming before DETECT_INTERVALS") {
 			REQUIRE(that_and_after(Step::DETECT_INTERVALS) == std::set<Step> {
 				Step::DETECT_INTERVALS,
+				Step::ADJUST_MESH_TO_MATERIAL,
+				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
+				Step::SOLVE_DIAG_ZONES_INTERVALS,
+				Step::MESH
+			});
+		}
+	}
+	WHEN("Running for ADJUST_MESH_TO_MATERIAL") {
+		THEN("Should return all Steps except those coming before ADJUST_MESH_TO_MATERIAL") {
+			REQUIRE(that_and_after(Step::ADJUST_MESH_TO_MATERIAL) == std::set<Step> {
+				Step::ADJUST_MESH_TO_MATERIAL,
 				Step::DETECT_INTERVALS_PER_DIAG_ZONES,
 				Step::SOLVE_DIAG_ZONES_INTERVALS,
 				Step::MESH

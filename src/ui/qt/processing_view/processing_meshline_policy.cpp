@@ -84,7 +84,7 @@ ProcessingMeshlinePolicy::ProcessingMeshlinePolicy(domain::MeshlinePolicy const*
 		normal += QString::fromStdString(to_string(meshline_policy->get_current_state().normal));
 		is_enabled += (meshline_policy->get_current_state().is_enabled ? "true" : "false");
 		policy += QString::fromStdString(to_string(meshline_policy->get_current_state().policy));
-		d += QString::number(meshline_policy->get_current_state().d);
+		d += QString::number(meshline_policy->global_params->switch_length_between_absolute_and_wavelength_relative(meshline_policy->get_current_state().d));
 	}
 
 	auto* text_normal = new nodegraph::Text(normal, this);

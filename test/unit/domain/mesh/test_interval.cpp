@@ -348,7 +348,7 @@ SCENARIO("double find_dmax(Interval::Side const& side, double dmax)", "[interval
 			t);
 		auto state_p = p.get_current_state();
 		auto state_a = a.get_current_state();
-		state_p.smoothness = 2;
+		state_p.smoothness = {{{ Params::ALL, Params::ALL }, 2 }};
 		state_a.d = 1;
 		p.set_next_state(state_p);
 		a.set_next_state(state_a);
@@ -421,7 +421,7 @@ SCENARIO("double find_dmax(Interval::Side const& side, Interval::Side const& b, 
 			t);
 		auto state_p = p.get_current_state();
 		auto state_a = a.get_current_state();
-		state_p.smoothness = 2;
+		state_p.smoothness = {{{ Params::ALL, Params::ALL }, 2 }};
 		state_a.d = 1;
 		p.set_next_state(state_p);
 		a.set_next_state(state_a);
@@ -461,8 +461,8 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 				t);
 			auto state_p = p.get_current_state();
 			auto state_a = a.get_current_state();
-			state_p.dmax = 1.2;
-			state_p.lmin = 2;
+			state_p.dmax = {{{ Params::ALL, Params::ALL }, 1.2 }};
+			state_p.lmin = {{{ Params::ALL, Params::ALL }, 2 }};
 			state_a.d = 1.0;
 			p.set_next_state(state_p);
 			a.set_next_state(state_a);
@@ -475,8 +475,8 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 					i.get_current_state().before.ls,
 					a.get_current_state().d,
 					i.get_current_state().before.smoothness,
-					p.get_current_state().dmax,
-					p.get_current_state().lmin));
+					p.get_dmax(Y),
+					p.get_lmin(Y)));
 			}
 
 			THEN("Side's d should be unchanged") {
@@ -503,8 +503,8 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 				t);
 			auto state_p = p.get_current_state();
 			auto state_a = a.get_current_state();
-			state_p.dmax = 2.0;
-			state_p.lmin = 10;
+			state_p.dmax = {{{ Params::ALL, Params::ALL }, 2.0 }};
+			state_p.lmin = {{{ Params::ALL, Params::ALL }, 10 }};
 			state_a.d = 1.0;
 			p.set_next_state(state_p);
 			a.set_next_state(state_a);
@@ -517,8 +517,8 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 					i.get_current_state().before.ls,
 					a.get_current_state().d,
 					i.get_current_state().before.smoothness,
-					p.get_current_state().dmax,
-					p.get_current_state().lmin));
+					p.get_dmax(Y),
+					p.get_lmin(Y)));
 			}
 
 			THEN("Side's d should be reduced") {
@@ -534,8 +534,8 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 						i.get_current_state().before.ls,
 						a.get_current_state().d,
 						i.get_current_state().before.smoothness,
-						p.get_current_state().dmax,
-						p.get_current_state().lmin));
+						p.get_dmax(Y),
+						p.get_lmin(Y)));
 				}
 			}
 		}
@@ -558,8 +558,8 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 				t);
 			auto state_p = p.get_current_state();
 			auto state_a = a.get_current_state();
-			state_p.dmax = 0.8;
-			state_p.lmin = 2;
+			state_p.dmax = {{{ Params::ALL, Params::ALL }, 0.8 }};
+			state_p.lmin = {{{ Params::ALL, Params::ALL }, 2 }};
 			state_a.d = 1.0;
 			p.set_next_state(state_p);
 			a.set_next_state(state_a);
@@ -572,8 +572,8 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 					i.get_current_state().before.ls,
 					a.get_current_state().d,
 					i.get_current_state().before.smoothness,
-					p.get_current_state().dmax,
-					p.get_current_state().lmin));
+					p.get_dmax(Y),
+					p.get_lmin(Y)));
 			}
 
 			THEN("Side's d should be reduced") {
@@ -589,8 +589,8 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 						i.get_current_state().before.ls,
 						a.get_current_state().d,
 						i.get_current_state().before.smoothness,
-						p.get_current_state().dmax,
-						p.get_current_state().lmin));
+						p.get_dmax(Y),
+						p.get_lmin(Y)));
 				}
 			}
 		}
@@ -613,8 +613,8 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 				t);
 			auto state_p = p.get_current_state();
 			auto state_a = a.get_current_state();
-			state_p.dmax = 0.8;
-			state_p.lmin = 10;
+			state_p.dmax = {{{ Params::ALL, Params::ALL }, 0.8 }};
+			state_p.lmin = {{{ Params::ALL, Params::ALL }, 10 }};
 			state_a.d = 1.0;
 			p.set_next_state(state_p);
 			a.set_next_state(state_a);
@@ -627,8 +627,8 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 					i.get_current_state().before.ls,
 					a.get_current_state().d,
 					i.get_current_state().before.smoothness,
-					p.get_current_state().dmax,
-					p.get_current_state().lmin));
+					p.get_dmax(Y),
+					p.get_lmin(Y)));
 			}
 
 			AND_WHEN("Process iterations are unlimited") {
@@ -647,8 +647,8 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 							i.get_current_state().before.ls,
 							a.get_current_state().d,
 							i.get_current_state().before.smoothness,
-							p.get_current_state().dmax,
-							p.get_current_state().lmin));
+							p.get_dmax(Y),
+							p.get_lmin(Y)));
 					}
 				}
 			}
@@ -669,8 +669,8 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_d_for_dmax_lmin(Interval::Si
 							i.get_current_state().before.ls,
 							a.get_current_state().d,
 							i.get_current_state().before.smoothness,
-							p.get_current_state().dmax,
-							p.get_current_state().lmin));
+							p.get_dmax(Y),
+							p.get_lmin(Y)));
 					}
 				}
 			}
@@ -699,9 +699,9 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_smoothness_for_s(Interval::S
 			t);
 		auto state_p = p.get_current_state();
 		auto state_a = a.get_current_state();
-		state_p.dmax = 30.0;
-		state_p.lmin = 5;
-		state_p.smoothness = 2;
+		state_p.dmax = {{{ Params::ALL, Params::ALL }, 30.0 }};
+		state_p.lmin = {{{ Params::ALL, Params::ALL }, 5 }};
+		state_p.smoothness = {{{ Params::ALL, Params::ALL }, 2 }};
 		state_a.d = 0.1;
 		p.set_next_state(state_p);
 		a.set_next_state(state_a);
@@ -718,14 +718,14 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_smoothness_for_s(Interval::S
 			i.get_current_state().before.ls,
 			a.get_current_state().d,
 			i.get_current_state().before.smoothness,
-			p.get_current_state().dmax,
-			p.get_current_state().lmin));
+			p.get_dmax(Y),
+			p.get_lmin(Y)));
 		REQUIRE(is_ls_valid_for_dmax_lmin_smoothness(
 			j.get_current_state().before.ls,
 			a.get_current_state().d,
 			j.get_current_state().before.smoothness,
-			p.get_current_state().dmax,
-			p.get_current_state().lmin));
+			p.get_dmax(Y),
+			p.get_lmin(Y)));
 		WHEN("Process iterations are unlimited") {
 			THEN("Side's smoothness should be reduced") {
 				{
@@ -735,7 +735,7 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_smoothness_for_s(Interval::S
 					i.update_ls(state_i);
 					i.set_next_state(state_i);
 					REQUIRE_FALSE(is_limit_reached);
-					REQUIRE(i.get_current_state().before.smoothness < p.get_current_state().smoothness);
+					REQUIRE(i.get_current_state().before.smoothness < p.get_smoothness(Y));
 				}
 
 				AND_THEN("The space between the last ls line and the middle of the Interval should be reduced") {
@@ -751,7 +751,7 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_smoothness_for_s(Interval::S
 								j.update_ls(state_j);
 								j.set_next_state(state_j);
 								REQUIRE(is_limit_reached);
-								REQUIRE(j.get_current_state().before.smoothness < p.get_current_state().smoothness);
+								REQUIRE(j.get_current_state().before.smoothness < p.get_smoothness(Y));
 							}
 
 							AND_THEN("The space between the last ls line and the middle of the Interval should be reduced, but less than if unlimited") {
@@ -784,9 +784,9 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_smoothness_for_s(Interval::S
 			t);
 		auto state_p = p.get_current_state();
 		auto state_a = a.get_current_state();
-		state_p.dmax = 30.0;
-		state_p.lmin = 5;
-		state_p.smoothness = 1;
+		state_p.dmax = {{{ Params::ALL, Params::ALL }, 30.0 }};
+		state_p.lmin = {{{ Params::ALL, Params::ALL }, 5 }};
+		state_p.smoothness = {{{ Params::ALL, Params::ALL }, 1 }};
 		state_a.d = 0.1;
 		p.set_next_state(state_p);
 		a.set_next_state(state_a);
@@ -799,8 +799,8 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_smoothness_for_s(Interval::S
 			i.get_current_state().before.ls,
 			a.get_current_state().d,
 			i.get_current_state().before.smoothness,
-			p.get_current_state().dmax,
-			p.get_current_state().lmin));
+			p.get_dmax(Y),
+			p.get_lmin(Y)));
 		THEN("Side's smoothness should not be reduced") {
 			auto [new_smoothness, is_limit_reached] = i.adjust_smoothness_for_s(i.get_current_state().before);
 			auto state_i = i.get_current_state();
@@ -808,7 +808,7 @@ SCENARIO("std::tuple<double, bool> Interval::adjust_smoothness_for_s(Interval::S
 			i.update_ls(state_i);
 			i.set_next_state(state_i);
 			REQUIRE_FALSE(is_limit_reached);
-			REQUIRE(new_smoothness == p.get_current_state().smoothness);
+			REQUIRE(new_smoothness == p.get_smoothness(Y));
 
 			AND_THEN("The space between the last ls line and the middle of the Interval should not be reduced") {
 				Coord new_last_space = i.get_current_state().before.ls.back() - i.s(i.get_current_state().before);
@@ -866,9 +866,9 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 			auto state_b = b.get_current_state();
 			auto state_c = c.get_current_state();
 			auto state_d = d.get_current_state();
-			state_p.dmax = 2;
-			state_p.lmin = 5;
-			state_p.smoothness = 2;
+			state_p.dmax = {{{ Params::ALL, Params::ALL }, 2 }};
+			state_p.lmin = {{{ Params::ALL, Params::ALL }, 5 }};
+			state_p.smoothness = {{{ Params::ALL, Params::ALL }, 2 }};
 			state_a.d = 0.1;
 			state_b.d = 0.1;
 			state_c.d = 0.1;
@@ -966,9 +966,9 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 			auto state_p = p.get_current_state();
 			auto state_a = a.get_current_state();
 			auto state_b = b.get_current_state();
-			state_p.dmax = 1.5;
-			state_p.lmin = 5;
-			state_p.smoothness = 2;
+			state_p.dmax = {{{ Params::ALL, Params::ALL }, 1.5 }};
+			state_p.lmin = {{{ Params::ALL, Params::ALL }, 5 }};
+			state_p.smoothness = {{{ Params::ALL, Params::ALL }, 2 }};
 			state_a.d = 0.1;
 			state_b.d = 0.1;
 			p.set_next_state(state_p);
@@ -1051,9 +1051,9 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 			auto state_b = b.get_current_state();
 			auto state_c = c.get_current_state();
 			auto state_d = d.get_current_state();
-			state_p.dmax = 2;
-			state_p.lmin = 5;
-			state_p.smoothness = 2;
+			state_p.dmax = {{{ Params::ALL, Params::ALL }, 2 }};
+			state_p.lmin = {{{ Params::ALL, Params::ALL }, 5 }};
+			state_p.smoothness = {{{ Params::ALL, Params::ALL }, 2 }};
 			state_a.d = 0.1;
 			state_b.d = 0.1;
 			state_c.d = 0.1;
@@ -1098,9 +1098,9 @@ SCENARIO("std::vector<std::unique_ptr<Meshline>> Interval::mesh() const", "[inte
 			auto state_p = p.get_current_state();
 			auto state_a = a.get_current_state();
 			auto state_b = b.get_current_state();
-			state_p.dmax = 1.5;
-			state_p.lmin = 5;
-			state_p.smoothness = 2;
+			state_p.dmax = {{{ Params::ALL, Params::ALL }, 1.5 }};
+			state_p.lmin = {{{ Params::ALL, Params::ALL }, 5 }};
+			state_p.smoothness = {{{ Params::ALL, Params::ALL }, 2 }};
 			state_a.d = 0.1;
 			state_b.d = 0.1;
 			p.set_next_state(state_p);

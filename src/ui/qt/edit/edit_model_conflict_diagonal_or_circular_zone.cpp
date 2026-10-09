@@ -16,7 +16,7 @@ namespace ui::qt {
 
 //******************************************************************************
 EditModelConflictDiagonalOrCircularZone::EditModelConflictDiagonalOrCircularZone(domain::ConflictDiagonalOrCircularZone* conflict, QObject* parent)
-: EditModel(parent)
+: EditModel(false, parent)
 , conflict(conflict)
 {
 	auto const& state = conflict->get_current_state();
@@ -24,14 +24,14 @@ EditModelConflictDiagonalOrCircularZone::EditModelConflictDiagonalOrCircularZone
 
 	make_row(0, "lmin", QString::number(state.lmin),
 		"Minimum line number per Interval half, at extremities of the diagonal zone.");
-	make_row(1, "dmax", QString::number(state.dmax),
+	make_row(1, "dmax", QString::number(conflict->global_params->switch_length_between_absolute_and_wavelength_relative(state.dmax)),
 		"Maximum distance between two adjacent lines.");
 	make_row(2, "Minimal angle", QString::number(state.minimal_angle),
 		"Angle threshold, above which angles between diagonal edges will generate MeshlinePolicies.");
 }
 
 //******************************************************************************
-void EditModelConflictDiagonalOrCircularZone::commit() {
+bool EditModelConflictDiagonalOrCircularZone::commit() {
 	auto state = conflict->get_current_state();
 
 	std::array does_succeed = {
@@ -41,12 +41,16 @@ void EditModelConflictDiagonalOrCircularZone::commit() {
 	};
 
 	if(std::ranges::all_of(does_succeed, is_true)) {
+		state.dmax = conflict->global_params->switch_length_between_absolute_and_wavelength_relative(state.dmax);
+
 		emit edit_from((state.minimal_angle != conflict->get_current_state().minimal_angle
 		               ? app::Step::SOLVE_DIAG_ZONES_ANGLES
 		               : app::Step::SOLVE_DIAG_ZONES_INTERVALS), [&]() {
 			conflict->set_next_state(state);
 		});
+		return true;
 	}
+	return false;
 }
 
 } // namespace ui::qt

@@ -4,24 +4,13 @@
 /// @author Thomas Lepoix <thomas.lepoix@protonmail.ch>
 ///*****************************************************************************
 
-#pragma once
-
-#include "edit_model.hpp"
-
-namespace domain {
-class MeshlinePolicy;
-} // namespace domain
+#include "edit_model_per_axis_per_criteria.hpp"
 
 namespace ui::qt {
 
 //******************************************************************************
-class EditModelMeshlinePolicy : public EditModel {
-public:
-	explicit EditModelMeshlinePolicy(domain::MeshlinePolicy* meshline_policy, QObject* parent = nullptr);
-	bool commit() override;
-
-private:
-	domain::MeshlinePolicy* meshline_policy;
-};
+IEditModelPerAxisPerCriteria::IEditModelPerAxisPerCriteria(QObject* parent)
+: EditModel(false, parent)
+{}
 
 } // namespace ui::qt

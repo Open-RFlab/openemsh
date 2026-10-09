@@ -8,6 +8,8 @@
 
 #include <array>
 
+#include "unreachable.hpp"
+
 /// @brief Counts variadic arguments
 ///*****************************************************************************
 template<typename ...Args>
@@ -31,3 +33,16 @@ constexpr std::size_t va_count(Args&&...) {
 	template<typename T> \
 	using ARRAY = typename std::array<T, va_count(__VA_ARGS__)>; \
 	constexpr ARRAY<ENUM const> All ##ENUM { __VA_ARGS__ };
+
+/// @brief Returns the index of an enum value among an array that contains all
+/// the enumerators.
+///*****************************************************************************
+// TODO rename key -> index ?
+//template<Enum E, std::size_t N>
+template<typename E, std::size_t N>
+constexpr std::size_t key(E e, std::array<E, N> const& all) {
+	for(std::size_t i = 0; i < all.size(); ++i)
+		if(all[i] == e)
+			return i;
+	unreachable();
+}

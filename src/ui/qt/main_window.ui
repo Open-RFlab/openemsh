@@ -688,6 +688,17 @@
   </widget>
 
   <widget class="QStatusBar" name="statusBar">
+   <widget class="QLabel" name="l_wavelength_min_vacuum">
+    <property name="text">
+     <string>λ&lt;sub&gt;min,0&lt;/sub&gt;: </string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::TextFormat::RichText</enum>
+    </property>
+    <property name="toolTip">
+     <string>Minimal wavelength in vacuum (m)</string>
+    </property>
+   </widget>
    <widget class="QLabel" name="l_cell_number">
     <property name="text">
      <string>Mesh cells: </string>

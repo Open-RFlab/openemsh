@@ -14,6 +14,7 @@
 #include <functional>
 #include <map>
 #include <string>
+#include <tuple>
 
 #include "utils/concepts.hpp"
 #include "utils/map_utils.hpp"
@@ -96,6 +97,87 @@ struct JustDo : CLI::Validator {
 };
 
 //******************************************************************************
+enum class CliAxis {
+	X,
+	Y,
+	Z,
+	ALL
+};
+
+//******************************************************************************
+enum class CliMatType {
+	CONDUCTOR,
+	DIELECTRIC,
+	AIR,
+	ALL
+};
+
+//******************************************************************************
+static std::map<std::string, CliAxis, std::less<>> const axes_without_all {
+	{ "x", CliAxis::X },
+	{ "y", CliAxis::Y },
+	{ "z", CliAxis::Z }
+};
+
+//******************************************************************************
+static std::map<std::string, CliAxis, std::less<>> const axes_with_all {
+	{ "x", CliAxis::X },
+	{ "y", CliAxis::Y },
+	{ "z", CliAxis::Z },
+	{ "*", CliAxis::ALL }
+};
+
+//******************************************************************************
+static std::map<std::string, CliMatType, std::less<>> const material_types_with_all {
+	{ "conductor", CliMatType::CONDUCTOR },
+	{ "dielectric", CliMatType::DIELECTRIC },
+	{ "air", CliMatType::AIR },
+	{ "*", CliMatType::ALL }
+};
+
+//******************************************************************************
+static std::map<std::string, domain::MeshlinePolicy::Policy, std::less<>> const meshline_policies {
+	{ "oneline", domain::MeshlinePolicy::Policy::ONELINE },
+	{ "halfs", domain::MeshlinePolicy::Policy::HALFS },
+	{ "thirds", domain::MeshlinePolicy::Policy::THIRDS }
+};
+
+//******************************************************************************
+static std::map<std::string, app::OpenEMSH::Params::OutputFormat, std::less<>> const output_formats {
+	{ "csx", app::OpenEMSH::Params::OutputFormat::CSX },
+	{ "plantuml", app::OpenEMSH::Params::OutputFormat::PLANTUML },
+	{ "prettyprint", app::OpenEMSH::Params::OutputFormat::PRETTYPRINT }
+};
+
+//******************************************************************************
+std::optional<domain::Axis> cast(CliAxis axis) noexcept {
+	switch(axis) {
+	case CliAxis::X: return domain::X;
+	case CliAxis::Y: return domain::Y;
+	case CliAxis::Z: return domain::Z;
+	case CliAxis::ALL: return std::nullopt;
+	default: ::unreachable();
+	}
+}
+
+//******************************************************************************
+std::optional<domain::Material::Type> cast(CliMatType type) noexcept {
+	using Type = domain::Material::Type;
+	switch(type) {
+	case CliMatType::CONDUCTOR: return Type::CONDUCTOR;
+	case CliMatType::DIELECTRIC: return Type::DIELECTRIC;
+	case CliMatType::AIR: return Type::AIR;
+	case CliMatType::ALL: return std::nullopt;
+	default: ::unreachable();
+	}
+}
+
+//******************************************************************************
+std::string cast(std::string const& s) noexcept {
+	return s;
+}
+
+//******************************************************************************
 template<auto Member>
 auto make_overrider(auto& overrides_collector) {
 	return [&overrides_collector](auto const& value) { // This is CLI::add_option_function callback.
@@ -104,6 +186,85 @@ auto make_overrider(auto& overrides_collector) {
 				to_override.*Member = value;
 			});
 	};
+}
+
+//******************************************************************************
+template<auto Member>
+auto make_appender_map_kkv(auto& overrides_collector) {
+	return [&overrides_collector](auto const& value) { // This is CLI::add_option_function callback.
+		overrides_collector.emplace_back(
+			[value](auto& to_override) { // This is to be executed to actually apply override.
+				auto& [k1, k2, v] = value;
+				(to_override.*Member)[{ cast(k1), cast(k2) }] = v;
+			});
+	};
+}
+
+// TODO find more elegant
+// https://stackoverflow.com/questions/72418821/getting-the-decltype-of-a-member-function
+//******************************************************************************
+template<auto Member, typename MemberType>
+auto* add_per_material_name_option(auto const& name, auto const& description, CLI::App& app, auto& overrides_collector, std::optional<std::map<std::string, MemberType, std::less<>>> const& enum_values_map = std::nullopt) {
+	using Value = MemberType::mapped_type;
+
+	auto* option = app.add_option_function<std::tuple<
+		CliAxis,
+		std::string,
+		Value>
+	>("--per-mat-"s + name,
+		make_appender_map_kkv<Member>(overrides_collector),
+		description
+	)->group("Mesher options (per Material)")
+	->take_all()
+	->delimiter(',')
+	->transform(CLI::CheckedTransformer(axes_with_all, CLI::ignore_case).application_index(0).description(""))
+	->type_name("["s
+		+ CLI::detail::type_name<domain::Axis>() + ":"
+		+ CLI::detail::generate_map(CLI::detail::smart_deref(axes_with_all), true) + ","
+		+ CLI::detail::type_name<std::string>() + ","
+		+ CLI::detail::type_name<Value>()
+		+ (enum_values_map.has_value()
+		  ? ":" + CLI::detail::generate_map(CLI::detail::smart_deref(enum_values_map.value()), true)
+		  : "")
+		+ "]");
+
+	if(enum_values_map.has_value())
+		option->transform(CLI::CheckedTransformer(enum_values_map.value(), CLI::ignore_case).application_index(2).description(""));
+
+	return option;
+}
+
+//******************************************************************************
+template<auto Member, typename MemberType>
+auto* add_per_material_type_option(auto const& name, auto const& description, CLI::App& app, auto& overrides_collector, std::optional<std::map<std::string, MemberType, std::less<>>> const& enum_values_map = std::nullopt) {
+	using Value = MemberType::mapped_type;
+	auto* option = app.add_option_function<std::tuple<
+		CliAxis,
+		CliMatType,
+		Value>
+	>("--per-mat-type-"s + name,
+		make_appender_map_kkv<Member>(overrides_collector),
+		description
+	)->group("Mesher options (per Material type)")
+	->take_all()
+	->delimiter(',')
+	->transform(CLI::CheckedTransformer(axes_with_all, CLI::ignore_case).application_index(0).description(""))
+	->transform(CLI::CheckedTransformer(material_types_with_all, CLI::ignore_case).application_index(1).description(""))
+	->type_name("["s
+		+ CLI::detail::type_name<domain::Axis>() + ":"
+		+ CLI::detail::generate_map(CLI::detail::smart_deref(axes_with_all), true) + ","
+		+ CLI::detail::type_name<domain::Material::Type>() + ":"
+		+ CLI::detail::generate_map(CLI::detail::smart_deref(material_types_with_all), true) + ","
+		+ CLI::detail::type_name<Value>()
+		+ (enum_values_map.has_value()
+		  ? ":" + CLI::detail::generate_map(CLI::detail::smart_deref(enum_values_map.value()), true)
+		  : "")
+		+ "]");
+
+	if(enum_values_map.has_value())
+		option->transform(CLI::CheckedTransformer(enum_values_map.value(), CLI::ignore_case).application_index(2).description(""));
+
+	return option;
 }
 
 //******************************************************************************
@@ -133,11 +294,6 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app.add_option("-o,--output", params.output, "Output CSX file. If different from input, will copy and extend it. (Defaults to input, if provided)")->type_name(format("{}:FILE", CLI::detail::type_name<decltype(params.output)>()));
 	app.add_flag("-f,--force", params.force, "Allow overwriting a file.")->trigger_on_parse();
 
-	static std::map<std::string, app::OpenEMSH::Params::OutputFormat, std::less<>> const output_formats {
-		{ "csx", app::OpenEMSH::Params::OutputFormat::CSX },
-		{ "plantuml", app::OpenEMSH::Params::OutputFormat::PLANTUML },
-		{ "prettyprint", app::OpenEMSH::Params::OutputFormat::PRETTYPRINT }
-	};
 	// https://github.com/CLIUtils/CLI11/issues/554#issuecomment-932782337
 	app.add_option("--output-format", params.output_format, "Output format.")->transform(CLI::CheckedTransformer(output_formats, CLI::ignore_case).description(CLI::detail::generate_map(CLI::detail::smart_deref(output_formats), true)))->default_str(reverse_kv(output_formats).at(params.output_format));
 
@@ -147,21 +303,16 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app.add_option("--read-oemsh-params", params.read_oemsh_params, "Read OpenEMSH parameters from file, if any.")->group("Input options")->default_str(to_string(params.read_oemsh_params));
 	app.add_option("--integrate-old-mesh", params.keep_old_mesh, "Keep current meshlines and integrate those in the final mesh.")->group("Input options")->default_str(to_string(params.keep_old_mesh));
 
-	static std::map<std::string, domain::Axis, std::less<>> const axes {
-		{ "x", domain::Axis::X },
-		{ "y", domain::Axis::Y },
-		{ "z", domain::Axis::Z }
-	};
 	app.add_option_function<decltype(domain::Params::input_fixed_meshlines)>("--add-fixed-meshline",
 		make_overrider<&domain::Params::input_fixed_meshlines>(domain_overrides),
 		"Add MeshlinePolicy at fixed position."
 	)->group("Mesher options")
 	->take_all()
 	->delimiter(',')
-	->transform(CLI::CheckedTransformer(axes, CLI::ignore_case).application_index(0).description(""))
+	->transform(CLI::CheckedTransformer(axes_without_all, CLI::ignore_case).application_index(0).description(""))
 	->type_name("["s
 		+ CLI::detail::type_name<decltype(domain::Params::input_fixed_meshlines)::value_type::first_type>() + ":"
-		+ CLI::detail::generate_map(CLI::detail::smart_deref(axes), true) + ","
+		+ CLI::detail::generate_map(CLI::detail::smart_deref(axes_without_all), true) + ","
 		+ CLI::detail::type_name<decltype(domain::Params::input_fixed_meshlines)::value_type::second_type>()
 		+ "]");
 
@@ -169,21 +320,6 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 		make_overrider<&domain::Params::proximity_limit>(domain_overrides),
 		"Distance under which two adjacent lines trigger a conflict."
 	)->group("Mesher options");
-
-	app.add_option_function<decltype(domain::Params::dmax)>("--dmax",
-		make_overrider<&domain::Params::dmax>(domain_overrides),
-		"Maximum distance between two adjacent lines."
-	)->group("Mesher options"); // TODO is in fact mres / sres / ares
-
-	app.add_option_function<decltype(domain::Params::lmin)>("--lmin",
-		make_overrider<&domain::Params::lmin>(domain_overrides),
-		"Minimum line number per interval half."
-	)->group("Mesher options");
-
-	app.add_option_function<decltype(domain::Params::smoothness)>("--smoothness",
-		make_overrider<&domain::Params::smoothness>(domain_overrides),
-		"Smoothness factor ]1;2]."
-	)->group("Mesher options")->check(BoundExclusiveInclusive(1.0, 2.0));
 
 	app.add_option_function<decltype(domain::Params::diagonal_dmax)>("--diag-dmax",
 		make_overrider<&domain::Params::diagonal_dmax>(domain_overrides),
@@ -199,6 +335,16 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 		make_overrider<&domain::Params::consecutive_diagonal_minimal_angle>(domain_overrides),
 		"Angle threshold, above which angles between diagonal edges will generate MeshlinePolicies."
 	)->group("Mesher options");
+
+	// TODO is in fact mres / sres / ares
+	add_per_material_type_option<&domain::Params::dmax, decltype(domain::Params::dmax)>("dmax", "Maximum distance between two adjacent lines.", app, domain_overrides);
+	add_per_material_name_option<&domain::Params::dmax, decltype(domain::Params::dmax)>("dmax", "Maximum distance between two adjacent lines.", app, domain_overrides);
+
+	add_per_material_type_option<&domain::Params::lmin, decltype(domain::Params::lmin)>("lmin", "Minimum line number per interval half.", app, domain_overrides);
+	add_per_material_name_option<&domain::Params::lmin, decltype(domain::Params::lmin)>("lmin", "Minimum line number per interval half.", app, domain_overrides);
+
+	add_per_material_type_option<&domain::Params::smoothness, decltype(domain::Params::smoothness)>("smoothness", "Smoothness factor ]1;2].", app, domain_overrides)->check(BoundExclusiveInclusive(1.0, 2.0).application_index(2));
+	add_per_material_name_option<&domain::Params::smoothness, decltype(domain::Params::smoothness)>("smoothness", "Smoothness factor ]1;2].", app, domain_overrides)->check(BoundExclusiveInclusive(1.0, 2.0).application_index(2));
 
 	app.add_flag("--no-x", [&params](size_t) { params.with_axis_x = false; }, "Don't include X axis meshlines in output.")->group("Output options");
 	app.add_flag("--no-y", [&params](size_t) { params.with_axis_y = false; }, "Don't include Y axis meshlines in output.")->group("Output options");
@@ -226,6 +372,10 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 		app.exit(e);
 		exit(EXIT_FAILURE);
 	}
+
+	domain_overrides.emplace_back([](auto& to_override) {
+		domain::GlobalParams::switch_all_lengths_between_absolute_and_wavelength_relative(to_override);
+	});
 
 	params.override_from_cli = [domain_overrides](domain::Params& to_override) {
 		for(auto const& apply : domain_overrides)

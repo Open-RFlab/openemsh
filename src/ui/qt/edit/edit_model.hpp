@@ -11,7 +11,6 @@
 #include <functional>
 
 #include "app/steps.hpp"
-#include "utils/concepts.hpp"
 
 namespace ui::qt {
 
@@ -25,11 +24,11 @@ class EditModel : public QStandardItemModel {
 public:
 	static EditModel* make(nodegraph::Node* node, QObject* parent = nullptr);
 
-	explicit EditModel(QObject* parent = nullptr);
-	virtual void commit();
+	EditModel(bool with_old_value, QObject* parent = nullptr);
+	virtual bool commit();
 
 protected:
-	static auto constexpr V = 2; // Value column index.
+	int const V; // Value column index.
 
 	template<typename T>
 	void make_row(int row, QString const& property, T const& old_value, T const& new_value, QString const& tool_tip);
@@ -40,8 +39,8 @@ protected:
 	static bool try_to_bool(Qt::CheckState const in, bool& out);
 
 private:
-	template<Enum E>
-	static void set_content(QStandardItem* item, E e);
+	template<typename T>
+	static void set_content(QStandardItem* item, T t);
 	static void set_content(QStandardItem* item, QString const& s);
 	static void set_content(QStandardItem* item, bool b);
 	static void set_uneditable(QStandardItem* item);
@@ -51,9 +50,9 @@ signals:
 };
 
 //******************************************************************************
-template<Enum E>
-void EditModel::set_content(QStandardItem* item, E e) {
-	item->setData(QVariant::fromValue(e));
+template<typename T>
+void EditModel::set_content(QStandardItem* item, T t) {
+	item->setData(QVariant::fromValue(t));
 }
 
 //******************************************************************************
@@ -80,7 +79,7 @@ void EditModel::make_row(int row, QString const& property, T const& old_value, T
 	item(row, 0)->setToolTip(tool_tip);
 	set_uneditable(item(row, 0));
 
-	if constexpr(V == 2) {
+	if(V == 2) {
 		setItem(row, 1, new QStandardItem());
 		item(row, 1)->setToolTip(tool_tip);
 		set_uneditable(item(row, 1));
@@ -89,7 +88,7 @@ void EditModel::make_row(int row, QString const& property, T const& old_value, T
 
 	setItem(row, V, new QStandardItem());
 	item(row, V)->setToolTip(tool_tip);
-	if constexpr(V == 2) {
+	if(V == 2) {
 		set_content(item(row, V), new_value);
 	} else {
 		set_content(item(row, V), old_value);

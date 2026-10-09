@@ -33,10 +33,8 @@ class ConflictDiagonalOrCircularZone
 : public Originator<ConflictDiagonalOrCircularZoneState const>
 , public Visitable<ConflictDiagonalOrCircularZone, EntityVisitor>
 , public Conflict {
-private:
-	GlobalParams* global_params;
-
 public:
+	GlobalParams* global_params;
 	Axis const axis;
 
 	ConflictDiagonalOrCircularZone(Axis axis, std::vector<Angle*> const& angles, GlobalParams* global_params, Timepoint* t);

@@ -36,9 +36,9 @@ EditDialog::~EditDialog() = default;
 //******************************************************************************
 void EditDialog::on_dbb_ok_accepted() {
 	QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-	static_cast<EditModel*>(ui->tv_properties->model())->commit();
+	if(static_cast<EditModel*>(ui->tv_properties->model())->commit())
+		accept();
 	QGuiApplication::restoreOverrideCursor();
-	accept();
 }
 
 //******************************************************************************
