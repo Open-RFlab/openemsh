@@ -60,7 +60,7 @@ public:
 	class Builder {
 	public:
 
-		void set_background_material(std::shared_ptr<Material> background);
+		void set_background_material(std::shared_ptr<Material> material);
 		void add_fixed_meshline_policy(Axis axis, Coord coord);
 		void add_polygon(Plane plane, std::shared_ptr<Material> const& material, std::string const& name, std::size_t priority, Polygon::RangeZ const& z_placement, std::initializer_list<Point> points);
 		void add_polygon(Plane plane, std::shared_ptr<Material> const& material, std::string const& name, std::size_t priority, Polygon::RangeZ const& z_placement, std::vector<std::unique_ptr<Point const>>&& points);
@@ -69,19 +69,19 @@ public:
 		[[nodiscard]] std::shared_ptr<Board> build(Params&& params = Params());
 
 	private:
-		std::shared_ptr<Material> material;
+		std::shared_ptr<Material> background_material;
 		PlaneSpace<std::vector<std::shared_ptr<Polygon>>> polygons;
 		AxisSpace<std::vector<std::function<void (Board*, Timepoint*)>>> fixed_meshline_policy_creators;
 	};
 
-	std::shared_ptr<Material> material;
+	std::shared_ptr<Material> background_material;
 	AxisSpace<std::vector<std::function<void (Board*, Timepoint*)>>> const fixed_meshline_policy_creators; // Meant to delay MeshlinePolicies creation at Step time instead of Parse time.
 
 	Board(PlaneSpace<std::vector<std::shared_ptr<Polygon>>>&& polygons, Params&& params, Timepoint* t);
 	Board(
 		PlaneSpace<std::vector<std::shared_ptr<Polygon>>>&& polygons,
 		AxisSpace<std::vector<std::function<void (Board*, Timepoint*)>>>&& fixed_meshline_policy_creators,
-		std::shared_ptr<Material>&& background,
+		std::shared_ptr<Material>&& background_material,
 		Params&& params,
 		Timepoint* t);
 

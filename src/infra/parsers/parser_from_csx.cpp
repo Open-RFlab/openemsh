@@ -130,13 +130,13 @@ expected<void, string> ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& n
 	if(auto a = global_params.attribute("ProximityLimit"); a)
 		domain_params.proximity_limit = a.as_double();
 
-	static std::map<std::string, optional<domain::Axis>> const axes {
+	static std::map<std::string, optional<domain::Axis>, std::less<>> const axes {
 		{ "X", domain::Axis::X },
 		{ "Y", domain::Axis::Y },
 		{ "Z", domain::Axis::Z },
 		{ "*", nullopt }
 	};
-	static std::map<std::string, optional<domain::Material::Type>> const material_types {
+	static std::map<std::string, optional<domain::Material::Type>, std::less<>> const material_types {
 		{ "Conductor", domain::Material::Type::CONDUCTOR },
 		{ "Dielectric", domain::Material::Type::DIELECTRIC },
 		{ "Air", domain::Material::Type::AIR },

@@ -37,7 +37,7 @@ EditDialogPerAxisPerCriteria::EditDialogPerAxisPerCriteria(IEditModelPerAxisPerC
 	connect(pb_delete, &QPushButton::clicked,
 		[this]() {
 			std::set<int> rows;
-			for(auto& index : ui->tv_properties->selectionModel()->selectedIndexes()) {
+			for(auto const& index : ui->tv_properties->selectionModel()->selectedIndexes()) {
 				rows.insert(index.row());
 			}
 			for(auto const& row : rows | std::views::reverse) {

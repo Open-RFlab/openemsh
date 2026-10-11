@@ -135,7 +135,7 @@ void EditModelPerAxisPerCriteria<Var>::set(Var const& v) {
 
 //******************************************************************************
 template<typename Var>
-Var const& EditModelPerAxisPerCriteria<Var>::get() {
+Var const& EditModelPerAxisPerCriteria<Var>::get() const {
 	return var;
 }
 

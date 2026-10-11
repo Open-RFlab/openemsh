@@ -30,7 +30,7 @@ public:
 	void add_new_row() override;
 
 	void set(Var const& v);
-	Var const& get();
+	Var const& get() const;
 
 private:
 	Var::value_type const default_value;

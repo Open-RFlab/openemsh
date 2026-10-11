@@ -256,7 +256,7 @@ SCENARIO("std::unique_ptr<Board> Board::Builder::build()", "[board]") {
 		WHEN("Calling build()") {
 			std::shared_ptr<Board> a = b.build();
 			THEN("Should output a Board containing the polygons") {
-				REQUIRE(a->material == material);
+				REQUIRE(a->background_material == material);
 				REQUIRE(a->get_current_state().polygons[XY].size() == 3);
 				REQUIRE(a->get_current_state().polygons[XY][0]->name == "MS1");
 				REQUIRE(*(a->get_current_state().polygons[XY][0]->points[0]) == Point(16.1, -26.5));
@@ -329,7 +329,7 @@ SCENARIO("shared_ptr<Material> Board::find_ambient_material(Axis axis, Coord con
 		WHEN("Looking for ambient Material outside of any Polygon") {
 			AND_WHEN("The board has a background Material") {
 				auto background = std::make_shared<Material>(Material::Type::DIELECTRIC, "");
-				b->material = background;
+				b->background_material = background;
 				auto material = b->find_ambient_material(X, 10);
 				THEN("Should return the board background Material") {
 					REQUIRE(material);
@@ -407,7 +407,7 @@ SCENARIO("std::pair<std::shared_ptr<Material>, std::remove_const_t<decltype(Poly
 		WHEN("Looking for ambient Material outside of any Polygon, relative to a Polygon") {
 			AND_WHEN("The board has a background Material") {
 				auto background = std::make_shared<Material>(Material::Type::DIELECTRIC, "");
-				b->material = background;
+				b->background_material = background;
 				auto [material, priority] = b->find_ambient_material(XY, Range({ 10, 10 }, { 11, 11 }), px);
 				THEN("Should return the board background Material and the lowest possible priority") {
 					REQUIRE(material);
@@ -455,7 +455,7 @@ SCENARIO("std::pair<std::shared_ptr<Material>, std::remove_const_t<decltype(Poly
 			}
 			AND_WHEN("The board has a background Material") {
 				auto background = std::make_shared<Material>(Material::Type::DIELECTRIC, "");
-				b->material = background;
+				b->background_material = background;
 				auto material = b->find_ambient_material(XY, Range({ 10, 10 }, { 11, 11 }));
 				THEN("Should return the board background Material") {
 					REQUIRE(material);

@@ -353,13 +353,13 @@ void EditDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, QMod
 	};
 
 	auto const handle_optional_material = [&]() {
-		auto* om = qobject_cast<OptionalMaterialEditor*>(editor);
+		auto const* om = qobject_cast<OptionalMaterialEditor*>(editor);
 		model->setData(index, QVariant::fromValue(om->get_value()), Qt::UserRole + 1);
 	};
 
 	auto const handle_per_axis_per_criteria = [&]<typename T>() {
-		auto* d = static_cast<EditDialogPerAxisPerCriteria*>(editor);
-		auto* m = static_cast<EditModelPerAxisPerCriteria<T>*>(d->get_model());
+		auto const* d = static_cast<EditDialogPerAxisPerCriteria*>(editor);
+		auto const* m = static_cast<EditModelPerAxisPerCriteria<T>*>(d->get_model());
 		model->setData(index, QVariant::fromValue(m->get()), Qt::UserRole + 1);
 	};
 
