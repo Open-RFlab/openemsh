@@ -688,6 +688,17 @@
   </widget>
 
   <widget class="QStatusBar" name="statusBar">
+   <widget class="QLabel" name="l_frequency_max">
+    <property name="text">
+     <string>f&lt;sub&gt;max&lt;/sub&gt;: </string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::TextFormat::RichText</enum>
+    </property>
+    <property name="toolTip">
+     <string>Maximal frequency (Hz)</string>
+    </property>
+   </widget>
    <widget class="QLabel" name="l_wavelength_min_vacuum">
     <property name="text">
      <string>λ&lt;sub&gt;min,0&lt;/sub&gt;: </string>

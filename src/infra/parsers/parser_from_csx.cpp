@@ -244,8 +244,8 @@ expected<void, string> ParserFromCsx::Pimpl::parse_grid(pugi::xml_node const& no
 //******************************************************************************
 expected<void, string> ParserFromCsx::Pimpl::parse_fdtd(pugi::xml_node const& node) {
 	if(auto a = node.attribute("f_max"); a) {
-		double f_max = a.as_double();
-		domain_params.wavelength_min_vacuum = Material::calc_wavelength_in_vacuum(f_max);
+		domain_params.f_max = a.as_double();
+		domain_params.wavelength_min_vacuum = Material::calc_wavelength_in_vacuum(domain_params.f_max);
 	} else {
 		return unexpected(format("No maximal frequency specified"));
 	}

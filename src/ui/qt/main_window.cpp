@@ -70,6 +70,7 @@ MainWindow::MainWindow(app::OpenEMSH& oemsh, QWidget* parent)
 
 	update_board_dependant_buttons_visibility(false);
 
+	ui->statusBar->addPermanentWidget(ui->l_frequency_max);
 	ui->statusBar->addPermanentWidget(ui->l_wavelength_min_vacuum);
 	ui->statusBar->addPermanentWidget(ui->l_cell_number);
 
@@ -151,6 +152,7 @@ bool MainWindow::parse_and_display() {
 	update_board_dependant_buttons_visibility(true);
 	update_title();
 	update_wavelength_min_vacuum();
+	update_frequency_max();
 	ui->structure_view->init(&oemsh.get_board());
 	ui->processing_view->init(&oemsh.get_board());
 	run();
@@ -165,6 +167,14 @@ void MainWindow::update_cell_number(bool reset) {
 	ui->l_cell_number->setText(reset
 		? base_str
 		: base_str + QString::number(oemsh.get_board().get_mesh_cell_number()));
+}
+
+//******************************************************************************
+void MainWindow::update_frequency_max(bool reset) {
+	static QString const base_str(ui->l_frequency_max->text());
+	ui->l_frequency_max->setText(reset
+		? base_str
+		: base_str + QString::number(oemsh.get_board().global_params->get_current_state().f_max, 'e', 2));
 }
 
 //******************************************************************************
@@ -190,6 +200,7 @@ void MainWindow::clear() {
 	ui->statusBar->clearMessage();
 	update_cell_number(true);
 	update_wavelength_min_vacuum(true);
+	update_frequency_max(true);
 }
 
 //******************************************************************************

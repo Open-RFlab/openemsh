@@ -23,6 +23,7 @@ namespace domain {
 struct Params {
 	bool has_grid_already = false; // TODO would better fit in infra layer?
 	double proximity_limit = 200; // Fed wavelength-relative, stored absolute.
+	double f_max = 0;
 	double wavelength_min_vacuum = 1;
 	double delta_unit = 1;
 
