@@ -28,7 +28,7 @@ struct Params {
 	double delta_unit = 1;
 
 	std::size_t diagonal_lmin = 2;
-	double diagonal_dmax = 30; // Fed wavelength-relative, stored absolute.
+	double diagonal_dmax = 60; // Fed wavelength-relative, stored absolute.
 	double consecutive_diagonal_minimal_angle = 20; // Limite between acute / obtuse angles.
 
 	std::vector<std::pair<Axis, double>> input_fixed_meshlines;

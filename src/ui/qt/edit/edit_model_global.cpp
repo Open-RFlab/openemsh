@@ -28,17 +28,22 @@ EditModelGlobal::EditModelGlobal(domain::GlobalParams* global, QObject* parent)
 	setRowCount(7);
 
 	make_row(0, "Proximity limit", QString::number(params.proximity_limit),
-		"Distance below which two MeshlinePolicies will be merged.");
+		"Distance below which two MeshlinePolicies will be merged.<br/>"
+		"Expressed as wavelength divisor (λ/value).");
 	make_row(1, "Smoothness", params.smoothness,
 		"Smoothness factor <b>]1;2]</b>. Meshing algorithm will decrease it, better to start high.");
 	make_row(2, "lmin", params.lmin,
 		"Minimum line number per Interval half.");
 	make_row(3, "dmax", params.dmax,
-		"Maximum distance between two adjacent lines.");
+		"Maximum distance between two adjacent lines.<br/>"
+		"Expressed as wavelength divisor (λ/value).<br/>"
+		"Accuracy-wise, 10 is strict minimum, 20 is sufficient.");
 	make_row(4, "Minimal angle", QString::number(params.consecutive_diagonal_minimal_angle),
 		"Angle threshold, above which angles between diagonal edges will generate MeshlinePolicies.");
 	make_row(5, "Diagonal dmax", QString::number(params.diagonal_dmax),
-		"Maximum distance between two adjacent lines in diagonal zones.");
+		"Maximum distance between two adjacent lines in diagonal zones.<br/>"
+		"Expressed as wavelength divisor (λ/value).<br/>"
+		"Accuracy-wise, 60 is sufficient");
 	make_row(6, "Diagonal lmin", QString::number(params.diagonal_lmin),
 		"Minimum line number per Interval half, at extremities of diagonal zones.");
 }

@@ -24,7 +24,8 @@ EditModelInterval::EditModelInterval(domain::Interval* interval, QObject* parent
 	setRowCount(5);
 
 	make_row(0, "dmax", QString::number(interval->global_params->switch_length_between_absolute_and_wavelength_relative(state.dmax)),
-		"Maximum distance between two adjacent lines.");
+		"Maximum distance between two adjacent lines.<br/>"
+		"Expressed as wavelength divisor (λ/value).");
 	make_row(1, "Before.lmin", QString::number(state.before.lmin),
 		"Minimum line number in the minimal interval half. "
 		"Note a line will always be placed at the interval center.");

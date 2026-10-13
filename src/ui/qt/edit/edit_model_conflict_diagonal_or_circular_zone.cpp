@@ -25,7 +25,8 @@ EditModelConflictDiagonalOrCircularZone::EditModelConflictDiagonalOrCircularZone
 	make_row(0, "lmin", QString::number(state.lmin),
 		"Minimum line number per Interval half, at extremities of the diagonal zone.");
 	make_row(1, "dmax", QString::number(conflict->global_params->switch_length_between_absolute_and_wavelength_relative(state.dmax)),
-		"Maximum distance between two adjacent lines.");
+		"Maximum distance between two adjacent lines.<br/>"
+		"Expressed as wavelength divisor (λ/value).");
 	make_row(2, "Minimal angle", QString::number(state.minimal_angle),
 		"Angle threshold, above which angles between diagonal edges will generate MeshlinePolicies.");
 }

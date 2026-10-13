@@ -34,7 +34,7 @@ EditModelMeshlinePolicy::EditModelMeshlinePolicy(domain::MeshlinePolicy* meshlin
 	make_row(0, "Policy", state.policy,
 		"<b>ONELINE:</b> One meshline at the policy position.<br/>"
 		"<b>HALFS:</b> Two lines centered around the policy position.<br/>"
-		"<b>THIRDS:</b> Two lines placed around (2d/3 in Normal direction, d/3 the other side) the policy position.");
+		"<b>THIRDS:</b> Two lines placed around the policy position (2d/3 in Normal direction, d/3 the other side).");
 	make_row(1, "Normal", state.normal,
 		"Direction associated with Policy.");
 	make_row(2, "Enabled", state.is_enabled,
@@ -42,7 +42,8 @@ EditModelMeshlinePolicy::EditModelMeshlinePolicy(domain::MeshlinePolicy* meshlin
 	make_row(3, "d", QString::number(meshline_policy->global_params->switch_length_between_absolute_and_wavelength_relative(state.d)),
 		"Desired distance between policy lines (HALFS|THIRDS) or "
 		"between policy line and adjacent lines (ONELINE).<br/>"
-		"Can be decreased by the meshing algorithm.");
+		"Expressed as wavelength divisor (λ/value).<br/>"
+		"Can be decreased by the meshing algorithm (value increased).");
 }
 
 //******************************************************************************
