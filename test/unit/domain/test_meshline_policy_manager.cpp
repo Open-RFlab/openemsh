@@ -505,12 +505,12 @@ SCENARIO("void MeshlinePolicyManager::mesh()", "[meshline_policy_manager]") {
 		}
 	};
 
-	GIVEN("A meshline policy manager and some meshline policies") {
+	GIVEN("A meshline policy manager, some meshline policies and detected intervals") {
 		Wrapper w(t);
 		auto params_state = w.params.get_current_state();
 		params_state.proximity_limit = 1;
-		params_state.lmin = 2;
-		params_state.dmax = 4.0;
+		params_state.lmin = {{{ Params::ALL, Params::ALL }, 2 }};
+		params_state.dmax = {{{ Params::ALL, Params::ALL }, 4.0 }};
 		w.params.set_next_state(params_state);
 		Point e0(1, 1), e1(1, 3);
 		Edge e(XY, &e0, &e1, t);

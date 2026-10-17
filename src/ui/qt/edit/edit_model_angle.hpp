@@ -18,7 +18,7 @@ namespace ui::qt {
 class EditModelAngle : public EditModel {
 public:
 	explicit EditModelAngle(domain::Angle* angle, QObject* parent = nullptr);
-	void commit() override;
+	bool commit() override;
 
 private:
 	domain::Angle* angle;

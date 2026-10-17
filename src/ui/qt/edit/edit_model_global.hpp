@@ -18,7 +18,7 @@ namespace ui::qt {
 class EditModelGlobal : public EditModel {
 public:
 	explicit EditModelGlobal(domain::GlobalParams* global, QObject* parent = nullptr);
-	void commit() override;
+	bool commit() override;
 
 private:
 	domain::GlobalParams* global;

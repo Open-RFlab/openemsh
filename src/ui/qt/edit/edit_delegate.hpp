@@ -6,10 +6,38 @@
 
 #pragma once
 
+#include <QComboBox>
 #include <QPersistentModelIndex>
 #include <QStyledItemDelegate>
 
+#include "domain/global.hpp"
+
 namespace ui::qt {
+
+//******************************************************************************
+using OptionalMaterial = std::optional<domain::Params::Mat>;
+enum class OptionalMaterialState { ALL, TYPE, NAME };
+
+//******************************************************************************
+class OptionalMaterialEditor : public QComboBox {
+	Q_OBJECT
+public:
+	explicit OptionalMaterialEditor(QWidget* parent = nullptr);
+
+	void set_value(OptionalMaterial const& material);
+	OptionalMaterial get_value() const;
+
+signals:
+	void editing_finished();
+
+private slots:
+	void on_activated(int index);
+
+private:
+	static QString const by_name_str;
+	int index_of_wildcard() const;
+	int index_of_by_name() const;
+};
 
 //******************************************************************************
 class EditDelegate : public QStyledItemDelegate {

@@ -18,7 +18,7 @@ namespace ui::qt {
 class EditModelMeshlinePolicy : public EditModel {
 public:
 	explicit EditModelMeshlinePolicy(domain::MeshlinePolicy* meshline_policy, QObject* parent = nullptr);
-	void commit() override;
+	bool commit() override;
 
 private:
 	domain::MeshlinePolicy* meshline_policy;

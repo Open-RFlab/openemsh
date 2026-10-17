@@ -17,7 +17,6 @@
 #include "domain/geometrics/normal.hpp"
 #include "domain/geometrics/space.hpp"
 #include "domain/utils/entity_visitor.hpp"
-#include "domain/global.hpp"
 #include "utils/entity.hpp"
 #include "utils/state_management.hpp"
 #include "i_meshline_origin.hpp"
@@ -26,6 +25,7 @@ namespace domain {
 
 class Conflict;
 class Meshline;
+class GlobalParams;
 
 struct MeshlinePolicyState;
 

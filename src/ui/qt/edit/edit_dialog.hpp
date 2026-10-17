@@ -22,11 +22,11 @@ class EditModel;
 //******************************************************************************
 class EditDialog : public QDialog {
 	Q_OBJECT
-private:
+protected:
 	std::unique_ptr<Ui::EditDialog> ui;
 	EditDelegate* delegate;
 
-private slots:
+public slots:
 	void on_dbb_ok_accepted();
 	void on_dbb_ok_rejected();
 

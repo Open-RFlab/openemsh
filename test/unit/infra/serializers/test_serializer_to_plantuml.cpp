@@ -34,9 +34,9 @@ SCENARIO("string SerializerToPlantuml::run(Board& board)", "[serializer_to_plant
 	GIVEN("The Lpf complex structure") {
 		std::shared_ptr<Board> lpf = create_lpf();
 		auto params_state = lpf->global_params->get_current_state();
-		params_state.lmin = 1;
+		params_state.lmin = {{{ Params::ALL, Params::ALL }, 1 }};
+		params_state.dmax = {{{ Params::ALL, Params::ALL }, 2 }};
 		params_state.proximity_limit = 0;
-//		params_state.dmax = 2;
 		lpf->global_params->set_next_state(params_state);
 		auto_mesh(lpf);
 
@@ -61,9 +61,9 @@ SCENARIO("string SerializerToPlantuml::run(Board& board)", "[serializer_to_plant
 	GIVEN("The Stub complex structure") {
 		std::shared_ptr<Board> stub = create_stub();
 		auto params_state = stub->global_params->get_current_state();
-		params_state.lmin = 0;
+		params_state.lmin = {{{ Params::ALL, Params::ALL }, 0 }};
+		params_state.dmax = {{{ Params::ALL, Params::ALL }, 2 }};
 		params_state.proximity_limit = 0.1;
-//		params_state.dmax = 2;
 		stub->global_params->set_next_state(params_state);
 		auto_mesh(stub);
 

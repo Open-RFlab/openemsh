@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include "domain/geometrics/edge.hpp"
 #include "domain/geometrics/polygon.hpp"
 #include "domain/geometrics/space.hpp"
@@ -24,3 +26,5 @@ std::string to_string(domain::Axis axis) noexcept;
 std::string to_string(domain::Normal normal) noexcept;
 std::string to_string(domain::Plane plane) noexcept;
 std::string to_string(domain::Material::Type type) noexcept;
+std::string to_string(std::optional<domain::Axis> const& axis) noexcept;
+std::string to_string(std::optional<domain::Params::Mat> const& mat) noexcept;

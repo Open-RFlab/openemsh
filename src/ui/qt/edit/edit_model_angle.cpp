@@ -16,7 +16,7 @@ namespace ui::qt {
 
 //******************************************************************************
 EditModelAngle::EditModelAngle(domain::Angle* angle, QObject* parent)
-: EditModel(parent)
+: EditModel(false, parent)
 , angle(angle)
 {
 	auto const& state = angle->get_current_state();
@@ -27,7 +27,7 @@ EditModelAngle::EditModelAngle(domain::Angle* angle, QObject* parent)
 }
 
 //******************************************************************************
-void EditModelAngle::commit() {
+bool EditModelAngle::commit() {
 	auto state = angle->get_current_state();
 
 	std::array does_succeed = {
@@ -39,7 +39,9 @@ void EditModelAngle::commit() {
 		emit edit_from(app::Step::DETECT_CONFLICT_EIP, [&]() {
 			angle->set_next_state(state);
 		});
+		return true;
 	}
+	return false;
 }
 
 } // namespace ui::qt

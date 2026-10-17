@@ -60,7 +60,7 @@ public:
 	class Builder {
 	public:
 
-		void set_background_material(std::shared_ptr<Material> background);
+		void set_background_material(std::shared_ptr<Material> material);
 		void add_fixed_meshline_policy(Axis axis, Coord coord);
 		void add_polygon(Plane plane, std::shared_ptr<Material> const& material, std::string const& name, std::size_t priority, Polygon::RangeZ const& z_placement, std::initializer_list<Point> points);
 		void add_polygon(Plane plane, std::shared_ptr<Material> const& material, std::string const& name, std::size_t priority, Polygon::RangeZ const& z_placement, std::vector<std::unique_ptr<Point const>>&& points);
@@ -69,19 +69,19 @@ public:
 		[[nodiscard]] std::shared_ptr<Board> build(Params&& params = Params());
 
 	private:
-		std::shared_ptr<Material> material;
+		std::shared_ptr<Material> background_material;
 		PlaneSpace<std::vector<std::shared_ptr<Polygon>>> polygons;
 		AxisSpace<std::vector<std::function<void (Board*, Timepoint*)>>> fixed_meshline_policy_creators;
 	};
 
-	std::shared_ptr<Material> material;
+	std::shared_ptr<Material> background_material;
 	AxisSpace<std::vector<std::function<void (Board*, Timepoint*)>>> const fixed_meshline_policy_creators; // Meant to delay MeshlinePolicies creation at Step time instead of Parse time.
 
 	Board(PlaneSpace<std::vector<std::shared_ptr<Polygon>>>&& polygons, Params&& params, Timepoint* t);
 	Board(
 		PlaneSpace<std::vector<std::shared_ptr<Polygon>>>&& polygons,
 		AxisSpace<std::vector<std::function<void (Board*, Timepoint*)>>>&& fixed_meshline_policy_creators,
-		std::shared_ptr<Material>&& background,
+		std::shared_ptr<Material>&& background_material,
 		Params&& params,
 		Timepoint* t);
 
@@ -94,6 +94,7 @@ public:
 	void detect_diagonal_angles(Plane plane);
 	void detect_diagonal_zones(Plane plane);
 	void add_fixed_meshline_policies(Axis axis);
+	void adjust_mesh_to_materials(Axis axis);
 
 	void adjust_edges_to_materials();
 	void detect_diagonal_angles();
@@ -104,6 +105,7 @@ public:
 	void detect_colinear_edges();
 	void detect_individual_edges();
 	void add_fixed_meshline_policies();
+	void adjust_mesh_to_materials();
 
 	/// Mesh resolution dependant detection tasks
 	///*************************************************************************
@@ -127,6 +129,7 @@ public:
 	std::size_t get_mesh_cell_number() const;
 
 private:
+	std::shared_ptr<Material> find_ambient_material(Axis axis, Coord const& coord) const;
 	std::shared_ptr<Material> find_ambient_material(Plane plane, Segment const& segment) const;
 	std::pair<std::shared_ptr<Material>, std::remove_const_t<decltype(Polygon::priority)>> find_ambient_material(Plane plane, Segment const& segment, std::shared_ptr<Polygon> const& current_polygon) const;
 };
