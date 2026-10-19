@@ -15,7 +15,7 @@ Despite being actually just the last step of the whole process, this explanatory
 - `x`: Position of `MeshlinePolicies`.
 - `m`: Position of the middle of the `Interval` between two `MeshlinePolicies`.
 - `h`: Half of the Interval between two `MeshlinePolicies`.
-- `f`: Smoothness factor `[1;2]`.
+- `w`: Smoothness factor `[1;2]`.
 - `d`: Distance between the two lines around a `MeshlinePolicy`.
 - `dinit`: Space between `x` and the first line (may not be the half of `d`).
 - `dmax`: Maximal authorized space between two lines. Calculated from minimal resolution: `dmax = λ/res_min`.
@@ -36,7 +36,7 @@ Despite being actually just the last step of the whole process, this explanatory
 
 ### Steps
 
-- Choose `dmax` among `Interval`'s `dmax` and projection from both sides' `d` of `f**(lz+1)`, so the sizes of the two cells around `m` (belonging to both sides) will respect the smoothness factor (`f`).
+- Choose `dmax` among `Interval`'s `dmax` and projection from both sides' `d` of `w**(lz+1)`, so the sizes of the two cells around `m` (belonging to both sides) will respect the smoothness factor (`w`).
 - Reduce `d` until enough lines are in the half (`lz >= lmin`).
 - Reduce the smoothness factor (which augments the spaces between lines, except `d`) until `z` matches `s`, that is to say until the last line of the half overlaps with `m` (actually just passed `m`).
 - Trim out the last line, that overlaps `m` (a line at `m`, that will count for both halves, will be placed instead).
