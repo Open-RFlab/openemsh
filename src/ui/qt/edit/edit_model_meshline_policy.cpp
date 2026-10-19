@@ -39,11 +39,11 @@ EditModelMeshlinePolicy::EditModelMeshlinePolicy(domain::MeshlinePolicy* meshlin
 		"Direction associated with Policy.");
 	make_row(2, "Enabled", state.is_enabled,
 		"Take into account in the meshing process.");
-	make_row(3, "d", QString::number(meshline_policy->global_params->switch_length_between_absolute_and_wavelength_relative(state.d)),
-		"Desired distance between policy lines (HALFS|THIRDS) or "
+	make_row(3, "Local resolution", QString::number(meshline_policy->global_params->switch_length_between_absolute_and_wavelength_relative(state.d)),
+		"Resolution (in Cells Per Wavelength) governing the cell "
+		"between policy lines (HALFS|THIRDS) or "
 		"between policy line and adjacent lines (ONELINE).<br/>"
-		"Expressed as wavelength divisor (λ/value).<br/>"
-		"Can be decreased by the meshing algorithm (value increased).");
+		"Can be increased by the meshing algorithm.");
 }
 
 //******************************************************************************

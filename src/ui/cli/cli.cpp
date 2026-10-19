@@ -318,12 +318,16 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 
 	app.add_option_function<decltype(domain::Params::proximity_limit)>("--proximity-limit",
 		make_overrider<&domain::Params::proximity_limit>(domain_overrides),
-		"Distance under which two adjacent lines trigger a conflict. Expressed as wavelength divisor (λ/value)."
-	)->group("Mesher options");
+		"Two MeshlinePolicies closer than allowed by this resolution "
+		"will be merged (in Cells Per Wavelength).\n"
+		"Note: It won't directly limit the smaller cell size in the meshing algorithm."
+	)->group("Mesher options")
+	->default_str(std::to_string(default_values.proximity_limit));
 
 	app.add_option_function<decltype(domain::Params::diagonal_dmax)>("--diag-dmax",
 		make_overrider<&domain::Params::diagonal_dmax>(domain_overrides),
-		"Maximum distance between two adjacent lines in diagonal zones. Expressed as wavelength divisor (λ/value). Accuracy-wise, 60 is sufficient."
+		"Minimal resolution in diagonal zones (in Cells Per Wavelength). "
+		"Accuracy-wise, 60 is sufficient."
 	)->group("Mesher options");
 
 	app.add_option_function<decltype(domain::Params::diagonal_lmin)>("--diag-lmin",
@@ -333,12 +337,11 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 
 	app.add_option_function<decltype(domain::Params::consecutive_diagonal_minimal_angle)>("--diag-minimal-angle",
 		make_overrider<&domain::Params::consecutive_diagonal_minimal_angle>(domain_overrides),
-		"Angle threshold, above which angles between diagonal edges will generate MeshlinePolicies."
+		"Angle threshold (in degree), above which angles between diagonal edges will generate MeshlinePolicies."
 	)->group("Mesher options");
 
 	auto const dmax_description =
-		"Maximum distance between two adjacent lines. "
-		"Expressed as wavelength divisor (λ/value). "
+		"Minimal resolution (in Cells Per Wavelength). "
 		"Accuracy-wise, 10 is strict minimum, 20 is sufficient.";
 	add_per_material_type_option<&domain::Params::dmax, decltype(domain::Params::dmax)>("dmax", dmax_description, app, domain_overrides);
 	add_per_material_name_option<&domain::Params::dmax, decltype(domain::Params::dmax)>("dmax", dmax_description, app, domain_overrides);

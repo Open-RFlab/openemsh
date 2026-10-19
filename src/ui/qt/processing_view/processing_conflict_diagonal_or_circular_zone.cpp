@@ -55,12 +55,12 @@ ProcessingConflictDiagonalOrCircularZone::ProcessingConflictDiagonalOrCircularZo
 		return locate_processing_conflict_docz_params().port;
 	};
 
-	QString dmax("dmax: ");
+	QString dmax("Resolution min: ");
 	QString lmin("lmin: ");
 	QString minimal_angle ("Minimal angle (°): ");
 	if(conflict) {
 		auto const& state = conflict->get_current_state();
-		dmax += "λ/" + QString::number(conflict->global_params->switch_length_between_absolute_and_wavelength_relative(state.dmax));
+		dmax += QString::number(conflict->global_params->switch_length_between_absolute_and_wavelength_relative(state.dmax));
 		lmin += QString::number(state.lmin);
 		minimal_angle += QString::number(state.minimal_angle);
 		for(auto const* angle : state.angles)

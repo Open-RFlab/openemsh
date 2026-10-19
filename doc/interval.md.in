@@ -18,7 +18,7 @@ Despite being actually just the last step of the whole process, this explanatory
 - `f`: Smoothness factor `[1;2]`.
 - `d`: Distance between the two lines around a `MeshlinePolicy`.
 - `dinit`: Space between `x` and the first line (may not be the half of `d`).
-- `dmax`: Maximal authorized space between two lines.
+- `dmax`: Maximal authorized space between two lines. Calculated from minimal resolution: `dmax = λ/res_min`.
 - `s`: Space to fill of lines.
 - `z`: Distance from the first line (belonging to `MeshlinePolicy`) to the last line before `m` (the middle of the `Interval`).
 - `lz`: Number of lines before the middle of the `Interval` (minus the line belonging to the `MeshlinePolicy`).
