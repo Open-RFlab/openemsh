@@ -215,7 +215,7 @@ auto* add_per_material_name_option(auto const& name, auto const& description, CL
 		make_appender_map_kkv<Member>(overrides_collector),
 		description
 	)->group("Mesher options (per Material)")
-	->take_all()
+	->trigger_on_parse()
 	->delimiter(',')
 	->transform(CLI::CheckedTransformer(axes_with_all, CLI::ignore_case).application_index(0).description(""))
 	->type_name("["s
@@ -226,7 +226,7 @@ auto* add_per_material_name_option(auto const& name, auto const& description, CL
 		+ (enum_values_map.has_value()
 		  ? ":" + CLI::detail::generate_map(CLI::detail::smart_deref(enum_values_map.value()), true)
 		  : "")
-		+ "]");
+		+ "] ... ");
 
 	if(enum_values_map.has_value())
 		option->transform(CLI::CheckedTransformer(enum_values_map.value(), CLI::ignore_case).application_index(2).description(""));
@@ -246,7 +246,7 @@ auto* add_per_material_type_option(auto const& name, auto const& description, CL
 		make_appender_map_kkv<Member>(overrides_collector),
 		description
 	)->group("Mesher options (per Material type)")
-	->take_all()
+	->trigger_on_parse()
 	->delimiter(',')
 	->transform(CLI::CheckedTransformer(axes_with_all, CLI::ignore_case).application_index(0).description(""))
 	->transform(CLI::CheckedTransformer(material_types_with_all, CLI::ignore_case).application_index(1).description(""))
@@ -259,7 +259,7 @@ auto* add_per_material_type_option(auto const& name, auto const& description, CL
 		+ (enum_values_map.has_value()
 		  ? ":" + CLI::detail::generate_map(CLI::detail::smart_deref(enum_values_map.value()), true)
 		  : "")
-		+ "]");
+		+ "] ... ");
 
 	if(enum_values_map.has_value())
 		option->transform(CLI::CheckedTransformer(enum_values_map.value(), CLI::ignore_case).application_index(2).description(""));
