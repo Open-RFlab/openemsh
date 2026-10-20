@@ -127,8 +127,9 @@ void ParserFromCsx::Pimpl::warn_unsupported_primitive(string const& primitive_ty
 //******************************************************************************
 expected<void, string> ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& node) {
 	pugi::xml_node global_params = node.child("GlobalParams");
-	if(auto a = global_params.attribute("ProximityLimit"); a)
-		domain_params.proximity_limit = a.as_double();
+	if(auto a = global_params.attribute("FeatResMax"); a) domain_params.proximity_limit = a.as_double();
+	if(auto a = global_params.attribute("DiagResMin"); a) domain_params.diagonal_dmax = a.as_double();
+	if(auto a = global_params.attribute("DiagAngleMin"); a) domain_params.consecutive_diagonal_minimal_angle = a.as_double();
 
 	static std::map<std::string, optional<domain::Axis>, std::less<>> const axes {
 		{ "X", domain::Axis::X },
@@ -144,7 +145,7 @@ expected<void, string> ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& n
 	};
 
 	auto const parse_per_material = [](auto& var, pugi::xml_node const& node) -> expected<void, string> {
-		for(auto const& rule : node.children()) {
+		for(auto const& rule : node.children("Rule")) {
 			auto a = rule.attribute("Axis");
 			auto v = rule.attribute("Value");
 			auto n = rule.attribute("Name");
@@ -184,9 +185,9 @@ expected<void, string> ParserFromCsx::Pimpl::parse_oemsh(pugi::xml_node const& n
 	};
 
 	pugi::xml_node per_material_params = node.child("PerMaterialParams");
-	TRY(parse_per_material(domain_params.dmax, per_material_params.child("dmax")));
+	TRY(parse_per_material(domain_params.dmax, per_material_params.child("ResMin")));
 	TRY(parse_per_material(domain_params.lmin, per_material_params.child("lmin")));
-	TRY(parse_per_material(domain_params.smoothness, per_material_params.child("smoothness")));
+	TRY(parse_per_material(domain_params.smoothness, per_material_params.child("Smoothness")));
 
 	pugi::xml_node fixed_meshlines = node.child("FixedMeshlines");
 	size_t delta_unit = fixed_meshlines.attribute("DeltaUnit").as_uint(1);

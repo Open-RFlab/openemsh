@@ -316,7 +316,7 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 		+ CLI::detail::type_name<decltype(domain::Params::input_fixed_meshlines)::value_type::second_type>()
 		+ "]");
 
-	app.add_option_function<decltype(domain::Params::proximity_limit)>("--proximity-limit",
+	app.add_option_function<decltype(domain::Params::proximity_limit)>("--feat-res-max",
 		make_overrider<&domain::Params::proximity_limit>(domain_overrides),
 		"Two MeshlinePolicies closer than allowed by this resolution "
 		"will be merged (in Cells Per Wavelength).\n"
@@ -324,7 +324,7 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	)->group("Mesher options")
 	->default_str(std::to_string(default_values.proximity_limit));
 
-	app.add_option_function<decltype(domain::Params::diagonal_dmax)>("--diag-dmax",
+	app.add_option_function<decltype(domain::Params::diagonal_dmax)>("--diag-res-min",
 		make_overrider<&domain::Params::diagonal_dmax>(domain_overrides),
 		"Minimal resolution in diagonal zones (in Cells Per Wavelength). "
 		"Accuracy-wise, 60 is sufficient."
@@ -335,7 +335,7 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 //		"Minimum line number per Interval half, at extremities of diagonal zones."
 //	)->group("Mesher options");
 
-	app.add_option_function<decltype(domain::Params::consecutive_diagonal_minimal_angle)>("--diag-minimal-angle",
+	app.add_option_function<decltype(domain::Params::consecutive_diagonal_minimal_angle)>("--diag-angle-min",
 		make_overrider<&domain::Params::consecutive_diagonal_minimal_angle>(domain_overrides),
 		"Angle threshold (in degree), above which angles between diagonal edges will generate MeshlinePolicies."
 	)->group("Mesher options");
@@ -343,8 +343,8 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	auto const dmax_description =
 		"Minimal resolution (in Cells Per Wavelength). "
 		"Accuracy-wise, 10 is strict minimum, 20 is sufficient.";
-	add_per_material_type_option<&domain::Params::dmax, decltype(domain::Params::dmax)>("dmax", dmax_description, app, domain_overrides);
-	add_per_material_name_option<&domain::Params::dmax, decltype(domain::Params::dmax)>("dmax", dmax_description, app, domain_overrides);
+	add_per_material_type_option<&domain::Params::dmax, decltype(domain::Params::dmax)>("res-min", dmax_description, app, domain_overrides);
+	add_per_material_name_option<&domain::Params::dmax, decltype(domain::Params::dmax)>("res-min", dmax_description, app, domain_overrides);
 
 	auto const lmin_description = "Minimum line number per interval half.";
 	add_per_material_type_option<&domain::Params::lmin, decltype(domain::Params::lmin)>("lmin", lmin_description, app, domain_overrides);
