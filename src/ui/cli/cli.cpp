@@ -271,6 +271,7 @@ auto* add_per_material_type_option(auto const& name, auto const& description, CL
 app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app::OpenEMSH::Params params;
 	vector<function<void (domain::Params&)>> domain_overrides;
+	domain::Params const default_values;
 
 	CLI::App app("OpenEMSH - Mesher for the openEMS FDTD solver", "OpenEMSH");
 
@@ -328,7 +329,8 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 		make_overrider<&domain::Params::diagonal_dmax>(domain_overrides),
 		"Minimal resolution in diagonal zones (in Cells Per Wavelength). "
 		"Accuracy-wise, 60 is sufficient."
-	)->group("Mesher options");
+	)->group("Mesher options")
+	->default_str(std::to_string(default_values.diagonal_dmax));
 
 //	app.add_option_function<decltype(domain::Params::diagonal_lmin)>("--diag-lmin",
 //		make_overrider<&domain::Params::diagonal_lmin>(domain_overrides),
@@ -338,7 +340,8 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 	app.add_option_function<decltype(domain::Params::consecutive_diagonal_minimal_angle)>("--diag-angle-min",
 		make_overrider<&domain::Params::consecutive_diagonal_minimal_angle>(domain_overrides),
 		"Angle threshold (in degree), above which angles between diagonal edges will generate MeshlinePolicies."
-	)->group("Mesher options");
+	)->group("Mesher options")
+	->default_str(std::to_string(default_values.consecutive_diagonal_minimal_angle));
 
 	auto const dmax_description =
 		"Minimal resolution (in Cells Per Wavelength). "
