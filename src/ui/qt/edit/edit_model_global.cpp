@@ -25,7 +25,7 @@ EditModelGlobal::EditModelGlobal(domain::GlobalParams* global, QObject* parent)
 {
 	auto params = global->get_current_state();
 	domain::GlobalParams::switch_all_lengths_between_absolute_and_wavelength_relative(params);
-	setRowCount(7);
+	setRowCount(6);
 
 	make_row(0, "Maximal feature resolution", QString::number(params.proximity_limit),
 		"Two MeshlinePolicies closer than allowed by this resolution "
@@ -38,13 +38,11 @@ EditModelGlobal::EditModelGlobal(domain::GlobalParams* global, QObject* parent)
 	make_row(3, "Minimal resolution", params.dmax,
 		"Minimal resolution (in Cells Per Wavelength).<br/>"
 		"Accuracy-wise, 10 is strict minimum, 20 is sufficient.");
-	make_row(4, "Minimal angle", QString::number(params.consecutive_diagonal_minimal_angle),
-		"Angle threshold, above which angles between diagonal edges will generate MeshlinePolicies (in degree).");
+	make_row(4, "Diagonal minimal angle", QString::number(params.consecutive_diagonal_minimal_angle),
+		"Angle threshold (in degree), above which angles between diagonal edges will generate MeshlinePolicies.");
 	make_row(5, "Diagonal minimal resolution", QString::number(params.diagonal_dmax),
 		"Minimal resolution in diagonal zones (in Cells Per Wavelength).<br/>"
 		"Accuracy-wise, 60 is sufficient");
-	make_row(6, "Diagonal lmin", QString::number(params.diagonal_lmin),
-		"Minimum line number per Interval half, at extremities of diagonal zones.");
 }
 
 //******************************************************************************
@@ -59,7 +57,6 @@ bool EditModelGlobal::commit() {
 		try_to_double(item(0, V)->text(), params.proximity_limit),
 		try_to_double(item(4, V)->text(), params.consecutive_diagonal_minimal_angle),
 		try_to_double(item(5, V)->text(), params.diagonal_dmax),
-		try_to_ulong(item(6, V)->text(), params.diagonal_lmin)
 	};
 
 	if(std::ranges::all_of(does_succeed, is_true)) {

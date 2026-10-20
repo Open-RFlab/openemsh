@@ -27,7 +27,7 @@ struct Params {
 	double wavelength_min_vacuum = 1;
 	double delta_unit = 1;
 
-	std::size_t diagonal_lmin = 2;
+//	std::size_t diagonal_lmin = 2;
 	double diagonal_dmax = 60; // Fed wavelength-relative, stored absolute.
 	double consecutive_diagonal_minimal_angle = 20; // Limite between acute / obtuse angles.
 

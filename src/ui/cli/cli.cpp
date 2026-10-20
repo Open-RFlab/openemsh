@@ -330,10 +330,10 @@ app::OpenEMSH::Params cli(int const argc, char* argv[]) {
 		"Accuracy-wise, 60 is sufficient."
 	)->group("Mesher options");
 
-	app.add_option_function<decltype(domain::Params::diagonal_lmin)>("--diag-lmin",
-		make_overrider<&domain::Params::diagonal_lmin>(domain_overrides),
-		"Minimum line number per Interval half, at extremities of diagonal zones."
-	)->group("Mesher options");
+//	app.add_option_function<decltype(domain::Params::diagonal_lmin)>("--diag-lmin",
+//		make_overrider<&domain::Params::diagonal_lmin>(domain_overrides),
+//		"Minimum line number per Interval half, at extremities of diagonal zones."
+//	)->group("Mesher options");
 
 	app.add_option_function<decltype(domain::Params::consecutive_diagonal_minimal_angle)>("--diag-minimal-angle",
 		make_overrider<&domain::Params::consecutive_diagonal_minimal_angle>(domain_overrides),
