@@ -32,11 +32,14 @@ Verbose mode.
 \fB-G\fR
 GUI mode (no arguments equals to \fB-G\fR)
 .TP
-\fB-i\fR \fIFILENAME\fR
-Input CSX XML file. (is also a positional argument)
+\fB-i\fR, \fB--input\fR \fIFILENAME\fR
+Input CSX XML file.
+(is also a positional argument)
 .TP
-\fB-o\fR \fIFILENAME\fR
-Output CSX XML file. If different from input, will copy and extend it.
+\fB-o\fR, \fB--output\fR \fIFILENAME\fR
+Output CSX XML file.
+If different from \fIinput\fR, will copy and extend it.
+Defaults to \fIinput\fR, if provided.
 .TP
 \fB-f\fR, \fB--force\fR
 Allow overwriting a file.
@@ -65,6 +68,14 @@ Don't process ZX plane.
 .TP
     \fB--no-xy\fR
 Don't process XY plane.
+.TP
+    \fB--read-oemsh-params\fR \fIBOOL\fR
+Read OpenEMSH parameters from file, if any.
+Default is \fBtrue\fR.
+.TP
+    \fB--integrate-old-mesh\fR \fIBOOL\fR
+Keep current meshlines and integrate those in the final mesh.
+Default is \fBfalse\fR.
 .SS Output options
 .TP
     \fB--no-x\fR
@@ -76,27 +87,144 @@ Don't include Y axis meshlines in output.
     \fB--no-z\fR
 Don't include Z axis meshlines in output.
 .TP
+    \fB--save-oemsh-params\fR
+Include OpenEMSH parameters used for this mesh.
+.TP
     \fB--meshlines\fR \fIBOOL\fR
-Include regular meshlines in output. Default is \fBtrue\fR.
+Include regular meshlines in output.
+Default is \fBtrue\fR.
 .TP
     \fB--policy-lines\fR \fIBOOL\fR
-Include meshline policies in output. Default is \fBfalse\fR.
+Include meshline policies in output.
+Default is \fBfalse\fR.
 .SS Mesher options
 .TP
-    \fB--proximity-limit\fR \fIFLOAT\fR
-Distance under which two adjacent lines trigger a conflict.
+    \fB--add-fixed-meshline\fR [\fBx\fR|\fBy\fR|\fBz\fR] \fIFLOAT\fR ...
+Add MeshlinePolicy at fixed position.
 .TP
-    \fB--dmax\fR \fIFLOAT\fR
-Maximum distance between two adjacent lines.
+    \fB--feat-res-max\fR \fIFLOAT\fR
+Two MeshlinePolicies closer than allowed by this resolution will be merged (in Cells Per Wavelength).
+Note: It won't directly limit the smaller cell size in the meshing algorithm.
+Default is \fB200\fR.
 .TP
-    \fB--lmin\fR \fIUINT\fR
+    \fB--diag-res-min\fR \fIFLOAT\fR
+Minimal resolution in diagonal zones (in Cells Per Wavelength).
+Accuracy-wise, \fB60\fR is sufficient.
+Default is \fB60\fR.
+.TP
+    \fB--diag-angle-min\fR \fIFLOAT\fR
+Angle threshold (in degree), above which angles between diagonal edges will generate MeshlinePolicies.
+Default is \fB20\fR.
+.SS Mesher options (per Material type)
+.TP
+\fIAXIS\fR can be: [\fB*\fR|\fBx\fR|\fBy\fR|\fBz\fR]
+.TP
+\fIMATERIAL\fR can be: [\fB*\fR|\fBair\fR|\fBdielectric\fR|\fBconductor\fR|\fBport\fR]
+.TP
+    \fB--per-mat-type-lmin\fR \fIAXIS\fR \fIMATERIAL\fR \fIUINT\fR ...
+Minimum line number per interval half.
+Default is {\fB*\fR,\fB*\fR,\fB2\fR}.
+.TP
+    \fB--per-mat-type-res-min\fR \fIAXIS\fR \fIMATERIAL\fR \fIFLOAT\fR ...
+Minimal resolution (in Cells Per Wavelength).
+Accuracy-wise, \fB10\fR is strict minimum, \fB20\fR is sufficient.
+Default is {\fB*\fR,\fB*\fR,\fB10\fR}.
+.TP
+    \fB--per-mat-type-smoothness\fR \fIAXIS\fR \fIMATERIAL\fR \fIFLOAT\fR ...
+Smoothness factor.
+Bounded to ]\fB1\fR;\fB2\fR].
+Default is {\fB*\fR,\fB*\fR,\fB2\fR}.
+.SS Mesher options (per Material)
+.TP
+\fIAXIS\fR can be: [\fB*\fR|\fBx\fR|\fBy\fR|\fBz\fR]
+.TP
+    \fB--per-mat-lmin\fR \fIAXIS\fR \fISTRING\fR \fIUINT\fR ...
 Minimum line number per interval half.
 .TP
-    \fB--smoothness\fR \fIFLOAT\fR
-Smoothness factor. Bounded to ]\fB1\fR;\fB2\fR]. Default is \fB2\fR.
+    \fB--per-mat-res-min\fR \fIAXIS\fR \fISTRING\fR \fIFLOAT\fR ...
+Minimal resolution (in Cells Per Wavelength).
+Accuracy-wise, \fB10\fR is strict minimum, \fB20\fR is sufficient.
+.TP
+    \fB--per-mat-smoothness\fR \fIAXIS\fR \fISTRING\fR \fIFLOAT\fR ...
+Smoothness factor.
+Bounded to ]\fB1\fR;\fB2\fR].
 
 .SH NOTES
-Currently, diagonals and circular shapes are not supported.
+.SS CSXCAD features support
+.TP
+\fBCoordinate systems\fR
+.PD 0
+.RS
+.TP
+	☑ \fBOrthogonal\fR
+.TP
+	☐ \fBRadial\fR
+.RE
+.PD
+.TP
+\fBPrimitives\fR
+.PD 0
+.RS
+.TP
+	☑ \fBPoint\fR
+.TP
+	☑ \fBBox\fR
+.TP
+	☑ \fBMultiBox\fR
+.TP
+	☑ \fBPolygon\fR
+.TP
+	☑ \fBLinPoly\fR
+.TP
+	☑ \fBSphere\fR
+.TP
+	☑ \fBCylinder\fR (partial)
+.TP
+	☑ \fBCurve\fR
+.TP
+	☐ \fBWire\fR
+.TP
+	☐ \fBPolyhedron\fR
+.TP
+	☐ \fBPolyhedronReader\fR
+.TP
+	☐ \fBRotPoly\fR
+.TP
+	☐ \fBSphericalShell\fR
+.TP
+	☐ \fBCylindricalShell\fR
+.TP
+	☐ \fBTransformations\fR
+.RE
+.PD
+.TP
+\fBProperties\fR
+.PD 0
+.RS
+.TP
+	☑ \fBMaterial\fR
+.TP
+	☑ \fBDebyeMaterial\fR
+.TP
+	☑ \fBLorentzMaterial\fR
+.TP
+	☑ \fBMetal\fR
+.TP
+	☑ \fBConductingSheet\fR
+.TP
+	☑ \fBLumpedElement\fR
+.TP
+	☑ \fBExcitation\fR
+.TP
+	☑ \fBProbeBox\fR
+.TP
+	☐ \fBDumpBox\fR
+.TP
+	☐ \fBDiscMaterial\fR
+.TP
+	☐ \fBResBox\fR
+.RE
+.PD
 
 .SH SEE ALSO
 @OEMSH_OEMS_MESHING@
