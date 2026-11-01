@@ -33,6 +33,7 @@ stdenv.mkDerivation {
       "icon"
       "pack"
       "test"
+      "tool"
       "CMakeLists.txt"
       "CMakePresets.json"
       "CHANGELOG"

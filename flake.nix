@@ -99,11 +99,11 @@
       '';
       patchPhase = ''
         mv ${package.name}/pack/debian ${package.name}/debian
-        # Add APT stuff and reformat timestamps
-        # https://manpages.debian.org/testing/dpkg-dev/deb-changelog.5.en.html
-        sed < ${package.name}/CHANGELOG -E \
-          -e 's/^(\S+ \(\S+\))$/\1 ${toString distributions}; ${lib.strings.concatStringsSep "," metadata}/g' \
-          -e 's/^( -- .+ <\S+@\S+>  )([0-9]{1,2} [a-zA-Z]{3} [0-9]{4})$/echo "\1$(date -R --date "\2")"/e' \
+        patchShebangs ${package.name}/tool/changelog_2_debian.sh
+        ${package.name}/tool/changelog_2_debian.sh \
+          ${package.name}/CHANGELOG \
+          "${toString distributions}" \
+          "${lib.strings.concatStringsSep "," metadata}" \
         > ${package.name}/debian/changelog
         cat ${package.name}/debian/changelog
       '';
